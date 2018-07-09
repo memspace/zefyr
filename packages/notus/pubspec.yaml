@@ -1,0 +1,17 @@
+name: notus
+description: Rich text document model for Zefyr editor.
+version: 0.1.0
+author: Memspace <hello@memspace.app>
+homepage: https://github.com/memspace/notus
+
+environment:
+  sdk: '>=2.0.0-dev.64.0 <2.0.0'
+
+dependencies:
+  collection: ^1.14.6
+  quill_delta: ^1.0.0-dev
+  quiver_hashcode: ^1.0.0
+
+dev_dependencies:
+  test: ^1.0.0
+  test_coverage: ^0.2.0

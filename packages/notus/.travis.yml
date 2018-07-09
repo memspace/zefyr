@@ -1,0 +1,15 @@
+language: dart
+
+dart:
+- dev
+
+before_script:
+- pub global activate coverage
+- pub global activate test_coverage
+
+script:
+- pub run test -r expanded
+- dartfmt -n --set-exit-if-changed lib/
+- dartanalyzer --fatal-infos --fatal-warnings .
+- pub global run test_coverage
+- bash <(curl -s https://codecov.io/bash)
