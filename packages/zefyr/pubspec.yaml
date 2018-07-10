@@ -1,0 +1,19 @@
+name: zefyr
+description: Flutter widgets for editing rich text.
+version: 0.1.0
+author: anatoly.pulyaevskiy@gmail.com
+homepage: https://github.com/pulyaevskiy/zefyr
+
+dependencies:
+  flutter:
+    sdk: flutter
+  collection: ^1.14.6
+  notus:
+    path: ../notus
+  url_launcher: ^3.0.0
+  quill_delta: ^1.0.0-dev.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  test: ^0.12.41
