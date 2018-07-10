@@ -1,5 +1,11 @@
 ## Quick Start
 
+Zefyr project is split in two main packages:
+
+1. `zefyr` - Flutter package which provides the UI part
+2. `notus` - platform-agnostic package which provides document model
+   used by `zefyr` package.
+
 ### Installation
 
 Add `zefyr` package as a dependency to your `pubspec.yaml`:
@@ -9,16 +15,17 @@ dependencies:
   zefyr: ^0.1.0
 ```
 
-And run `flutter packages get` to install.
+And run `flutter packages get` to install. This installs both `zefyr`
+and `notus` packages.
 
 ### Usage
 
 There are 3 main objects you would normally interact with in your code:
 
-* `ZefyrDocument`, represents a rich text document and provides
+* `NotusDocument`, represents a rich text document and provides
   high-level methods for manipulating the document's state, like
   inserting, deleting and formatting of text.
-  Read [documentation][data_and_docs] for more details on Zefyr's
+  Read [documentation][data_and_docs] for more details on Notus
   document model and data format.
 * `ZefyrEditor`, a Flutter widget responsible for rendering of rich text
   on the screen and reacting to user actions.
@@ -46,7 +53,7 @@ class MyWidgetState extends State<MyWidget> {
     super.initState();
     // Create an empty document or load existing if you have one.
     // Here we create an empty document:
-    final document = new ZefyrDocument();
+    final document = new NotusDocument();
     _controller = new ZefyrController(document);
     _focusNode = new FocusNode();
   }
