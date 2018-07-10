@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:quill_delta/quill_delta.dart';
+import 'package:notus/notus.dart';
 
 /// A heuristic rule for delete operations.
 abstract class DeleteRule {
@@ -69,5 +70,55 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
   Map<String, dynamic> _unsetAttributes(Map<String, dynamic> attributes) {
     if (attributes == null) return null;
     return attributes.map((key, value) => new MapEntry(key, null));
+  }
+}
+
+/// Prevents user from merging line containing an embed with other lines.
+class EnsureEmbedLineRule extends DeleteRule {
+  const EnsureEmbedLineRule();
+
+  @override
+  Delta apply(Delta document, int index, int length) {
+    DeltaIterator iter = new DeltaIterator(document);
+    // First, check if line-break deleted after an embed.
+    Operation op = iter.skip(index);
+    int indexDelta = 0;
+    int lengthDelta = 0;
+    int remaining = length;
+    bool foundEmbed = false;
+    if (op != null && op.data.endsWith(kZeroWidthSpace)) {
+      foundEmbed = true;
+      Operation candidate = iter.next(1);
+      remaining--;
+      if (candidate.data == '\n') {
+        indexDelta += 1;
+        lengthDelta -= 1;
+
+        /// Check if it's an empty line
+        candidate = iter.next(1);
+        remaining--;
+        if (candidate.data == '\n') {
+          // Allow deleting empty line after an embed.
+          lengthDelta += 1;
+        }
+      }
+    }
+
+    // Second, check if line-break deleted before an embed.
+    op = iter.skip(remaining);
+    if (op != null && op.data.endsWith('\n')) {
+      final candidate = iter.next(1);
+      if (candidate.data == kZeroWidthSpace) {
+        foundEmbed = true;
+        lengthDelta -= 1;
+      }
+    }
+    if (foundEmbed) {
+      return new Delta()
+        ..retain(index + indexDelta)
+        ..delete(length + lengthDelta);
+    }
+
+    return null; // fallback
   }
 }

@@ -10,13 +10,25 @@ import 'block.dart';
 import 'leaf.dart';
 import 'node.dart';
 
-/// A line of text in a Notus document.
+/// A line of rich text in a Notus document.
 ///
 /// LineNode serves as a container for [LeafNode]s, like [TextNode] and
-/// [ImageNode].
+/// [EmbedNode].
+///
+/// When a line contains an embed, it fully occupies the line, no other embeds
+/// or text nodes are allowed.
 class LineNode extends ContainerNode<LeafNode>
     with StyledNodeMixin
     implements StyledNode {
+  /// Returns `true` if this line contains an embed.
+  bool get hasEmbed {
+    if (childCount == 1) {
+      return children.single is EmbedNode;
+    }
+    assert(children.every((child) => child is TextNode));
+    return false;
+  }
+
   /// Returns next [LineNode] or `null` if this is the last line in the document.
   LineNode get nextLine {
     if (isLast) {
@@ -112,7 +124,7 @@ class LineNode extends ContainerNode<LeafNode>
     }
 
     final data = lookup(offset, inclusive: true);
-    TextNode node = data.node;
+    LeafNode node = data.node;
     if (node != null) {
       result = result.mergeAll(node.style);
       int pos = node.length - data.offset;

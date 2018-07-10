@@ -26,6 +26,13 @@ void main() {
       expect(node.toDelta().toList(), [new Operation.insert('\n')]);
     });
 
+    test('hasEmbed', () {
+      LineNode node = new LineNode();
+      expect(node.hasEmbed, isFalse);
+      node.add(new EmbedNode());
+      expect(node.hasEmbed, isTrue);
+    });
+
     test('nextLine', () {
       root.insert(
           0, 'Hello world\nThis is my first multiline\nItem\ndocument.', null);
@@ -50,7 +57,7 @@ void main() {
       expect('$node', '¶ ⟨London "Grammar"⟩b → ⟨ - Hey Now⟩ ⏎ {heading: 1}');
     });
 
-    test('splitAt with multiple text segments', (){
+    test('splitAt with multiple text segments', () {
       root.insert(0, 'This house is a circus', null);
       root.retain(0, 4, boldStyle);
       root.retain(16, 6, boldStyle);
@@ -92,7 +99,7 @@ void main() {
       expect(node.toDelta(), new Delta()..insert('Hello world!!!\n'));
     });
 
-    test('insert text with a line-break at the end of line', () {
+    test('insert text with line-break at the end of line', () {
       root.insert(0, 'Hello world', null);
       root.insert(11, '!!!\n', null);
       expect(root.childCount, 2);
@@ -259,6 +266,18 @@ void main() {
       LineNode line = result.node;
       var attrs = line.collectStyle(result.offset, 5);
       expect(attrs, h2Style);
+    });
+
+    test('collectStyle with embed nodes', () {
+      root.insert(0, 'Hello world\n\nMore text.\n', null);
+      NotusStyle style = new NotusStyle();
+      style = style.put(NotusAttribute.embed.horizontalRule);
+      root.insert(12, EmbedNode.kPlainTextPlaceholder, style);
+
+      var lookup = root.lookup(0);
+      LineNode line = lookup.node;
+      var result = line.collectStyle(lookup.offset, 15);
+      expect(result, isEmpty);
     });
   });
 }

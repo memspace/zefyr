@@ -113,7 +113,7 @@ void main() {
   group('$AutoExitBlockRule', () {
     final rule = new AutoExitBlockRule();
 
-    test('applies for new line-break on empty line in a block', () {
+    test('applies when line-break is inserted on empty line in a block', () {
       final ul = NotusAttribute.ul.toJson();
       final doc = new Delta()
         ..insert('Item 1')

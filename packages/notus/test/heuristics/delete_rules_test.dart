@@ -54,4 +54,61 @@ void main() {
       expect(actual, expected);
     });
   });
+
+  group('$EnsureEmbedLineRule', () {
+    final rule = new EnsureEmbedLineRule();
+
+    test('ensures line-break before embed', () {
+      final hr = NotusAttribute.embed.horizontalRule;
+      final doc = new Delta()
+        ..insert('Document\n')
+        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert('\n');
+      final actual = rule.apply(doc, 8, 1);
+      final expected = new Delta()..retain(8);
+      expect(actual, expected);
+    });
+
+    test('ensures line-break after embed', () {
+      final hr = NotusAttribute.embed.horizontalRule;
+      final doc = new Delta()
+        ..insert('Document\n')
+        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert('\n');
+      final actual = rule.apply(doc, 10, 1);
+      final expected = new Delta()..retain(11);
+      expect(actual, expected);
+    });
+
+    test('still deletes everything between embeds', () {
+      final hr = NotusAttribute.embed.horizontalRule;
+      final doc = new Delta()
+        ..insert('Document\n')
+        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert('\nSome text\n')
+        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert('\n');
+      final actual = rule.apply(doc, 10, 11);
+      final expected = new Delta()
+        ..retain(11)
+        ..delete(9);
+      expect(actual, expected);
+    });
+
+    test('allows deleting empty line after embed', () {
+      final hr = NotusAttribute.embed.horizontalRule;
+      final doc = new Delta()
+        ..insert('Document\n')
+        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert('\n')
+        ..insert('\n', NotusAttribute.block.bulletList.toJson())
+        ..insert('Text')
+        ..insert('\n');
+      final actual = rule.apply(doc, 10, 1);
+      final expected = new Delta()
+        ..retain(11)
+        ..delete(1);
+      expect(actual, expected);
+    });
+  });
 }

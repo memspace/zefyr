@@ -13,6 +13,16 @@ NotusDocument dartconfDoc() {
   return new NotusDocument.fromDelta(delta);
 }
 
+NotusDocument dartconfEmbedDoc() {
+  final hr = NotusAttribute.embed.horizontalRule.toJson();
+  Delta delta = new Delta()
+    ..insert('DartConf\n')
+    ..insert(kZeroWidthSpace, hr)
+    ..insert('\n')
+    ..insert('Los Angeles\n');
+  return new NotusDocument.fromDelta(delta);
+}
+
 final ul = NotusAttribute.ul.toJson();
 final h1 = NotusAttribute.h1.toJson();
 
@@ -56,7 +66,7 @@ void main() {
       expect(doc.toPlainText(), 'DartConf\nLos Angeles\n');
     });
 
-    test('document delta must end with line-break', () {
+    test('document delta must end with line-break character', () {
       Delta delta = new Delta()..insert('DartConf\nLos Angeles');
       expect(() {
         new NotusDocument.fromDelta(delta);
@@ -195,6 +205,14 @@ void main() {
       expect(line.style.get(NotusAttribute.heading), NotusAttribute.h1);
     });
 
+    test('delete which results in an empty change', () {
+      // This test relies on a delete rule which ensures line-breaks around
+      // and embed.
+      NotusDocument doc = dartconfEmbedDoc();
+      doc.delete(8, 1);
+      expect(doc.toPlainText(), 'DartConf\n${kZeroWidthSpace}\nLos Angeles\n');
+    });
+
     test('checks for closed state', () {
       final doc = dartconfDoc();
       expect(doc.isClosed, isFalse);
@@ -220,7 +238,7 @@ void main() {
       expect(style, isNotNull);
     });
 
-    test('insert embed after newline', () {
+    test('insert embed after line-break', () {
       final doc = dartconfDoc();
       doc.insert(9, const HorizontalRuleEmbed());
       expect(doc.root.children, hasLength(3));
@@ -233,7 +251,7 @@ void main() {
       expect(embed.style, style);
     });
 
-    test('insert embed before newline', () {
+    test('insert embed before line-break', () {
       final doc = dartconfDoc();
       doc.insert(8, const HorizontalRuleEmbed());
       expect(doc.root.children, hasLength(3));
