@@ -2,4 +2,4 @@
 
 set -e
 
-$TRAVIS_BUILD_DIR/flutter/bin/flutter test
+$TRAVIS_BUILD_DIR/flutter/bin/flutter test --coverage
