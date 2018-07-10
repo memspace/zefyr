@@ -101,9 +101,11 @@ class ZefyrController extends ChangeNotifier {
   void replaceText(int index, int length, String text,
       {TextSelection selection}) {
     Delta delta;
+
     if (length > 0 || text.isNotEmpty) {
       delta = document.replace(index, length, text);
     }
+
     if (selection != null) {
       if (delta == null) {
         _updateSelectionSilent(selection, source: ChangeSource.local);
