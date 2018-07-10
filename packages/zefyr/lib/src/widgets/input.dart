@@ -103,14 +103,27 @@ class InputConnectionController implements TextInputClient {
       _sentRemoteValues.remove(value);
       return;
     }
-
-    final effectiveLastKnownValue = _lastKnownRemoteTextEditingValue;
-    _lastKnownRemoteTextEditingValue = value;
-    final oldText = effectiveLastKnownValue.text;
-    final text = value.text;
-    final cursorPosition = value.selection.extentOffset;
-    final diff = fastDiff(oldText, text, cursorPosition);
-    onValueChanged(diff.start, diff.deleted, diff.inserted, value.selection);
+    // Note Flutter (unintentionally?) silences errors occurred during
+    // text input update, so we have to report it ourselves.
+    // For more details see https://github.com/flutter/flutter/issues/19191
+    // TODO: remove try-catch when/if Flutter stops silencing these errors.
+    try {
+      final effectiveLastKnownValue = _lastKnownRemoteTextEditingValue;
+      _lastKnownRemoteTextEditingValue = value;
+      final oldText = effectiveLastKnownValue.text;
+      final text = value.text;
+      final cursorPosition = value.selection.extentOffset;
+      final diff = fastDiff(oldText, text, cursorPosition);
+      onValueChanged(diff.start, diff.deleted, diff.inserted, value.selection);
+    } catch (e, trace) {
+      FlutterError.reportError(new FlutterErrorDetails(
+        exception: e,
+        stack: trace,
+        library: 'Zefyr',
+        context: 'while updating editing value',
+      ));
+      rethrow;
+    }
   }
 
   //

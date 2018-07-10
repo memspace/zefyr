@@ -130,10 +130,10 @@ class NotusDocument {
     assert(index >= 0 && length > 0);
     // TODO: need a heuristic rule to ensure last line-break.
     final change = _heuristics.applyDeleteRules(this, index, length);
-    // Delete rules are allowed to prevent the edit.
-//    if (change.isNotEmpty) {
+    // Delete rules are allowed to prevent the edit so it may be empty.
+    if (change.isNotEmpty) {
       compose(change, ChangeSource.local);
-//    }
+    }
     return change;
   }
 
