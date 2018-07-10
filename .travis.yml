@@ -29,10 +29,11 @@ matrix:
     - env: FLUTTER_VERSION=dev
 
 before_script:
+  - pwd
   - git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION
   - ./flutter/bin/flutter doctor
-  - export PATH="$PATH:./flutter/bin"
 
 script:
+- pwd
 - ./tool/travis.sh notus
 - ./tool/travis.sh zefyr

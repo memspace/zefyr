@@ -2,4 +2,4 @@
 
 set -e
 
-flutter test
+$TRAVIS_BUILD_DIR/flutter test
