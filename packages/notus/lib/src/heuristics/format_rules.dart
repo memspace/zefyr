@@ -144,4 +144,3 @@ class FormatLinkAtCaretPositionRule extends FormatRule {
     return result;
   }
 }
-

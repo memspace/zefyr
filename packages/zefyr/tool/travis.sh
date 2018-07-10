@@ -2,4 +2,4 @@
 
 set -e
 
-~/flutter/bin/flutter test
+flutter test
