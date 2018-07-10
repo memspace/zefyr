@@ -2,6 +2,5 @@
 
 set -e
 
-cd "$1"
+cd "packages/$1"
 ./tool/travis.sh
-
