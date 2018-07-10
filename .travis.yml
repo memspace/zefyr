@@ -1,0 +1,37 @@
+language: dart
+
+dart:
+  - dev
+
+os:
+  - linux
+
+sudo: false
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - libstdc++6
+      - fonts-droid
+
+cache:
+  directories:
+    - $HOME/.pub-cache
+
+env:
+  - FLUTTER_VERSION=beta
+  - FLUTTER_VERSION=dev
+
+matrix:
+  allow_failures:
+    - env: FLUTTER_VERSION=dev
+
+before_script:
+  - git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION
+  - ./flutter/bin/flutter doctor
+
+script:
+- ./tool/travis.sh notus
+- ./tool/travis.sh zefyr
