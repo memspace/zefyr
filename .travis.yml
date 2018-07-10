@@ -21,7 +21,7 @@ cache:
     - $HOME/.pub-cache
 
 env:
-  - FLUTTER_VERSION=beta
+#  - FLUTTER_VERSION=beta
   - FLUTTER_VERSION=dev
 
 matrix:
