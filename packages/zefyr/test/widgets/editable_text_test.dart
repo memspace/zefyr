@@ -1,6 +1,7 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zefyr/zefyr.dart';
 
@@ -11,15 +12,21 @@ void main() {
     testWidgets('user input', (tester) async {
       final editor = new EditorSandBox(tester: tester);
       await editor.tapEditor();
-      await enterText(tester, 'Test');
-      expect(editor.document.toPlainText(), startsWith('Test'));
+      final currentValue = editor.document.toPlainText();
+      await enterText(tester, 'Added $currentValue');
+      expect(editor.document.toPlainText(), 'Added This House Is A Circus\n');
     });
   });
 }
 
 Future<Null> enterText(WidgetTester tester, String text) async {
   return TestAsyncUtils.guard(() async {
-    tester.testTextInput.enterText(text);
+    tester.testTextInput.updateEditingValue(
+      new TextEditingValue(
+        text: text,
+        selection: new TextSelection.collapsed(offset: 6),
+      ),
+    );
     await tester.idle();
   });
 }
