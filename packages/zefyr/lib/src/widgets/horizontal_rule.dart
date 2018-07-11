@@ -56,7 +56,7 @@ class HorizontalRule extends LeafRenderObjectWidget {
 }
 
 class RenderHorizontalRule extends RenderBox implements RenderEditableBox {
-  static const kPaddingBottom = 16.0;
+  static const kPaddingBottom = 24.0;
   static const kWidth = 3.0;
 
   RenderHorizontalRule({

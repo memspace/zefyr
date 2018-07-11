@@ -28,6 +28,7 @@ enum ZefyrToolbarAction {
   numberList,
   code,
   quote,
+  horizontalRule,
   hideKeyboard,
   close,
   confirm,
@@ -44,7 +45,8 @@ final kZefyrToolbarAttributeActions = <ZefyrToolbarAction, NotusAttributeKey>{
   ZefyrToolbarAction.bulletList: NotusAttribute.block.bulletList,
   ZefyrToolbarAction.numberList: NotusAttribute.block.numberList,
   ZefyrToolbarAction.code: NotusAttribute.block.code,
-  ZefyrToolbarAction.quote: NotusAttribute.block.quote
+  ZefyrToolbarAction.quote: NotusAttribute.block.quote,
+  ZefyrToolbarAction.horizontalRule: NotusAttribute.embed.horizontalRule,
 };
 
 /// Allows customizing appearance of [ZefyrToolbar].
@@ -258,6 +260,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
       buildButton(context, ZefyrToolbarAction.numberList),
       buildButton(context, ZefyrToolbarAction.quote),
       buildButton(context, ZefyrToolbarAction.code),
+      buildButton(context, ZefyrToolbarAction.horizontalRule),
     ];
     return buttons;
   }
@@ -344,6 +347,7 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.numberList: Icons.format_list_numbered,
     ZefyrToolbarAction.code: Icons.code,
     ZefyrToolbarAction.quote: Icons.format_quote,
+    ZefyrToolbarAction.horizontalRule: Icons.remove,
     ZefyrToolbarAction.hideKeyboard: Icons.keyboard_hide,
     ZefyrToolbarAction.close: Icons.close,
     ZefyrToolbarAction.confirm: Icons.check,

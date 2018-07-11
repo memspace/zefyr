@@ -11,7 +11,6 @@ export 'src/document/block.dart';
 export 'src/document/leaf.dart';
 export 'src/document/line.dart';
 export 'src/document/node.dart';
-export 'src/embed.dart';
 export 'src/heuristics.dart';
 export 'src/heuristics/delete_rules.dart';
 export 'src/heuristics/format_rules.dart';

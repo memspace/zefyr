@@ -10,7 +10,6 @@ import 'document/block.dart';
 import 'document/leaf.dart';
 import 'document/line.dart';
 import 'document/node.dart';
-import 'embed.dart';
 import 'heuristics.dart';
 
 /// Source of a [NotusChange].
@@ -95,27 +94,18 @@ class NotusDocument {
     _controller.close();
   }
 
-  /// Inserts [value] in this document at specified [index]. Value must be a
-  /// [String] or an instance of [NotusEmbed].
+  /// Inserts [text] in this document at specified [index].
   ///
   /// This method applies heuristic rules before modifying this document and
   /// produces a [NotusChange] with source set to [ChangeSource.local].
   ///
   /// Returns an instance of [Delta] actually composed into this document.
-  Delta insert(int index, dynamic value) {
+  Delta insert(int index, String text) {
     assert(index >= 0);
-    assert(value is String || value is NotusEmbed,
-        'Value must be a string or a NotusEmbed.');
-    Delta change;
-    if (value is String) {
-      assert(value.isNotEmpty);
-      value = _sanitizeString(value);
-      if (value.isEmpty) return new Delta();
-      change = _heuristics.applyInsertRules(this, index, value);
-    } else {
-      NotusEmbed embed = value;
-      change = _heuristics.applyEmbedRules(this, index, embed.attribute);
-    }
+    assert(text.isNotEmpty);
+    text = _sanitizeString(text);
+    if (text.isEmpty) return new Delta();
+    final change = _heuristics.applyInsertRules(this, index, text);
     compose(change, ChangeSource.local);
     return change;
   }
@@ -130,34 +120,27 @@ class NotusDocument {
     assert(index >= 0 && length > 0);
     // TODO: need a heuristic rule to ensure last line-break.
     final change = _heuristics.applyDeleteRules(this, index, length);
-    // Delete rules are allowed to prevent the edit so it may be empty.
     if (change.isNotEmpty) {
+      // Delete rules are allowed to prevent the edit so it may be empty.
       compose(change, ChangeSource.local);
     }
     return change;
   }
 
-  /// Replaces [length] of characters starting at [index] with [value]. Value
-  /// must be a [String] or an instance of [NotusEmbed].
+  /// Replaces [length] of characters starting at [index] [text].
   ///
   /// This method applies heuristic rules before modifying this document and
   /// produces a [NotusChange] with source set to [ChangeSource.local].
   ///
   /// Returns an instance of [Delta] actually composed into this document.
-  Delta replace(int index, int length, dynamic value) {
-    assert(index >= 0 && (value.isNotEmpty || length > 0),
-        'With index $index, length $length and text "$value"');
-    assert(value is String || value is NotusEmbed,
-        'Value must be a string or a NotusEmbed.');
-
-    final hasInsert =
-        (value is NotusEmbed || (value is String && value.isNotEmpty));
+  Delta replace(int index, int length, String text) {
+    assert(index >= 0 && (text.isNotEmpty || length > 0),
+        'With index $index, length $length and text "$text"');
     Delta delta = new Delta();
-
     // We have to compose before applying delete rules
     // Otherwise delete would be operating on stale document snapshot.
-    if (hasInsert) {
-      delta = insert(index, value);
+    if (text.isNotEmpty) {
+      delta = insert(index, text);
       index = delta.transformPosition(index);
     }
 
@@ -168,7 +151,7 @@ class NotusDocument {
     return delta;
   }
 
-  /// Formats portion of this document with specified [attribute].
+  /// Formats segment of this document with specified [attribute].
   ///
   /// Applies heuristic rules before modifying this document and
   /// produces a [NotusChange] with source set to [ChangeSource.local].
@@ -178,13 +161,7 @@ class NotusDocument {
   /// unchanged and no [NotusChange] is published to [changes] stream.
   Delta format(int index, int length, NotusAttribute attribute) {
     assert(index >= 0 && length >= 0 && attribute != null);
-    Delta change;
-    if (attribute is EmbedAttribute) {
-      assert(length == 1);
-      change = _heuristics.applyEmbedRules(this, index, attribute);
-    } else {
-      change = _heuristics.applyFormatRules(this, index, length, attribute);
-    }
+    final change = _heuristics.applyFormatRules(this, index, length, attribute);
     if (change.isNotEmpty) {
       compose(change, ChangeSource.local);
     }

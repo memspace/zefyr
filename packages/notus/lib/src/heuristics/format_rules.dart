@@ -144,3 +144,75 @@ class FormatLinkAtCaretPositionRule extends FormatRule {
     return result;
   }
 }
+
+/// Handles all format operations which manipulate embeds.
+class FormatEmbedsRule extends FormatRule {
+  const FormatEmbedsRule();
+
+  @override
+  Delta apply(Delta document, int index, int length, NotusAttribute attribute) {
+    // We are only interested in embed attributes
+    if (attribute is! EmbedAttribute) return null;
+    EmbedAttribute embed = attribute;
+
+    if (length == 1 && embed.isUnset) {
+      // Remove the embed.
+      return new Delta()
+        ..retain(index)
+        ..delete(length);
+    } else {
+      // If length is 0 we treat it as an insert at specified [index].
+      // If length is non-zero we treat it as a replace of selected range
+      // with the embed.
+      assert(!embed.isUnset);
+      return _insertEmbed(document, index, length, embed);
+    }
+  }
+
+  Delta _insertEmbed(
+      Delta document, int index, int length, EmbedAttribute embed) {
+    Delta result = new Delta()..retain(index);
+    final iter = new DeltaIterator(document);
+    final previous = iter.skip(index);
+    iter.skip(length); // ignore deleted part.
+    final target = iter.next();
+
+    // Check if [index] is on an empty line already.
+    final isNewlineBefore = previous == null || previous.data.endsWith('\n');
+    final isNewlineAfter = target.data.startsWith('\n');
+    final isOnEmptyLine = isNewlineBefore && isNewlineAfter;
+    if (isOnEmptyLine) {
+      return result..insert(EmbedNode.kPlainTextPlaceholder, embed.toJson());
+    }
+    // We are on a non-empty line, split it (preserving style if needed)
+    // and insert our embed.
+    final lineStyle = _getLineStyle(iter, target);
+    if (!isNewlineBefore) {
+      result..insert('\n', lineStyle);
+    }
+    result..insert(EmbedNode.kPlainTextPlaceholder, embed.toJson());
+    if (!isNewlineAfter) {
+      result..insert('\n');
+    }
+    result.delete(length);
+    return result;
+  }
+
+  Map<String, dynamic> _getLineStyle(
+      DeltaIterator iterator, Operation current) {
+    if (current.data.indexOf('\n') >= 0) {
+      return current.attributes;
+    }
+    // Continue looking for line-break.
+    Map<String, dynamic> attributes;
+    while (iterator.hasNext) {
+      final op = iterator.next();
+      int lf = op.data.indexOf('\n');
+      if (lf >= 0) {
+        attributes = op.attributes;
+        break;
+      }
+    }
+    return attributes;
+  }
+}

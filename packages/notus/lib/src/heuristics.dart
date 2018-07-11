@@ -6,7 +6,6 @@ import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 import 'heuristics/delete_rules.dart';
-import 'heuristics/embed_rules.dart';
 import 'heuristics/format_rules.dart';
 import 'heuristics/insert_rules.dart';
 
@@ -16,6 +15,7 @@ class NotusHeuristics {
   /// Default set of heuristic rules.
   static const NotusHeuristics fallback = NotusHeuristics(
     formatRules: [
+      FormatEmbedsRule(),
       FormatLinkAtCaretPositionRule(),
       ResolveLineFormatRule(),
       ResolveInlineFormatRule(),
@@ -36,16 +36,12 @@ class NotusHeuristics {
       PreserveLineStyleOnMergeRule(),
       CatchAllDeleteRule(),
     ],
-    embedRules: [
-      FormatEmbedsRule(),
-    ],
   );
 
   const NotusHeuristics({
     this.formatRules,
     this.insertRules,
     this.deleteRules,
-    this.embedRules,
   });
 
   /// List of format rules in this registry.
@@ -56,9 +52,6 @@ class NotusHeuristics {
 
   /// List of delete rules in this registry.
   final List<DeleteRule> deleteRules;
-
-  /// List of embed rules in this registry.
-  final List<EmbedRule> embedRules;
 
   /// Applies heuristic rules to specified insert operation based on current
   /// state of Notus [document].
@@ -95,18 +88,5 @@ class NotusHeuristics {
     }
     throw new StateError(
         'Failed to apply delete heuristic rules: none applied.');
-  }
-
-  /// Applies heuristic rules to specified embed operation based on current
-  /// state of [document].
-  Delta applyEmbedRules(
-      NotusDocument document, int index, EmbedAttribute embed) {
-    final delta = document.toDelta();
-    for (var rule in embedRules) {
-      final result = rule.apply(delta, index, embed);
-      if (result != null) return result..trim();
-    }
-    throw new StateError(
-        'Failed to apply embed heuristic rules: none applied.');
   }
 }
