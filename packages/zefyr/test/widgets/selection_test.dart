@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:zefyr/src/widgets/editable_paragraph.dart';
+import 'package:zefyr/src/widgets/editable_rich_text.dart';
 import 'package:zefyr/zefyr.dart';
 
 import '../testing.dart';
@@ -15,7 +15,7 @@ void main() {
       await editor.tapEditor();
 
       RenderEditableParagraph renderObject =
-          tester.firstRenderObject(find.byType(EditableParagraph));
+          tester.firstRenderObject(find.byType(EditableRichText));
       var offset = renderObject.localToGlobal(Offset.zero);
       offset += Offset(5.0, 5.0);
       await tester.tapAt(offset);

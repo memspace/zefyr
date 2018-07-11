@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quill_delta/quill_delta.dart';
-import 'package:zefyr/src/widgets/editable_paragraph.dart';
+import 'package:zefyr/src/widgets/editable_rich_text.dart';
 import 'package:zefyr/zefyr.dart';
 
 import '../testing.dart';
@@ -23,7 +23,7 @@ void main() {
       var editor =
           new EditorSandBox(tester: tester, document: doc, theme: theme);
       await editor.tapEditor();
-      EditableParagraph p = tester.widget(find.byType(EditableParagraph).first);
+      EditableRichText p = tester.widget(find.byType(EditableRichText).first);
       expect(p.text.children.first.style.color, Colors.red);
     });
 

@@ -5,12 +5,13 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
-import 'editable_paragraph.dart';
+import 'editable_box.dart';
+import 'editable_rich_text.dart';
 import 'editable_text.dart';
 import 'horizontal_rule.dart';
 import 'theme.dart';
 
-/// Raw widget representing a single line of Notus document in Zefyr editor.
+/// Raw widget representing a single line of rich text document in Zefyr editor.
 ///
 /// See [ZefyrParagraph] and [ZefyrHeading] which wrap this widget and
 /// integrate it with current [ZefyrTheme].
@@ -50,9 +51,14 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
       content = buildEmbed(context);
     } else {
       assert(widget.style != null);
-      content = new EditableParagraph(
+
+      final text = new EditableRichText(
         node: widget.node,
         text: buildText(context),
+      );
+      content = new EditableBox(
+        child: text,
+        node: widget.node,
         layerLink: _link,
         renderContext: editable.renderContext,
         showCursor: editable.showCursor,
@@ -137,7 +143,9 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     EmbedAttribute embed = node.style.get(NotusAttribute.embed);
 
     if (embed.type == EmbedType.horizontalRule) {
-      return new HorizontalRule(
+      final hr = new HorizontalRule(node: node);
+      return new EditableBox(
+        child: hr,
         node: widget.node,
         layerLink: _link,
         renderContext: editable.renderContext,

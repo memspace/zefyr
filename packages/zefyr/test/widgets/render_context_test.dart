@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:zefyr/src/widgets/editable_paragraph.dart';
+import 'package:zefyr/src/widgets/editable_box.dart';
 import 'package:zefyr/src/widgets/render_context.dart';
 import 'package:zefyr/zefyr.dart';
 
@@ -68,22 +68,20 @@ void main() {
   });
 }
 
-RenderEditableParagraph createParagraph(ZefyrRenderContext viewport) {
+RenderEditableProxyBox createParagraph(ZefyrRenderContext viewport) {
   final doc = new NotusDocument();
   doc.insert(0, 'This House Is A Circus');
-  final text = new TextSpan(text: 'This House Is A Circus');
+  final LineNode node = doc.root.children.first;
   final link = new LayerLink();
   final showCursor = new ValueNotifier<bool>(true);
   final selection = new TextSelection.collapsed(offset: 0);
   final selectionColor = Colors.blue;
-  return new RenderEditableParagraph(
-    text,
-    node: doc.root.children.first,
+  return new RenderEditableProxyBox(
+    node: node,
     layerLink: link,
     renderContext: viewport,
     showCursor: showCursor,
     selection: selection,
     selectionColor: selectionColor,
-    textDirection: TextDirection.ltr,
   );
 }
