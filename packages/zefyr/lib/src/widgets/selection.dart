@@ -218,7 +218,10 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
     final localPoint = box.globalToLocal(globalPoint);
     final position = box.getPositionForOffset(localPoint);
-    final selection = new TextSelection.collapsed(offset: position.offset);
+    final selection = new TextSelection.collapsed(
+      offset: position.offset,
+      affinity: position.affinity,
+    );
     if (_didCaretTap && _selection == selection) {
       _didCaretTap = false;
       hideToolbar();

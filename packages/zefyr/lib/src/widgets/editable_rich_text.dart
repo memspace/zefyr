@@ -102,7 +102,7 @@ class RenderEditableParagraph extends RenderParagraph
   @override
   TextRange getWordBoundary(TextPosition position) {
     final localPosition = new TextPosition(
-      offset: position.offset - _node.offset,
+      offset: position.offset - _node.documentOffset,
       affinity: position.affinity,
     );
     final localRange = super.getWordBoundary(localPosition);
