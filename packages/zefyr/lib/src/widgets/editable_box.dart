@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
+import 'caret.dart';
 import 'render_context.dart';
 
 class EditableBox extends SingleChildRenderObjectWidget {
@@ -29,7 +30,7 @@ class EditableBox extends SingleChildRenderObjectWidget {
   final Color selectionColor;
 
   @override
-  RenderObject createRenderObject(BuildContext context) {
+  RenderEditableProxyBox createRenderObject(BuildContext context) {
     return new RenderEditableProxyBox(
       node: node,
       layerLink: layerLink,
@@ -38,6 +39,18 @@ class EditableBox extends SingleChildRenderObjectWidget {
       selection: selection,
       selectionColor: selectionColor,
     );
+  }
+
+  @override
+  void updateRenderObject(
+      BuildContext context, RenderEditableProxyBox renderObject) {
+    renderObject
+      ..node = node
+      ..layerLink = layerLink
+      ..renderContext = renderContext
+      ..showCursor = showCursor
+      ..selection = selection
+      ..selectionColor = selectionColor;
   }
 }
 
@@ -114,8 +127,6 @@ class RenderEditableProxyBox extends RenderBox
     markNeedsPaint();
   }
 
-  double get preferredLineHeight => child.preferredLineHeight;
-
   /// Returns `true` if current selection is collapsed, located within
   /// this paragraph and is visible according to tick timer.
   bool get isCaretVisible {
@@ -153,12 +164,11 @@ class RenderEditableProxyBox extends RenderBox
     super.detach();
   }
 
-  /// Subclasses must call super as the last statement when overriding this
-  /// method.
   @override
   @mustCallSuper
   void performLayout() {
     super.performLayout();
+    _caretPainter.layout(preferredLineHeight);
     // Indicate to render context that this object can be used by other
     // layers (selection overlay, for instance).
     _renderContext.markDirty(this, false);
@@ -169,6 +179,30 @@ class RenderEditableProxyBox extends RenderBox
     // Temporarily remove this object from the render context.
     _renderContext.markDirty(this, true);
     super.markNeedsLayout();
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (selectionOrder == SelectionOrder.background && isSelectionVisible) {
+      paintSelection(context, offset, selection, selectionColor);
+    }
+    super.paint(context, offset);
+    if (selectionOrder == SelectionOrder.foreground && isSelectionVisible) {
+      paintSelection(context, offset, selection, selectionColor);
+    }
+    if (isCaretVisible) {
+      _paintCaret(context, offset);
+    }
+  }
+
+  final CaretPainter _caretPainter = new CaretPainter();
+
+  void _paintCaret(PaintingContext context, Offset offset) {
+    final TextPosition caret = new TextPosition(
+      offset: _selection.extentOffset - node.documentOffset,
+    );
+    Offset caretOffset = getOffsetForCaret(caret, _caretPainter.prototype);
+    _caretPainter.paint(context.canvas, caretOffset + offset);
   }
 
   @override
@@ -183,6 +217,25 @@ class RenderEditableProxyBox extends RenderBox
     return false;
   }
 
+  //
+  // Proxy methods
+  //
+
+  @override
+  double get preferredLineHeight => child.preferredLineHeight;
+
+  @override
+  SelectionOrder get selectionOrder => child.selectionOrder;
+
+  @override
+  void paintSelection(PaintingContext context, Offset offset,
+          TextSelection selection, Color selectionColor) =>
+      child.paintSelection(context, offset, selection, selectionColor);
+
+  @override
+  Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) =>
+      child.getOffsetForCaret(position, caretPrototype);
+
   @override
   TextSelection getLocalSelection(TextSelection documentSelection) =>
       child.getLocalSelection(documentSelection);
@@ -191,9 +244,8 @@ class RenderEditableProxyBox extends RenderBox
       child.intersectsWithSelection(selection);
 
   @override
-  List<ui.TextBox> getEndpointsForSelection(TextSelection selection,
-          {bool isLocal: false}) =>
-      child.getEndpointsForSelection(selection, isLocal: isLocal);
+  List<ui.TextBox> getEndpointsForSelection(TextSelection selection) =>
+      child.getEndpointsForSelection(selection);
 
   @override
   ui.TextPosition getPositionForOffset(ui.Offset offset) =>
@@ -204,13 +256,20 @@ class RenderEditableProxyBox extends RenderBox
       child.getWordBoundary(position);
 }
 
+enum SelectionOrder {
+  /// Background selection is painted before primary content of editable box.
+  background,
+
+  /// Foreground selection is painted after primary content of editable box.
+  foreground,
+}
+
 abstract class RenderEditableBox extends RenderBox {
   Node get node;
   double get preferredLineHeight;
 
   TextPosition getPositionForOffset(Offset offset);
-  List<ui.TextBox> getEndpointsForSelection(TextSelection selection,
-      {bool isLocal: false});
+  List<ui.TextBox> getEndpointsForSelection(TextSelection selection);
 
   /// Returns the text range of the word at the given offset. Characters not
   /// part of a word, such as spaces, symbols, and punctuation, have word breaks
@@ -222,6 +281,14 @@ abstract class RenderEditableBox extends RenderBox {
   ///
   /// Valid only after [layout].
   TextRange getWordBoundary(TextPosition position);
+
+  /// Paint order of selection in this editable box.
+  SelectionOrder get selectionOrder;
+
+  void paintSelection(PaintingContext context, Offset offset,
+      TextSelection selection, Color selectionColor);
+
+  Offset getOffsetForCaret(TextPosition position, Rect caretPrototype);
 
   /// Returns part of [documentSelection] local to this box. May return
   /// `null`.

@@ -9,13 +9,17 @@ class CaretPainter {
   static const double _kCaretHeightOffset = 2.0; // pixels
   static const double _kCaretWidth = 1.0; // pixels
 
+  static Rect buildPrototype(double lineHeight) {
+    return new Rect.fromLTWH(
+        0.0, 0.0, _kCaretWidth, lineHeight - _kCaretHeightOffset);
+  }
+
   Rect _prototype;
 
   Rect get prototype => _prototype;
 
   void layout(double lineHeight) {
-    _prototype = new Rect.fromLTWH(
-        0.0, 0.0, _kCaretWidth, lineHeight - _kCaretHeightOffset);
+    _prototype = buildPrototype(lineHeight);
   }
 
   void paint(Canvas canvas, Offset offset) {

@@ -76,6 +76,9 @@ class RenderEditableParagraph extends RenderParagraph
   double get preferredLineHeight => _prototypePainter.height;
 
   @override
+  SelectionOrder get selectionOrder => SelectionOrder.background;
+
+  @override
   TextSelection getLocalSelection(TextSelection documentSelection) {
     if (!intersectsWithSelection(documentSelection)) return null;
 
@@ -89,19 +92,18 @@ class RenderEditableParagraph extends RenderParagraph
 
   // This method works around some issues in getBoxesForSelection and handles
   // edge-case with our TextSpan objects not having last line-break character.
-  // Wait for https://github.com/flutter/flutter/issues/16418 to be resolved.
   @override
-  List<ui.TextBox> getEndpointsForSelection(TextSelection selection,
-      {bool isLocal: false}) {
-    TextSelection local = isLocal ? selection : getLocalSelection(selection);
+  List<ui.TextBox> getEndpointsForSelection(TextSelection selection) {
+    TextSelection local = getLocalSelection(selection);
     if (local.isCollapsed) {
-      final offset = getOffsetForCaret(local.extent, _caretPainter.prototype);
+      final caret = CaretPainter.buildPrototype(preferredLineHeight);
+      final offset = getOffsetForCaret(local.extent, caret);
       return [
         new ui.TextBox.fromLTRBD(
           offset.dx,
           offset.dy,
           offset.dx,
-          offset.dy + _caretPainter.prototype.height,
+          offset.dy + caret.height,
           TextDirection.ltr,
         )
       ];
@@ -158,46 +160,36 @@ class RenderEditableParagraph extends RenderParagraph
     super.performLayout();
     _prototypePainter.layout(
         minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
-    _caretPainter.layout(_prototypePainter.height);
   }
 
   @override
   void paint(PaintingContext context, Offset offset) {
-//    if (isSelectionVisible) _paintSelection(context, offset);
     super.paint(context, offset);
-//    if (isCaretVisible) _paintCaret(context, offset);
   }
 
-  //
-  // Private members
-  //
-
   final TextPainter _prototypePainter;
-  final CaretPainter _caretPainter = new CaretPainter();
   List<ui.TextBox> _selectionRects;
 
   /// Returns `true` if this paragraph intersects with document [selection].
+  @override
   bool intersectsWithSelection(TextSelection selection) {
     final int base = node.documentOffset;
     final int extent = base + node.length;
     return base <= selection.extentOffset && selection.baseOffset <= extent;
   }
 
-//
-//  void _paintCaret(PaintingContext context, Offset offset) {
-//    final TextPosition caret = new TextPosition(
-//      offset: _selection.extentOffset - node.documentOffset,
-//    );
-//    Offset caretOffset = getOffsetForCaret(caret, _caretPainter.prototype);
-//    _caretPainter.paint(context.canvas, caretOffset + offset);
-//  }
-//
+  TextSelection _lastPaintedSelection;
+  @override
   void paintSelection(PaintingContext context, Offset offset,
       TextSelection selection, Color selectionColor) {
-    // TODO: this could be improved by painting additional box for line-break characters.
+    if (_lastPaintedSelection != selection) {
+      _selectionRects = null;
+    }
     _selectionRects ??= getBoxesForSelection(getLocalSelection(selection));
     final Paint paint = new Paint()..color = selectionColor;
-    for (ui.TextBox box in _selectionRects)
+    for (ui.TextBox box in _selectionRects) {
       context.canvas.drawRect(box.toRect().shift(offset), paint);
+    }
+    _lastPaintedSelection = selection;
   }
 }

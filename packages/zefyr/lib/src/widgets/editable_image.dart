@@ -46,7 +46,11 @@ class RenderEditableImage extends RenderImage implements RenderEditableBox {
     _node = value;
   }
 
+  @override
   double get preferredLineHeight => size.height;
+
+  @override
+  SelectionOrder get selectionOrder => SelectionOrder.foreground;
 
   @override
   TextSelection getLocalSelection(TextSelection documentSelection) {
@@ -60,43 +64,28 @@ class RenderEditableImage extends RenderImage implements RenderEditableBox {
     return documentSelection.copyWith(baseOffset: base, extentOffset: extent);
   }
 
-  List<ui.TextBox> getEndpointsForSelection(TextSelection selection,
-      {bool isLocal: false}) {
-    TextSelection local = isLocal ? selection : getLocalSelection(selection);
+  @override
+  List<TextBox> getEndpointsForSelection(TextSelection selection) {
+    TextSelection local = getLocalSelection(selection);
     if (local.isCollapsed) {
       return [
-        new ui.TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
+        new TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
       ];
     }
 
     return [
-      new ui.TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
-      new ui.TextBox.fromLTRBD(
+      new TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
+      new TextBox.fromLTRBD(
           size.width, 0.0, size.width, size.height, TextDirection.ltr),
     ];
   }
 
   @override
-  void performLayout() {
-    super.performLayout();
-//    _prototypePainter.layout(
-//        minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
-//    _caretPainter.layout(_prototypePainter.height);
+  TextPosition getPositionForOffset(Offset offset) {
+    return new TextPosition(offset: node.documentOffset);
   }
 
   @override
-  void paint(PaintingContext context, Offset offset) {
-//    if (_isSelectionVisible) _paintSelection(context, offset);
-    super.paint(context, offset);
-//    if (_isCaretVisible) _paintCaret(context, offset);
-  }
-
-  @override
-  ui.TextPosition getPositionForOffset(ui.Offset offset) {
-    return new ui.TextPosition(offset: node.documentOffset);
-  }
-
-  /// Returns `true` if this paragraph intersects with document [selection].
   bool intersectsWithSelection(TextSelection selection) {
     final int base = node.documentOffset;
     final int extent = base + node.length;
@@ -106,5 +95,22 @@ class RenderEditableImage extends RenderImage implements RenderEditableBox {
   @override
   TextRange getWordBoundary(ui.TextPosition position) {
     return new TextRange(start: position.offset, end: position.offset + 1);
+  }
+
+  @override
+  ui.Offset getOffsetForCaret(
+      ui.TextPosition position, ui.Rect caretPrototype) {
+    final pos = position.offset - node.documentOffset;
+    Offset caretOffset = Offset.zero;
+    if (pos == 1) {
+      caretOffset = caretOffset + new Offset(size.width - 1.0, 0.0);
+    }
+    return caretOffset;
+  }
+
+  @override
+  void paintSelection(PaintingContext context, ui.Offset offset,
+      TextSelection selection, ui.Color selectionColor) {
+    // TODO: implement paintSelection
   }
 }

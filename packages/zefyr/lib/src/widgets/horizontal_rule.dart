@@ -48,9 +48,12 @@ class RenderHorizontalRule extends RenderEditableBox {
   @override
   double get preferredLineHeight => size.height;
 
-  List<ui.TextBox> getEndpointsForSelection(TextSelection selection,
-      {bool isLocal: false}) {
-    TextSelection local = isLocal ? selection : getLocalSelection(selection);
+  @override
+  SelectionOrder get selectionOrder => SelectionOrder.background;
+
+  @override
+  List<ui.TextBox> getEndpointsForSelection(TextSelection selection) {
+    TextSelection local =  getLocalSelection(selection);
     if (local.isCollapsed) {
       return [
         new ui.TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
@@ -68,16 +71,13 @@ class RenderHorizontalRule extends RenderEditableBox {
   void performLayout() {
     assert(constraints.hasBoundedWidth);
     size = new Size(constraints.maxWidth, _kHeight);
-//    _caretPainter.layout(height);
   }
 
   @override
   void paint(PaintingContext context, Offset offset) {
-//    if (isSelectionVisible) _paintSelection(context, offset);
     final rect = new Rect.fromLTWH(0.0, 0.0, size.width, _kThickness);
     final paint = new ui.Paint()..color = Colors.grey.shade200;
     context.canvas.drawRect(rect.shift(offset), paint);
-//    if (isCaretVisible) _paintCaret(context, offset);
   }
 
   @override
@@ -86,29 +86,25 @@ class RenderHorizontalRule extends RenderEditableBox {
   }
 
   @override
-  TextRange getWordBoundary(ui.TextPosition position) {
+  TextRange getWordBoundary(TextPosition position) {
     return new TextRange(start: position.offset, end: position.offset + 1);
   }
 
-  //
-  // Private members
-  //
-//
-//  final CaretPainter _caretPainter = new CaretPainter();
-//
-//  void _paintCaret(PaintingContext context, Offset offset) {
-//    final pos = selection.extentOffset - node.documentOffset;
-//    Offset caretOffset = Offset.zero;
-//    if (pos == 1) {
-//      caretOffset = caretOffset + new Offset(size.width - 1.0, 0.0);
-//    }
-//    _caretPainter.paint(context.canvas, caretOffset + offset);
-//  }
-//
-//  void _paintSelection(PaintingContext context, Offset offset) {
-//    assert(isSelectionVisible);
-//    final Paint paint = new Paint()..color = selectionColor;
-//    final rect = new Rect.fromLTWH(0.0, 0.0, size.width, _kHeight);
-//    context.canvas.drawRect(rect.shift(offset), paint);
-//  }
+  @override
+  void paintSelection(PaintingContext context, Offset offset,
+      TextSelection selection, Color selectionColor) {
+    final Paint paint = new Paint()..color = selectionColor;
+    final rect = new Rect.fromLTWH(0.0, 0.0, size.width, _kHeight);
+    context.canvas.drawRect(rect.shift(offset), paint);
+  }
+
+  @override
+  Offset getOffsetForCaret(ui.TextPosition position, ui.Rect caretPrototype) {
+    final pos = position.offset - node.documentOffset;
+    Offset caretOffset = Offset.zero;
+    if (pos == 1) {
+      caretOffset = caretOffset + new Offset(size.width - 1.0, 0.0);
+    }
+    return caretOffset;
+  }
 }
