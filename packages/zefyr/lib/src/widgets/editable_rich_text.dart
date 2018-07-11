@@ -90,6 +90,37 @@ class RenderEditableParagraph extends RenderParagraph
     return documentSelection.copyWith(baseOffset: base, extentOffset: extent);
   }
 
+  @override
+  TextPosition getPositionForOffset(Offset offset) {
+    final position = super.getPositionForOffset(offset);
+    return new TextPosition(
+      offset: _node.documentOffset + position.offset,
+      affinity: position.affinity,
+    );
+  }
+
+  @override
+  TextRange getWordBoundary(TextPosition position) {
+    final localPosition = new TextPosition(
+      offset: position.offset - _node.offset,
+      affinity: position.affinity,
+    );
+    final localRange = super.getWordBoundary(localPosition);
+    return new TextRange(
+      start: _node.documentOffset + localRange.start,
+      end: _node.documentOffset + localRange.end,
+    );
+  }
+
+  @override
+  Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
+    final localPosition = new TextPosition(
+      offset: position.offset - _node.documentOffset,
+      affinity: position.affinity,
+    );
+    return super.getOffsetForCaret(localPosition, caretPrototype);
+  }
+
   // This method works around some issues in getBoxesForSelection and handles
   // edge-case with our TextSpan objects not having last line-break character.
   @override

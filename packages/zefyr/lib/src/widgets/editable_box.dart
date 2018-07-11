@@ -198,10 +198,8 @@ class RenderEditableProxyBox extends RenderBox
   final CaretPainter _caretPainter = new CaretPainter();
 
   void _paintCaret(PaintingContext context, Offset offset) {
-    final TextPosition caret = new TextPosition(
-      offset: _selection.extentOffset - node.documentOffset,
-    );
-    Offset caretOffset = getOffsetForCaret(caret, _caretPainter.prototype);
+    Offset caretOffset =
+        getOffsetForCaret(_selection.extent, _caretPainter.prototype);
     _caretPainter.paint(context.canvas, caretOffset + offset);
   }
 

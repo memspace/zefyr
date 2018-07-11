@@ -13,7 +13,7 @@ import 'editable_box.dart';
 import 'editable_text.dart';
 import 'editor.dart';
 
-RenderEditableBox _getRenderParagraph(HitTestResult result) {
+RenderEditableBox _getEditableBox(HitTestResult result) {
   for (var entry in result.path) {
     if (entry.target is RenderEditableBox) {
       return entry.target;
@@ -213,13 +213,12 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     HitTestResult result = new HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
 
-    final paragraph = _getRenderParagraph(result);
-    if (paragraph == null) return;
+    final box = _getEditableBox(result);
+    if (box == null) return;
 
-    final localPoint = paragraph.globalToLocal(globalPoint);
-    final position = paragraph.getPositionForOffset(localPoint);
-    final selection = new TextSelection.collapsed(
-        offset: paragraph.node.documentOffset + position.offset);
+    final localPoint = box.globalToLocal(globalPoint);
+    final position = box.getPositionForOffset(localPoint);
+    final selection = new TextSelection.collapsed(offset: position.offset);
     if (_didCaretTap && _selection == selection) {
       _didCaretTap = false;
       hideToolbar();
@@ -235,16 +234,16 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     _longPressPosition = null;
     HitTestResult result = new HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
-    final paragraph = _getRenderParagraph(result);
-    if (paragraph == null) {
+    final box = _getEditableBox(result);
+    if (box == null) {
       return;
     }
-    final localPoint = paragraph.globalToLocal(globalPoint);
-    final position = paragraph.getPositionForOffset(localPoint);
-    final word = paragraph.getWordBoundary(position);
+    final localPoint = box.globalToLocal(globalPoint);
+    final position = box.getPositionForOffset(localPoint);
+    final word = box.getWordBoundary(position);
     final selection = new TextSelection(
-      baseOffset: paragraph.node.documentOffset + word.start,
-      extentOffset: paragraph.node.documentOffset + word.end,
+      baseOffset: word.start,
+      extentOffset: word.end,
     );
     widget.controller.updateSelection(selection, source: ChangeSource.local);
   }
@@ -290,10 +289,8 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
     assert(localSelection != null);
 
     final boxes = block.getEndpointsForSelection(selection);
-    if (boxes.isEmpty) {
-      print('Got empty boxes for selection ${selection}');
-      return null;
-    }
+    assert(boxes.isNotEmpty, 'Got empty boxes for selection ${selection}');
+
     final box = isBaseHandle ? boxes.first : boxes.last;
     final dx = isBaseHandle ? box.start : box.end;
     return new Offset(dx, box.bottom);
@@ -369,18 +366,16 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
     final globalPoint = _dragPosition;
     final editor = ZefyrEditor.of(context);
     final editable = ZefyrEditableText.of(context);
-    final paragraph =
-        editable.renderContext.boxForGlobalPoint(globalPoint);
+    final paragraph = editable.renderContext.boxForGlobalPoint(globalPoint);
     if (paragraph == null) {
       return;
     }
 
     final localPoint = paragraph.globalToLocal(globalPoint);
     final position = paragraph.getPositionForOffset(localPoint);
-    final documentOffset = paragraph.node.documentOffset + position.offset;
     final newSelection = selection.copyWith(
-      baseOffset: isBaseHandle ? documentOffset : selection.baseOffset,
-      extentOffset: isBaseHandle ? selection.extentOffset : documentOffset,
+      baseOffset: isBaseHandle ? position.offset : selection.baseOffset,
+      extentOffset: isBaseHandle ? selection.extentOffset : position.offset,
     );
     if (newSelection.baseOffset >= newSelection.extentOffset) {
       // Don't allow reversed or collapsed selection.
@@ -413,6 +408,7 @@ class _SelectionToolbar extends StatefulWidget {
 
 class _SelectionToolbarState extends State<_SelectionToolbar> {
   ZefyrEditableTextScope get editable => widget.editable;
+  TextSelection get selection => widget.delegate.textEditingValue.selection;
 
   @override
   Widget build(BuildContext context) {
@@ -420,13 +416,13 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
   }
 
   Widget _buildToolbar(BuildContext context) {
-    final base = editable.selection.baseOffset;
+    final base = selection.baseOffset;
+    // TODO: Editable is not refreshed and may contain stale renderContext instance.
     final block = editable.renderContext.boxForTextOffset(base);
     if (block == null) {
       return Container();
     }
-
-    final boxes = block.getEndpointsForSelection(editable.selection);
+    final boxes = block.getEndpointsForSelection(selection);
 
     // Find the horizontal midpoint, just above the selected text.
     final Offset midpoint = new Offset(

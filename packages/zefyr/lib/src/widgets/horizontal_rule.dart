@@ -53,10 +53,11 @@ class RenderHorizontalRule extends RenderEditableBox {
 
   @override
   List<ui.TextBox> getEndpointsForSelection(TextSelection selection) {
-    TextSelection local =  getLocalSelection(selection);
+    TextSelection local = getLocalSelection(selection);
     if (local.isCollapsed) {
+      final dx = local.extentOffset == 0 ? 0.0 : size.width;
       return [
-        new ui.TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
+        new ui.TextBox.fromLTRBD(dx, 0.0, dx, size.height, TextDirection.ltr),
       ];
     }
 
@@ -81,21 +82,31 @@ class RenderHorizontalRule extends RenderEditableBox {
   }
 
   @override
-  ui.TextPosition getPositionForOffset(ui.Offset offset) {
-    return new ui.TextPosition(offset: _node.documentOffset);
+  TextPosition getPositionForOffset(Offset offset) {
+    int position = _node.documentOffset;
+
+    if (offset.dx > size.width / 2) {
+      position++;
+    }
+    return new TextPosition(offset: position);
   }
 
   @override
   TextRange getWordBoundary(TextPosition position) {
-    return new TextRange(start: position.offset, end: position.offset + 1);
+    final start = _node.documentOffset;
+    return new TextRange(start: start, end: start + 1);
   }
 
   @override
   void paintSelection(PaintingContext context, Offset offset,
       TextSelection selection, Color selectionColor) {
-    final Paint paint = new Paint()..color = selectionColor;
-    final rect = new Rect.fromLTWH(0.0, 0.0, size.width, _kHeight);
-    context.canvas.drawRect(rect.shift(offset), paint);
+    final localSelection = getLocalSelection(selection);
+    assert(localSelection != null);
+    if (!localSelection.isCollapsed) {
+      final Paint paint = new Paint()..color = selectionColor;
+      final rect = new Rect.fromLTWH(0.0, 0.0, size.width, _kHeight);
+      context.canvas.drawRect(rect.shift(offset), paint);
+    }
   }
 
   @override

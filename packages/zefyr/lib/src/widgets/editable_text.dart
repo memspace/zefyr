@@ -60,19 +60,19 @@ class ZefyrEditableTextScope extends InheritedWidget {
     @required this.selection,
     @required this.showCursor,
     @required this.renderContext,
-  })  : _activeParagraphs = new Set.from(renderContext.active),
+  })  : _activeBoxes = new Set.from(renderContext.active),
         super(key: key, child: child);
 
   final TextSelection selection;
   final ValueNotifier<bool> showCursor;
   final ZefyrRenderContext renderContext;
-  final Set<RenderEditableBox> _activeParagraphs;
+  final Set<RenderEditableBox> _activeBoxes;
 
   @override
   bool updateShouldNotify(ZefyrEditableTextScope oldWidget) {
     return selection != oldWidget.selection ||
         showCursor != oldWidget.showCursor ||
-        !_kEquality.equals(_activeParagraphs, oldWidget._activeParagraphs);
+        !_kEquality.equals(_activeBoxes, oldWidget._activeBoxes);
   }
 }
 
