@@ -39,7 +39,7 @@ this Markdown block:
 
 Zefyr can deliver exactly that:
 
-[screenshot]
+![markdown_semantics](/markdown-semantics.png | width=100)
 
 > Nested blocks support (e.g. lists inside quote blocks) is planned.
 

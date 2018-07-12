@@ -29,6 +29,7 @@ class ZefyrApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Zefyr Editor',
       theme: new ThemeData(primarySwatch: Colors.cyan),
       home: new MyHomePage(),
