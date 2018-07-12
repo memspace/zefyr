@@ -39,9 +39,10 @@ this Markdown block:
 
 Zefyr can deliver exactly that:
 
-![markdown_semantics](/markdown-semantics.png | width=100)
+<img src="https://github.com/memspace/zefyr/raw/master/markdown-semantics.png" width="375">
 
-> Nested blocks support (e.g. lists inside quote blocks) is planned.
+> Nested blocks support (e.g. lists inside quote blocks or bullet list
+> inside number list) is planned.
 
 ## Collaborative editing built-in
 
