@@ -91,8 +91,8 @@ class _ImageEmbedState extends State<ImageEmbed> {
   @override
   Widget build(BuildContext context) {
     return _EditableImage(
+      child: new RawImage(image: _imageInfo?.image),
       node: widget.node,
-      image: _imageInfo?.image,
     );
   }
 
@@ -112,15 +112,16 @@ class _ImageEmbedState extends State<ImageEmbed> {
   }
 }
 
-class _EditableImage extends LeafRenderObjectWidget {
-  _EditableImage({@required this.node, this.image}) : assert(node != null);
+class _EditableImage extends SingleChildRenderObjectWidget {
+  _EditableImage({@required Widget child, @required this.node})
+      : assert(node != null),
+        super(child: child);
 
   final EmbedNode node;
-  final ui.Image image;
 
   @override
   RenderEditableImage createRenderObject(BuildContext context) {
-    return new RenderEditableImage(node: node, image: image);
+    return new RenderEditableImage(node: node);
   }
 
   @override
@@ -130,14 +131,19 @@ class _EditableImage extends LeafRenderObjectWidget {
   }
 }
 
-class RenderEditableImage extends RenderImage implements RenderEditableBox {
+class RenderEditableImage extends RenderBox
+    with
+        RenderObjectWithChildMixin<RenderImage>,
+        RenderProxyBoxMixin<RenderImage>
+    implements RenderEditableBox {
+  static const kPaddingBottom = 24.0;
+
   RenderEditableImage({
-    ui.Image image,
+    RenderImage child,
     @required EmbedNode node,
-  })  : _node = node,
-        super(
-          image: image,
-        );
+  }) : _node = node {
+    this.child = child;
+  }
 
   @override
   EmbedNode get node => _node;
@@ -150,7 +156,7 @@ class RenderEditableImage extends RenderImage implements RenderEditableBox {
   double get preferredLineHeight => size.height;
 
   @override
-  SelectionOrder get selectionOrder => SelectionOrder.foreground;
+  SelectionOrder get selectionOrder => SelectionOrder.background;
 
   @override
   TextSelection getLocalSelection(TextSelection documentSelection) {
@@ -165,24 +171,36 @@ class RenderEditableImage extends RenderImage implements RenderEditableBox {
   }
 
   @override
-  List<TextBox> getEndpointsForSelection(TextSelection selection) {
+  List<ui.TextBox> getEndpointsForSelection(TextSelection selection) {
     TextSelection local = getLocalSelection(selection);
     if (local.isCollapsed) {
+      final dx = local.extentOffset == 0 ? 0.0 : size.width;
       return [
-        new TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
+        new ui.TextBox.fromLTRBD(dx, 0.0, dx, size.height, TextDirection.ltr),
       ];
     }
 
     return [
-      new TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
-      new TextBox.fromLTRBD(
+      new ui.TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
+      new ui.TextBox.fromLTRBD(
           size.width, 0.0, size.width, size.height, TextDirection.ltr),
     ];
   }
 
   @override
   TextPosition getPositionForOffset(Offset offset) {
-    return new TextPosition(offset: node.documentOffset);
+    int position = _node.documentOffset;
+
+    if (offset.dx > size.width / 2) {
+      position++;
+    }
+    return new TextPosition(offset: position);
+  }
+
+  @override
+  TextRange getWordBoundary(TextPosition position) {
+    final start = _node.documentOffset;
+    return new TextRange(start: start, end: start + 1);
   }
 
   @override
@@ -193,13 +211,7 @@ class RenderEditableImage extends RenderImage implements RenderEditableBox {
   }
 
   @override
-  TextRange getWordBoundary(ui.TextPosition position) {
-    return new TextRange(start: position.offset, end: position.offset + 1);
-  }
-
-  @override
-  ui.Offset getOffsetForCaret(
-      ui.TextPosition position, ui.Rect caretPrototype) {
+  Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
     final pos = position.offset - node.documentOffset;
     Offset caretOffset = Offset.zero;
     if (pos == 1) {
@@ -211,6 +223,27 @@ class RenderEditableImage extends RenderImage implements RenderEditableBox {
   @override
   void paintSelection(PaintingContext context, ui.Offset offset,
       TextSelection selection, ui.Color selectionColor) {
-    // TODO: implement paintSelection
+    final localSelection = getLocalSelection(selection);
+    assert(localSelection != null);
+    if (!localSelection.isCollapsed) {
+      final Paint paint = new Paint()..color = selectionColor;
+      final rect = new Rect.fromLTWH(0.0, 0.0, size.width, size.height);
+      context.canvas.drawRect(rect.shift(offset), paint);
+    }
+  }
+
+  @override
+  void performLayout() {
+    assert(constraints.hasBoundedWidth);
+    if (child != null) {
+      // Make constraints use 16:9 aspect ratio.
+      final childConstraints = constraints.copyWith(
+        maxHeight: (constraints.maxWidth * 9 / 16).floorToDouble(),
+      );
+      child.layout(childConstraints, parentUsesSize: true);
+      size = new Size(child.size.width, child.size.height + kPaddingBottom);
+    } else {
+      performResize();
+    }
   }
 }

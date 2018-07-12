@@ -6,9 +6,10 @@ import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
 import 'editable_box.dart';
-import 'editable_rich_text.dart';
 import 'editable_text.dart';
 import 'horizontal_rule.dart';
+import 'image.dart';
+import 'rich_text.dart';
 import 'theme.dart';
 
 /// Raw widget representing a single line of rich text document in Zefyr editor.
@@ -154,8 +155,15 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
         selectionColor: theme.selectionColor,
       );
     } else if (embed.type == EmbedType.image) {
-      // TODO: implement image embeds.
-      return null;
+      return new EditableBox(
+        child: ImageEmbed(node: node, delegate: editable.imageDelegate),
+        node: widget.node,
+        layerLink: _link,
+        renderContext: editable.renderContext,
+        showCursor: editable.showCursor,
+        selection: editable.selection,
+        selectionColor: theme.selectionColor,
+      );
     } else {
       throw new UnimplementedError('Unimplemented embed type ${embed.type}');
     }

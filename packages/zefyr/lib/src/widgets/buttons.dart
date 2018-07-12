@@ -3,8 +3,9 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:notus/notus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'editor.dart';
 import 'theme.dart';
@@ -246,7 +247,7 @@ class ImageButton extends StatefulWidget {
   _ImageButtonState createState() => _ImageButtonState();
 }
 
-class _ImageButtonState extends State<HeadingButton> {
+class _ImageButtonState extends State<ImageButton> {
   @override
   Widget build(BuildContext context) {
     final toolbar = ZefyrToolbar.of(context);
@@ -276,8 +277,19 @@ class _ImageButtonState extends State<HeadingButton> {
     return ZefyrToolbarScaffold(body: buttons);
   }
 
-  void _pickFromCamera() {}
-  void _pickFromGallery() {}
+  void _pickFromCamera() async {
+    final editor = ZefyrEditor.of(context);
+    final image = await editor.imageDelegate.pickImage(ImageSource.camera);
+    if (image != null)
+      editor.formatSelection(NotusAttribute.embed.image(image));
+  }
+
+  void _pickFromGallery() async {
+    final editor = ZefyrEditor.of(context);
+    final image = await editor.imageDelegate.pickImage(ImageSource.gallery);
+    if (image != null)
+      editor.formatSelection(NotusAttribute.embed.image(image));
+  }
 }
 
 class LinkButton extends StatefulWidget {

@@ -6,6 +6,7 @@ import 'package:notus/notus.dart';
 
 import 'controller.dart';
 import 'editable_text.dart';
+import 'image.dart';
 import 'theme.dart';
 import 'toolbar.dart';
 
@@ -19,6 +20,7 @@ class ZefyrEditor extends StatefulWidget {
     this.enabled: true,
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
     this.toolbarDelegate,
+    this.imageDelegate,
   }) : super(key: key);
 
   final ZefyrController controller;
@@ -26,6 +28,7 @@ class ZefyrEditor extends StatefulWidget {
   final bool autofocus;
   final bool enabled;
   final ZefyrToolbarDelegate toolbarDelegate;
+  final ZefyrImageDelegate imageDelegate;
 
   /// Padding around editable area.
   final EdgeInsets padding;
@@ -47,6 +50,7 @@ class ZefyrEditorScope extends InheritedWidget {
   final TextSelection selection;
   final FocusOwner focusOwner;
   final FocusNode toolbarFocusNode;
+  final ZefyrImageDelegate imageDelegate;
   final ZefyrController _controller;
   final FocusNode _focusNode;
 
@@ -57,6 +61,7 @@ class ZefyrEditorScope extends InheritedWidget {
     @required this.selection,
     @required this.focusOwner,
     @required this.toolbarFocusNode,
+    @required this.imageDelegate,
     @required ZefyrController controller,
     @required FocusNode focusNode,
   })  : _controller = controller,
@@ -84,7 +89,8 @@ class ZefyrEditorScope extends InheritedWidget {
   bool updateShouldNotify(ZefyrEditorScope oldWidget) {
     return (selectionStyle != oldWidget.selectionStyle ||
         selection != oldWidget.selection ||
-        focusOwner != oldWidget.focusOwner);
+        focusOwner != oldWidget.focusOwner ||
+        imageDelegate != oldWidget.imageDelegate);
   }
 }
 
@@ -94,6 +100,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   NotusStyle _selectionStyle;
   TextSelection _selection;
   FocusOwner _focusOwner;
+  ZefyrImageDelegate _imageDelegate;
 
   FocusOwner getFocusOwner() {
     if (widget.focusNode.hasFocus) {
@@ -111,6 +118,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
     _selectionStyle = widget.controller.getSelectionStyle();
     _selection = widget.controller.selection;
     _focusOwner = getFocusOwner();
+    _imageDelegate = widget.imageDelegate ?? new ZefyrDefaultImageDelegate();
     widget.controller.addListener(_handleControllerChange);
     _toolbarFocusNode.addListener(_handleFocusChange);
     widget.focusNode.addListener(_handleFocusChange);
@@ -129,6 +137,9 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       _selectionStyle = widget.controller.getSelectionStyle();
       _selection = widget.controller.selection;
     }
+    if (widget.imageDelegate != oldWidget.imageDelegate) {
+      _imageDelegate = widget.imageDelegate ?? new ZefyrDefaultImageDelegate();
+    }
   }
 
   @override
@@ -145,6 +156,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
     Widget editable = new ZefyrEditableText(
       controller: widget.controller,
       focusNode: widget.focusNode,
+      imageDelegate: _imageDelegate,
       autofocus: widget.autofocus,
       enabled: widget.enabled,
     );
@@ -173,6 +185,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
         selectionStyle: _selectionStyle,
         focusOwner: _focusOwner,
         toolbarFocusNode: _toolbarFocusNode,
+        imageDelegate: _imageDelegate,
         controller: widget.controller,
         focusNode: widget.focusNode,
         child: Column(children: children),

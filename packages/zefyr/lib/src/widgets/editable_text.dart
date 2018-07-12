@@ -13,6 +13,7 @@ import 'common.dart';
 import 'controller.dart';
 import 'editable_box.dart';
 import 'editor.dart';
+import 'image.dart';
 import 'input.dart';
 import 'list.dart';
 import 'paragraph.dart';
@@ -31,12 +32,14 @@ class ZefyrEditableText extends StatefulWidget {
     Key key,
     @required this.controller,
     @required this.focusNode,
+    @required this.imageDelegate,
     this.autofocus: true,
     this.enabled: true,
   }) : super(key: key);
 
   final ZefyrController controller;
   final FocusNode focusNode;
+  final ZefyrImageDelegate imageDelegate;
   final bool autofocus;
   final bool enabled;
 
@@ -60,18 +63,21 @@ class ZefyrEditableTextScope extends InheritedWidget {
     @required this.selection,
     @required this.showCursor,
     @required this.renderContext,
+    @required this.imageDelegate,
   })  : _activeBoxes = new Set.from(renderContext.active),
         super(key: key, child: child);
 
   final TextSelection selection;
   final ValueNotifier<bool> showCursor;
   final ZefyrRenderContext renderContext;
+  final ZefyrImageDelegate imageDelegate;
   final Set<RenderEditableBox> _activeBoxes;
 
   @override
   bool updateShouldNotify(ZefyrEditableTextScope oldWidget) {
     return selection != oldWidget.selection ||
         showCursor != oldWidget.showCursor ||
+        imageDelegate != oldWidget.imageDelegate ||
         !_kEquality.equals(_activeBoxes, oldWidget._activeBoxes);
   }
 }
@@ -138,6 +144,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       selection: selection,
       showCursor: showCursor,
       renderContext: renderContext,
+      imageDelegate: widget.imageDelegate,
       child: Stack(fit: StackFit.expand, children: layers),
     );
   }

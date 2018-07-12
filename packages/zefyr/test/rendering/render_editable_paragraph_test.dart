@@ -6,8 +6,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:zefyr/src/widgets/editable_rich_text.dart';
 import 'package:zefyr/src/widgets/render_context.dart';
+import 'package:zefyr/src/widgets/rich_text.dart';
 import 'package:zefyr/zefyr.dart';
 
 void main() {

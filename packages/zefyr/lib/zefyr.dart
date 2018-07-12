@@ -5,14 +5,22 @@
 /// Zefyr widgets and document model.
 ///
 /// To use, `import 'package:zefyr/zefyr.dart';`.
-///
-/// See also:
-///
-///   * [Quick start]()
-///   * [NotusDocument], model for Zefyr documents.
-///   * [ZefyrEditor], widget for editing Zefyr documents.
 library zefyr;
 
 export 'package:notus/notus.dart';
 
-export 'widgets.dart';
+export 'src/widgets/buttons.dart' hide HeadingButton, LinkButton;
+export 'src/widgets/code.dart';
+export 'src/widgets/common.dart';
+export 'src/widgets/controller.dart';
+export 'src/widgets/editable_text.dart';
+export 'src/widgets/editor.dart';
+export 'src/widgets/image.dart';
+export 'src/widgets/list.dart';
+export 'src/widgets/paragraph.dart';
+export 'src/widgets/quote.dart';
+export 'src/widgets/selection.dart' hide SelectionHandleDriver;
+export 'src/widgets/theme.dart';
+export 'src/widgets/toolbar.dart';
+//export 'src/widgets/render_context.dart';
+

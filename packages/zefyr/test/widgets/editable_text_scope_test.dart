@@ -57,6 +57,20 @@ void main() {
       widget2 = createScope(renderingContext: context, showCursor: showCursor);
       expect(widget2.updateShouldNotify(widget1), isTrue);
     });
+
+    test('updateShouldNotify for imageDelegate changes', () {
+      var context = new ZefyrRenderContext();
+      var delegate = new ZefyrDefaultImageDelegate();
+      var widget1 =
+          createScope(renderingContext: context, imageDelegate: delegate);
+      var widget2 =
+          createScope(renderingContext: context, imageDelegate: delegate);
+
+      expect(widget2.updateShouldNotify(widget1), isFalse);
+      delegate = new ZefyrDefaultImageDelegate();
+      widget2 = createScope(renderingContext: context, imageDelegate: delegate);
+      expect(widget2.updateShouldNotify(widget1), isTrue);
+    });
   });
 }
 
@@ -64,11 +78,13 @@ ZefyrEditableTextScope createScope({
   @required ZefyrRenderContext renderingContext,
   TextSelection selection,
   ValueNotifier<bool> showCursor,
+  ZefyrImageDelegate imageDelegate,
 }) {
   return ZefyrEditableTextScope(
     renderContext: renderingContext,
     selection: selection,
     showCursor: showCursor,
+    imageDelegate: imageDelegate,
     child: null,
   );
 }
