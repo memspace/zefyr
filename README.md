@@ -27,9 +27,9 @@ Zefyr's rich text editor is built with simplicity and flexibility in
 mind. It provides clean interface for distraction-free editing. Think
 Medium.com-like experience.
 
-[screenshot]
+<img src="https://github.com/memspace/zefyr/raw/master/zefyr.png" width="375">
 
-## Markdown-style semantics
+## Markdown-inspired semantics
 
 Ever needed to have a heading line inside of a quote block, like in
 this Markdown block:
