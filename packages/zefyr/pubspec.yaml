@@ -8,10 +8,12 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.14.6
-  notus:
-    path: ../notus
   url_launcher: ^3.0.0
   quill_delta: ^1.0.0-dev.1.0
+  notus:
+    git:
+      url: git@github.com:memspace/zefyr.git
+      path: packages/notus
 
 dev_dependencies:
   flutter_test:
