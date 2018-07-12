@@ -235,6 +235,51 @@ class _HeadingButtonState extends State<HeadingButton> {
   }
 }
 
+/// Controls heading styles.
+///
+/// When pressed, this button displays overlay toolbar with three
+/// buttons for each heading level.
+class ImageButton extends StatefulWidget {
+  const ImageButton({Key key}) : super(key: key);
+
+  @override
+  _ImageButtonState createState() => _ImageButtonState();
+}
+
+class _ImageButtonState extends State<HeadingButton> {
+  @override
+  Widget build(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    return toolbar.buildButton(
+      context,
+      ZefyrToolbarAction.image,
+      onPressed: showOverlay,
+    );
+  }
+
+  void showOverlay() {
+    final toolbar = ZefyrToolbar.of(context);
+    toolbar.showOverlay(buildOverlay);
+  }
+
+  Widget buildOverlay(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    final buttons = Row(
+      children: <Widget>[
+        SizedBox(width: 8.0),
+        toolbar.buildButton(context, ZefyrToolbarAction.cameraImage,
+            onPressed: _pickFromCamera),
+        toolbar.buildButton(context, ZefyrToolbarAction.galleryImage,
+            onPressed: _pickFromGallery),
+      ],
+    );
+    return ZefyrToolbarScaffold(body: buttons);
+  }
+
+  void _pickFromCamera() {}
+  void _pickFromGallery() {}
+}
+
 class LinkButton extends StatefulWidget {
   const LinkButton({Key key}) : super(key: key);
 
