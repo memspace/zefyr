@@ -31,7 +31,7 @@ Zefyr's rich text editor is built with simplicity and flexibility in
 mind. It provides clean interface for distraction-free editing. Think
 Medium.com-like experience.
 
-<img src="https://github.com/memspace/zefyr/raw/master/zefyr-1.png" width="375"> <img src="https://github.com/memspace/zefyr/raw/master/zefyr-2.png" width="375">
+<img src="https://github.com/memspace/zefyr/raw/master/assets/zefyr-1.png" width="375"> <img src="https://github.com/memspace/zefyr/raw/assets/master/zefyr-2.png" width="375">
 
 ## Markdown-inspired semantics
 
@@ -43,12 +43,10 @@ this Markdown block:
 
 Zefyr can deliver exactly that:
 
-<img src="https://github.com/memspace/zefyr/raw/master/markdown-semantics.png" width="375">
+<img src="https://github.com/memspace/zefyr/raw/master/assets/markdown-semantics.png" width="375">
 
-> Nested blocks support (e.g. lists inside quote blocks or bullet list
-> inside number list) is planned.
 
-## Collaborative editing built-in
+## Ready for collaborative editing
 
 Zefyr's document model uses data format compatible with
 [Operational Transformation][ot] which makes it possible to use for
