@@ -10,8 +10,8 @@ import 'package:notus/notus.dart';
 
 import 'editable_box.dart';
 
-class HorizontalRule extends LeafRenderObjectWidget {
-  HorizontalRule({@required this.node}) : assert(node != null);
+class ZefyrHorizontalRule extends LeafRenderObjectWidget {
+  ZefyrHorizontalRule({@required this.node}) : assert(node != null);
 
   final EmbedNode node;
 

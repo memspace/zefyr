@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zefyr/src/widgets/buttons.dart';
 import 'package:zefyr/zefyr.dart';
@@ -67,6 +68,15 @@ void main() {
       await editor.tapButtonWithText('H2');
       expect(line.style.containsSame(NotusAttribute.heading.level2), isTrue);
     });
+
+    testWidgets('close overlay', (tester) async {
+      final editor = new EditorSandBox(tester: tester);
+      await editor.tapEditor();
+      await editor.tapButtonWithIcon(Icons.format_size);
+      expect(find.text('H1'), findsOneWidget);
+      await editor.tapButtonWithIcon(Icons.close);
+      expect(find.text('H1'), findsNothing);
+    });
   });
 
   group('$LinkButton', () {
@@ -130,6 +140,69 @@ void main() {
       await editor.tapButtonWithIcon(Icons.link_off);
       line = editor.document.root.children.first;
       expect(line.childCount, 1);
+    });
+  });
+
+  group('$ImageButton', () {
+    const MethodChannel channel =
+        const MethodChannel('plugins.flutter.io/image_picker');
+
+    final List<MethodCall> log = <MethodCall>[];
+
+    setUp(() {
+      channel.setMockMethodCallHandler((MethodCall methodCall) async {
+        log.add(methodCall);
+        return 'file:///tmp/test.jpg';
+      });
+      log.clear();
+    });
+
+    testWidgets('toggle overlay', (tester) async {
+      final editor = new EditorSandBox(tester: tester);
+      await editor.tapEditor();
+      await editor.tapButtonWithIcon(Icons.photo);
+
+      expect(find.byIcon(Icons.photo_camera), findsOneWidget);
+      await editor.tapButtonWithIcon(Icons.close);
+      expect(find.byIcon(Icons.photo_camera), findsNothing);
+    });
+
+    testWidgets('pick from camera', (tester) async {
+      final editor = new EditorSandBox(tester: tester);
+      await editor.tapEditor();
+      await editor.tapButtonWithIcon(Icons.photo);
+      await editor.tapButtonWithIcon(Icons.photo_camera);
+      expect(log, hasLength(1));
+      expect(
+        log.single,
+        isMethodCall(
+          'pickImage',
+          arguments: <String, dynamic>{
+            'source': 0,
+            'maxWidth': null,
+            'maxHeight': null,
+          },
+        ),
+      );
+    });
+
+    testWidgets('pick from gallery', (tester) async {
+      final editor = new EditorSandBox(tester: tester);
+      await editor.tapEditor();
+      await editor.tapButtonWithIcon(Icons.photo);
+      await editor.tapButtonWithIcon(Icons.photo_library);
+      expect(log, hasLength(1));
+      expect(
+        log.single,
+        isMethodCall(
+          'pickImage',
+          arguments: <String, dynamic>{
+            'source': 1,
+            'maxWidth': null,
+            'maxHeight': null,
+          },
+        ),
+      );
     });
   });
 }

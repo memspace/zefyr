@@ -144,7 +144,7 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     EmbedAttribute embed = node.style.get(NotusAttribute.embed);
 
     if (embed.type == EmbedType.horizontalRule) {
-      final hr = new HorizontalRule(node: node);
+      final hr = new ZefyrHorizontalRule(node: node);
       return new EditableBox(
         child: hr,
         node: widget.node,
@@ -156,7 +156,7 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
       );
     } else if (embed.type == EmbedType.image) {
       return new EditableBox(
-        child: ImageEmbed(node: node, delegate: editable.imageDelegate),
+        child: ZefyrImage(node: node, delegate: editable.imageDelegate),
         node: widget.node,
         layerLink: _link,
         renderContext: editable.renderContext,

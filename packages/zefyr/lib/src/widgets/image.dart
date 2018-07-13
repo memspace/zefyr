@@ -39,18 +39,18 @@ class ZefyrDefaultImageDelegate implements ZefyrImageDelegate<ImageSource> {
   }
 }
 
-class ImageEmbed extends StatefulWidget {
-  const ImageEmbed({Key key, @required this.node, @required this.delegate})
+class ZefyrImage extends StatefulWidget {
+  const ZefyrImage({Key key, @required this.node, @required this.delegate})
       : super(key: key);
 
   final EmbedNode node;
   final ZefyrImageDelegate delegate;
 
   @override
-  _ImageEmbedState createState() => _ImageEmbedState();
+  _ZefyrImageState createState() => _ZefyrImageState();
 }
 
-class _ImageEmbedState extends State<ImageEmbed> {
+class _ZefyrImageState extends State<ZefyrImage> {
   ImageProvider _provider;
   ImageStream _imageStream;
   ImageInfo _imageInfo;
@@ -70,7 +70,7 @@ class _ImageEmbedState extends State<ImageEmbed> {
   }
 
   @override
-  void didUpdateWidget(ImageEmbed oldWidget) {
+  void didUpdateWidget(ZefyrImage oldWidget) {
     super.didUpdateWidget(oldWidget);
     EmbedAttribute oldStyle = oldWidget.node.style.get(NotusAttribute.embed);
     final oldSource = oldStyle.value['source'];
