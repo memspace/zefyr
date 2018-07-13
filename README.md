@@ -31,7 +31,7 @@ Zefyr's rich text editor is built with simplicity and flexibility in
 mind. It provides clean interface for distraction-free editing. Think
 Medium.com-like experience.
 
-<img src="https://github.com/memspace/zefyr/raw/master/zefyr.png" width="375">
+<img src="https://github.com/memspace/zefyr/raw/master/zefyr-1.png" width="375"> <img src="https://github.com/memspace/zefyr/raw/master/zefyr-2.png" width="375">
 
 ## Markdown-inspired semantics
 
