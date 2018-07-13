@@ -152,7 +152,7 @@ void main() {
     setUp(() {
       channel.setMockMethodCallHandler((MethodCall methodCall) async {
         log.add(methodCall);
-        return 'file:///tmp/test.jpg';
+        return '/tmp/test.jpg';
       });
       log.clear();
     });
