@@ -26,7 +26,7 @@ class EditorSandBox {
     document ??= NotusDocument.fromDelta(delta);
     var controller = ZefyrController(document);
 
-    Widget widget = ZefyrEditor(controller: controller, focusNode: focusNode);
+    Widget widget = _ZefyrSandbox(controller: controller, focusNode: focusNode);
     if (theme != null) {
       widget = ZefyrTheme(data: theme, child: widget);
     }
@@ -49,6 +49,12 @@ class EditorSandBox {
     controller.updateSelection(
       new TextSelection(baseOffset: base, extentOffset: extent),
     );
+    return tester.pumpAndSettle();
+  }
+
+  Future<void> disable() {
+    _ZefyrSandboxState state = tester.state(find.byType(_ZefyrSandbox));
+    state.disable();
     return tester.pumpAndSettle();
   }
 
@@ -89,5 +95,34 @@ class EditorSandBox {
     return find.descendant(
         of: find.byType(SelectionHandleDriver),
         matching: find.byType(Positioned));
+  }
+}
+
+class _ZefyrSandbox extends StatefulWidget {
+  const _ZefyrSandbox({Key key, this.controller, this.focusNode})
+      : super(key: key);
+  final ZefyrController controller;
+  final FocusNode focusNode;
+
+  @override
+  _ZefyrSandboxState createState() => _ZefyrSandboxState();
+}
+
+class _ZefyrSandboxState extends State<_ZefyrSandbox> {
+  bool _enabled = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return new ZefyrEditor(
+      controller: widget.controller,
+      focusNode: widget.focusNode,
+      enabled: _enabled,
+    );
+  }
+
+  void disable() {
+    setState(() {
+      _enabled = false;
+    });
   }
 }

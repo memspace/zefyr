@@ -173,6 +173,9 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   bool _didCaretTap = false;
 
   void _updateToolbar() {
+    if (!mounted) {
+      return;
+    }
     final editor = ZefyrEditor.of(context);
     final selection = editor.selection;
     final focusOwner = editor.focusOwner;

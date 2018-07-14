@@ -36,5 +36,14 @@ void main() {
       expect(editor.findSelectionHandle(), findsNothing);
       expect(editor.selection, TextSelection.collapsed(offset: 3));
     });
+
+    testWidgets('toggle enabled state', (tester) async {
+      final editor = new EditorSandBox(tester: tester);
+      await editor.tapEditor();
+      await editor.updateSelection(base: 0, extent: 3);
+      await editor.disable();
+      ZefyrEditor widget = tester.widget(find.byType(ZefyrEditor));
+      expect(widget.enabled, isFalse);
+    });
   });
 }
