@@ -1,7 +1,7 @@
 name: zefyr
 description: Flutter widgets for editing rich text.
 version: 0.1.0
-author: anatoly.pulyaevskiy@gmail.com
+author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 homepage: https://github.com/pulyaevskiy/zefyr
 
 dependencies:

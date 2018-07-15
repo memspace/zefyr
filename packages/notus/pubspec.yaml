@@ -1,7 +1,7 @@
 name: notus
 description: Rich text document model for Zefyr editor.
 version: 0.1.0
-author: Memspace <hello@memspace.app>
+author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 homepage: https://github.com/memspace/zefyr
 
 environment:
