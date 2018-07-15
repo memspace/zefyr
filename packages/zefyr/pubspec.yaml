@@ -4,6 +4,9 @@ version: 0.1.0
 author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 homepage: https://github.com/pulyaevskiy/zefyr
 
+environment:
+  sdk: '>=2.0.0-dev.58.0 <2.0.0'
+
 dependencies:
   flutter:
     sdk: flutter
@@ -11,10 +14,7 @@ dependencies:
   url_launcher: ^3.0.0
   image_picker: ^0.4.5
   quill_delta: ^1.0.0-dev.1.0
-  notus:
-    git:
-      url: https://github.com/memspace/zefyr.git
-      path: packages/notus
+  notus: ^0.1.0
 
 dev_dependencies:
   flutter_test:
