@@ -67,13 +67,23 @@ class InputConnectionController implements TextInputClient {
   void updateRemoteValue(TextEditingValue value) {
     if (!hasConnection) return;
 
-    if (value == _lastKnownRemoteTextEditingValue) return;
+    // Since we don't keep track of composing range in value provided by
+    // ZefyrController we need to add it here manually before comparing
+    // with the last known remote value.
+    // It is important to prevent excessive remote updates as it can cause
+    // race conditions.
+    final actualValue = value.copyWith(
+      composing: _lastKnownRemoteTextEditingValue.composing,
+    );
+
+    if (actualValue == _lastKnownRemoteTextEditingValue) return;
+
     bool shouldRemember = value.text != _lastKnownRemoteTextEditingValue.text;
-    _lastKnownRemoteTextEditingValue = value;
-    _textInputConnection.setEditingState(value);
-    // Only keep track if text changed (selection changes are not relevant)
+    _lastKnownRemoteTextEditingValue = actualValue;
+    _textInputConnection.setEditingState(actualValue);
     if (shouldRemember) {
-      _sentRemoteValues.add(value);
+      // Only keep track if text changed (selection changes are not relevant)
+      _sentRemoteValues.add(actualValue);
     }
   }
 
@@ -103,6 +113,12 @@ class InputConnectionController implements TextInputClient {
       _sentRemoteValues.remove(value);
       return;
     }
+
+    if (_lastKnownRemoteTextEditingValue == value) {
+      // There is no difference between this value and the last known value.
+      return;
+    }
+
     // Note Flutter (unintentionally?) silences errors occurred during
     // text input update, so we have to report it ourselves.
     // For more details see https://github.com/flutter/flutter/issues/19191
