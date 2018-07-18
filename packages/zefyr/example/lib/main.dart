@@ -63,11 +63,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final theme = new ZefyrThemeData(
       toolbarTheme: ZefyrToolbarTheme.fallback(context).copyWith(
-            color: Colors.grey.shade800,
-            toggleColor: Colors.grey.shade900,
-            iconColor: Colors.white,
-            disabledIconColor: Colors.grey.shade500,
-          ),
+        color: Colors.grey.shade800,
+        toggleColor: Colors.grey.shade900,
+        iconColor: Colors.white,
+        disabledIconColor: Colors.grey.shade500,
+      ),
     );
 
     final done = _editing
