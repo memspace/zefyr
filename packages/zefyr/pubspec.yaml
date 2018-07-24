@@ -15,6 +15,7 @@ dependencies:
   image_picker: ^0.4.5
   quill_delta: ^1.0.0-dev.1.0
   notus: ^0.1.0
+  meta: ^1.1.0
 
 dev_dependencies:
   flutter_test:
