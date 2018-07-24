@@ -1,3 +1,8 @@
+## 0.1.2
+
+* Fixed analysis warnings
+* Handle user taps on padding area around the editor.
+
 ## 0.1.1
 
 * Fixed: Prevent sending excessive value updates to the native side
