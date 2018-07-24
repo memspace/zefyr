@@ -216,8 +216,12 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     HitTestResult result = new HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
 
-    final box = _getEditableBox(result);
-    if (box == null) return;
+    RenderEditableProxyBox box = _getEditableBox(result);
+    if (box == null) {
+      final editable = ZefyrEditableText.of(context);
+      box = editable.renderContext.closestBoxForGlobalPoint(globalPoint);
+    }
+    if (box == null) return null;
 
     final localPoint = box.globalToLocal(globalPoint);
     final position = box.getPositionForOffset(localPoint);

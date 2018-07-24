@@ -94,6 +94,25 @@ class ZefyrRenderContext extends ChangeNotifier {
     }, orElse: _null);
   }
 
+  /// Returns closest render box to the specified global [point].
+  ///
+  /// If [point] is inside of one of active render boxes that box is returned.
+  /// Otherwise this method checks if [point] is to the left or to the right
+  /// side of a box, e.g. if vertical offset of this point is inside of one of
+  /// the active boxes. If it is then that box is returned.
+  RenderEditableProxyBox closestBoxForGlobalPoint(Offset point) {
+    assert(!_disposed);
+    RenderEditableProxyBox box = boxForGlobalPoint(point);
+    if (box != null) return box;
+
+    box = _activeBoxes.firstWhere((p) {
+      final localPoint = p.globalToLocal(point);
+      return (localPoint.dy >= 0 && localPoint.dy < p.size.height);
+    }, orElse: _null);
+
+    return box;
+  }
+
   static Null _null() => null;
 
   @override

@@ -33,5 +33,24 @@ void main() {
       await editor.unfocus();
       expect(editor.findSelectionHandle(), findsNothing);
     });
+
+    testWidgets('tap outside of text area finds closest paragraph',
+        (tester) async {
+      final editor = new EditorSandBox(tester: tester);
+      await editor.tapEditor();
+      editor.controller
+          .updateSelection(new TextSelection.collapsed(offset: 10));
+      await tester.pumpAndSettle();
+      expect(editor.controller.selection.extentOffset, 10);
+
+      RenderEditableParagraph renderObject =
+          tester.firstRenderObject(find.byType(EditableRichText));
+      var offset = renderObject.localToGlobal(Offset.zero);
+      offset += Offset(-5.0, 5.0);
+      await tester.tapAt(offset);
+      await tester.pumpAndSettle();
+      expect(editor.controller.selection.isCollapsed, isTrue);
+      expect(editor.controller.selection.extentOffset, 0);
+    });
   });
 }

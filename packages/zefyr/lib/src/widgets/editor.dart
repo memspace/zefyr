@@ -159,10 +159,9 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       imageDelegate: _imageDelegate,
       autofocus: widget.autofocus,
       enabled: widget.enabled,
+      padding: widget.padding,
     );
-    if (widget.padding != null) {
-      editable = new Padding(padding: widget.padding, child: editable);
-    }
+
     final children = <Widget>[];
     children.add(Expanded(child: editable));
     final toolbar = ZefyrToolbar(

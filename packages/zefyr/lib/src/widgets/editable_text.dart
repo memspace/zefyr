@@ -35,6 +35,7 @@ class ZefyrEditableText extends StatefulWidget {
     @required this.imageDelegate,
     this.autofocus: true,
     this.enabled: true,
+    this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
   }) : super(key: key);
 
   final ZefyrController controller;
@@ -42,6 +43,9 @@ class ZefyrEditableText extends StatefulWidget {
   final ZefyrImageDelegate imageDelegate;
   final bool autofocus;
   final bool enabled;
+
+  /// Padding around editable area.
+  final EdgeInsets padding;
 
   static ZefyrEditableTextScope of(BuildContext context) {
     final ZefyrEditableTextScope result =
@@ -123,11 +127,15 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     super.build(context); // See AutomaticKeepAliveState.
     ZefyrEditor.of(context);
 
+    Widget body = ListBody(children: _buildChildren(context));
+    if (widget.padding != null) {
+      body = new Padding(padding: widget.padding, child: body);
+    }
     final scrollable = SingleChildScrollView(
       padding: EdgeInsets.only(top: 16.0),
       physics: AlwaysScrollableScrollPhysics(),
       controller: _scrollController,
-      child: ListBody(children: _buildChildren(context)),
+      child: body,
     );
 
     final overlay = Overlay.of(context, debugRequiredFor: widget);
