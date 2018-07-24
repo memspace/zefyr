@@ -34,8 +34,7 @@ void main() {
       expect(editor.findSelectionHandle(), findsNothing);
     });
 
-    testWidgets('tap outside of text area finds closest paragraph',
-        (tester) async {
+    testWidgets('tap on padding area finds closest paragraph', (tester) async {
       final editor = new EditorSandBox(tester: tester);
       await editor.tapEditor();
       editor.controller
@@ -51,6 +50,34 @@ void main() {
       await tester.pumpAndSettle();
       expect(editor.controller.selection.isCollapsed, isTrue);
       expect(editor.controller.selection.extentOffset, 0);
+    });
+
+    testWidgets('tap on empty space finds closest paragraph', (tester) async {
+      final editor = new EditorSandBox(tester: tester);
+      await editor.tapEditor();
+      editor.controller.replaceText(10, 1, '\n',
+          selection: new TextSelection.collapsed(offset: 0));
+      await tester.pumpAndSettle();
+      expect(editor.controller.document.toPlainText(),
+          'This House\nIs A Circus\n');
+      expect(editor.controller.selection.extentOffset, 0);
+
+      RenderBox renderObject =
+          tester.firstRenderObject(find.byType(ZefyrEditableText));
+      var offset = renderObject.localToGlobal(Offset.zero);
+      offset += Offset(50.0, renderObject.size.height - 5.0);
+      await tester.tapAt(offset);
+      await tester.pumpAndSettle();
+      expect(editor.controller.selection.isCollapsed, isTrue);
+      expect(editor.controller.selection.extentOffset,
+          13); // Note that this is probably too fragile.
+
+      offset = renderObject.localToGlobal(Offset.zero) + Offset(50.0, 1.0);
+      await tester.tapAt(offset);
+      await tester.pumpAndSettle();
+      expect(editor.controller.selection.isCollapsed, isTrue);
+      expect(editor.controller.selection.extentOffset,
+          2); // Note that this is probably too fragile.
     });
   });
 }

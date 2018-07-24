@@ -109,6 +109,15 @@ class ZefyrRenderContext extends ChangeNotifier {
       final localPoint = p.globalToLocal(point);
       return (localPoint.dy >= 0 && localPoint.dy < p.size.height);
     }, orElse: _null);
+    if (box != null) return box;
+
+    box = _activeBoxes.map((p) {
+      final localPoint = p.globalToLocal(point);
+      final distance = localPoint.dy - p.size.height;
+      return new MapEntry(distance.abs(), p);
+    }).reduce((a, b) {
+      return (a.key <= b.key) ? a : b;
+    }).value;
 
     return box;
   }

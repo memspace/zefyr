@@ -231,8 +231,11 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     );
     if (_didCaretTap && _selection == selection) {
       _didCaretTap = false;
-      hideToolbar();
-      showToolbar();
+      if (isToolbarVisible) {
+        hideToolbar();
+      } else {
+        showToolbar();
+      }
     } else {
       _didCaretTap = true;
     }

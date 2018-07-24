@@ -1,7 +1,9 @@
 ## 0.1.2
 
-* Fixed analysis warnings
-* Handle user taps on padding area around the editor.
+* Fixed analysis warnings.
+* UX: User taps on padding area around the editor and in empty space inside it now look for the nearest
+  paragraph to move caret to.
+* UX: Toggle selection toolbar on double tap instead of refreshing it.
 
 ## 0.1.1
 
