@@ -14,8 +14,8 @@ import 'package:image_picker/image_picker.dart';
 import 'editable_box.dart';
 
 abstract class ZefyrImageDelegate<S> {
-  /// Creates [ImageProvider] for specified [imageSource].
-  ImageProvider createImageProvider(String imageSource);
+  /// Builds image widget for specified [imageSource] and [context].
+  Widget buildImage(BuildContext context, String imageSource);
 
   /// Picks an image from specified [source].
   ///
@@ -26,9 +26,10 @@ abstract class ZefyrImageDelegate<S> {
 
 class ZefyrDefaultImageDelegate implements ZefyrImageDelegate<ImageSource> {
   @override
-  ImageProvider createImageProvider(String imageSource) {
+  Widget buildImage(BuildContext context, String imageSource) {
     final file = new File.fromUri(Uri.parse(imageSource));
-    return new FileImage(file);
+    final image = new FileImage(file);
+    return new Image(image: image);
   }
 
   @override
@@ -51,64 +52,18 @@ class ZefyrImage extends StatefulWidget {
 }
 
 class _ZefyrImageState extends State<ZefyrImage> {
-  ImageProvider _provider;
-  ImageStream _imageStream;
-  ImageInfo _imageInfo;
-
-  @override
-  void initState() {
-    super.initState();
+  String get imageSource {
     EmbedAttribute attribute = widget.node.style.get(NotusAttribute.embed);
-    final source = attribute.value['source'];
-    _provider = widget.delegate.createImageProvider(source);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _getImage();
-  }
-
-  @override
-  void didUpdateWidget(ZefyrImage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    EmbedAttribute oldStyle = oldWidget.node.style.get(NotusAttribute.embed);
-    final oldSource = oldStyle.value['source'];
-    EmbedAttribute style = widget.node.style.get(NotusAttribute.embed);
-    final source = style.value['source'];
-    if (oldSource != source || oldWidget.delegate != widget.delegate) {
-      _provider = widget.delegate.createImageProvider(source);
-      _getImage();
-    }
-  }
-
-  @override
-  void dispose() {
-    _imageStream.removeListener(_updateImage);
-    super.dispose();
+    return attribute.value['source'];
   }
 
   @override
   Widget build(BuildContext context) {
+    final image = widget.delegate.buildImage(context, imageSource);
     return _EditableImage(
-      child: new RawImage(image: _imageInfo?.image),
+      child: image,
       node: widget.node,
     );
-  }
-
-  void _getImage() {
-    final oldImageStream = _imageStream;
-    _imageStream = _provider.resolve(createLocalImageConfiguration(context));
-    if (_imageStream.key != oldImageStream?.key) {
-      oldImageStream?.removeListener(_updateImage);
-      _imageStream.addListener(_updateImage);
-    }
-  }
-
-  void _updateImage(ImageInfo imageInfo, bool synchronousCall) {
-    setState(() {
-      _imageInfo = imageInfo;
-    });
   }
 }
 

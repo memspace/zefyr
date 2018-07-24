@@ -1,3 +1,8 @@
+## 0.1.3
+
+* Breaking change: `ZefyrImageDelegate.createImageProvider` replaced with
+  `ZefyrImageDelegate.buildImage`.
+
 ## 0.1.2
 
 * Fixed analysis warnings.

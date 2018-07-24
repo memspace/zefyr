@@ -113,12 +113,13 @@ class _MyHomePageState extends State<MyHomePage> {
 /// Default image delegate only supports [FileImage]s.
 class CustomImageDelegate extends ZefyrDefaultImageDelegate {
   @override
-  ImageProvider createImageProvider(String imageSource) {
+  Widget buildImage(BuildContext context, String imageSource) {
     // We use custom "asset" scheme to distinguish asset images from other files.
     if (imageSource.startsWith('asset://')) {
-      return new AssetImage(imageSource.replaceFirst('asset://', ''));
+      final asset = new AssetImage(imageSource.replaceFirst('asset://', ''));
+      return new Image(image: asset);
     } else {
-      return super.createImageProvider(imageSource);
+      return super.buildImage(context, imageSource);
     }
   }
 }
