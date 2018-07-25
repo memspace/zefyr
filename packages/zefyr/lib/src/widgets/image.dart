@@ -87,9 +87,7 @@ class _EditableImage extends SingleChildRenderObjectWidget {
 }
 
 class RenderEditableImage extends RenderBox
-    with
-        RenderObjectWithChildMixin<RenderImage>,
-        RenderProxyBoxMixin<RenderImage>
+    with RenderObjectWithChildMixin<RenderBox>, RenderProxyBoxMixin<RenderBox>
     implements RenderEditableBox {
   static const kPaddingBottom = 24.0;
 
