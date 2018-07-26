@@ -105,8 +105,9 @@ class RenderEditableImage extends RenderBox
     _node = value;
   }
 
+  // TODO: Customize caret height offset instead of adjusting here by 2px.
   @override
-  double get preferredLineHeight => size.height - kPaddingBottom;
+  double get preferredLineHeight => size.height - kPaddingBottom + 2.0;
 
   @override
   SelectionOrder get selectionOrder => SelectionOrder.foreground;
@@ -169,9 +170,10 @@ class RenderEditableImage extends RenderBox
   @override
   Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
     final pos = position.offset - node.documentOffset;
-    Offset caretOffset = Offset.zero;
+    Offset caretOffset = _childOffset - new Offset(kHorizontalPadding, 0.0);
     if (pos == 1) {
-      caretOffset = caretOffset + new Offset(size.width - 1.0, 0.0);
+      caretOffset = caretOffset +
+          new Offset(_lastChildSize.width + kHorizontalPadding, 0.0);
     }
     return caretOffset;
   }
