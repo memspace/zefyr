@@ -106,10 +106,10 @@ class RenderEditableImage extends RenderBox
   }
 
   @override
-  double get preferredLineHeight => size.height;
+  double get preferredLineHeight => size.height - kPaddingBottom;
 
   @override
-  SelectionOrder get selectionOrder => SelectionOrder.background;
+  SelectionOrder get selectionOrder => SelectionOrder.foreground;
 
   @override
   TextSelection getLocalSelection(TextSelection documentSelection) {
@@ -127,16 +127,19 @@ class RenderEditableImage extends RenderBox
   List<ui.TextBox> getEndpointsForSelection(TextSelection selection) {
     TextSelection local = getLocalSelection(selection);
     if (local.isCollapsed) {
-      final dx = local.extentOffset == 0 ? 0.0 : size.width;
+      final dx = local.extentOffset == 0 ? _childOffset.dx : size.width;
       return [
-        new ui.TextBox.fromLTRBD(dx, 0.0, dx, size.height, TextDirection.ltr),
+        new ui.TextBox.fromLTRBD(
+            dx, 0.0, dx, size.height - kPaddingBottom, TextDirection.ltr),
       ];
     }
 
+    final rect = _childRect;
     return [
-      new ui.TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
       new ui.TextBox.fromLTRBD(
-          size.width, 0.0, size.width, size.height, TextDirection.ltr),
+          rect.left, rect.top, rect.left, rect.bottom, TextDirection.ltr),
+      new ui.TextBox.fromLTRBD(
+          rect.right, rect.top, rect.right, rect.bottom, TextDirection.ltr),
     ];
   }
 
@@ -174,15 +177,38 @@ class RenderEditableImage extends RenderBox
   }
 
   @override
-  void paintSelection(PaintingContext context, ui.Offset offset,
-      TextSelection selection, ui.Color selectionColor) {
+  void paintSelection(PaintingContext context, Offset offset,
+      TextSelection selection, Color selectionColor) {
     final localSelection = getLocalSelection(selection);
     assert(localSelection != null);
     if (!localSelection.isCollapsed) {
-      final Paint paint = new Paint()..color = selectionColor;
-      final rect = new Rect.fromLTWH(0.0, 0.0, size.width, size.height);
-      context.canvas.drawRect(rect.shift(offset), paint);
+      final Paint paint = new Paint()
+        ..color = selectionColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3.0;
+      final rect = new Rect.fromLTWH(
+          0.0, 0.0, _lastChildSize.width, _lastChildSize.height);
+      context.canvas.drawRect(rect.shift(offset + _childOffset), paint);
     }
+  }
+
+  void paint(PaintingContext context, Offset offset) {
+    super.paint(context, offset + _childOffset);
+  }
+
+  static const double kHorizontalPadding = 1.0;
+
+  Size _lastChildSize;
+
+  Offset get _childOffset {
+    final dx = (size.width - _lastChildSize.width) / 2 + kHorizontalPadding;
+    final dy = (size.height - _lastChildSize.height - kPaddingBottom) / 2;
+    return new Offset(dx, dy);
+  }
+
+  Rect get _childRect {
+    return new Rect.fromLTWH(_childOffset.dx, _childOffset.dy,
+        _lastChildSize.width, _lastChildSize.height);
   }
 
   @override
@@ -190,11 +216,17 @@ class RenderEditableImage extends RenderBox
     assert(constraints.hasBoundedWidth);
     if (child != null) {
       // Make constraints use 16:9 aspect ratio.
+      final width = constraints.maxWidth - kHorizontalPadding * 2;
       final childConstraints = constraints.copyWith(
-        maxHeight: (constraints.maxWidth * 9 / 16).floorToDouble(),
+        minWidth: 0.0,
+        maxWidth: width,
+        minHeight: 0.0,
+        maxHeight: (width * 9 / 16).floorToDouble(),
       );
       child.layout(childConstraints, parentUsesSize: true);
-      size = new Size(child.size.width, child.size.height + kPaddingBottom);
+      _lastChildSize = child.size;
+      size = new Size(
+          constraints.maxWidth, _lastChildSize.height + kPaddingBottom);
     } else {
       performResize();
     }

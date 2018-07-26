@@ -351,7 +351,10 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
       handle = new CompositedTransformFollower(
         link: block.layerLink,
         showWhenUnlinked: false,
-        child: new Stack(children: <Widget>[handle]),
+        child: new Stack(
+          overflow: Overflow.visible,
+          children: <Widget>[handle],
+        ),
       );
     }
     // Always return this gesture detector even if handle is an empty container
