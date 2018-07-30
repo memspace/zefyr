@@ -80,6 +80,7 @@ class InputConnectionController implements TextInputClient {
 
     bool shouldRemember = value.text != _lastKnownRemoteTextEditingValue.text;
     _lastKnownRemoteTextEditingValue = actualValue;
+    print('>>> updateRemoteValue: $actualValue');
     _textInputConnection.setEditingState(actualValue);
     if (shouldRemember) {
       // Only keep track if text changed (selection changes are not relevant)
@@ -143,6 +144,7 @@ class InputConnectionController implements TextInputClient {
       final text = value.text;
       final cursorPosition = value.selection.extentOffset;
       final diff = fastDiff(oldText, text, cursorPosition);
+      print('<<< updateEditingValue $value');
       onValueChanged(diff.start, diff.deleted, diff.inserted, value.selection);
     } catch (e, trace) {
       FlutterError.reportError(new FlutterErrorDetails(
