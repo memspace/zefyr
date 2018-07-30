@@ -119,6 +119,19 @@ class InputConnectionController implements TextInputClient {
       return;
     }
 
+    // Check if only composing range changed.
+    if (_lastKnownRemoteTextEditingValue.text == value.text &&
+        _lastKnownRemoteTextEditingValue.selection == value.selection) {
+      // This update only modifies composing range. Since we don't keep track
+      // of composing range in Zefyr we just need to update last known value
+      // here.
+      // Note: this check fixes an issue on Android when it sends
+      // composing updates separately from regular changes for text and
+      // selection.
+      _lastKnownRemoteTextEditingValue = value;
+      return;
+    }
+
     // Note Flutter (unintentionally?) silences errors occurred during
     // text input update, so we have to report it ourselves.
     // For more details see https://github.com/flutter/flutter/issues/19191
