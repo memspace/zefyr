@@ -19,6 +19,7 @@ class NotusMarkdownCodec extends Codec<Delta, String> {
 }
 
 class _NotusMarkdownEncoder extends Converter<Delta, String> {
+  static const kColor = '&&';
   static const kBold = '**';
   static const kItalic = '_';
   static final kSimpleBlocks = <NotusAttribute, String>{
@@ -160,6 +161,8 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
       {bool close: false}) {
     if (attribute == NotusAttribute.bold) {
       _writeBoldTag(buffer);
+    } else if (attribute == NotusAttribute.color) {
+      _writeColorTag(buffer);
     } else if (attribute == NotusAttribute.italic) {
       _writeItalicTag(buffer);
     } else if (attribute.key == NotusAttribute.link.key) {
@@ -175,6 +178,10 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
 
   void _writeBoldTag(StringBuffer buffer) {
     buffer.write(kBold);
+  }
+
+  void _writeColorTag(StringBuffer buffer) {
+    buffer.write(kColor);
   }
 
   void _writeItalicTag(StringBuffer buffer) {
