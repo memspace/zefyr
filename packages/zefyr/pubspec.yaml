@@ -20,4 +20,3 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  test: ^0.12.37
