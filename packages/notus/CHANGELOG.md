@@ -1,3 +1,8 @@
+## 0.1.3
+
+- Fixed handling of user input around embeds.
+- Added new heuristic rule to preserve block style on paste
+
 ## 0.1.2
 
 * Upgraded dependency on quiver_hashcode to 2.0.0.
