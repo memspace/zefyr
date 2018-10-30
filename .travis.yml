@@ -1,6 +1,7 @@
 language: dart
 
 dart:
+  - stable
   - dev
 
 os:
@@ -21,7 +22,7 @@ cache:
     - $HOME/.pub-cache
 
 env:
-#  - FLUTTER_VERSION=beta
+  - FLUTTER_VERSION=beta
   - FLUTTER_VERSION=dev
 
 matrix:
@@ -37,4 +38,4 @@ script:
 - pwd
 - ./tool/travis.sh notus
 - ./tool/travis.sh zefyr
-- bash <(curl -s https://codecov.io/bash)
+#- bash <(curl -s https://codecov.io/bash)
