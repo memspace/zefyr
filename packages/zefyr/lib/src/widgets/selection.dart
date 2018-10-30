@@ -99,6 +99,8 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     super.initState();
     _toolbarController = new AnimationController(
         duration: _kFadeDuration, vsync: widget.overlay);
+    _selection = widget.controller.selection;
+    widget.controller.addListener(_handleChange);
   }
 
   static const Duration _kFadeDuration = const Duration(milliseconds: 150);
@@ -112,6 +114,10 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
       _toolbarController = new AnimationController(
           duration: _kFadeDuration, vsync: widget.overlay);
     }
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_handleChange);
+      widget.controller.addListener(_handleChange);
+    }
   }
 
   @override
@@ -124,6 +130,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
   @override
   void dispose() {
+    widget.controller.removeListener(_handleChange);
     hideToolbar();
     _toolbarController.dispose();
     _toolbarController = null;
@@ -171,6 +178,12 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   TextSelection _selection;
 
   bool _didCaretTap = false;
+
+  void _handleChange() {
+    if (_selection != widget.controller.selection) {
+      _updateToolbar();
+    }
+  }
 
   void _updateToolbar() {
     if (!mounted) {
