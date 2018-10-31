@@ -424,6 +424,7 @@ class _LinkButtonState extends State<LinkButton> {
   }
 
   Widget buildOverlay(BuildContext context) {
+
     final toolbar = ZefyrToolbar.of(context);
     final style = toolbar.editor.selectionStyle;
 

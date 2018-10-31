@@ -184,6 +184,37 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   final FocusNode _toolbarFocusNode = new FocusNode();
   ZefyrImageDelegate _imageDelegate;
   ZefyrEditorScope _scope;
+  ZefyrThemeData _themeData;
+
+  OverlayEntry _toolbar;
+  OverlayState _overlay;
+
+  void showToolbar() {
+    _toolbar = new OverlayEntry(
+      builder: (context) => _ZefyrToolbarContainer(
+            theme: _themeData,
+            toolbar: ZefyrToolbar(
+              focusNode: _toolbarFocusNode,
+              editor: _scope,
+              delegate: widget.toolbarDelegate,
+            ),
+          ),
+    );
+    _overlay.insert(_toolbar);
+  }
+
+  void hideToolbar() {
+    _toolbar?.remove();
+    _toolbar = null;
+  }
+
+  void _handleChange() {
+    if (_scope.focusOwner == FocusOwner.none) {
+      hideToolbar();
+    } else if (_toolbar == null) {
+      showToolbar();
+    }
+  }
 
   @override
   void initState() {
@@ -195,6 +226,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       controller: widget.controller,
       focusNode: widget.focusNode,
     );
+    _scope.addListener(_handleChange);
   }
 
   @override
@@ -209,7 +241,27 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final parentTheme = ZefyrTheme.of(context, nullOk: true);
+    final fallbackTheme = ZefyrThemeData.fallback(context);
+    _themeData = (parentTheme != null)
+        ? fallbackTheme.merge(parentTheme)
+        : fallbackTheme;
+
+    final overlay = Overlay.of(context, debugRequiredFor: widget);
+    if (_overlay != overlay) {
+      hideToolbar();
+      _overlay = overlay;
+      // TODO: update toolbar.
+    }
+  }
+
+  @override
   void dispose() {
+    hideToolbar();
+    _scope.removeListener(_handleChange);
     _scope.dispose();
     _toolbarFocusNode.dispose();
     super.dispose();
@@ -228,25 +280,41 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
 
     final children = <Widget>[];
     children.add(Expanded(child: editable));
-    final toolbar = ZefyrToolbar(
-      editor: _scope,
-      focusNode: _toolbarFocusNode,
-      delegate: widget.toolbarDelegate,
-    );
-    children.add(toolbar);
-
-    final parentTheme = ZefyrTheme.of(context, nullOk: true);
-    final fallbackTheme = ZefyrThemeData.fallback(context);
-    final actualTheme = (parentTheme != null)
-        ? fallbackTheme.merge(parentTheme)
-        : fallbackTheme;
+    if (_toolbar != null) {
+      children.add(SizedBox(height: ZefyrToolbar.kToolbarHeight));
+    }
+//    final toolbar = ZefyrToolbar(
+//      editor: _scope,
+//      focusNode: _toolbarFocusNode,
+//      delegate: widget.toolbarDelegate,
+//    );
+//    children.add(toolbar);
 
     return ZefyrTheme(
-      data: actualTheme,
+      data: _themeData,
       child: _ZefyrEditorScope(
         scope: _scope,
         child: Column(children: children),
       ),
+    );
+  }
+}
+
+class _ZefyrToolbarContainer extends StatelessWidget {
+  final ZefyrThemeData theme;
+  final Widget toolbar;
+
+  const _ZefyrToolbarContainer({Key key, this.theme, this.toolbar})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    return Positioned(
+      bottom: media.viewInsets.bottom,
+      left: 0.0,
+      right: 0.0,
+      child: ZefyrTheme(data: theme, child: toolbar),
     );
   }
 }

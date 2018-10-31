@@ -82,7 +82,6 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
               editable: editable,
               controls: widget.controls,
               delegate: this,
-              visible: true,
             ),
           ),
     );
@@ -423,13 +422,11 @@ class _SelectionToolbar extends StatefulWidget {
     @required this.editable,
     @required this.controls,
     @required this.delegate,
-    @required this.visible,
   }) : super(key: key);
 
   final ZefyrEditableTextScope editable;
   final TextSelectionControls controls;
   final TextSelectionDelegate delegate;
-  final bool visible;
 
   @override
   _SelectionToolbarState createState() => new _SelectionToolbarState();
