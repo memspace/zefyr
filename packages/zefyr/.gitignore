@@ -13,3 +13,4 @@ ios/Flutter/Generated.xcconfig
 example/ios/.symlinks
 example/ios/Flutter/Generated.xcconfig
 doc/api/
+build/

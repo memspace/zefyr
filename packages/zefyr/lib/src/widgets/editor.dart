@@ -10,6 +10,143 @@ import 'image.dart';
 import 'theme.dart';
 import 'toolbar.dart';
 
+class ZefyrEditorScope extends ChangeNotifier {
+  ZefyrEditorScope({
+    @required ZefyrImageDelegate imageDelegate,
+    @required ZefyrController controller,
+    @required FocusNode focusNode,
+    @required FocusNode toolbarFocusNode,
+  })  : _controller = controller,
+        _imageDelegate = imageDelegate,
+        _focusNode = focusNode,
+        _toolbarFocusNode = toolbarFocusNode {
+    _selectionStyle = _controller.getSelectionStyle();
+    _selection = _controller.selection;
+    _controller.addListener(_handleControllerChange);
+    toolbarFocusNode.addListener(_handleFocusChange);
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  bool _disposed = false;
+
+  ZefyrImageDelegate _imageDelegate;
+  ZefyrImageDelegate get imageDelegate => _imageDelegate;
+
+  FocusNode _focusNode;
+  FocusNode _toolbarFocusNode;
+  FocusNode get toolbarFocusNode => _toolbarFocusNode;
+
+  ZefyrController _controller;
+  NotusStyle get selectionStyle => _selectionStyle;
+  NotusStyle _selectionStyle;
+  TextSelection get selection => _selection;
+  TextSelection _selection;
+
+  @override
+  void dispose() {
+    assert(!_disposed);
+    _controller.removeListener(_handleControllerChange);
+    _toolbarFocusNode.removeListener(_handleFocusChange);
+    _focusNode.removeListener(_handleFocusChange);
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _updateControllerIfNeeded(ZefyrController value) {
+    if (_controller != value) {
+      _controller.removeListener(_handleControllerChange);
+      _controller = value;
+      _selectionStyle = _controller.getSelectionStyle();
+      _selection = _controller.selection;
+      _controller.addListener(_handleControllerChange);
+      notifyListeners();
+    }
+  }
+
+  void _updateFocusNodeIfNeeded(FocusNode value) {
+    if (_focusNode != value) {
+      _focusNode.removeListener(_handleFocusChange);
+      _focusNode = value;
+      _focusNode.addListener(_handleFocusChange);
+      notifyListeners();
+    }
+  }
+
+  void _updateImageDelegateIfNeeded(ZefyrImageDelegate value) {
+    if (_imageDelegate != value) {
+      _imageDelegate = value;
+      notifyListeners();
+    }
+  }
+
+  void _handleControllerChange() {
+    assert(!_disposed);
+    final attrs = _controller.getSelectionStyle();
+    final selection = _controller.selection;
+    if (_selectionStyle != attrs || _selection != selection) {
+      _selectionStyle = attrs;
+      _selection = _controller.selection;
+      notifyListeners();
+    }
+  }
+
+  void _handleFocusChange() {
+    assert(!_disposed);
+    if (focusOwner == FocusOwner.none && !_selection.isCollapsed) {
+      // Collapse selection if there is nothing focused.
+      _controller.updateSelection(_selection.copyWith(
+        baseOffset: _selection.extentOffset,
+        extentOffset: _selection.extentOffset,
+      ));
+    }
+    notifyListeners();
+  }
+
+  FocusOwner get focusOwner {
+    assert(!_disposed);
+    if (_focusNode.hasFocus) {
+      return FocusOwner.editor;
+    } else if (toolbarFocusNode.hasFocus) {
+      return FocusOwner.toolbar;
+    } else {
+      return FocusOwner.none;
+    }
+  }
+
+  void updateSelection(TextSelection value,
+      {ChangeSource source: ChangeSource.remote}) {
+    assert(!_disposed);
+    _controller.updateSelection(value, source: source);
+  }
+
+  void formatSelection(NotusAttribute value) {
+    assert(!_disposed);
+    _controller.formatSelection(value);
+  }
+
+  void focus(BuildContext context) {
+    assert(!_disposed);
+    FocusScope.of(context).requestFocus(_focusNode);
+  }
+
+  void hideKeyboard() {
+    assert(!_disposed);
+    _focusNode.unfocus();
+  }
+}
+
+class _ZefyrEditorScope extends InheritedWidget {
+  final ZefyrEditorScope scope;
+
+  _ZefyrEditorScope({Key key, Widget child, @required this.scope})
+      : super(key: key, child: child);
+
+  @override
+  bool updateShouldNotify(_ZefyrEditorScope oldWidget) {
+    return oldWidget.scope != scope;
+  }
+}
+
 /// Widget for editing Zefyr documents.
 class ZefyrEditor extends StatefulWidget {
   const ZefyrEditor({
@@ -34,119 +171,46 @@ class ZefyrEditor extends StatefulWidget {
   final EdgeInsets padding;
 
   static ZefyrEditorScope of(BuildContext context) {
-    ZefyrEditorScope scope =
-        context.inheritFromWidgetOfExactType(ZefyrEditorScope);
-    return scope;
+    _ZefyrEditorScope widget =
+        context.inheritFromWidgetOfExactType(_ZefyrEditorScope);
+    return widget.scope;
   }
 
   @override
   _ZefyrEditorState createState() => new _ZefyrEditorState();
 }
 
-/// Inherited widget which provides access to shared state of a Zefyr editor.
-class ZefyrEditorScope extends InheritedWidget {
-  /// Current selection style
-  final NotusStyle selectionStyle;
-  final TextSelection selection;
-  final FocusOwner focusOwner;
-  final FocusNode toolbarFocusNode;
-  final ZefyrImageDelegate imageDelegate;
-  final ZefyrController _controller;
-  final FocusNode _focusNode;
-
-  ZefyrEditorScope({
-    Key key,
-    @required Widget child,
-    @required this.selectionStyle,
-    @required this.selection,
-    @required this.focusOwner,
-    @required this.toolbarFocusNode,
-    @required this.imageDelegate,
-    @required ZefyrController controller,
-    @required FocusNode focusNode,
-  })  : _controller = controller,
-        _focusNode = focusNode,
-        super(key: key, child: child);
-
-  void updateSelection(TextSelection value,
-      {ChangeSource source: ChangeSource.remote}) {
-    _controller.updateSelection(value, source: source);
-  }
-
-  void formatSelection(NotusAttribute value) {
-    _controller.formatSelection(value);
-  }
-
-  void focus(BuildContext context) {
-    FocusScope.of(context).requestFocus(_focusNode);
-  }
-
-  void hideKeyboard() {
-    _focusNode.unfocus();
-  }
-
-  @override
-  bool updateShouldNotify(ZefyrEditorScope oldWidget) {
-    return (selectionStyle != oldWidget.selectionStyle ||
-        selection != oldWidget.selection ||
-        focusOwner != oldWidget.focusOwner ||
-        imageDelegate != oldWidget.imageDelegate);
-  }
-}
-
 class _ZefyrEditorState extends State<ZefyrEditor> {
   final FocusNode _toolbarFocusNode = new FocusNode();
-
-  NotusStyle _selectionStyle;
-  TextSelection _selection;
-  FocusOwner _focusOwner;
   ZefyrImageDelegate _imageDelegate;
-
-  FocusOwner getFocusOwner() {
-    if (widget.focusNode.hasFocus) {
-      return FocusOwner.editor;
-    } else if (_toolbarFocusNode.hasFocus) {
-      return FocusOwner.toolbar;
-    } else {
-      return FocusOwner.none;
-    }
-  }
+  ZefyrEditorScope _scope;
 
   @override
   void initState() {
     super.initState();
-    _selectionStyle = widget.controller.getSelectionStyle();
-    _selection = widget.controller.selection;
-    _focusOwner = getFocusOwner();
     _imageDelegate = widget.imageDelegate ?? new ZefyrDefaultImageDelegate();
-    widget.controller.addListener(_handleControllerChange);
-    _toolbarFocusNode.addListener(_handleFocusChange);
-    widget.focusNode.addListener(_handleFocusChange);
+    _scope = ZefyrEditorScope(
+      toolbarFocusNode: _toolbarFocusNode,
+      imageDelegate: _imageDelegate,
+      controller: widget.controller,
+      focusNode: widget.focusNode,
+    );
   }
 
   @override
   void didUpdateWidget(ZefyrEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.focusNode != oldWidget.focusNode) {
-      oldWidget.focusNode.removeListener(_handleFocusChange);
-      widget.focusNode.addListener(_handleFocusChange);
-    }
-    if (widget.controller != oldWidget.controller) {
-      oldWidget.controller.removeListener(_handleControllerChange);
-      widget.controller.addListener(_handleControllerChange);
-      _selectionStyle = widget.controller.getSelectionStyle();
-      _selection = widget.controller.selection;
-    }
+    _scope._updateControllerIfNeeded(widget.controller);
+    _scope._updateFocusNodeIfNeeded(widget.focusNode);
     if (widget.imageDelegate != oldWidget.imageDelegate) {
       _imageDelegate = widget.imageDelegate ?? new ZefyrDefaultImageDelegate();
+      _scope._updateImageDelegateIfNeeded(_imageDelegate);
     }
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(_handleControllerChange);
-    widget.focusNode.removeListener(_handleFocusChange);
-    _toolbarFocusNode.removeListener(_handleFocusChange);
+    _scope.dispose();
     _toolbarFocusNode.dispose();
     super.dispose();
   }
@@ -165,8 +229,8 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
     final children = <Widget>[];
     children.add(Expanded(child: editable));
     final toolbar = ZefyrToolbar(
+      editor: _scope,
       focusNode: _toolbarFocusNode,
-      controller: widget.controller,
       delegate: widget.toolbarDelegate,
     );
     children.add(toolbar);
@@ -179,40 +243,10 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
 
     return ZefyrTheme(
       data: actualTheme,
-      child: ZefyrEditorScope(
-        selection: _selection,
-        selectionStyle: _selectionStyle,
-        focusOwner: _focusOwner,
-        toolbarFocusNode: _toolbarFocusNode,
-        imageDelegate: _imageDelegate,
-        controller: widget.controller,
-        focusNode: widget.focusNode,
+      child: _ZefyrEditorScope(
+        scope: _scope,
         child: Column(children: children),
       ),
     );
-  }
-
-  void _handleControllerChange() {
-    final attrs = widget.controller.getSelectionStyle();
-    final selection = widget.controller.selection;
-    if (_selectionStyle != attrs || _selection != selection) {
-      setState(() {
-        _selectionStyle = attrs;
-        _selection = widget.controller.selection;
-      });
-    }
-  }
-
-  void _handleFocusChange() {
-    setState(() {
-      _focusOwner = getFocusOwner();
-      if (_focusOwner == FocusOwner.none && !_selection.isCollapsed) {
-        // Collapse selection if there is nothing focused.
-        widget.controller.updateSelection(_selection.copyWith(
-          baseOffset: _selection.extentOffset,
-          extentOffset: _selection.extentOffset,
-        ));
-      }
-    });
   }
 }
