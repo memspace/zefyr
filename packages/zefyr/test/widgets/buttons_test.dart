@@ -104,6 +104,7 @@ void main() {
       await tester
           .tap(find.widgetWithText(GestureDetector, 'Tap to edit link'));
       await tester.pumpAndSettle();
+      expect(editor.focusNode.hasFocus, isFalse);
       await editor.updateSelection(base: 10, extent: 10);
       expect(find.byIcon(Icons.link_off), findsNothing);
     });

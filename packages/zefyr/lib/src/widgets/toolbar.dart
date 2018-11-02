@@ -102,13 +102,11 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
 
   const ZefyrToolbar({
     Key key,
-    @required this.focusNode,
     @required this.editor,
     this.autoHide: true,
     this.delegate,
   }) : super(key: key);
 
-  final FocusNode focusNode;
   final ZefyrToolbarDelegate delegate;
   final ZefyrEditorScope editor;
 
@@ -187,21 +185,12 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
 
   ZefyrEditorScope get editor => widget.editor;
 
-  void _handleChange() {
-    if (_selection != editor.selection) {
-      _selection = editor.selection;
-      closeOverlay();
-    }
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
     _delegate = widget.delegate ?? new _DefaultZefyrToolbarDelegate();
     _overlayAnimation = new AnimationController(
         vsync: this, duration: Duration(milliseconds: 100));
-    widget.editor.addListener(_handleChange);
   }
 
   @override
@@ -210,15 +199,14 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     if (widget.delegate != oldWidget.delegate) {
       _delegate = widget.delegate ?? new _DefaultZefyrToolbarDelegate();
     }
-    if (widget.editor != oldWidget.editor) {
-      oldWidget.editor.removeListener(_handleChange);
-      widget.editor.addListener(_handleChange);
+    if (_selection != editor.selection) {
+      _selection = editor.selection;
+      closeOverlay();
     }
   }
 
   @override
   void dispose() {
-    widget.editor.removeListener(_handleChange);
     super.dispose();
   }
 
@@ -253,11 +241,14 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
 
     final constraints =
         BoxConstraints.tightFor(height: ZefyrToolbar.kToolbarHeight);
-    return new _ZefyrToolbarScope(
-      toolbar: this,
-      child: Container(
-        constraints: constraints,
-        child: Stack(children: layers),
+    return FocusScope(
+      node: editor.focusScope,
+      child: _ZefyrToolbarScope(
+        toolbar: this,
+        child: Container(
+          constraints: constraints,
+          child: Stack(children: layers),
+        ),
       ),
     );
   }

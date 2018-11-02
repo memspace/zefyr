@@ -300,10 +300,30 @@ class LinkButton extends StatefulWidget {
 }
 
 class _LinkButtonState extends State<LinkButton> {
-  final TextEditingController _inputController = new TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  final TextEditingController _inputController = TextEditingController();
   Key _inputKey;
   bool _formatError = false;
+  ZefyrEditorScope _editor;
+
   bool get isEditing => _inputKey != null;
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final toolbar = ZefyrToolbar.of(context);
+    if (_editor != toolbar.editor) {
+      _editor?.setToolbarFocusNode(null);
+      _editor = toolbar.editor;
+      _editor.setToolbarFocusNode(_focusNode);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -376,7 +396,7 @@ class _LinkButtonState extends State<LinkButton> {
         _inputController.text = '';
         _inputController.removeListener(_handleInputChange);
         toolbar.markNeedsRebuild();
-        toolbar.editor.focus(context);
+        toolbar.editor.focus();
       }
     });
   }
@@ -388,7 +408,7 @@ class _LinkButtonState extends State<LinkButton> {
         _inputKey = null;
         _inputController.text = '';
         _inputController.removeListener(_handleInputChange);
-        editor.focus(context);
+        editor.focus();
       });
     }
   }
@@ -424,7 +444,6 @@ class _LinkButtonState extends State<LinkButton> {
   }
 
   Widget buildOverlay(BuildContext context) {
-
     final toolbar = ZefyrToolbar.of(context);
     final style = toolbar.editor.selectionStyle;
 
@@ -438,7 +457,7 @@ class _LinkButtonState extends State<LinkButton> {
         : _LinkInput(
             key: _inputKey,
             controller: _inputController,
-            focusNode: toolbar.editor.toolbarFocusNode,
+            focusNode: _focusNode,
             formatError: _formatError,
           );
     final items = <Widget>[Expanded(child: body)];
@@ -517,13 +536,14 @@ class _LinkInputState extends State<_LinkInput> {
       keyboardType: TextInputType.url,
       focusNode: widget.focusNode,
       controller: widget.controller,
-      autofocus: true,
+//      autofocus: true,
       decoration: new InputDecoration(
-          hintText: 'https://',
-          filled: true,
-          fillColor: toolbarTheme.color,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(10.0)),
+        hintText: 'https://',
+        filled: true,
+        fillColor: toolbarTheme.color,
+        border: InputBorder.none,
+        contentPadding: const EdgeInsets.all(10.0),
+      ),
     );
   }
 }
