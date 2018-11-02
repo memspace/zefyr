@@ -207,6 +207,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
 
   @override
   void dispose() {
+    _overlayAnimation.dispose();
     super.dispose();
   }
 
