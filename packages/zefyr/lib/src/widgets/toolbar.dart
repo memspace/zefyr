@@ -191,6 +191,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     _delegate = widget.delegate ?? new _DefaultZefyrToolbarDelegate();
     _overlayAnimation = new AnimationController(
         vsync: this, duration: Duration(milliseconds: 100));
+    _selection = editor.selection;
   }
 
   @override

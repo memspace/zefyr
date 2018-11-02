@@ -300,30 +300,12 @@ class LinkButton extends StatefulWidget {
 }
 
 class _LinkButtonState extends State<LinkButton> {
-  final FocusNode _focusNode = FocusNode();
   final TextEditingController _inputController = TextEditingController();
   Key _inputKey;
   bool _formatError = false;
   ZefyrEditorScope _editor;
 
   bool get isEditing => _inputKey != null;
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final toolbar = ZefyrToolbar.of(context);
-    if (_editor != toolbar.editor) {
-      _editor?.setToolbarFocusNode(null);
-      _editor = toolbar.editor;
-      _editor.setToolbarFocusNode(_focusNode);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -457,7 +439,6 @@ class _LinkButtonState extends State<LinkButton> {
         : _LinkInput(
             key: _inputKey,
             controller: _inputController,
-            focusNode: _focusNode,
             formatError: _formatError,
           );
     final items = <Widget>[Expanded(child: body)];
@@ -494,16 +475,13 @@ class _LinkButtonState extends State<LinkButton> {
 }
 
 class _LinkInput extends StatefulWidget {
-  final FocusNode focusNode;
   final TextEditingController controller;
   final bool formatError;
 
-  const _LinkInput({
-    Key key,
-    @required this.focusNode,
-    @required this.controller,
-    this.formatError: false,
-  }) : super(key: key);
+  const _LinkInput(
+      {Key key, @required this.controller, this.formatError: false})
+      : super(key: key);
+
   @override
   _LinkInputState createState() {
     return new _LinkInputState();
@@ -511,20 +489,37 @@ class _LinkInput extends StatefulWidget {
 }
 
 class _LinkInputState extends State<_LinkInput> {
+  final FocusNode _focusNode = FocusNode();
+
   bool _didAutoFocus = false;
+  ZefyrEditorScope _editor;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final toolbar = ZefyrToolbar.of(context);
     if (!_didAutoFocus) {
-      FocusScope.of(context).requestFocus(widget.focusNode);
+      FocusScope.of(context).requestFocus(_focusNode);
       _didAutoFocus = true;
+    }
+
+    if (_editor != toolbar.editor) {
+      _editor?.setToolbarFocusNode(null);
+      _editor = toolbar.editor;
+      _editor.setToolbarFocusNode(_focusNode);
     }
   }
 
   @override
+  void dispose() {
+    _focusNode.dispose();
+    _editor = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).reparentIfNeeded(widget.focusNode);
+    FocusScope.of(context).reparentIfNeeded(_focusNode);
 
     final theme = Theme.of(context);
     final toolbarTheme = ZefyrTheme.of(context).toolbarTheme;
@@ -534,7 +529,7 @@ class _LinkInputState extends State<_LinkInput> {
     return TextField(
       style: style,
       keyboardType: TextInputType.url,
-      focusNode: widget.focusNode,
+      focusNode: _focusNode,
       controller: widget.controller,
 //      autofocus: true,
       decoration: new InputDecoration(

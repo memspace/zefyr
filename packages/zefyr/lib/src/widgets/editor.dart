@@ -108,7 +108,8 @@ class ZefyrEditorScope extends ChangeNotifier {
       _toolbarFocusNode?.removeListener(_handleFocusChange);
       _toolbarFocusNode = node;
       _toolbarFocusNode.addListener(_handleFocusChange);
-      notifyListeners();
+      // We do not notify listeners here because it will happen when
+      // focus state changes.
     }
   }
 
