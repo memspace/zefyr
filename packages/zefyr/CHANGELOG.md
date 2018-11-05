@@ -6,8 +6,11 @@ layouts, like forms with multiple input fields.
 It is now required to always wrap `ZefyrEditor` with an instance of this new widget. See examples
 and readme for more details.
 
+There is also new `ZefyrField` widget which integrates Zefyr with material design decorations.
+
 * Breaking change: `ZefyrEditor` requires an ancestor `ZefyrScaffold`.
 * Exposed `ZefyrEditor.physics` property to allow customization of `ScrollPhysics`.
+* Added basic `ZefyrField` widget.
 
 ## 0.2.0
 

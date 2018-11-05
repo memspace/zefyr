@@ -17,21 +17,8 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
     final form = ListView(
       children: <Widget>[
         TextField(decoration: InputDecoration(labelText: 'Name')),
-        TextField(decoration: InputDecoration(labelText: 'Email')),
-        TextField(
-          decoration: InputDecoration(labelText: 'Regular multiline text'),
-          maxLines: 5,
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 16.0),
-          child: Text(
-            'Zefyr rich text',
-            style: TextStyle(color: Colors.black54, fontSize: 16.0),
-          ),
-          alignment: Alignment.centerLeft,
-        ),
-
         buildEditor(),
+        TextField(decoration: InputDecoration(labelText: 'Email')),
       ],
     );
 
@@ -62,21 +49,16 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
       ),
     );
 
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
-      constraints: BoxConstraints.tightFor(height: 300.0),
-      decoration:
-          BoxDecoration(border: Border.all(color: Colors.grey.shade400)),
-      child: ZefyrTheme(
-        data: theme,
-        child: ZefyrEditor(
-          padding: EdgeInsets.all(8.0),
-          controller: _controller,
-          focusNode: _focusNode,
-          autofocus: false,
-          imageDelegate: new CustomImageDelegate(),
-          physics: ClampingScrollPhysics(),
-        ),
+    return ZefyrTheme(
+      data: theme,
+      child: ZefyrField(
+        height: 200.0,
+        decoration: InputDecoration(labelText: 'Description'),
+        controller: _controller,
+        focusNode: _focusNode,
+        autofocus: false,
+        imageDelegate: new CustomImageDelegate(),
+        physics: ClampingScrollPhysics(),
       ),
     );
   }
