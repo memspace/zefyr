@@ -18,14 +18,19 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
       children: <Widget>[
         TextField(decoration: InputDecoration(labelText: 'Name')),
         TextField(decoration: InputDecoration(labelText: 'Email')),
+        TextField(
+          decoration: InputDecoration(labelText: 'Regular multiline text'),
+          maxLines: 5,
+        ),
         Container(
           padding: EdgeInsets.only(top: 16.0),
           child: Text(
-            'Description',
+            'Zefyr rich text',
             style: TextStyle(color: Colors.black54, fontSize: 16.0),
           ),
           alignment: Alignment.centerLeft,
         ),
+
         buildEditor(),
       ],
     );

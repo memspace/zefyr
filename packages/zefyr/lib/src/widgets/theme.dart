@@ -172,7 +172,7 @@ class HeadingTheme {
           height: 1.25,
           fontWeight: FontWeight.w600,
         ),
-        padding: EdgeInsets.only(bottom: 16.0),
+        padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
       ),
       level2: StyleTheme(
         textStyle: TextStyle(
