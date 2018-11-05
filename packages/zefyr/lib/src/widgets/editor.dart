@@ -7,6 +7,7 @@ import 'package:notus/notus.dart';
 import 'controller.dart';
 import 'editable_text.dart';
 import 'image.dart';
+import 'scaffold.dart';
 import 'theme.dart';
 import 'toolbar.dart';
 
@@ -31,7 +32,6 @@ class ZefyrEditorScope extends ChangeNotifier {
   ZefyrImageDelegate _imageDelegate;
   ZefyrImageDelegate get imageDelegate => _imageDelegate;
 
-  FocusScopeNode get focusScope => _focusScope;
   FocusScopeNode _focusScope;
   FocusNode _focusNode;
 
@@ -103,13 +103,13 @@ class ZefyrEditorScope extends ChangeNotifier {
   FocusNode _toolbarFocusNode;
 
   void setToolbarFocusNode(FocusNode node) {
-    assert(!_disposed);
+    assert(!_disposed || node == null);
     if (_toolbarFocusNode != node) {
       _toolbarFocusNode?.removeListener(_handleFocusChange);
       _toolbarFocusNode = node;
-      _toolbarFocusNode.addListener(_handleFocusChange);
+      _toolbarFocusNode?.addListener(_handleFocusChange);
       // We do not notify listeners here because it will happen when
-      // focus state changes.
+      // focus state changes, see [_handleFocusChange].
     }
   }
 
@@ -169,6 +169,7 @@ class ZefyrEditor extends StatefulWidget {
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
     this.toolbarDelegate,
     this.imageDelegate,
+    this.physics,
   }) : super(key: key);
 
   final ZefyrController controller;
@@ -177,6 +178,7 @@ class ZefyrEditor extends StatefulWidget {
   final bool enabled;
   final ZefyrToolbarDelegate toolbarDelegate;
   final ZefyrImageDelegate imageDelegate;
+  final ScrollPhysics physics;
 
   /// Padding around editable area.
   final EdgeInsets padding;
@@ -195,36 +197,42 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   ZefyrImageDelegate _imageDelegate;
   ZefyrEditorScope _scope;
   ZefyrThemeData _themeData;
+  GlobalKey<ZefyrToolbarState> _toolbarKey;
+  ZefyrScaffoldState _scaffold;
 
-  OverlayEntry _toolbar;
-  OverlayState _overlay;
+  bool get hasToolbar => _toolbarKey != null;
 
   void showToolbar() {
-    _toolbar = new OverlayEntry(
-      builder: (context) => _ZefyrToolbarContainer(
-            theme: _themeData,
-            toolbar: ZefyrToolbar(
-              editor: _scope,
-              delegate: widget.toolbarDelegate,
-            ),
-          ),
-    );
-    _overlay.insert(_toolbar);
+    assert(_toolbarKey == null);
+    _toolbarKey = GlobalKey();
+    _scaffold.showToolbar(buildToolbar);
   }
 
   void hideToolbar() {
-    _toolbar?.remove();
-    _toolbar = null;
+    if (_toolbarKey == null) return;
+    _scaffold.hideToolbar();
+    _toolbarKey = null;
+  }
+
+  Widget buildToolbar(BuildContext) {
+    return ZefyrTheme(
+      data: _themeData,
+      child: ZefyrToolbar(
+        key: _toolbarKey,
+        editor: _scope,
+        delegate: widget.toolbarDelegate,
+      ),
+    );
   }
 
   void _handleChange() {
     if (_scope.focusOwner == FocusOwner.none) {
       hideToolbar();
-    } else if (_toolbar == null) {
+    } else if (!hasToolbar) {
       showToolbar();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _toolbar?.markNeedsBuild();
+        _toolbarKey?.currentState?.markNeedsRebuild();
       });
     }
   }
@@ -249,6 +257,11 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final parentTheme = ZefyrTheme.of(context, nullOk: true);
+    final fallbackTheme = ZefyrThemeData.fallback(context);
+    _themeData = (parentTheme != null)
+        ? fallbackTheme.merge(parentTheme)
+        : fallbackTheme;
 
     if (_scope == null) {
       _scope = ZefyrEditorScope(
@@ -265,17 +278,12 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       }
     }
 
-    final parentTheme = ZefyrTheme.of(context, nullOk: true);
-    final fallbackTheme = ZefyrThemeData.fallback(context);
-    _themeData = (parentTheme != null)
-        ? fallbackTheme.merge(parentTheme)
-        : fallbackTheme;
-
-    final overlay = Overlay.of(context, debugRequiredFor: widget);
-    if (_overlay != overlay) {
+    final scaffold = ZefyrScaffold.of(context);
+    if (_scaffold != scaffold) {
+      bool didHaveToolbar = hasToolbar;
       hideToolbar();
-      _overlay = overlay;
-      // TODO: update toolbar.
+      _scaffold = scaffold;
+      if (didHaveToolbar) showToolbar();
     }
   }
 
@@ -296,45 +304,15 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       autofocus: widget.autofocus,
       enabled: widget.enabled,
       padding: widget.padding,
+      physics: widget.physics,
     );
-
-    final children = <Widget>[];
-    children.add(Expanded(child: editable));
-    if (_toolbar != null) {
-      children.add(SizedBox(height: ZefyrToolbar.kToolbarHeight));
-    }
-//    final toolbar = ZefyrToolbar(
-//      editor: _scope,
-//      focusNode: _toolbarFocusNode,
-//      delegate: widget.toolbarDelegate,
-//    );
-//    children.add(toolbar);
 
     return ZefyrTheme(
       data: _themeData,
       child: _ZefyrEditorScope(
         scope: _scope,
-        child: Column(children: children),
+        child: editable,
       ),
-    );
-  }
-}
-
-class _ZefyrToolbarContainer extends StatelessWidget {
-  final ZefyrThemeData theme;
-  final Widget toolbar;
-
-  const _ZefyrToolbarContainer({Key key, this.theme, this.toolbar})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    return Positioned(
-      bottom: media.viewInsets.bottom,
-      left: 0.0,
-      right: 0.0,
-      child: ZefyrTheme(data: theme, child: toolbar),
     );
   }
 }

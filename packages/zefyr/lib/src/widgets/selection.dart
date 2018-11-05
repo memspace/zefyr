@@ -66,6 +66,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
   @override
   void hideToolbar() {
+    _didCaretTap = false; // reset double tap.
     _toolbar?.remove();
     _toolbar = null;
     _toolbarController.stop();
@@ -98,8 +99,6 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     super.initState();
     _toolbarController = new AnimationController(
         duration: _kFadeDuration, vsync: widget.overlay);
-    _selection = widget.controller.selection;
-    widget.controller.addListener(_handleChange);
   }
 
   static const Duration _kFadeDuration = const Duration(milliseconds: 150);
@@ -113,23 +112,24 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
       _toolbarController = new AnimationController(
           duration: _kFadeDuration, vsync: widget.overlay);
     }
-    if (oldWidget.controller != widget.controller) {
-      oldWidget.controller.removeListener(_handleChange);
-      widget.controller.addListener(_handleChange);
-    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateToolbar();
-    });
+    final editor = ZefyrEditor.of(context);
+    if (_editor != editor) {
+      _editor?.removeListener(_handleChange);
+      _editor = editor;
+      _editor.addListener(_handleChange);
+      _selection = _editor.selection;
+      _focusOwner = _editor.focusOwner;
+    }
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(_handleChange);
+    _editor.removeListener(_handleChange);
     hideToolbar();
     _toolbarController.dispose();
     _toolbarController = null;
@@ -174,12 +174,14 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   OverlayEntry _toolbar;
   AnimationController _toolbarController;
 
+  ZefyrEditorScope _editor;
   TextSelection _selection;
+  FocusOwner _focusOwner;
 
   bool _didCaretTap = false;
 
   void _handleChange() {
-    if (_selection != widget.controller.selection) {
+    if (_selection != _editor.selection || _focusOwner != _editor.focusOwner) {
       _updateToolbar();
     }
   }
@@ -208,6 +210,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
         }
       }
       _selection = selection;
+      _focusOwner = focusOwner;
     });
   }
 

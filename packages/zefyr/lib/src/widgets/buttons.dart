@@ -491,17 +491,18 @@ class _LinkInput extends StatefulWidget {
 class _LinkInputState extends State<_LinkInput> {
   final FocusNode _focusNode = FocusNode();
 
-  bool _didAutoFocus = false;
   ZefyrEditorScope _editor;
+  bool _didAutoFocus = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final toolbar = ZefyrToolbar.of(context);
     if (!_didAutoFocus) {
       FocusScope.of(context).requestFocus(_focusNode);
       _didAutoFocus = true;
     }
+
+    final toolbar = ZefyrToolbar.of(context);
 
     if (_editor != toolbar.editor) {
       _editor?.setToolbarFocusNode(null);
@@ -512,6 +513,7 @@ class _LinkInputState extends State<_LinkInput> {
 
   @override
   void dispose() {
+    _editor?.setToolbarFocusNode(null);
     _focusNode.dispose();
     _editor = null;
     super.dispose();
@@ -519,8 +521,6 @@ class _LinkInputState extends State<_LinkInput> {
 
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).reparentIfNeeded(_focusNode);
-
     final theme = Theme.of(context);
     final toolbarTheme = ZefyrTheme.of(context).toolbarTheme;
     final color =
@@ -531,7 +531,7 @@ class _LinkInputState extends State<_LinkInput> {
       keyboardType: TextInputType.url,
       focusNode: _focusNode,
       controller: widget.controller,
-//      autofocus: true,
+      autofocus: true,
       decoration: new InputDecoration(
         hintText: 'https://',
         filled: true,

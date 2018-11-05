@@ -20,6 +20,7 @@ export 'src/widgets/image.dart';
 export 'src/widgets/list.dart';
 export 'src/widgets/paragraph.dart';
 export 'src/widgets/quote.dart';
+export 'src/widgets/scaffold.dart';
 export 'src/widgets/selection.dart' hide SelectionHandleDriver;
 export 'src/widgets/theme.dart';
 export 'src/widgets/toolbar.dart';

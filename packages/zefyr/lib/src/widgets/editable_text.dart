@@ -36,6 +36,7 @@ class ZefyrEditableText extends StatefulWidget {
     this.autofocus: true,
     this.enabled: true,
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    this.physics,
   }) : super(key: key);
 
   final ZefyrController controller;
@@ -43,6 +44,7 @@ class ZefyrEditableText extends StatefulWidget {
   final ZefyrImageDelegate imageDelegate;
   final bool autofocus;
   final bool enabled;
+  final ScrollPhysics physics;
 
   /// Padding around editable area.
   final EdgeInsets padding;
@@ -132,8 +134,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       body = new Padding(padding: widget.padding, child: body);
     }
     final scrollable = SingleChildScrollView(
-      padding: EdgeInsets.only(top: 16.0),
-      physics: AlwaysScrollableScrollPhysics(),
+      physics: widget.physics,
       controller: _scrollController,
       child: body,
     );

@@ -151,7 +151,12 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
   TextSelection _selection;
 
   void markNeedsRebuild() {
-    setState(() {});
+    setState(() {
+      if (_selection != editor.selection) {
+        _selection = editor.selection;
+        closeOverlay();
+      }
+    });
   }
 
   Widget buildButton(BuildContext context, ZefyrToolbarAction action,
@@ -200,10 +205,6 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     if (widget.delegate != oldWidget.delegate) {
       _delegate = widget.delegate ?? new _DefaultZefyrToolbarDelegate();
     }
-    if (_selection != editor.selection) {
-      _selection = editor.selection;
-      closeOverlay();
-    }
   }
 
   @override
@@ -214,10 +215,6 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
 
   @override
   Widget build(BuildContext context) {
-    if (editor.focusOwner == FocusOwner.none) {
-      return new Container();
-    }
-
     final layers = <Widget>[];
 
     // Must set unique key for the toolbar to prevent it from reconstructing
@@ -243,14 +240,11 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
 
     final constraints =
         BoxConstraints.tightFor(height: ZefyrToolbar.kToolbarHeight);
-    return FocusScope(
-      node: editor.focusScope,
-      child: _ZefyrToolbarScope(
-        toolbar: this,
-        child: Container(
-          constraints: constraints,
-          child: Stack(children: layers),
-        ),
+    return _ZefyrToolbarScope(
+      toolbar: this,
+      child: Container(
+        constraints: constraints,
+        child: Stack(children: layers),
       ),
     );
   }
