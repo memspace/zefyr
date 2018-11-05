@@ -118,7 +118,6 @@ void main() {
       await tester
           .tap(find.widgetWithText(GestureDetector, 'Tap to edit link'));
       await tester.pumpAndSettle();
-      // TODO: figure out why below finder finds 2 instances of TextField
       expect(find.byType(TextField), findsOneWidget);
 
       await tester.enterText(find.widgetWithText(TextField, 'https://').first,
