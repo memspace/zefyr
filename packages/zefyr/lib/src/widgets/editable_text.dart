@@ -20,6 +20,7 @@ import 'paragraph.dart';
 import 'quote.dart';
 import 'render_context.dart';
 import 'selection.dart';
+import 'gestures.dart';
 
 /// Core widget responsible for editing Zefyr documents.
 ///
@@ -33,6 +34,7 @@ class ZefyrEditableText extends StatefulWidget {
     @required this.controller,
     @required this.focusNode,
     @required this.imageDelegate,
+    @required this.gesturesDelegate,
     this.autofocus: true,
     this.enabled: true,
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -45,6 +47,7 @@ class ZefyrEditableText extends StatefulWidget {
   final bool autofocus;
   final bool enabled;
   final ScrollPhysics physics;
+  final ZefyrGesturesDelegate gesturesDelegate;
 
   /// Padding around editable area.
   final EdgeInsets padding;
@@ -146,6 +149,13 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
         controller: widget.controller,
         controls: cupertinoTextSelectionControls,
         overlay: overlay,
+      ));
+    }else {
+      layers.add(GesturesOverlay(
+        controller: widget.controller,
+        controls: cupertinoTextSelectionControls,
+        overlay: overlay,
+        gesturesDelegate: widget.gesturesDelegate,
       ));
     }
 

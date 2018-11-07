@@ -70,6 +70,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
             controller: _controller,
             focusNode: _focusNode,
             enabled: _editing,
+            gesturesDelegate: MyGestures(),
             imageDelegate: new CustomImageDelegate(),
           ),
         ),
@@ -105,4 +106,20 @@ class CustomImageDelegate extends ZefyrDefaultImageDelegate {
       return super.buildImage(context, imageSource);
     }
   }
+}
+
+
+class MyGestures extends ZefyrGesturesDelegate {
+  @override
+  void onLongPress(RenderEditableBox renderNode, NotusStyle style, Offset offset) {
+    // TODO: implement onLongPress
+    print("---->n");
+  }
+
+  @override
+  void onPress(RenderEditableBox renderNode, NotusStyle style, Offset offset) {
+    // TODO: implement onPress
+    print("---->l");
+  }
+
 }

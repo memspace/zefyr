@@ -154,6 +154,25 @@ class ZefyrController extends ChangeNotifier {
     formatText(index, length, attribute);
   }
 
+  void delSelection(TextSelection value) {
+    int index = value.start;
+    int length = value.end - index;
+    final change = document.delete(index, length);
+    _lastChangeSource = ChangeSource.local;
+    // Transform selection against the composed change and give priority to
+    // the change. This is needed in cases when format operation actually
+    // inserts data into the document (e.g. embeds).
+    final base = change.transformPosition(_selection.baseOffset);
+    final extent =
+    change.transformPosition(_selection.extentOffset);
+    final adjustedSelection =
+    _selection.copyWith(baseOffset: base, extentOffset: extent);
+    if (_selection != adjustedSelection) {
+      _updateSelectionSilent(adjustedSelection, source: _lastChangeSource);
+    }
+    notifyListeners();
+  }
+
   NotusStyle getSelectionStyle() {
     int start = _selection.start;
     int length = _selection.end - start;

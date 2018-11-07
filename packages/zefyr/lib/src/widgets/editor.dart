@@ -10,6 +10,7 @@ import 'image.dart';
 import 'scaffold.dart';
 import 'theme.dart';
 import 'toolbar.dart';
+import 'gestures.dart';
 
 class ZefyrEditorScope extends ChangeNotifier {
   ZefyrEditorScope({
@@ -135,6 +136,10 @@ class ZefyrEditorScope extends ChangeNotifier {
     _controller.formatSelection(value);
   }
 
+  void delSelection(TextSelection value) {
+    _controller.delSelection(value);
+  }
+
   void focus() {
     assert(!_disposed);
     _focusScope.requestFocus(_focusNode);
@@ -169,6 +174,7 @@ class ZefyrEditor extends StatefulWidget {
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
     this.toolbarDelegate,
     this.imageDelegate,
+    this.gesturesDelegate,
     this.physics,
   }) : super(key: key);
 
@@ -179,6 +185,7 @@ class ZefyrEditor extends StatefulWidget {
   final ZefyrToolbarDelegate toolbarDelegate;
   final ZefyrImageDelegate imageDelegate;
   final ScrollPhysics physics;
+  final ZefyrGesturesDelegate gesturesDelegate;
 
   /// Padding around editable area.
   final EdgeInsets padding;
@@ -301,6 +308,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       controller: widget.controller,
       focusNode: widget.focusNode,
       imageDelegate: _imageDelegate,
+      gesturesDelegate: widget.gesturesDelegate,
       autofocus: widget.autofocus,
       enabled: widget.enabled,
       padding: widget.padding,

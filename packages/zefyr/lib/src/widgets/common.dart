@@ -9,6 +9,7 @@ import 'editable_box.dart';
 import 'editable_text.dart';
 import 'horizontal_rule.dart';
 import 'image.dart';
+import 'goods.dart';
 import 'rich_text.dart';
 import 'theme.dart';
 
@@ -147,6 +148,16 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
       final hr = new ZefyrHorizontalRule(node: node);
       return new EditableBox(
         child: hr,
+        node: widget.node,
+        layerLink: _link,
+        renderContext: editable.renderContext,
+        showCursor: editable.showCursor,
+        selection: editable.selection,
+        selectionColor: theme.selectionColor,
+      );
+    } else if (embed.type == EmbedType.goods) {
+      return new EditableBox(
+        child: ZefyrGoods(node: node),
         node: widget.node,
         layerLink: _link,
         renderContext: editable.renderContext,

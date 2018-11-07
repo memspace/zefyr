@@ -30,6 +30,7 @@ enum ZefyrToolbarAction {
   quote,
   horizontalRule,
   image,
+  goods,
   cameraImage,
   galleryImage,
   hideKeyboard,
@@ -50,6 +51,7 @@ final kZefyrToolbarAttributeActions = <ZefyrToolbarAction, NotusAttributeKey>{
   ZefyrToolbarAction.code: NotusAttribute.block.code,
   ZefyrToolbarAction.quote: NotusAttribute.block.quote,
   ZefyrToolbarAction.horizontalRule: NotusAttribute.embed.horizontalRule,
+  ZefyrToolbarAction.goods: NotusAttribute.embed.goods({}),
 };
 
 /// Allows customizing appearance of [ZefyrToolbar].
@@ -260,6 +262,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
       buildButton(context, ZefyrToolbarAction.quote),
       buildButton(context, ZefyrToolbarAction.code),
       buildButton(context, ZefyrToolbarAction.horizontalRule),
+      GoodsButton(),
       ImageButton(),
     ];
     return buttons;
@@ -349,6 +352,7 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.quote: Icons.format_quote,
     ZefyrToolbarAction.horizontalRule: Icons.remove,
     ZefyrToolbarAction.image: Icons.photo,
+    ZefyrToolbarAction.goods: Icons.shopping_cart,
     ZefyrToolbarAction.cameraImage: Icons.photo_camera,
     ZefyrToolbarAction.galleryImage: Icons.photo_library,
     ZefyrToolbarAction.hideKeyboard: Icons.keyboard_hide,
