@@ -53,9 +53,24 @@ Delta getDelta() {
   return Delta.fromJson(json.decode(doc));
 }
 
+NotusDocument getdocument(){
+  final doc = new NotusDocument();
+  // Modify this document with insert, delete and format operations
+  doc.insert(
+      0, 'Notus package provides rich text document model for Zefyr editor');
+  doc.format(0, 5, NotusAttribute.bold); // Makes first word bold.
+  doc.format(0, 5, NotusAttribute.color.fromString([255,34,67,220])); // Makes first word color.
+  doc.format(0, 0, NotusAttribute.h1); // Makes first line a heading.
+  doc.delete(23, 10); // Deletes "rich text " segment.
+
+  // Collects style attributes at 1 character in this document.
+  doc.collectStyle(1, 0); // returned style would include "bold" and "h1".
+  return doc;
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   final ZefyrController _controller =
-      ZefyrController(NotusDocument.fromDelta(getDelta()));
+      ZefyrController(getdocument());
   final FocusNode _focusNode = new FocusNode();
   bool _editing = false;
 

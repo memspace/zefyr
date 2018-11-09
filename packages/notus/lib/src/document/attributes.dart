@@ -65,6 +65,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 /// List of supported attributes:
 ///
 ///   * [NotusAttribute.bold]
+///   * [NotusAttribute.color]
 ///   * [NotusAttribute.italic]
 ///   * [NotusAttribute.link]
 ///   * [NotusAttribute.heading]
@@ -72,6 +73,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static final Map<String, NotusAttributeBuilder> _registry = {
     NotusAttribute.bold.key: NotusAttribute.bold,
+    NotusAttribute.color.key: NotusAttribute.color,
     NotusAttribute.italic.key: NotusAttribute.italic,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
@@ -86,6 +88,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Italic style attribute.
   static const italic = const _ItalicAttribute();
+
+  /// Color style attribute.
+  static const color = const ColorAttributeBuilder._();
 
   /// Link style attribute.
   static const link = const LinkAttributeBuilder._();
@@ -320,6 +325,20 @@ class _BoldAttribute extends NotusAttribute<bool> {
 /// Applies italic style to a text segment.
 class _ItalicAttribute extends NotusAttribute<bool> {
   const _ItalicAttribute() : super._('i', NotusAttributeScope.inline, true);
+}
+
+
+/// Builder for color attribute values.
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.color] instead.
+class ColorAttributeBuilder extends NotusAttributeBuilder<List<int>> {
+  static const _cLink = 'c';
+  const ColorAttributeBuilder._() : super._(_cLink, NotusAttributeScope.inline);
+
+  /// Creates a color attribute with specified link [value].
+  NotusAttribute<List<int>> fromString(List<int> value) =>
+      new NotusAttribute<List<int>>._(key, scope, value);
 }
 
 /// Builder for link attribute values.
