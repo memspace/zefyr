@@ -23,6 +23,8 @@ void main() {
       var editor =
           new EditorSandBox(tester: tester, document: doc, theme: theme);
       await editor.tapEditor();
+      // TODO: figure out why this extra pump is needed here
+      await tester.pumpAndSettle();
       EditableRichText p = tester.widget(find.byType(EditableRichText).first);
       expect(p.text.children.first.style.color, Colors.red);
     });

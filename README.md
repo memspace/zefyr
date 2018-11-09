@@ -17,12 +17,14 @@ request or found a bug, please file it at the [issue tracker][].
 * [Data Format and Document Model][data_and_document]
 * [Style attributes][attributes]
 * [Heuristic rules][heuristics]
+* [Images][images]
 * [FAQ][faq]
 
 [quick_start]: /doc/quick_start.md
 [data_and_document]: /doc/data_and_document.md
 [attributes]: /doc/attributes.md
 [heuristics]: /doc/heuristics.md
+[images]: /doc/images.md
 [faq]: /doc/faq.md
 
 ## Clean and modern look

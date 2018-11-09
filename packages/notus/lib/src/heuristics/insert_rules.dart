@@ -72,8 +72,9 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
   }
 }
 
-/// Resets format for a newly inserted line when insert occurred at the end
 /// of a line (right before a line-break).
+
+/// Resets format for a newly inserted line when insert occurred at the end
 class ResetLineFormatOnNewLineRule extends InsertRule {
   const ResetLineFormatOnNewLineRule();
 
@@ -254,5 +255,71 @@ class ForceNewlineForInsertsAroundEmbedRule extends InsertRule {
       return delta..insert(text);
     }
     return null;
+  }
+}
+
+/// Preserves block style when user pastes text containing line-breaks.
+/// This rule may also be activated for changes triggered by auto-correct.
+class PreserveBlockStyleOnPasteRule extends InsertRule {
+  const PreserveBlockStyleOnPasteRule();
+
+  bool isEdgeLineSplit(Operation before, Operation after) {
+    if (before == null) return true; // split at the beginning of a doc
+    return before.data.endsWith('\n') || after.data.startsWith('\n');
+  }
+
+  @override
+  Delta apply(Delta document, int index, String text) {
+    if (!text.contains('\n') || text.length == 1) {
+      // Only interested in text containing at least one line-break and at least
+      // one more character.
+      return null;
+    }
+
+    DeltaIterator iter = new DeltaIterator(document);
+    iter.skip(index);
+
+    // Look for next line-break.
+    Map<String, dynamic> lineStyle;
+    while (iter.hasNext) {
+      final op = iter.next();
+      int lf = op.data.indexOf('\n');
+      if (lf >= 0) {
+        lineStyle = op.attributes;
+        break;
+      }
+    }
+
+    Map<String, dynamic> resetStyle = null;
+    Map<String, dynamic> blockStyle = null;
+    if (lineStyle != null) {
+      if (lineStyle.containsKey(NotusAttribute.heading.key)) {
+        resetStyle = NotusAttribute.heading.unset.toJson();
+      }
+
+      if (lineStyle.containsKey(NotusAttribute.block.key)) {
+        blockStyle = <String, dynamic>{
+          NotusAttribute.block.key: lineStyle[NotusAttribute.block.key]
+        };
+      }
+    }
+
+    final lines = text.split('\n');
+    Delta result = new Delta()..retain(index);
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i];
+      if (line.isNotEmpty) {
+        result.insert(line);
+      }
+      if (i == 0) {
+        result.insert('\n', lineStyle);
+      } else if (i == lines.length - 1) {
+        if (resetStyle != null) result.retain(1, resetStyle);
+      } else {
+        result.insert('\n', blockStyle);
+      }
+    }
+
+    return result;
   }
 }

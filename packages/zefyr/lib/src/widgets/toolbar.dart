@@ -103,14 +103,14 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
   const ZefyrToolbar({
     Key key,
     @required this.focusNode,
-    @required this.controller,
+    @required this.editor,
     this.autoHide: true,
     this.delegate,
   }) : super(key: key);
 
   final FocusNode focusNode;
-  final ZefyrController controller;
   final ZefyrToolbarDelegate delegate;
+  final ZefyrEditorScope editor;
 
   /// Whether to automatically hide this toolbar when editor loses focus.
   final bool autoHide;
@@ -185,12 +185,23 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
 
   bool get hasOverlay => _overlayBuilder != null;
 
+  ZefyrEditorScope get editor => widget.editor;
+
+  void _handleChange() {
+    if (_selection != editor.selection) {
+      _selection = editor.selection;
+      closeOverlay();
+    }
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
     _delegate = widget.delegate ?? new _DefaultZefyrToolbarDelegate();
     _overlayAnimation = new AnimationController(
         vsync: this, duration: Duration(milliseconds: 100));
+    widget.editor.addListener(_handleChange);
   }
 
   @override
@@ -199,22 +210,20 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     if (widget.delegate != oldWidget.delegate) {
       _delegate = widget.delegate ?? new _DefaultZefyrToolbarDelegate();
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final editor = ZefyrEditor.of(context);
-    if (_selection != editor.selection) {
-      _selection = editor.selection;
-      closeOverlay();
+    if (widget.editor != oldWidget.editor) {
+      oldWidget.editor.removeListener(_handleChange);
+      widget.editor.addListener(_handleChange);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    final editor = ZefyrEditor.of(context);
+  void dispose() {
+    widget.editor.removeListener(_handleChange);
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     if (editor.focusOwner == FocusOwner.none) {
       return new Container();
     }
