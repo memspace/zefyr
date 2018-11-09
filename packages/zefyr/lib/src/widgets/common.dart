@@ -133,6 +133,11 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     if (style.contains(NotusAttribute.link)) {
       result = result.merge(theme.linkStyle);
     }
+    if(style.contains(NotusAttribute.color)){
+      List<int> notusAttribute = style.value(NotusAttribute.color);
+      TextStyle textStyle=new TextStyle(color: Color.fromARGB(notusAttribute[0], notusAttribute[1], notusAttribute[2], notusAttribute[3]));
+      result = result.merge(textStyle);
+    }
     return result;
   }
 
