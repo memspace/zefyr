@@ -73,8 +73,7 @@ void main() {
     });
 
     test('applies at the beginning of a document', () {
-      final doc = new Delta()
-        ..insert('\n', NotusAttribute.h1.toJson());
+      final doc = new Delta()..insert('\n', NotusAttribute.h1.toJson());
       final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNotNull);
       final expected = new Delta()
@@ -210,6 +209,25 @@ void main() {
         ..insert('https://example.com', link);
       final actual = rule.apply(doc, 33, ' ');
       expect(actual, isNull);
+    });
+  });
+
+  group('$PreserveBlockStyleOnPasteRule', () {
+    final rule = new PreserveBlockStyleOnPasteRule();
+
+    test('applies in a block', () {
+      final doc = new Delta()
+        ..insert('One and two')
+        ..insert('\n', ul)
+        ..insert('Three')
+        ..insert('\n', ul);
+      final actual = rule.apply(doc, 8, 'also \n');
+      final expected = new Delta()
+        ..retain(8)
+        ..insert('also ')
+        ..insert('\n', ul);
+      expect(actual, isNotNull);
+      expect(actual, expected);
     });
   });
 }

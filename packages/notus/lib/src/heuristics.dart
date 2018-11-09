@@ -23,6 +23,7 @@ class NotusHeuristics {
       // attributes.
     ],
     insertRules: [
+      PreserveBlockStyleOnPasteRule(),
       ForceNewlineForInsertsAroundEmbedRule(),
       PreserveLineStyleOnSplitRule(),
       AutoExitBlockRule(),

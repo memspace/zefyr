@@ -87,3 +87,15 @@ When composing a change which came from a different site or server make
 sure to use `ChangeSource.remote` when calling `compose()`. This allows
 you to distinguish such changes from local changes made by the user
 when listening on `NotusDocument.changes` stream.
+
+### Next up
+
+* [Images][images]
+
+[images]: /doc/images.md
+
+### Previous
+
+* [Style attributes][attributes]
+
+[attributes]: /doc/attributes.md

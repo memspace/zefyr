@@ -1,8 +1,10 @@
-## 0.1.3
+## 0.2.0
 
 * Breaking change: `ZefyrImageDelegate.createImageProvider` replaced with
   `ZefyrImageDelegate.buildImage`.
-* Fixed: Prevent redundant updates on composing range for Android.
+* Fixed redundant updates on composing range for Android.
+* Added TextCapitalization.sentences
+* Added docs for embedding images.
 
 ## 0.1.2
 

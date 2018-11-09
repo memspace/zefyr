@@ -42,6 +42,7 @@ class InputConnectionController implements TextInputClient {
           obscureText: false,
           autocorrect: true,
           inputAction: TextInputAction.newline,
+          textCapitalization: TextCapitalization.sentences,
         ),
       )..setEditingState(value);
       _sentRemoteValues.add(value);

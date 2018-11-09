@@ -65,8 +65,8 @@ class ZefyrButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final editor = ZefyrEditor.of(context);
     final toolbar = ZefyrToolbar.of(context);
+    final editor = toolbar.editor;
     final toolbarTheme = ZefyrTheme.of(context).toolbarTheme;
     final pressedHandler = _getPressedHandler(editor, toolbar);
     final iconColor = (pressedHandler == null)
@@ -236,7 +236,7 @@ class _HeadingButtonState extends State<HeadingButton> {
   }
 }
 
-/// Controls heading styles.
+/// Controls image attribute.
 ///
 /// When pressed, this button displays overlay toolbar with three
 /// buttons for each heading level.
@@ -278,14 +278,14 @@ class _ImageButtonState extends State<ImageButton> {
   }
 
   void _pickFromCamera() async {
-    final editor = ZefyrEditor.of(context);
+    final editor = ZefyrToolbar.of(context).editor;
     final image = await editor.imageDelegate.pickImage(ImageSource.camera);
     if (image != null)
       editor.formatSelection(NotusAttribute.embed.image(image));
   }
 
   void _pickFromGallery() async {
-    final editor = ZefyrEditor.of(context);
+    final editor = ZefyrToolbar.of(context).editor;
     final image = await editor.imageDelegate.pickImage(ImageSource.gallery);
     if (image != null)
       editor.formatSelection(NotusAttribute.embed.image(image));
@@ -307,8 +307,8 @@ class _LinkButtonState extends State<LinkButton> {
 
   @override
   Widget build(BuildContext context) {
-    final editor = ZefyrEditor.of(context);
     final toolbar = ZefyrToolbar.of(context);
+    final editor = toolbar.editor;
     final enabled =
         hasLink(editor.selectionStyle) || !editor.selection.isCollapsed;
 
@@ -322,7 +322,7 @@ class _LinkButtonState extends State<LinkButton> {
   bool hasLink(NotusStyle style) => style.contains(NotusAttribute.link);
 
   String getLink([String defaultValue]) {
-    final editor = ZefyrEditor.of(context);
+    final editor = ZefyrToolbar.of(context).editor;
     final attrs = editor.selectionStyle;
     if (hasLink(attrs)) {
       return attrs.value(NotusAttribute.link);
@@ -351,7 +351,6 @@ class _LinkButtonState extends State<LinkButton> {
   }
 
   void doneEdit() {
-    final editor = ZefyrEditor.of(context);
     final toolbar = ZefyrToolbar.of(context);
     setState(() {
       var error = false;
@@ -360,7 +359,7 @@ class _LinkButtonState extends State<LinkButton> {
           var uri = Uri.parse(_inputController.text);
           if ((uri.isScheme('https') || uri.isScheme('http')) &&
               uri.host.isNotEmpty) {
-            editor.formatSelection(
+            toolbar.editor.formatSelection(
                 NotusAttribute.link.fromString(_inputController.text));
           } else {
             error = true;
@@ -377,14 +376,14 @@ class _LinkButtonState extends State<LinkButton> {
         _inputController.text = '';
         _inputController.removeListener(_handleInputChange);
         toolbar.markNeedsRebuild();
-        editor.focus(context);
+        toolbar.editor.focus(context);
       }
     });
   }
 
   void cancelEdit() {
     if (mounted) {
-      final editor = ZefyrEditor.of(context);
+      final editor = ZefyrToolbar.of(context).editor;
       setState(() {
         _inputKey = null;
         _inputController.text = '';
@@ -395,7 +394,7 @@ class _LinkButtonState extends State<LinkButton> {
   }
 
   void unlink() {
-    final editor = ZefyrEditor.of(context);
+    final editor = ZefyrToolbar.of(context).editor;
     editor.formatSelection(NotusAttribute.link.unset);
     closeOverlay();
   }
@@ -407,7 +406,7 @@ class _LinkButtonState extends State<LinkButton> {
   }
 
   void openInBrowser() async {
-    final editor = ZefyrEditor.of(context);
+    final editor = ZefyrToolbar.of(context).editor;
     var link = getLink();
     assert(link != null);
     if (await canLaunch(link)) {
@@ -425,9 +424,8 @@ class _LinkButtonState extends State<LinkButton> {
   }
 
   Widget buildOverlay(BuildContext context) {
-    final editor = ZefyrEditor.of(context);
     final toolbar = ZefyrToolbar.of(context);
-    final style = editor.selectionStyle;
+    final style = toolbar.editor.selectionStyle;
 
     String value = 'Tap to edit link';
     if (style.contains(NotusAttribute.link)) {
@@ -439,7 +437,7 @@ class _LinkButtonState extends State<LinkButton> {
         : _LinkInput(
             key: _inputKey,
             controller: _inputController,
-            focusNode: editor.toolbarFocusNode,
+            focusNode: toolbar.editor.toolbarFocusNode,
             formatError: _formatError,
           );
     final items = <Widget>[Expanded(child: body)];

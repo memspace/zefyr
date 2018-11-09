@@ -26,6 +26,11 @@ int getPositionDelta(Delta user, Delta actual) {
     } else if (userOp.isDelete && actualOp.isRetain) {
       diff += userOp.length;
     } else if (userOp.isRetain && actualOp.isInsert) {
+      if (actualOp.data.startsWith('\n') ) {
+        // At this point user input reached its end (retain). If a heuristic
+        // rule inserts a new line we should keep cursor on it's original position.
+        continue;
+      }
       diff += actualOp.length;
     } else {
       // TODO: this likely needs to cover more edge cases.

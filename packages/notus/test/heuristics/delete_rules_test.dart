@@ -110,5 +110,19 @@ void main() {
         ..delete(1);
       expect(actual, expected);
     });
+
+    test('allows deleting empty line(s) before embed', () {
+      final hr = NotusAttribute.embed.horizontalRule;
+      final doc = new Delta()
+        ..insert('Document\n')
+        ..insert('\n')
+        ..insert('\n')
+        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert('\n')
+        ..insert('Text')
+        ..insert('\n');
+      final actual = rule.apply(doc, 11, 1);
+      expect(actual, isNull);
+    });
   });
 }

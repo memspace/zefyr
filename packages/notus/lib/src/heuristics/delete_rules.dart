@@ -80,12 +80,14 @@ class EnsureEmbedLineRule extends DeleteRule {
   @override
   Delta apply(Delta document, int index, int length) {
     DeltaIterator iter = new DeltaIterator(document);
+
     // First, check if line-break deleted after an embed.
     Operation op = iter.skip(index);
     int indexDelta = 0;
     int lengthDelta = 0;
     int remaining = length;
     bool foundEmbed = false;
+    bool hasLineBreakBefore = false;
     if (op != null && op.data.endsWith(kZeroWidthSpace)) {
       foundEmbed = true;
       Operation candidate = iter.next(1);
@@ -102,17 +104,23 @@ class EnsureEmbedLineRule extends DeleteRule {
           lengthDelta += 1;
         }
       }
+    } else {
+      // If op is `null` it's a beginning of the doc, e.g. implicit line break.
+      hasLineBreakBefore = op == null || op.data.endsWith('\n');
     }
 
     // Second, check if line-break deleted before an embed.
     op = iter.skip(remaining);
     if (op != null && op.data.endsWith('\n')) {
       final candidate = iter.next(1);
-      if (candidate.data == kZeroWidthSpace) {
+      // If there is a line-break before deleted range we allow the operation
+      // since it results in a correctly formatted line with single embed in it.
+      if (candidate.data == kZeroWidthSpace && !hasLineBreakBefore) {
         foundEmbed = true;
         lengthDelta -= 1;
       }
     }
+
     if (foundEmbed) {
       return new Delta()
         ..retain(index + indexDelta)
