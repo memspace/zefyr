@@ -9,8 +9,9 @@ and readme for more details.
 There is also new `ZefyrField` widget which integrates Zefyr with material design decorations.
 
 * Breaking change: `ZefyrEditor` requires an ancestor `ZefyrScaffold`.
+* Upgraded to `url_launcher` version 4.0.0.
 * Exposed `ZefyrEditor.physics` property to allow customization of `ScrollPhysics`.
-* Added basic `ZefyrField` widget.
+* Added basic `ZefyrField` widget with material design decorations.
 
 ## 0.2.0
 

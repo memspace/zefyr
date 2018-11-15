@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
 import 'buttons.dart';
-import 'controller.dart';
 import 'editor.dart';
 import 'theme.dart';
 
