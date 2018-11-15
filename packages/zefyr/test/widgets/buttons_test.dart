@@ -104,6 +104,7 @@ void main() {
       await tester
           .tap(find.widgetWithText(GestureDetector, 'Tap to edit link'));
       await tester.pumpAndSettle();
+      expect(editor.focusNode.hasFocus, isFalse);
       await editor.updateSelection(base: 10, extent: 10);
       expect(find.byIcon(Icons.link_off), findsNothing);
     });
@@ -117,8 +118,8 @@ void main() {
       await tester
           .tap(find.widgetWithText(GestureDetector, 'Tap to edit link'));
       await tester.pumpAndSettle();
-      // TODO: figure out why below finder finds 2 instances of TextField
-      expect(find.widgetWithText(TextField, 'https://'), findsWidgets);
+      expect(find.byType(TextField), findsOneWidget);
+
       await tester.enterText(find.widgetWithText(TextField, 'https://').first,
           'https://github.com');
       await tester.pumpAndSettle();

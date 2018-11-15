@@ -75,7 +75,7 @@ void main() {
       expect(editor.selection.extentOffset, embed.documentOffset);
     });
 
-    testWidgets('tap right side of horizontal rule puts caret after it',
+    testWidgets('tap right side of image puts caret after it',
         (tester) async {
       final editor = new EditorSandBox(tester: tester);
       await editor.tapEditor();

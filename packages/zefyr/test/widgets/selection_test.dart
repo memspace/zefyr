@@ -65,7 +65,7 @@ void main() {
       RenderBox renderObject =
           tester.firstRenderObject(find.byType(ZefyrEditableText));
       var offset = renderObject.localToGlobal(Offset.zero);
-      offset += Offset(50.0, renderObject.size.height - 5.0);
+      offset += Offset(50.0, renderObject.size.height - 500.0);
       await tester.tapAt(offset);
       await tester.pumpAndSettle();
       expect(editor.controller.selection.isCollapsed, isTrue);

@@ -1,6 +1,6 @@
 analyzer:
   language:
-    enableSuperMixins: true
+#    enableSuperMixins: true
 
 # Lint rules and documentation, see http://dart-lang.github.io/linter/lints
 linter:

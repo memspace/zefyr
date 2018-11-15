@@ -12,7 +12,7 @@ Add `zefyr` package as a dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zefyr: ^0.1.0
+  zefyr: ^0.3.0
 ```
 
 And run `flutter packages get` to install. This installs both `zefyr`
@@ -20,7 +20,7 @@ and `notus` packages.
 
 ### Usage
 
-There are 3 main objects you would normally interact with in your code:
+There are 4 main objects you would normally interact with in your code:
 
 * `NotusDocument`, represents a rich text document and provides
   high-level methods for manipulating the document's state, like
@@ -30,6 +30,9 @@ There are 3 main objects you would normally interact with in your code:
 * `ZefyrEditor`, a Flutter widget responsible for rendering of rich text
   on the screen and reacting to user actions.
 * `ZefyrController`, ties the above two objects together.
+* `ZefyrScaffold`, allows embedding Zefyr toolbar into any custom layout.
+
+`ZefyrEditor` depends on presence of `ZefyrScaffold` somewhere up the widget tree.
 
 Normally you would need to place `ZefyrEditor` inside of a
 `StatefulWidget`. Shown below is a minimal setup required to use the
@@ -60,9 +63,11 @@ class MyWidgetState extends State<MyWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ZefyrEditor(
-      controller: _controller,
-      focusNode: _focusNode,
+    return ZefyrScaffold(
+      child: ZefyrEditor(
+        controller: _controller,
+        focusNode: _focusNode,
+      ),
     );
   }
 }

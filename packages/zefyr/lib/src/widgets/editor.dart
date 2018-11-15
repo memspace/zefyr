@@ -7,6 +7,7 @@ import 'package:notus/notus.dart';
 import 'controller.dart';
 import 'editable_text.dart';
 import 'image.dart';
+import 'scaffold.dart';
 import 'theme.dart';
 import 'toolbar.dart';
 
@@ -15,15 +16,14 @@ class ZefyrEditorScope extends ChangeNotifier {
     @required ZefyrImageDelegate imageDelegate,
     @required ZefyrController controller,
     @required FocusNode focusNode,
-    @required FocusNode toolbarFocusNode,
+    @required FocusScopeNode focusScope,
   })  : _controller = controller,
         _imageDelegate = imageDelegate,
-        _focusNode = focusNode,
-        _toolbarFocusNode = toolbarFocusNode {
+        _focusScope = focusScope,
+        _focusNode = focusNode {
     _selectionStyle = _controller.getSelectionStyle();
     _selection = _controller.selection;
     _controller.addListener(_handleControllerChange);
-    toolbarFocusNode.addListener(_handleFocusChange);
     _focusNode.addListener(_handleFocusChange);
   }
 
@@ -32,9 +32,8 @@ class ZefyrEditorScope extends ChangeNotifier {
   ZefyrImageDelegate _imageDelegate;
   ZefyrImageDelegate get imageDelegate => _imageDelegate;
 
+  FocusScopeNode _focusScope;
   FocusNode _focusNode;
-  FocusNode _toolbarFocusNode;
-  FocusNode get toolbarFocusNode => _toolbarFocusNode;
 
   ZefyrController _controller;
   NotusStyle get selectionStyle => _selectionStyle;
@@ -46,7 +45,6 @@ class ZefyrEditorScope extends ChangeNotifier {
   void dispose() {
     assert(!_disposed);
     _controller.removeListener(_handleControllerChange);
-    _toolbarFocusNode.removeListener(_handleFocusChange);
     _focusNode.removeListener(_handleFocusChange);
     _disposed = true;
     super.dispose();
@@ -102,11 +100,24 @@ class ZefyrEditorScope extends ChangeNotifier {
     notifyListeners();
   }
 
+  FocusNode _toolbarFocusNode;
+
+  void setToolbarFocusNode(FocusNode node) {
+    assert(!_disposed || node == null);
+    if (_toolbarFocusNode != node) {
+      _toolbarFocusNode?.removeListener(_handleFocusChange);
+      _toolbarFocusNode = node;
+      _toolbarFocusNode?.addListener(_handleFocusChange);
+      // We do not notify listeners here because it will happen when
+      // focus state changes, see [_handleFocusChange].
+    }
+  }
+
   FocusOwner get focusOwner {
     assert(!_disposed);
     if (_focusNode.hasFocus) {
       return FocusOwner.editor;
-    } else if (toolbarFocusNode.hasFocus) {
+    } else if (_toolbarFocusNode?.hasFocus == true) {
       return FocusOwner.toolbar;
     } else {
       return FocusOwner.none;
@@ -124,9 +135,9 @@ class ZefyrEditorScope extends ChangeNotifier {
     _controller.formatSelection(value);
   }
 
-  void focus(BuildContext context) {
+  void focus() {
     assert(!_disposed);
-    FocusScope.of(context).requestFocus(_focusNode);
+    _focusScope.requestFocus(_focusNode);
   }
 
   void hideKeyboard() {
@@ -158,6 +169,7 @@ class ZefyrEditor extends StatefulWidget {
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
     this.toolbarDelegate,
     this.imageDelegate,
+    this.physics,
   }) : super(key: key);
 
   final ZefyrController controller;
@@ -166,6 +178,7 @@ class ZefyrEditor extends StatefulWidget {
   final bool enabled;
   final ZefyrToolbarDelegate toolbarDelegate;
   final ZefyrImageDelegate imageDelegate;
+  final ScrollPhysics physics;
 
   /// Padding around editable area.
   final EdgeInsets padding;
@@ -181,20 +194,53 @@ class ZefyrEditor extends StatefulWidget {
 }
 
 class _ZefyrEditorState extends State<ZefyrEditor> {
-  final FocusNode _toolbarFocusNode = new FocusNode();
   ZefyrImageDelegate _imageDelegate;
   ZefyrEditorScope _scope;
+  ZefyrThemeData _themeData;
+  GlobalKey<ZefyrToolbarState> _toolbarKey;
+  ZefyrScaffoldState _scaffold;
+
+  bool get hasToolbar => _toolbarKey != null;
+
+  void showToolbar() {
+    assert(_toolbarKey == null);
+    _toolbarKey = GlobalKey();
+    _scaffold.showToolbar(buildToolbar);
+  }
+
+  void hideToolbar() {
+    if (_toolbarKey == null) return;
+    _scaffold.hideToolbar();
+    _toolbarKey = null;
+  }
+
+  Widget buildToolbar(BuildContext) {
+    return ZefyrTheme(
+      data: _themeData,
+      child: ZefyrToolbar(
+        key: _toolbarKey,
+        editor: _scope,
+        delegate: widget.toolbarDelegate,
+      ),
+    );
+  }
+
+  void _handleChange() {
+    if (_scope.focusOwner == FocusOwner.none) {
+      hideToolbar();
+    } else if (!hasToolbar) {
+      showToolbar();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _toolbarKey?.currentState?.markNeedsRebuild();
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _imageDelegate = widget.imageDelegate ?? new ZefyrDefaultImageDelegate();
-    _scope = ZefyrEditorScope(
-      toolbarFocusNode: _toolbarFocusNode,
-      imageDelegate: _imageDelegate,
-      controller: widget.controller,
-      focusNode: widget.focusNode,
-    );
   }
 
   @override
@@ -209,9 +255,43 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final parentTheme = ZefyrTheme.of(context, nullOk: true);
+    final fallbackTheme = ZefyrThemeData.fallback(context);
+    _themeData = (parentTheme != null)
+        ? fallbackTheme.merge(parentTheme)
+        : fallbackTheme;
+
+    if (_scope == null) {
+      _scope = ZefyrEditorScope(
+        imageDelegate: _imageDelegate,
+        controller: widget.controller,
+        focusNode: widget.focusNode,
+        focusScope: FocusScope.of(context),
+      );
+      _scope.addListener(_handleChange);
+    } else {
+      final focusScope = FocusScope.of(context);
+      if (focusScope != _scope._focusScope) {
+        _scope._focusScope = focusScope;
+      }
+    }
+
+    final scaffold = ZefyrScaffold.of(context);
+    if (_scaffold != scaffold) {
+      bool didHaveToolbar = hasToolbar;
+      hideToolbar();
+      _scaffold = scaffold;
+      if (didHaveToolbar) showToolbar();
+    }
+  }
+
+  @override
   void dispose() {
+    hideToolbar();
+    _scope.removeListener(_handleChange);
     _scope.dispose();
-    _toolbarFocusNode.dispose();
     super.dispose();
   }
 
@@ -224,28 +304,14 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       autofocus: widget.autofocus,
       enabled: widget.enabled,
       padding: widget.padding,
+      physics: widget.physics,
     );
-
-    final children = <Widget>[];
-    children.add(Expanded(child: editable));
-    final toolbar = ZefyrToolbar(
-      editor: _scope,
-      focusNode: _toolbarFocusNode,
-      delegate: widget.toolbarDelegate,
-    );
-    children.add(toolbar);
-
-    final parentTheme = ZefyrTheme.of(context, nullOk: true);
-    final fallbackTheme = ZefyrThemeData.fallback(context);
-    final actualTheme = (parentTheme != null)
-        ? fallbackTheme.merge(parentTheme)
-        : fallbackTheme;
 
     return ZefyrTheme(
-      data: actualTheme,
+      data: _themeData,
       child: _ZefyrEditorScope(
         scope: _scope,
-        child: Column(children: children),
+        child: editable,
       ),
     );
   }

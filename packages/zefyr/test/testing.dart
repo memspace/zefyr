@@ -30,7 +30,9 @@ class EditorSandBox {
     if (theme != null) {
       widget = ZefyrTheme(data: theme, child: widget);
     }
-    widget = MaterialApp(home: widget);
+    widget = MaterialApp(
+      home: ZefyrScaffold(child: widget),
+    );
 
     return EditorSandBox._(tester, focusNode, document, controller, widget);
   }

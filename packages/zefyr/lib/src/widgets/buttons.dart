@@ -300,9 +300,11 @@ class LinkButton extends StatefulWidget {
 }
 
 class _LinkButtonState extends State<LinkButton> {
-  final TextEditingController _inputController = new TextEditingController();
+  final TextEditingController _inputController = TextEditingController();
   Key _inputKey;
   bool _formatError = false;
+  ZefyrEditorScope _editor;
+
   bool get isEditing => _inputKey != null;
 
   @override
@@ -376,7 +378,7 @@ class _LinkButtonState extends State<LinkButton> {
         _inputController.text = '';
         _inputController.removeListener(_handleInputChange);
         toolbar.markNeedsRebuild();
-        toolbar.editor.focus(context);
+        toolbar.editor.focus();
       }
     });
   }
@@ -388,7 +390,7 @@ class _LinkButtonState extends State<LinkButton> {
         _inputKey = null;
         _inputController.text = '';
         _inputController.removeListener(_handleInputChange);
-        editor.focus(context);
+        editor.focus();
       });
     }
   }
@@ -437,7 +439,6 @@ class _LinkButtonState extends State<LinkButton> {
         : _LinkInput(
             key: _inputKey,
             controller: _inputController,
-            focusNode: toolbar.editor.toolbarFocusNode,
             formatError: _formatError,
           );
     final items = <Widget>[Expanded(child: body)];
@@ -474,16 +475,13 @@ class _LinkButtonState extends State<LinkButton> {
 }
 
 class _LinkInput extends StatefulWidget {
-  final FocusNode focusNode;
   final TextEditingController controller;
   final bool formatError;
 
-  const _LinkInput({
-    Key key,
-    @required this.focusNode,
-    @required this.controller,
-    this.formatError: false,
-  }) : super(key: key);
+  const _LinkInput(
+      {Key key, @required this.controller, this.formatError: false})
+      : super(key: key);
+
   @override
   _LinkInputState createState() {
     return new _LinkInputState();
@@ -491,21 +489,38 @@ class _LinkInput extends StatefulWidget {
 }
 
 class _LinkInputState extends State<_LinkInput> {
+  final FocusNode _focusNode = FocusNode();
+
+  ZefyrEditorScope _editor;
   bool _didAutoFocus = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_didAutoFocus) {
-      FocusScope.of(context).requestFocus(widget.focusNode);
+      FocusScope.of(context).requestFocus(_focusNode);
       _didAutoFocus = true;
+    }
+
+    final toolbar = ZefyrToolbar.of(context);
+
+    if (_editor != toolbar.editor) {
+      _editor?.setToolbarFocusNode(null);
+      _editor = toolbar.editor;
+      _editor.setToolbarFocusNode(_focusNode);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    FocusScope.of(context).reparentIfNeeded(widget.focusNode);
+  void dispose() {
+    _editor?.setToolbarFocusNode(null);
+    _focusNode.dispose();
+    _editor = null;
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final toolbarTheme = ZefyrTheme.of(context).toolbarTheme;
     final color =
@@ -514,15 +529,16 @@ class _LinkInputState extends State<_LinkInput> {
     return TextField(
       style: style,
       keyboardType: TextInputType.url,
-      focusNode: widget.focusNode,
+      focusNode: _focusNode,
       controller: widget.controller,
       autofocus: true,
       decoration: new InputDecoration(
-          hintText: 'https://',
-          filled: true,
-          fillColor: toolbarTheme.color,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(10.0)),
+        hintText: 'https://',
+        filled: true,
+        fillColor: toolbarTheme.color,
+        border: InputBorder.none,
+        contentPadding: const EdgeInsets.all(10.0),
+      ),
     );
   }
 }

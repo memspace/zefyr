@@ -1,3 +1,18 @@
+## 0.3.0
+
+This version introduces new widget `ZefyrScaffold` which allows embedding Zefyr in custom
+layouts, like forms with multiple input fields.
+
+It is now required to always wrap `ZefyrEditor` with an instance of this new widget. See examples
+and readme for more details.
+
+There is also new `ZefyrField` widget which integrates Zefyr with material design decorations.
+
+* Breaking change: `ZefyrEditor` requires an ancestor `ZefyrScaffold`.
+* Upgraded to `url_launcher` version 4.0.0.
+* Exposed `ZefyrEditor.physics` property to allow customization of `ScrollPhysics`.
+* Added basic `ZefyrField` widget with material design decorations.
+
 ## 0.2.0
 
 * Breaking change: `ZefyrImageDelegate.createImageProvider` replaced with

@@ -52,12 +52,14 @@ void main() {
     });
 
     testWidgets('notifyListeners is delayed to next frame', (tester) async {
-      var focusNode = new FocusNode();
-      var controller = new ZefyrController(new NotusDocument());
-      var widget = new MaterialApp(
-        home: new ZefyrEditor(
-          controller: controller,
-          focusNode: focusNode,
+      var focusNode = FocusNode();
+      var controller = ZefyrController(new NotusDocument());
+      var widget = MaterialApp(
+        home: ZefyrScaffold(
+          child: ZefyrEditor(
+            controller: controller,
+            focusNode: focusNode,
+          ),
         ),
       );
       await tester.pumpWidget(widget);

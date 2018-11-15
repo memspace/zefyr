@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
 import 'buttons.dart';
-import 'controller.dart';
 import 'editor.dart';
 import 'theme.dart';
 
@@ -102,13 +101,11 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
 
   const ZefyrToolbar({
     Key key,
-    @required this.focusNode,
     @required this.editor,
     this.autoHide: true,
     this.delegate,
   }) : super(key: key);
 
-  final FocusNode focusNode;
   final ZefyrToolbarDelegate delegate;
   final ZefyrEditorScope editor;
 
@@ -153,7 +150,12 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
   TextSelection _selection;
 
   void markNeedsRebuild() {
-    setState(() {});
+    setState(() {
+      if (_selection != editor.selection) {
+        _selection = editor.selection;
+        closeOverlay();
+      }
+    });
   }
 
   Widget buildButton(BuildContext context, ZefyrToolbarAction action,
@@ -187,21 +189,13 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
 
   ZefyrEditorScope get editor => widget.editor;
 
-  void _handleChange() {
-    if (_selection != editor.selection) {
-      _selection = editor.selection;
-      closeOverlay();
-    }
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
     _delegate = widget.delegate ?? new _DefaultZefyrToolbarDelegate();
     _overlayAnimation = new AnimationController(
         vsync: this, duration: Duration(milliseconds: 100));
-    widget.editor.addListener(_handleChange);
+    _selection = editor.selection;
   }
 
   @override
@@ -210,24 +204,16 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     if (widget.delegate != oldWidget.delegate) {
       _delegate = widget.delegate ?? new _DefaultZefyrToolbarDelegate();
     }
-    if (widget.editor != oldWidget.editor) {
-      oldWidget.editor.removeListener(_handleChange);
-      widget.editor.addListener(_handleChange);
-    }
   }
 
   @override
   void dispose() {
-    widget.editor.removeListener(_handleChange);
+    _overlayAnimation.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (editor.focusOwner == FocusOwner.none) {
-      return new Container();
-    }
-
     final layers = <Widget>[];
 
     // Must set unique key for the toolbar to prevent it from reconstructing
@@ -253,7 +239,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
 
     final constraints =
         BoxConstraints.tightFor(height: ZefyrToolbar.kToolbarHeight);
-    return new _ZefyrToolbarScope(
+    return _ZefyrToolbarScope(
       toolbar: this,
       child: Container(
         constraints: constraints,
