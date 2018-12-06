@@ -7,10 +7,6 @@ request or found a bug, please file it at the [issue tracker][].
 
 [issue tracker]: https://github.com/memspace/zefyr/issues
 
-> **Important:** Zefyr currently tracks latest development version of
-> Flutter (`master` branch) and may not work with Flutter beta channel
-> if there are breaking changes.
-
 ### Documentation
 
 * [Quick Start][quick_start]
