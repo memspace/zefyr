@@ -32,6 +32,7 @@ class deltaKeys {
   static const i = "i";
   static const b = "b";
   static const quote = "quote";
+  static const code = "code";
   static const type = "type";
   static const block = "block";
   static const image = "image";
@@ -61,6 +62,7 @@ class htmlKeys {
   static const image = "img";
   static const imageSrc = "src";
   static const br = "br";
+  static const preformatted = "pre";
 }
 
 String htmlTagNameToDeltaAttributeName(String htmlTag) {
@@ -68,6 +70,7 @@ String htmlTagNameToDeltaAttributeName(String htmlTag) {
     case htmlKeys.blockquote:
     case htmlKeys.unorderedList:
     case htmlKeys.orderedList:
+    case htmlKeys.preformatted:
       return deltaKeys.block;
     case htmlKeys.h1:
     case htmlKeys.h2:
@@ -142,34 +145,22 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
 
       if (blockStyle == null) {
         buffer.write(currentBlockLines.join('\n'));
-        // buffer.writeln();
-      } else if (blockStyle == NotusAttribute.code) {
-        _writeAttribute(buffer, blockStyle);
-        buffer.write(currentBlockLines.join('\n'));
-        _writeAttribute(buffer, blockStyle, close: true);
-        buffer.writeln();
+      } else if (blockStyle == NotusAttribute.bq ||
+          blockStyle == NotusAttribute.code) {
+        _writeBlockTag(buffer, blockStyle, start: true);
+        buffer.write(currentBlockLines.join("\n"));
+        _writeBlockTag(buffer, blockStyle, close: true);
       } else {
         for (var i = 0; i < currentBlockLines.length; i++) {
           var line = currentBlockLines[i];
           if (i == 0) {
             _writeBlockTag(buffer, blockStyle, start: true);
-            if (blockStyle != NotusAttribute.bq) {
-              buffer.writeln();
-            }
-          }
-          if (blockStyle == NotusAttribute.ol ||
-              blockStyle == NotusAttribute.ul) {
-            buffer.write("<${htmlKeys.list}>");
-          }
-          buffer.write(line);
-          if (blockStyle == NotusAttribute.ol ||
-              blockStyle == NotusAttribute.ul) {
-            buffer.write("</${htmlKeys.list}>");
-          }
-          if (blockStyle != NotusAttribute.bq ||
-              i != currentBlockLines.length - 1) {
             buffer.writeln();
           }
+          buffer.write("<${htmlKeys.list}>");
+          buffer.write(line);
+          buffer.write("</${htmlKeys.list}>");
+          buffer.writeln();
           if (i == currentBlockLines.length - 1) {
             _writeBlockTag(buffer, blockStyle, close: true);
           }
@@ -364,10 +355,10 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
   void _writeBlockTag(StringBuffer buffer, NotusAttribute<String> block,
       {bool close: false, bool start: false}) {
     if (block == NotusAttribute.code) {
-      if (close) {
-        buffer.write('\n```');
-      } else {
-        buffer.write('```\n');
+      if (start) {
+        buffer.write('<${htmlKeys.preformatted}${buildContainer(block.key)}>');
+      } else if (close) {
+        buffer.write('</${htmlKeys.preformatted}>');
       }
     } else {
       final tag = kSimpleBlocks[block];
@@ -393,6 +384,7 @@ var _allowedHTMLTag = Set<String>.from([
   htmlKeys.h2,
   htmlKeys.h3,
   htmlKeys.image,
+  htmlKeys.preformatted,
 ]);
 
 void setDeltaAllowedTagForHTMLDecoder(Set<String> tagList) {
@@ -437,6 +429,9 @@ class _HTMLNotusDecoder extends Converter<String, Delta> {
             deltaKeys.type: deltaKeys.image,
             deltaKeys.imageSrc: elem.attributes[htmlKeys.imageSrc],
           };
+          break;
+        case htmlKeys.preformatted:
+          deltaAttributeLine[deltaKeys.block] = deltaKeys.code;
           break;
         case htmlKeys.blockquote:
           deltaAttributeLine[deltaKeys.block] = deltaKeys.quote;
