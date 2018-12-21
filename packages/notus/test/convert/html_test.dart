@@ -262,6 +262,7 @@ void main() {
       runFor(NotusAttribute.ol, 'item', '<ol>\n<li>item\nitem</li>\n</ol>\n');
       runFor(NotusAttribute.bq, 'item',
           '<blockquote>\nitem\nitem\n</blockquote>\n');
+      runFor(NotusAttribute.code, 'item', '<pre>\nitem\nitem\n</pre>\n');
     });
     test('decode: img tag inside a tag', () {
       final expected = Delta.fromJson([
@@ -574,11 +575,9 @@ void main() {
           '<blockquote foo="bar">item</blockquote>\n');
     });
 
-    test('encode block styles', () {
+    test('encode block styles: ol, ul', () {
       runFor(NotusAttribute<String> attribute, String source, String expected) {
-        final delta = new Delta()
-          ..insert(source)
-          ..insert('\n', attribute.toJson());
+        final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusHTML.encode(delta);
         expect(result, expected);
       }
@@ -589,8 +588,23 @@ void main() {
           NotusAttribute.ol, 'List item', '<ol>\n<li>List item</li>\n</ol>\n');
       runFor(NotusAttribute.bq, 'List item',
           '<blockquote>List item</blockquote>\n');
+    });
 
-      // runFor(NotusAttribute.code, 'List item', '```\nList item\n```\n\n');
+    test('encode block styles: code, bq', () {
+      runFor(NotusAttribute<String> attribute, String source, String expected) {
+        List<String> items = source.split("\n");
+        final delta = Delta()
+          ..insert(items[0])
+          ..insert('\n', attribute.toJson())
+          ..insert(items[1])
+          ..insert('\n', attribute.toJson());
+        final result = notusHTML.encode(delta);
+        expect(result, expected);
+      }
+
+      runFor(NotusAttribute.code, 'item1\nitem2', '<pre>item1\nitem2</pre>\n');
+      runFor(NotusAttribute.bq, 'item1\nitem2',
+          '<blockquote>item1\nitem2</blockquote>\n');
     });
 
     test('encode image', () {
