@@ -20,9 +20,9 @@ cache:
   directories:
     - $HOME/.pub-cache
 
-env:
-  - FLUTTER_VERSION=stable
-  - FLUTTER_VERSION=master
+#env:
+#  - FLUTTER_VERSION=stable
+#  - FLUTTER_VERSION=master
 
 matrix:
   include:
