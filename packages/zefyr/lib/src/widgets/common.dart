@@ -11,6 +11,7 @@ import 'horizontal_rule.dart';
 import 'image.dart';
 import 'rich_text.dart';
 import 'theme.dart';
+import 'view.dart';
 
 /// Raw widget representing a single line of rich text document in Zefyr editor.
 ///
@@ -43,36 +44,49 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
 
   @override
   Widget build(BuildContext context) {
-    ensureVisible(context);
+    ZefyrViewState view = ZefyrView.of(context);
+    ZefyrEditableTextScope editable;
+    if (view == null) {
+      editable = ZefyrEditableText.of(context);
+    }
+
+    final isEditable = editable != null;
+
+    if (isEditable) {
+      ensureVisible(context);
+    }
     final theme = ZefyrTheme.of(context);
-    final editable = ZefyrEditableText.of(context);
 
     Widget content;
     if (widget.node.hasEmbed) {
-      content = buildEmbed(context);
+      content = buildEmbed(context, view, editable);
     } else {
       assert(widget.style != null);
 
-      final text = new EditableRichText(
+      final text = EditableRichText(
         node: widget.node,
         text: buildText(context),
       );
-      content = new EditableBox(
-        child: text,
-        node: widget.node,
-        layerLink: _link,
-        renderContext: editable.renderContext,
-        showCursor: editable.showCursor,
-        selection: editable.selection,
-        selectionColor: theme.selectionColor,
-      );
+      if (isEditable) {
+        content = EditableBox(
+          child: text,
+          node: widget.node,
+          layerLink: _link,
+          renderContext: editable.renderContext,
+          showCursor: editable.showCursor,
+          selection: editable.selection,
+          selectionColor: theme.selectionColor,
+        );
+        content = CompositedTransformTarget(link: _link, child: content);
+      } else {
+        content = text;
+      }
     }
 
-    final result = new CompositedTransformTarget(link: _link, child: content);
     if (widget.padding != null) {
-      return new Padding(padding: widget.padding, child: result);
+      return Padding(padding: widget.padding, child: content);
     }
-    return result;
+    return content;
   }
 
   void ensureVisible(BuildContext context) {
@@ -136,36 +150,40 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     return result;
   }
 
-  Widget buildEmbed(BuildContext context) {
+  Widget buildEmbed(BuildContext context, ZefyrViewState view,
+      ZefyrEditableTextScope editable) {
+    final isEditable = editable != null;
+
     final theme = ZefyrTheme.of(context);
-    final editable = ZefyrEditableText.of(context);
 
     EmbedNode node = widget.node.children.single;
     EmbedAttribute embed = node.style.get(NotusAttribute.embed);
 
+    Widget result;
     if (embed.type == EmbedType.horizontalRule) {
-      final hr = new ZefyrHorizontalRule(node: node);
-      return new EditableBox(
-        child: hr,
-        node: widget.node,
-        layerLink: _link,
-        renderContext: editable.renderContext,
-        showCursor: editable.showCursor,
-        selection: editable.selection,
-        selectionColor: theme.selectionColor,
-      );
+      result = ZefyrHorizontalRule(node: node);
     } else if (embed.type == EmbedType.image) {
-      return new EditableBox(
-        child: ZefyrImage(node: node, delegate: editable.imageDelegate),
-        node: widget.node,
-        layerLink: _link,
-        renderContext: editable.renderContext,
-        showCursor: editable.showCursor,
-        selection: editable.selection,
-        selectionColor: theme.selectionColor,
-      );
+      if (isEditable) {
+        result = ZefyrImage(node: node, delegate: editable.imageDelegate);
+      } else {
+        result = ZefyrImage(node: node, delegate: view.imageDelegate);
+      }
     } else {
       throw new UnimplementedError('Unimplemented embed type ${embed.type}');
     }
+
+    if (!isEditable) {
+      return result;
+    }
+
+    return new EditableBox(
+      child: result,
+      node: widget.node,
+      layerLink: _link,
+      renderContext: editable.renderContext,
+      showCursor: editable.showCursor,
+      selection: editable.selection,
+      selectionColor: theme.selectionColor,
+    );
   }
 }
