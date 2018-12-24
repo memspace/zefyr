@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
 import 'buttons.dart';
-import 'editor.dart';
+import 'scope.dart';
 import 'theme.dart';
 
 /// List of all button actions supported by [ZefyrToolbar] buttons.
@@ -107,7 +107,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
   }) : super(key: key);
 
   final ZefyrToolbarDelegate delegate;
-  final ZefyrEditorScope editor;
+  final ZefyrScope editor;
 
   /// Whether to automatically hide this toolbar when editor loses focus.
   final bool autoHide;
@@ -187,7 +187,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
 
   bool get hasOverlay => _overlayBuilder != null;
 
-  ZefyrEditorScope get editor => widget.editor;
+  ZefyrScope get editor => widget.editor;
 
   @override
   void initState() {

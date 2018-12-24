@@ -9,7 +9,7 @@ import 'package:zefyr/src/widgets/rich_text.dart';
 import 'package:zefyr/zefyr.dart';
 
 void main() {
-  group('$EditableRichText', () {
+  group('$ZefyrRichText', () {
     final doc = new NotusDocument();
     doc.insert(0, 'This House Is A Circus');
     final text = new TextSpan(text: 'This House Is A Circus');
@@ -18,7 +18,7 @@ void main() {
     setUp(() {
       widget = new Directionality(
         textDirection: TextDirection.ltr,
-        child: new EditableRichText(
+        child: new ZefyrRichText(
           node: doc.root.children.first,
           text: text,
         ),
@@ -27,8 +27,8 @@ void main() {
 
     testWidgets('initialize', (tester) async {
       await tester.pumpWidget(widget);
-      EditableRichText result =
-          tester.firstWidget(find.byType(EditableRichText));
+      ZefyrRichText result =
+          tester.firstWidget(find.byType(ZefyrRichText));
       expect(result, isNotNull);
       expect(result.text.text, 'This House Is A Circus');
     });

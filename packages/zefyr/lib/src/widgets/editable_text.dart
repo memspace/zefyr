@@ -1,8 +1,6 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'dart:async';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
@@ -11,6 +9,7 @@ import 'package:notus/notus.dart';
 import 'code.dart';
 import 'common.dart';
 import 'controller.dart';
+import 'cursor_timer.dart';
 import 'editable_box.dart';
 import 'editor.dart';
 import 'image.dart';
@@ -49,21 +48,15 @@ class ZefyrEditableText extends StatefulWidget {
   /// Padding around editable area.
   final EdgeInsets padding;
 
-  static ZefyrEditableTextScope of(BuildContext context) {
-    final ZefyrEditableTextScope result =
-        context.inheritFromWidgetOfExactType(ZefyrEditableTextScope);
-    return result;
-  }
-
   @override
   _ZefyrEditableTextState createState() => new _ZefyrEditableTextState();
 }
 
 /// Provides access to shared state of [ZefyrEditableText].
-class ZefyrEditableTextScope extends InheritedWidget {
+class _ZefyrEditableTextScope extends InheritedWidget {
   static const _kEquality = const SetEquality<RenderEditableBox>();
 
-  ZefyrEditableTextScope({
+  _ZefyrEditableTextScope({
     Key key,
     @required Widget child,
     @required this.selection,
@@ -80,7 +73,7 @@ class ZefyrEditableTextScope extends InheritedWidget {
   final Set<RenderEditableBox> _activeBoxes;
 
   @override
-  bool updateShouldNotify(ZefyrEditableTextScope oldWidget) {
+  bool updateShouldNotify(_ZefyrEditableTextScope oldWidget) {
     return selection != oldWidget.selection ||
         showCursor != oldWidget.showCursor ||
         imageDelegate != oldWidget.imageDelegate ||
@@ -127,7 +120,6 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   Widget build(BuildContext context) {
     FocusScope.of(context).reparentIfNeeded(focusNode);
     super.build(context); // See AutomaticKeepAliveState.
-    ZefyrEditor.of(context);
 
     Widget body = ListBody(children: _buildChildren(context));
     if (widget.padding != null) {
@@ -149,13 +141,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       ));
     }
 
-    return new ZefyrEditableTextScope(
-      selection: selection,
-      showCursor: showCursor,
-      renderContext: renderContext,
-      imageDelegate: widget.imageDelegate,
-      child: Stack(fit: StackFit.expand, children: layers),
-    );
+    return Stack(fit: StackFit.expand, children: layers);
   }
 
   @override
@@ -196,9 +182,9 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   // Private members
   //
 
-  final ScrollController _scrollController = new ScrollController();
-  final ZefyrRenderContext _renderContext = new ZefyrRenderContext();
-  final _CursorTimer _cursorTimer = new _CursorTimer();
+  final ScrollController _scrollController = ScrollController();
+  final ZefyrRenderContext _renderContext = ZefyrRenderContext();
+  final CursorTimer _cursorTimer = CursorTimer();
   InputConnectionController _input;
   bool _didAutoFocus = false;
 
@@ -295,44 +281,5 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     setState(() {
       // nothing to update internally.
     });
-  }
-}
-
-/// Helper class that keeps state relevant to the cursor.
-class _CursorTimer {
-  static const _kCursorBlinkHalfPeriod = const Duration(milliseconds: 500);
-
-  Timer _timer;
-  final ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(false);
-
-  ValueNotifier<bool> get value => _showCursor;
-
-  void _cursorTick(Timer timer) {
-    _showCursor.value = !_showCursor.value;
-  }
-
-  /// Starts cursor timer.
-  void start() {
-    _showCursor.value = true;
-    _timer = new Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
-  }
-
-  /// Stops cursor timer.
-  void stop() {
-    _timer?.cancel();
-    _timer = null;
-    _showCursor.value = false;
-  }
-
-  /// Starts or stops cursor timer based on current state of [focusNode]
-  /// and [selection].
-  void startOrStop(FocusNode focusNode, TextSelection selection) {
-    final hasFocus = focusNode.hasFocus;
-    final selectionCollapsed = selection.isCollapsed;
-    if (_timer == null && hasFocus && selectionCollapsed) {
-      start();
-    } else if (_timer != null && (!hasFocus || !selectionCollapsed)) {
-      stop();
-    }
   }
 }

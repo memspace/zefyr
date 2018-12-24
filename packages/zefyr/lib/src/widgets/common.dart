@@ -6,12 +6,11 @@ import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
 import 'editable_box.dart';
-import 'editable_text.dart';
 import 'horizontal_rule.dart';
 import 'image.dart';
 import 'rich_text.dart';
+import 'scope.dart';
 import 'theme.dart';
-import 'view.dart';
 
 /// Raw widget representing a single line of rich text document in Zefyr editor.
 ///
@@ -44,37 +43,31 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
 
   @override
   Widget build(BuildContext context) {
-    ZefyrViewState view = ZefyrView.of(context);
-    ZefyrEditableTextScope editable;
-    if (view == null) {
-      editable = ZefyrEditableText.of(context);
-    }
+    final scope = ZefyrScope.of(context);
 
-    final isEditable = editable != null;
-
-    if (isEditable) {
-      ensureVisible(context);
+    if (scope.isEditable) {
+      ensureVisible(context, scope);
     }
     final theme = ZefyrTheme.of(context);
 
     Widget content;
     if (widget.node.hasEmbed) {
-      content = buildEmbed(context, view, editable);
+      content = buildEmbed(context, scope);
     } else {
       assert(widget.style != null);
 
-      final text = EditableRichText(
+      final text = ZefyrRichText(
         node: widget.node,
         text: buildText(context),
       );
-      if (isEditable) {
+      if (scope.isEditable) {
         content = EditableBox(
           child: text,
           node: widget.node,
           layerLink: _link,
-          renderContext: editable.renderContext,
-          showCursor: editable.showCursor,
-          selection: editable.selection,
+          renderContext: scope.renderContext,
+          showCursor: scope.showCursor,
+          selection: scope.selection,
           selectionColor: theme.selectionColor,
         );
         content = CompositedTransformTarget(link: _link, child: content);
@@ -89,10 +82,9 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     return content;
   }
 
-  void ensureVisible(BuildContext context) {
-    final editable = ZefyrEditableText.of(context);
-    if (editable.selection.isCollapsed &&
-        widget.node.containsOffset(editable.selection.extentOffset)) {
+  void ensureVisible(BuildContext context, ZefyrScope scope) {
+    if (scope.selection.isCollapsed &&
+        widget.node.containsOffset(scope.selection.extentOffset)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         bringIntoView(context);
       });
@@ -150,10 +142,7 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     return result;
   }
 
-  Widget buildEmbed(BuildContext context, ZefyrViewState view,
-      ZefyrEditableTextScope editable) {
-    final isEditable = editable != null;
-
+  Widget buildEmbed(BuildContext context, ZefyrScope scope) {
     final theme = ZefyrTheme.of(context);
 
     EmbedNode node = widget.node.children.single;
@@ -163,16 +152,12 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     if (embed.type == EmbedType.horizontalRule) {
       result = ZefyrHorizontalRule(node: node);
     } else if (embed.type == EmbedType.image) {
-      if (isEditable) {
-        result = ZefyrImage(node: node, delegate: editable.imageDelegate);
-      } else {
-        result = ZefyrImage(node: node, delegate: view.imageDelegate);
-      }
+      result = ZefyrImage(node: node, delegate: scope.imageDelegate);
     } else {
       throw new UnimplementedError('Unimplemented embed type ${embed.type}');
     }
 
-    if (!isEditable) {
+    if (!scope.isEditable) {
       return result;
     }
 
@@ -180,9 +165,9 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
       child: result,
       node: widget.node,
       layerLink: _link,
-      renderContext: editable.renderContext,
-      showCursor: editable.showCursor,
-      selection: editable.selection,
+      renderContext: scope.renderContext,
+      showCursor: scope.showCursor,
+      selection: scope.selection,
       selectionColor: theme.selectionColor,
     );
   }

@@ -7,19 +7,8 @@ import 'image.dart';
 import 'list.dart';
 import 'paragraph.dart';
 import 'quote.dart';
+import 'scope.dart';
 import 'theme.dart';
-
-class _ZefyrViewAccess extends InheritedWidget {
-  final ZefyrViewState state;
-
-  _ZefyrViewAccess({Key key, @required this.state, Widget child})
-      : super(key: key, child: child);
-
-  @override
-  bool updateShouldNotify(_ZefyrViewAccess oldWidget) {
-    return state != oldWidget.state;
-  }
-}
 
 /// Non-scrollable read-only view of a Notus rich text document.
 class ZefyrView extends StatefulWidget {
@@ -29,21 +18,27 @@ class ZefyrView extends StatefulWidget {
   const ZefyrView({Key key, this.document, this.imageDelegate})
       : super(key: key);
 
-  static ZefyrViewState of(BuildContext context) {
-    final _ZefyrViewAccess widget =
-        context.inheritFromWidgetOfExactType(_ZefyrViewAccess);
-    if (widget == null) return null;
-    return widget.state;
-  }
-
   @override
   ZefyrViewState createState() => ZefyrViewState();
 }
 
 class ZefyrViewState extends State<ZefyrView> {
+  ZefyrScope _scope;
   ZefyrThemeData _themeData;
 
   ZefyrImageDelegate get imageDelegate => widget.imageDelegate;
+
+  @override
+  void initState() {
+    super.initState();
+    _scope = ZefyrScope.view(imageDelegate: widget.imageDelegate);
+  }
+
+  @override
+  void didUpdateWidget(ZefyrView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _scope.imageDelegate = widget.imageDelegate;
+  }
 
   @override
   void didChangeDependencies() {
@@ -56,11 +51,17 @@ class ZefyrViewState extends State<ZefyrView> {
   }
 
   @override
+  void dispose() {
+    _scope.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ZefyrTheme(
       data: _themeData,
-      child: _ZefyrViewAccess(
-        state: this,
+      child: ZefyrScopeAccess(
+        scope: _scope,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: _buildChildren(context),
