@@ -18,11 +18,14 @@ import 'list.dart';
 import 'paragraph.dart';
 import 'quote.dart';
 import 'render_context.dart';
+import 'scope.dart';
 import 'selection.dart';
+import 'theme.dart';
 
 /// Core widget responsible for editing Zefyr documents.
 ///
-/// Depends on presence of [ZefyrTheme] somewhere up the widget tree.
+/// Depends on presence of [ZefyrTheme] and [ZefyrScope] somewhere up the
+/// widget tree.
 ///
 /// Consider using [ZefyrEditor] which wraps this widget and adds a toolbar to
 /// edit style attributes.
@@ -95,8 +98,6 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   /// Current text selection.
   TextSelection get selection => widget.controller.selection;
-  ZefyrRenderContext get renderContext => _renderContext;
-  ValueNotifier<bool> get showCursor => _cursorTimer.value;
 
   /// Express interest in interacting with the keyboard.
   ///
@@ -166,6 +167,22 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final scope = ZefyrScope.of(context);
+    if (_renderContext != scope.renderContext) {
+      _renderContext?.removeListener(_handleRenderContextChange);
+      _renderContext = scope.renderContext;
+      _renderContext.addListener(_handleRenderContextChange);
+    }
+    if (_cursorTimer != scope.cursorTimer) {
+      _cursorTimer?.stop();
+      _cursorTimer = scope.cursorTimer;
+      _cursorTimer.startOrStop(focusNode, selection);
+    }
+  }
+
+  @override
   void dispose() {
     _cancelSubscriptions();
     super.dispose();
@@ -183,8 +200,8 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   //
 
   final ScrollController _scrollController = ScrollController();
-  final ZefyrRenderContext _renderContext = ZefyrRenderContext();
-  final CursorTimer _cursorTimer = CursorTimer();
+  ZefyrRenderContext _renderContext;
+  CursorTimer _cursorTimer;
   InputConnectionController _input;
   bool _didAutoFocus = false;
 
@@ -223,7 +240,6 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   void _updateSubscriptions([ZefyrEditableText oldWidget]) {
     if (oldWidget == null) {
-      _renderContext.addListener(_handleRenderContextChange);
       widget.controller.addListener(_handleLocalValueChange);
       focusNode.addListener(_handleFocusChange);
       return;
@@ -243,7 +259,6 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   void _cancelSubscriptions() {
     _renderContext.removeListener(_handleRenderContextChange);
-    _renderContext.dispose();
     widget.controller.removeListener(_handleLocalValueChange);
     focusNode.removeListener(_handleFocusChange);
     _input.closeConnection();

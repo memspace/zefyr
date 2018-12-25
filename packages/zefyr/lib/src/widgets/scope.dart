@@ -176,7 +176,7 @@ class ZefyrScope extends ChangeNotifier {
     final selection = _controller.selection;
     if (_selectionStyle != attrs || _selection != selection) {
       _selectionStyle = attrs;
-      _selection = _controller.selection;
+      _selection = selection;
       notifyListeners();
     }
   }

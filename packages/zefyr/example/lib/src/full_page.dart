@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -39,6 +40,21 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
       ZefyrController(NotusDocument.fromDelta(getDelta()));
   final FocusNode _focusNode = new FocusNode();
   bool _editing = false;
+  StreamSubscription<NotusChange> _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    _sub = _controller.document.changes.listen((change) {
+      print('${change.source}: ${change.change}');
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

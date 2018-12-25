@@ -294,6 +294,8 @@ class SelectionHandleDriver extends StatefulWidget {
 }
 
 class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
+  ZefyrScope _scope;
+
   /// Current document selection.
   TextSelection get selection => _selection;
   TextSelection _selection;
@@ -327,7 +329,18 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final scope = ZefyrScope.of(context);
-    _selection = scope.selection;
+    if (_scope != scope) {
+      _scope?.removeListener(_handleScopeChange);
+      _scope = scope;
+      _scope.addListener(_handleScopeChange);
+    }
+    _selection = _scope.selection;
+  }
+
+  @override
+  void dispose() {
+    _scope?.removeListener(_handleScopeChange);
+    super.dispose();
   }
 
   //
@@ -385,6 +398,12 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
   //
 
   Offset _dragPosition;
+
+  void _handleScopeChange() {
+    setState(() {
+      _selection = _scope.selection;
+    });
+  }
 
   void _handleDragStart(DragStartDetails details) {
     _dragPosition = details.globalPosition;

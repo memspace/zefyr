@@ -144,9 +144,9 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   @override
   Widget build(BuildContext context) {
     Widget editable = new ZefyrEditableText(
-      controller: widget.controller,
-      focusNode: widget.focusNode,
-      imageDelegate: _imageDelegate,
+      controller: _scope.controller,
+      focusNode: _scope.focusNode,
+      imageDelegate: _scope.imageDelegate,
       autofocus: widget.autofocus,
       enabled: widget.enabled,
       padding: widget.padding,
