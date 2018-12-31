@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
@@ -191,6 +192,11 @@ class ZefyrScope extends ChangeNotifier {
       ));
     }
     notifyListeners();
+  }
+
+  @override
+  String toString() {
+    return '$ZefyrScope#${shortHash(this)}';
   }
 }
 

@@ -10,6 +10,7 @@ import 'package:zefyr/util.dart';
 
 import 'controller.dart';
 import 'editable_box.dart';
+import 'render_context.dart';
 import 'scope.dart';
 
 RenderEditableBox _getEditableBox(HitTestResult result) {
@@ -232,8 +233,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
     RenderEditableProxyBox box = _getEditableBox(result);
     if (box == null) {
-      final scope = ZefyrScope.of(context);
-      box = scope.renderContext.closestBoxForGlobalPoint(globalPoint);
+      box = _editor.renderContext.closestBoxForGlobalPoint(globalPoint);
     }
     if (box == null) return null;
 
@@ -349,14 +349,13 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
 
   @override
   Widget build(BuildContext context) {
-    final scope = ZefyrScope.of(context);
     if (selection == null ||
         selection.isCollapsed ||
         widget.controls == null ||
-        scope.focusOwner != FocusOwner.editor) {
+        _scope.focusOwner != FocusOwner.editor) {
       return new Container();
     }
-    final block = scope.renderContext.boxForTextOffset(documentOffset);
+    final block = _scope.renderContext.boxForTextOffset(documentOffset);
     final position = getPosition(block);
     Widget handle;
     if (position == null) {
@@ -400,9 +399,11 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
   Offset _dragPosition;
 
   void _handleScopeChange() {
-    setState(() {
-      _selection = _scope.selection;
-    });
+    if (_selection != _scope.selection) {
+      setState(() {
+        _selection = _scope.selection;
+      });
+    }
   }
 
   void _handleDragStart(DragStartDetails details) {
@@ -412,8 +413,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
   void _handleDragUpdate(DragUpdateDetails details) {
     _dragPosition += details.delta;
     final globalPoint = _dragPosition;
-    final scope = ZefyrScope.of(context);
-    final paragraph = scope.renderContext.boxForGlobalPoint(globalPoint);
+    final paragraph = _scope.renderContext.boxForGlobalPoint(globalPoint);
     if (paragraph == null) {
       return;
     }
@@ -430,7 +430,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
     }
 
     if (newSelection != _selection) {
-      scope.updateSelection(newSelection, source: ChangeSource.local);
+      _scope.updateSelection(newSelection, source: ChangeSource.local);
     }
   }
 }
@@ -468,7 +468,6 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
       return Container();
     }
     final boxes = block.getEndpointsForSelection(selection);
-
     // Find the horizontal midpoint, just above the selected text.
     final Offset midpoint = new Offset(
       (boxes.length == 1)
@@ -481,7 +480,6 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
       block.localToGlobal(Offset.zero),
       block.localToGlobal(block.size.bottomRight(Offset.zero)),
     );
-
     final toolbar = widget.controls
         .buildToolbar(context, editingRegion, midpoint, widget.delegate);
     return new CompositedTransformFollower(

@@ -102,6 +102,7 @@ class RenderEditableProxyBox extends RenderBox
   set showCursor(ValueNotifier<bool> value) {
     assert(value != null);
     if (_showCursor == value) return;
+    // TODO: only mark to repaint if cursor is collapsed and inside this box.
     if (attached) _showCursor.removeListener(markNeedsPaint);
     _showCursor = value;
     if (attached) _showCursor.addListener(markNeedsPaint);

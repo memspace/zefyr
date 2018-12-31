@@ -44,7 +44,6 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
   @override
   Widget build(BuildContext context) {
     final scope = ZefyrScope.of(context);
-
     if (scope.isEditable) {
       ensureVisible(context, scope);
     }
@@ -55,25 +54,23 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
       content = buildEmbed(context, scope);
     } else {
       assert(widget.style != null);
-
-      final text = ZefyrRichText(
+      content = ZefyrRichText(
         node: widget.node,
         text: buildText(context),
       );
-      if (scope.isEditable) {
-        content = EditableBox(
-          child: text,
-          node: widget.node,
-          layerLink: _link,
-          renderContext: scope.renderContext,
-          showCursor: scope.showCursor,
-          selection: scope.selection,
-          selectionColor: theme.selectionColor,
-        );
-        content = CompositedTransformTarget(link: _link, child: content);
-      } else {
-        content = text;
-      }
+    }
+
+    if (scope.isEditable) {
+      content = EditableBox(
+        child: content,
+        node: widget.node,
+        layerLink: _link,
+        renderContext: scope.renderContext,
+        showCursor: scope.showCursor,
+        selection: scope.selection,
+        selectionColor: theme.selectionColor,
+      );
+      content = CompositedTransformTarget(link: _link, child: content);
     }
 
     if (widget.padding != null) {
@@ -143,32 +140,15 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
   }
 
   Widget buildEmbed(BuildContext context, ZefyrScope scope) {
-    final theme = ZefyrTheme.of(context);
-
     EmbedNode node = widget.node.children.single;
     EmbedAttribute embed = node.style.get(NotusAttribute.embed);
 
-    Widget result;
     if (embed.type == EmbedType.horizontalRule) {
-      result = ZefyrHorizontalRule(node: node);
+      return ZefyrHorizontalRule(node: node);
     } else if (embed.type == EmbedType.image) {
-      result = ZefyrImage(node: node, delegate: scope.imageDelegate);
+      return ZefyrImage(node: node, delegate: scope.imageDelegate);
     } else {
       throw new UnimplementedError('Unimplemented embed type ${embed.type}');
     }
-
-    if (!scope.isEditable) {
-      return result;
-    }
-
-    return new EditableBox(
-      child: result,
-      node: widget.node,
-      layerLink: _link,
-      renderContext: scope.renderContext,
-      showCursor: scope.showCursor,
-      selection: scope.selection,
-      selectionColor: theme.selectionColor,
-    );
   }
 }
