@@ -7,7 +7,7 @@ import 'package:notus/notus.dart';
 void main() {
   group('$NotusStyle', () {
     test('get', () {
-      var attrs = NotusStyle.fromJson({'block': 'ul'});
+      var attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'ul'});
       var attr = attrs.get(NotusAttribute.block);
       expect(attr, NotusAttribute.ul);
     });

@@ -44,7 +44,7 @@ class NotusDocument {
     _loadDocument(_delta);
   }
 
-  NotusDocument.fromJson(dynamic data)
+  NotusDocument.fromJson(List data)
       : _heuristics = NotusHeuristics.fallback,
         _delta = Delta.fromJson(data) {
     _loadDocument(_delta);

@@ -238,7 +238,7 @@ abstract class ContainerNode<T extends Node> extends Node {
 
     if (isEmpty) {
       assert(index == 0);
-      Node node = defaultChild;
+      T node = defaultChild;
       add(node);
       node.insert(index, value, style);
     } else {

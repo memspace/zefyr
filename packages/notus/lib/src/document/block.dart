@@ -40,7 +40,7 @@ class BlockNode extends ContainerNode<LineNode>
       while (child != line) {
         child.unlink();
         before.add(child);
-        child = this.first;
+        child = this.first as LineNode;
       }
       line.unlink();
       insertBefore(line);

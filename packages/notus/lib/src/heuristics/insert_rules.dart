@@ -87,7 +87,7 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
     final target = iter.next();
 
     if (target.data.startsWith('\n')) {
-      Map<String, dynamic> resetStyle = null;
+      Map<String, dynamic> resetStyle;
       if (target.attributes != null &&
           target.attributes.containsKey(NotusAttribute.heading.key)) {
         resetStyle = NotusAttribute.heading.unset.toJson();
@@ -290,8 +290,8 @@ class PreserveBlockStyleOnPasteRule extends InsertRule {
       }
     }
 
-    Map<String, dynamic> resetStyle = null;
-    Map<String, dynamic> blockStyle = null;
+    Map<String, dynamic> resetStyle;
+    Map<String, dynamic> blockStyle;
     if (lineStyle != null) {
       if (lineStyle.containsKey(NotusAttribute.heading.key)) {
         resetStyle = NotusAttribute.heading.unset.toJson();

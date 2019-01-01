@@ -4,15 +4,34 @@ import 'package:notus/notus.dart';
 
 import 'controller.dart';
 import 'cursor_timer.dart';
+import 'editor.dart';
 import 'image.dart';
 import 'render_context.dart';
+import 'view.dart';
 
+/// Provides access to shared state of [ZefyrEditor] or [ZefyrView].
+///
+/// A scope object can be created by an editable widget like [ZefyrEditor] in
+/// which case it provides access to editing state, including focus nodes,
+/// selection and such. Editable scope can be created using
+/// [ZefyrScope.editable] constructor.
+///
+/// If a scope object is created by a view-only widget like [ZefyrView] then
+/// it only provides access to [imageDelegate].
+///
+/// Can be retrieved using [ZefyrScope.of].
 class ZefyrScope extends ChangeNotifier {
+  /// Creates a view-only scope.
+  ///
+  /// Normally used in [ZefyrView].
   ZefyrScope.view({@required ZefyrImageDelegate imageDelegate})
       : assert(imageDelegate != null),
         isEditable = false,
         _imageDelegate = imageDelegate;
 
+  /// Creates editable scope.
+  ///
+  /// Normally used in [ZefyrEditor].
   ZefyrScope.editable({
     @required ZefyrController controller,
     @required ZefyrImageDelegate imageDelegate,
@@ -33,6 +52,12 @@ class ZefyrScope extends ChangeNotifier {
     _selection = _controller.selection;
     _controller.addListener(_handleControllerChange);
     _focusNode.addListener(_handleFocusChange);
+  }
+
+  static ZefyrScope of(BuildContext context) {
+    final ZefyrScopeAccess widget =
+        context.inheritFromWidgetOfExactType(ZefyrScopeAccess);
+    return widget.scope;
   }
 
   ZefyrImageDelegate _imageDelegate;
@@ -106,12 +131,6 @@ class ZefyrScope extends ChangeNotifier {
   /// non-editable scopes these are set to `null`. You can still access
   /// objects which are not dependent on editing flow, e.g. [imageDelegate].
   final bool isEditable;
-
-  static ZefyrScope of(BuildContext context) {
-    final ZefyrScopeAccess widget =
-        context.inheritFromWidgetOfExactType(ZefyrScopeAccess);
-    return widget.scope;
-  }
 
   set toolbarFocusNode(FocusNode node) {
     assert(isEditable);
