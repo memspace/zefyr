@@ -55,35 +55,6 @@ class ZefyrEditableText extends StatefulWidget {
   _ZefyrEditableTextState createState() => new _ZefyrEditableTextState();
 }
 
-/// Provides access to shared state of [ZefyrEditableText].
-class _ZefyrEditableTextScope extends InheritedWidget {
-  static const _kEquality = const SetEquality<RenderEditableBox>();
-
-  _ZefyrEditableTextScope({
-    Key key,
-    @required Widget child,
-    @required this.selection,
-    @required this.showCursor,
-    @required this.renderContext,
-    @required this.imageDelegate,
-  })  : _activeBoxes = new Set.from(renderContext.active),
-        super(key: key, child: child);
-
-  final TextSelection selection;
-  final ValueNotifier<bool> showCursor;
-  final ZefyrRenderContext renderContext;
-  final ZefyrImageDelegate imageDelegate;
-  final Set<RenderEditableBox> _activeBoxes;
-
-  @override
-  bool updateShouldNotify(_ZefyrEditableTextScope oldWidget) {
-    return selection != oldWidget.selection ||
-        showCursor != oldWidget.showCursor ||
-        imageDelegate != oldWidget.imageDelegate ||
-        !_kEquality.equals(_activeBoxes, oldWidget._activeBoxes);
-  }
-}
-
 class _ZefyrEditableTextState extends State<ZefyrEditableText>
     with AutomaticKeepAliveClientMixin {
   //
