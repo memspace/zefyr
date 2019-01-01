@@ -61,7 +61,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
     _toolbarKey = null;
   }
 
-  Widget buildToolbar(BuildContext) {
+  Widget buildToolbar(BuildContext context) {
     return ZefyrTheme(
       data: _themeData,
       child: ZefyrToolbar(

@@ -10,13 +10,12 @@ import 'package:zefyr/util.dart';
 
 import 'controller.dart';
 import 'editable_box.dart';
-import 'render_context.dart';
 import 'scope.dart';
 
 RenderEditableBox _getEditableBox(HitTestResult result) {
   for (var entry in result.path) {
     if (entry.target is RenderEditableBox) {
-      return entry.target;
+      return entry.target as RenderEditableBox;
     }
   }
   return null;

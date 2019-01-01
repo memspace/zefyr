@@ -1,7 +1,6 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
@@ -10,7 +9,6 @@ import 'code.dart';
 import 'common.dart';
 import 'controller.dart';
 import 'cursor_timer.dart';
-import 'editable_box.dart';
 import 'editor.dart';
 import 'image.dart';
 import 'input.dart';
@@ -197,13 +195,13 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     final BlockNode block = node;
     final blockStyle = block.style.get(NotusAttribute.block);
     if (blockStyle == NotusAttribute.block.code) {
-      return new ZefyrCode(node: node);
+      return new ZefyrCode(node: block);
     } else if (blockStyle == NotusAttribute.block.bulletList) {
-      return new ZefyrList(node: node);
+      return new ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.numberList) {
-      return new ZefyrList(node: node);
+      return new ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.quote) {
-      return new ZefyrQuote(node: node);
+      return new ZefyrQuote(node: block);
     }
 
     throw new UnimplementedError('Block format $blockStyle.');

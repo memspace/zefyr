@@ -97,7 +97,7 @@ RenderEditableProxyBox createParagraph(ZefyrRenderContext context) {
   final selection = new TextSelection.collapsed(offset: 0);
   final selectionColor = Colors.blue;
   return new RenderEditableProxyBox(
-    node: doc.root.children.first,
+    node: doc.root.children.first as LineNode,
     layerLink: link,
     renderContext: context,
     showCursor: showCursor,

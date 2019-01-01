@@ -19,7 +19,7 @@ void main() {
       widget = new Directionality(
         textDirection: TextDirection.ltr,
         child: new ZefyrRichText(
-          node: doc.root.children.first,
+          node: doc.root.children.first as LineNode,
           text: text,
         ),
       );

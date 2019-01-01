@@ -91,13 +91,13 @@ class ZefyrViewState extends State<ZefyrView> {
     final BlockNode block = node;
     final blockStyle = block.style.get(NotusAttribute.block);
     if (blockStyle == NotusAttribute.block.code) {
-      return new ZefyrCode(node: node);
+      return new ZefyrCode(node: block);
     } else if (blockStyle == NotusAttribute.block.bulletList) {
-      return new ZefyrList(node: node);
+      return new ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.numberList) {
-      return new ZefyrList(node: node);
+      return new ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.quote) {
-      return new ZefyrQuote(node: node);
+      return new ZefyrQuote(node: block);
     }
 
     throw new UnimplementedError('Block format $blockStyle.');

@@ -24,7 +24,7 @@ void main() {
       renderContext = new ZefyrRenderContext();
       p = new RenderZefyrParagraph(
         text,
-        node: doc.root.children.first,
+        node: doc.root.children.first as LineNode,
         textDirection: TextDirection.ltr,
       );
     });

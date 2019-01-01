@@ -43,7 +43,7 @@ class RenderZefyrParagraph extends RenderParagraph
     implements RenderEditableBox {
   RenderZefyrParagraph(
     TextSpan text, {
-    @required ContainerNode node,
+    @required LineNode node,
     TextAlign textAlign: TextAlign.start,
     @required TextDirection textDirection,
     bool softWrap: true,
