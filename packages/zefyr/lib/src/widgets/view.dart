@@ -10,12 +10,12 @@ import 'quote.dart';
 import 'scope.dart';
 import 'theme.dart';
 
-/// Non-scrollable read-only view of a Notus rich text document.
+/// Non-scrollable read-only view of Notus rich text documents.
 class ZefyrView extends StatefulWidget {
   final NotusDocument document;
   final ZefyrImageDelegate imageDelegate;
 
-  const ZefyrView({Key key, this.document, this.imageDelegate})
+  const ZefyrView({Key key, @required this.document, this.imageDelegate})
       : super(key: key);
 
   @override
