@@ -24,7 +24,7 @@ void main() {
       expect(bold.value, 'House');
 
       await editor.tapButtonWithIcon(Icons.format_bold);
-      line = editor.document.root.children.first;
+      line = editor.document.root.children.first as LineNode;
       expect(line.childCount, 1);
     });
 
@@ -139,7 +139,7 @@ void main() {
       await editor.updateSelection(base: 7, extent: 7);
       await editor.tapButtonWithIcon(Icons.link);
       await editor.tapButtonWithIcon(Icons.link_off);
-      line = editor.document.root.children.first;
+      line = editor.document.root.children.first as LineNode;
       expect(line.childCount, 1);
     });
   });

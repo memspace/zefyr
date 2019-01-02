@@ -114,7 +114,7 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
   String _writeLine(String text, NotusStyle style) {
     StringBuffer buffer = new StringBuffer();
     if (style.contains(NotusAttribute.heading)) {
-      _writeAttribute(buffer, style.get(NotusAttribute.heading));
+      _writeAttribute(buffer, style.get<int>(NotusAttribute.heading));
     }
 
     // Write the text itself
@@ -163,11 +163,11 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
     } else if (attribute == NotusAttribute.italic) {
       _writeItalicTag(buffer);
     } else if (attribute.key == NotusAttribute.link.key) {
-      _writeLinkTag(buffer, attribute, close: close);
+      _writeLinkTag(buffer, attribute as NotusAttribute<String>, close: close);
     } else if (attribute.key == NotusAttribute.heading.key) {
-      _writeHeadingTag(buffer, attribute);
+      _writeHeadingTag(buffer, attribute as NotusAttribute<int>);
     } else if (attribute.key == NotusAttribute.block.key) {
-      _writeBlockTag(buffer, attribute, close: close);
+      _writeBlockTag(buffer, attribute as NotusAttribute<String>, close: close);
     } else {
       throw new ArgumentError('Cannot handle $attribute');
     }

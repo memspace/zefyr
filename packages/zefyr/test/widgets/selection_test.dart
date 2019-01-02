@@ -14,8 +14,8 @@ void main() {
       final editor = new EditorSandBox(tester: tester);
       await editor.tapEditor();
 
-      RenderEditableParagraph renderObject =
-          tester.firstRenderObject(find.byType(EditableRichText));
+      RenderZefyrParagraph renderObject =
+          tester.firstRenderObject(find.byType(ZefyrRichText));
       var offset = renderObject.localToGlobal(Offset.zero);
       offset += Offset(5.0, 5.0);
       await tester.tapAt(offset);
@@ -42,8 +42,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(editor.controller.selection.extentOffset, 10);
 
-      RenderEditableParagraph renderObject =
-          tester.firstRenderObject(find.byType(EditableRichText));
+      RenderZefyrParagraph renderObject =
+          tester.firstRenderObject(find.byType(ZefyrRichText));
       var offset = renderObject.localToGlobal(Offset.zero);
       offset += Offset(-5.0, 5.0);
       await tester.tapAt(offset);

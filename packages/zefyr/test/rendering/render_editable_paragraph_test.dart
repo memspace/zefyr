@@ -11,20 +11,20 @@ import 'package:zefyr/src/widgets/rich_text.dart';
 import 'package:zefyr/zefyr.dart';
 
 void main() {
-  group('$RenderEditableParagraph', () {
+  group('$RenderZefyrParagraph', () {
     final doc = new NotusDocument();
     doc.insert(0, 'This House Is A Circus');
     final text = new TextSpan(text: 'This House Is A Circus');
 
     ZefyrRenderContext renderContext;
-    RenderEditableParagraph p;
+    RenderZefyrParagraph p;
 
     setUp(() {
       WidgetsFlutterBinding.ensureInitialized();
       renderContext = new ZefyrRenderContext();
-      p = new RenderEditableParagraph(
+      p = new RenderZefyrParagraph(
         text,
-        node: doc.root.children.first,
+        node: doc.root.children.first as LineNode,
         textDirection: TextDirection.ltr,
       );
     });

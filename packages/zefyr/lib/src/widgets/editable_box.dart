@@ -102,9 +102,9 @@ class RenderEditableProxyBox extends RenderBox
   set showCursor(ValueNotifier<bool> value) {
     assert(value != null);
     if (_showCursor == value) return;
-    if (attached) _showCursor.removeListener(markNeedsPaint);
+    if (attached) _showCursor.removeListener(markNeedsCursorPaint);
     _showCursor = value;
-    if (attached) _showCursor.addListener(markNeedsPaint);
+    if (attached) _showCursor.addListener(markNeedsCursorPaint);
     markNeedsPaint();
   }
 
@@ -130,8 +130,13 @@ class RenderEditableProxyBox extends RenderBox
   /// Returns `true` if current selection is collapsed, located within
   /// this paragraph and is visible according to tick timer.
   bool get isCaretVisible {
+    return _showCursor.value && containsCaret;
+  }
+
+  /// Returns `true` if current selection is collapsed and located
+  /// within this paragraph.
+  bool get containsCaret {
     if (!_selection.isCollapsed) return false;
-    if (!_showCursor.value) return false;
 
     final int start = node.documentOffset;
     final int end = start + node.length;
@@ -146,6 +151,12 @@ class RenderEditableProxyBox extends RenderBox
     return intersectsWithSelection(_selection);
   }
 
+  void markNeedsCursorPaint() {
+    if (containsCaret) {
+      markNeedsPaint();
+    }
+  }
+
   //
   // Overridden members of RenderBox
   //
@@ -153,13 +164,13 @@ class RenderEditableProxyBox extends RenderBox
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
-    _showCursor.addListener(markNeedsPaint);
+    _showCursor.addListener(markNeedsCursorPaint);
     _renderContext.addBox(this);
   }
 
   @override
   void detach() {
-    _showCursor.removeListener(markNeedsPaint);
+    _showCursor.removeListener(markNeedsCursorPaint);
     _renderContext.removeBox(this);
     super.detach();
   }

@@ -1,9 +1,6 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'dart:async';
-
-import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
@@ -11,7 +8,7 @@ import 'package:notus/notus.dart';
 import 'code.dart';
 import 'common.dart';
 import 'controller.dart';
-import 'editable_box.dart';
+import 'cursor_timer.dart';
 import 'editor.dart';
 import 'image.dart';
 import 'input.dart';
@@ -19,11 +16,14 @@ import 'list.dart';
 import 'paragraph.dart';
 import 'quote.dart';
 import 'render_context.dart';
+import 'scope.dart';
 import 'selection.dart';
+import 'theme.dart';
 
 /// Core widget responsible for editing Zefyr documents.
 ///
-/// Depends on presence of [ZefyrTheme] somewhere up the widget tree.
+/// Depends on presence of [ZefyrTheme] and [ZefyrScope] somewhere up the
+/// widget tree.
 ///
 /// Consider using [ZefyrEditor] which wraps this widget and adds a toolbar to
 /// edit style attributes.
@@ -49,43 +49,8 @@ class ZefyrEditableText extends StatefulWidget {
   /// Padding around editable area.
   final EdgeInsets padding;
 
-  static ZefyrEditableTextScope of(BuildContext context) {
-    final ZefyrEditableTextScope result =
-        context.inheritFromWidgetOfExactType(ZefyrEditableTextScope);
-    return result;
-  }
-
   @override
   _ZefyrEditableTextState createState() => new _ZefyrEditableTextState();
-}
-
-/// Provides access to shared state of [ZefyrEditableText].
-class ZefyrEditableTextScope extends InheritedWidget {
-  static const _kEquality = const SetEquality<RenderEditableBox>();
-
-  ZefyrEditableTextScope({
-    Key key,
-    @required Widget child,
-    @required this.selection,
-    @required this.showCursor,
-    @required this.renderContext,
-    @required this.imageDelegate,
-  })  : _activeBoxes = new Set.from(renderContext.active),
-        super(key: key, child: child);
-
-  final TextSelection selection;
-  final ValueNotifier<bool> showCursor;
-  final ZefyrRenderContext renderContext;
-  final ZefyrImageDelegate imageDelegate;
-  final Set<RenderEditableBox> _activeBoxes;
-
-  @override
-  bool updateShouldNotify(ZefyrEditableTextScope oldWidget) {
-    return selection != oldWidget.selection ||
-        showCursor != oldWidget.showCursor ||
-        imageDelegate != oldWidget.imageDelegate ||
-        !_kEquality.equals(_activeBoxes, oldWidget._activeBoxes);
-  }
 }
 
 class _ZefyrEditableTextState extends State<ZefyrEditableText>
@@ -102,8 +67,6 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   /// Current text selection.
   TextSelection get selection => widget.controller.selection;
-  ZefyrRenderContext get renderContext => _renderContext;
-  ValueNotifier<bool> get showCursor => _cursorTimer.value;
 
   /// Express interest in interacting with the keyboard.
   ///
@@ -127,7 +90,6 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   Widget build(BuildContext context) {
     FocusScope.of(context).reparentIfNeeded(focusNode);
     super.build(context); // See AutomaticKeepAliveState.
-    ZefyrEditor.of(context);
 
     Widget body = ListBody(children: _buildChildren(context));
     if (widget.padding != null) {
@@ -149,13 +111,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       ));
     }
 
-    return new ZefyrEditableTextScope(
-      selection: selection,
-      showCursor: showCursor,
-      renderContext: renderContext,
-      imageDelegate: widget.imageDelegate,
-      child: Stack(fit: StackFit.expand, children: layers),
-    );
+    return Stack(fit: StackFit.expand, children: layers);
   }
 
   @override
@@ -180,6 +136,22 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final scope = ZefyrScope.of(context);
+    if (_renderContext != scope.renderContext) {
+      _renderContext?.removeListener(_handleRenderContextChange);
+      _renderContext = scope.renderContext;
+      _renderContext.addListener(_handleRenderContextChange);
+    }
+    if (_cursorTimer != scope.cursorTimer) {
+      _cursorTimer?.stop();
+      _cursorTimer = scope.cursorTimer;
+      _cursorTimer.startOrStop(focusNode, selection);
+    }
+  }
+
+  @override
   void dispose() {
     _cancelSubscriptions();
     super.dispose();
@@ -196,9 +168,9 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   // Private members
   //
 
-  final ScrollController _scrollController = new ScrollController();
-  final ZefyrRenderContext _renderContext = new ZefyrRenderContext();
-  final _CursorTimer _cursorTimer = new _CursorTimer();
+  final ScrollController _scrollController = ScrollController();
+  ZefyrRenderContext _renderContext;
+  CursorTimer _cursorTimer;
   InputConnectionController _input;
   bool _didAutoFocus = false;
 
@@ -223,13 +195,13 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     final BlockNode block = node;
     final blockStyle = block.style.get(NotusAttribute.block);
     if (blockStyle == NotusAttribute.block.code) {
-      return new ZefyrCode(node: node);
+      return new ZefyrCode(node: block);
     } else if (blockStyle == NotusAttribute.block.bulletList) {
-      return new ZefyrList(node: node);
+      return new ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.numberList) {
-      return new ZefyrList(node: node);
+      return new ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.quote) {
-      return new ZefyrQuote(node: node);
+      return new ZefyrQuote(node: block);
     }
 
     throw new UnimplementedError('Block format $blockStyle.');
@@ -237,7 +209,6 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   void _updateSubscriptions([ZefyrEditableText oldWidget]) {
     if (oldWidget == null) {
-      _renderContext.addListener(_handleRenderContextChange);
       widget.controller.addListener(_handleLocalValueChange);
       focusNode.addListener(_handleFocusChange);
       return;
@@ -257,7 +228,6 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   void _cancelSubscriptions() {
     _renderContext.removeListener(_handleRenderContextChange);
-    _renderContext.dispose();
     widget.controller.removeListener(_handleLocalValueChange);
     focusNode.removeListener(_handleFocusChange);
     _input.closeConnection();
@@ -295,44 +265,5 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     setState(() {
       // nothing to update internally.
     });
-  }
-}
-
-/// Helper class that keeps state relevant to the cursor.
-class _CursorTimer {
-  static const _kCursorBlinkHalfPeriod = const Duration(milliseconds: 500);
-
-  Timer _timer;
-  final ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(false);
-
-  ValueNotifier<bool> get value => _showCursor;
-
-  void _cursorTick(Timer timer) {
-    _showCursor.value = !_showCursor.value;
-  }
-
-  /// Starts cursor timer.
-  void start() {
-    _showCursor.value = true;
-    _timer = new Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
-  }
-
-  /// Stops cursor timer.
-  void stop() {
-    _timer?.cancel();
-    _timer = null;
-    _showCursor.value = false;
-  }
-
-  /// Starts or stops cursor timer based on current state of [focusNode]
-  /// and [selection].
-  void startOrStop(FocusNode focusNode, TextSelection selection) {
-    final hasFocus = focusNode.hasFocus;
-    final selectionCollapsed = selection.isCollapsed;
-    if (_timer == null && hasFocus && selectionCollapsed) {
-      start();
-    } else if (_timer != null && (!hasFocus || !selectionCollapsed)) {
-      stop();
-    }
   }
 }

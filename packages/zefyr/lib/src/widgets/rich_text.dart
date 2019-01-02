@@ -11,8 +11,9 @@ import 'package:notus/notus.dart';
 import 'caret.dart';
 import 'editable_box.dart';
 
-class EditableRichText extends LeafRenderObjectWidget {
-  EditableRichText({
+/// Represents single paragraph of Zefyr rich-text.
+class ZefyrRichText extends LeafRenderObjectWidget {
+  ZefyrRichText({
     @required this.node,
     @required this.text,
   }) : assert(node != null && text != null);
@@ -22,7 +23,7 @@ class EditableRichText extends LeafRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return new RenderEditableParagraph(
+    return new RenderZefyrParagraph(
       text,
       node: node,
       textDirection: Directionality.of(context),
@@ -31,18 +32,18 @@ class EditableRichText extends LeafRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext context, RenderEditableParagraph renderObject) {
+      BuildContext context, RenderZefyrParagraph renderObject) {
     renderObject
       ..text = text
       ..node = node;
   }
 }
 
-class RenderEditableParagraph extends RenderParagraph
+class RenderZefyrParagraph extends RenderParagraph
     implements RenderEditableBox {
-  RenderEditableParagraph(
+  RenderZefyrParagraph(
     TextSpan text, {
-    @required ContainerNode node,
+    @required LineNode node,
     TextAlign textAlign: TextAlign.start,
     @required TextDirection textDirection,
     bool softWrap: true,

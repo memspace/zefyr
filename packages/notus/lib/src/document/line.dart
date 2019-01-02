@@ -34,13 +34,15 @@ class LineNode extends ContainerNode<LeafNode>
     if (isLast) {
       if (parent is BlockNode) {
         if (parent.isLast) return null;
-        return (parent.next is BlockNode)
+        LineNode line = (parent.next is BlockNode)
             ? (parent.next as BlockNode).first
             : parent.next;
+        return line;
       } else
         return null;
     } else {
-      return (next is BlockNode) ? (next as BlockNode).first : next;
+      LineNode line = (next is BlockNode) ? (next as BlockNode).first : next;
+      return line;
     }
   }
 
@@ -129,7 +131,7 @@ class LineNode extends ContainerNode<LeafNode>
       result = result.mergeAll(node.style);
       int pos = node.length - data.offset;
       while (!node.isLast && pos < local) {
-        node = node.next;
+        node = node.next as LeafNode;
         _handle(node.style);
         pos += node.length;
       }

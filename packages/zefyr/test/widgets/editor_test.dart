@@ -25,7 +25,7 @@ void main() {
       await editor.tapEditor();
       // TODO: figure out why this extra pump is needed here
       await tester.pumpAndSettle();
-      EditableRichText p = tester.widget(find.byType(EditableRichText).first);
+      ZefyrRichText p = tester.widget(find.byType(ZefyrRichText).first);
       expect(p.text.children.first.style.color, Colors.red);
     });
 
