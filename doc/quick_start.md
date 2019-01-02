@@ -12,7 +12,7 @@ Add `zefyr` package as a dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zefyr: ^0.3.0
+  zefyr: [latest_version]
 ```
 
 And run `flutter packages get` to install. This installs both `zefyr`
