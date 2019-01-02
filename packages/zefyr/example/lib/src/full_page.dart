@@ -32,7 +32,7 @@ final doc =
     r'g":2}},{"insert":"Of course:\nimport ‘package:flutter/material.dart’;"},{"insert":"\n","attributes":{"block":"code"}},{"insert":"import ‘package:zefyr/zefyr.dart’;"},{"insert":"\n\n","attributes":{"block":"code"}},{"insert":"void main() {"},{"insert":"\n","attributes":{"block":"code"}},{"insert":" runApp(MyZefyrApp());"},{"insert":"\n","attributes":{"block":"code"}},{"insert":"}"},{"insert":"\n","attributes":{"block":"code"}},{"insert":"\n\n\n"}]';
 
 Delta getDelta() {
-  return Delta.fromJson(json.decode(doc));
+  return Delta.fromJson(json.decode(doc) as List);
 }
 
 class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
