@@ -51,7 +51,10 @@ abstract class ZefyrSelectionControls {
   /// Whether the current selection of the document managed by the given
   /// [scope] can be extended to include the entire content of the document.
   bool canSelectAll(ZefyrScope scope) {
-    return scope.controller.document.length > 1 && scope.selection.isCollapsed;
+    return scope.isEditable &&
+        scope.mode != ZefyrMode.view &&
+        scope.controller.document.length > 1 &&
+        scope.selection.isCollapsed;
   }
 
   /// Copy the current selection of the document managed by the given

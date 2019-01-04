@@ -57,6 +57,15 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
   bool _didCaretTap = false;
 
+  /// Whether selection controls should be hidden.
+  bool get shouldHideControls {
+    if (_scope.mode == ZefyrMode.view) return true;
+    final selection = _scope.selection;
+    final collapsedSelection = selection == null || selection.isCollapsed;
+    if (_scope.mode == ZefyrMode.select) return collapsedSelection;
+    return collapsedSelection || _scope.focusOwner != FocusOwner.editor;
+  }
+
   void showToolbar() {
     final toolbarOpacity = _toolbarController.view;
     _toolbar = OverlayEntry(
@@ -179,15 +188,6 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     return new Container(child: overlay);
   }
 
-  /// Whether selection toolbar should be hidden.
-  bool get shouldHideToolbar {
-    if (_scope.mode == ZefyrMode.view) return true;
-    final selection = _scope.selection;
-    final collapsedSelection = selection == null || selection.isCollapsed;
-    if (_scope.mode == ZefyrMode.select) return collapsedSelection;
-    return collapsedSelection || _scope.focusOwner != FocusOwner.editor;
-  }
-
   void _handleChange() {
     if (_selection != _scope.selection || _focusOwner != _scope.focusOwner) {
       _updateToolbar();
@@ -202,7 +202,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     final selection = _scope.selection;
     final focusOwner = _scope.focusOwner;
     setState(() {
-      if (shouldHideToolbar && isToolbarVisible) {
+      if (shouldHideControls && isToolbarVisible) {
         hideToolbar();
       } else {
         if (_selection != selection) {
@@ -354,21 +354,9 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
     super.dispose();
   }
 
-  /// Whether selection handle should be shown.
-  bool get shouldHideHandle {
-    if (_scope.mode == ZefyrMode.view) return true;
-    final collapsedSelection = selection == null || selection.isCollapsed;
-    if (_scope.mode == ZefyrMode.select) return collapsedSelection;
-    return collapsedSelection || _scope.focusOwner != FocusOwner.editor;
-  }
-
-  //
-  // Overridden members
-  //
-
   @override
   Widget build(BuildContext context) {
-    if (shouldHideHandle) {
+    if (widget.selectionOverlay.shouldHideControls) {
       return new Container();
     }
     final block = _scope.renderContext.boxForTextOffset(documentOffset);
@@ -473,7 +461,6 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
   @override
   Widget build(BuildContext context) {
     final base = selection.baseOffset;
-    // TODO: Editable is not refreshed and may contain stale renderContext instance.
     final block = scope.renderContext.boxForTextOffset(base);
     if (block == null) {
       return Container();

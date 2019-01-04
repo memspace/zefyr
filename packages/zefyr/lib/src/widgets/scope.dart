@@ -157,14 +157,6 @@ class ZefyrScope extends ChangeNotifier {
       // focus state changes, see [_handleFocusChange].
     }
   }
-  
-  /// Returns `true` if user is allowed to select a range of text based on
-  /// the current value of [mode].
-  ///
-  /// See also:
-  ///
-  ///   - [ZefyrMode] for details on when selection is allowed.
-  bool get isSelectionEnabled => _mode != ZefyrMode.view;
 
   FocusOwner get focusOwner {
     assert(isEditable);
