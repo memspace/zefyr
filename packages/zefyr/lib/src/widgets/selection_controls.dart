@@ -123,10 +123,12 @@ class DefaultZefyrSelectionControls extends ZefyrSelectionControls {
   final Color textColor;
 
   DefaultZefyrSelectionControls({
-    @required this.toolbarElevation,
-    @required this.toolbarColor,
-    @required this.textColor,
-  });
+    double toolbarElevation,
+    Color toolbarColor,
+    Color textColor,
+  })  : toolbarElevation = toolbarElevation ?? 0.0,
+        toolbarColor = toolbarColor ?? Colors.grey.shade900,
+        textColor = textColor ?? Colors.white;
 
   @override
   Widget buildToolbar(BuildContext context, ZefyrScope scope) {

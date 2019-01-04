@@ -34,17 +34,17 @@ class ZefyrTextSelectionToolbar extends StatelessWidget {
     if (handleCut != null)
       items.add(FlatButton(
           textColor: textColor,
-          child: Text(localizations.cutButtonLabel),
+          child: Icon(Icons.content_cut, size: 20.0),
           onPressed: handleCut));
     if (handleCopy != null)
       items.add(FlatButton(
           textColor: textColor,
-          child: Text(localizations.copyButtonLabel),
+          child: Icon(Icons.content_copy, size: 20.0),
           onPressed: handleCopy));
     if (handlePaste != null)
       items.add(FlatButton(
         textColor: textColor,
-        child: Text(localizations.pasteButtonLabel),
+        child: Icon(Icons.content_paste, size: 20.0),
         onPressed: handlePaste,
       ));
     if (handleSelectAll != null)
@@ -53,12 +53,17 @@ class ZefyrTextSelectionToolbar extends StatelessWidget {
           child: Text(localizations.selectAllButtonLabel),
           onPressed: handleSelectAll));
 
-    return Material(
-      elevation: elevation,
-      color: color,
-      child: Container(
-        height: 44.0,
-        child: Row(mainAxisSize: MainAxisSize.min, children: items),
+    final theme = ButtonTheme.of(context);
+    return ButtonTheme.fromButtonThemeData(
+      data: theme.copyWith(minWidth: 20.0),
+      child: Material(
+        elevation: elevation,
+        color: color,
+        child: Container(
+          height: 44.0,
+          padding: EdgeInsets.symmetric(horizontal: 4.0),
+          child: Row(mainAxisSize: MainAxisSize.min, children: items),
+        ),
       ),
     );
   }

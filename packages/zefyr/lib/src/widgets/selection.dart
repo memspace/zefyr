@@ -104,14 +104,15 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   @override
   void initState() {
     super.initState();
-    _controls =
-        ZefyrSelectionControlsAdapter(scope: null, controls: widget.controls);
+    _controls = ZefyrSelectionControlsAdapter(
+      controls: widget.controls ?? DefaultZefyrSelectionControls(),
+    );
   }
 
   @override
   void didUpdateWidget(ZefyrSelectionOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _controls.controls = oldWidget.controls;
+    _controls.controls = oldWidget.controls ?? DefaultZefyrSelectionControls();
   }
 
   @override

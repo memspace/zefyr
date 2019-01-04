@@ -2,6 +2,9 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+// Most of this code is copied from Flutter SDK due to implementations being
+// hidden from public API.
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';

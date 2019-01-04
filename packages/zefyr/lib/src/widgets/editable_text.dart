@@ -39,6 +39,7 @@ class ZefyrEditableText extends StatefulWidget {
     this.enabled: true,
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
     this.physics,
+    this.selectionControls,
   }) : super(key: key);
 
   final ZefyrController controller;
@@ -47,6 +48,7 @@ class ZefyrEditableText extends StatefulWidget {
   final bool autofocus;
   final bool enabled;
   final ScrollPhysics physics;
+  final ZefyrSelectionControls selectionControls;
 
   /// Padding around editable area.
   final EdgeInsets padding;
@@ -104,15 +106,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     );
 
     final layers = <Widget>[scrollable];
-    if (widget.enabled) {
-      layers.add(ZefyrSelectionOverlay(
-        controls: DefaultZefyrSelectionControls(
-          toolbarElevation: 1.0,
-          toolbarColor: Colors.grey.shade900,
-          textColor: Colors.white,
-        ),
-      ));
-    }
+    layers.add(ZefyrSelectionOverlay(controls: widget.selectionControls));
 
     return Stack(fit: StackFit.expand, children: layers);
   }
