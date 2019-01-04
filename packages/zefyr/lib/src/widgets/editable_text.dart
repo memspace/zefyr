@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
@@ -18,6 +19,7 @@ import 'quote.dart';
 import 'render_context.dart';
 import 'scope.dart';
 import 'selection.dart';
+import 'selection_controls.dart';
 import 'theme.dart';
 
 /// Core widget responsible for editing Zefyr documents.
@@ -101,13 +103,14 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       child: body,
     );
 
-    final overlay = Overlay.of(context, debugRequiredFor: widget);
     final layers = <Widget>[scrollable];
     if (widget.enabled) {
       layers.add(ZefyrSelectionOverlay(
-        controller: widget.controller,
-        controls: cupertinoTextSelectionControls,
-        overlay: overlay,
+        controls: DefaultZefyrSelectionControls(
+          toolbarElevation: 1.0,
+          toolbarColor: Colors.grey.shade900,
+          textColor: Colors.white,
+        ),
       ));
     }
 
