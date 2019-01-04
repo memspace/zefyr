@@ -118,7 +118,7 @@ class _ZefyrSandboxState extends State<_ZefyrSandbox> {
     return new ZefyrEditor(
       controller: widget.controller,
       focusNode: widget.focusNode,
-      enabled: _enabled,
+      mode: _enabled ? ZefyrMode.edit : ZefyrMode.view,
     );
   }
 

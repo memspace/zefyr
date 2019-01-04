@@ -45,7 +45,7 @@ void main() {
       await editor.updateSelection(base: 0, extent: 3);
       await editor.disable();
       ZefyrEditor widget = tester.widget(find.byType(ZefyrEditor));
-      expect(widget.enabled, isFalse);
+      expect(widget.mode, ZefyrMode.view);
     });
   });
 }

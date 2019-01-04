@@ -10,6 +10,10 @@
   `ZefyrEditorScope`. Unified all shared resources under one class.
 * Breaking change: removed `ZefyrEditor.of` and `ZefyrEditableText.of` static methods.
   Use `ZefyrScope.of` instead.
+* Breaking change: replaced `enabled` field on `ZefyrEditor`, `ZefyrField` and `ZefyrEditableText`
+  with new `mode` field of type `ZefyrMode` which is a enum of either `edit`, `select` or `view`
+  states. The `mode` field is set to `ZefyrMode.edit` by default which provides similar behavior
+  as the removed `enabled` field.
 
 ## 0.3.0
 

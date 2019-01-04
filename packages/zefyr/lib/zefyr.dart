@@ -24,6 +24,8 @@ export 'src/widgets/quote.dart';
 export 'src/widgets/scaffold.dart';
 export 'src/widgets/scope.dart' hide ZefyrScopeAccess;
 export 'src/widgets/selection.dart' hide SelectionHandleDriver;
+export 'src/widgets/selection_controls.dart' hide ZefyrSelectionControlsAdapter;
+export 'src/widgets/selection_toolbar.dart';
 export 'src/widgets/theme.dart';
 export 'src/widgets/toolbar.dart';
 export 'src/widgets/view.dart';

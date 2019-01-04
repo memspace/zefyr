@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
 import 'cupertino/selection_controls.dart';
+import 'editable_text.dart';
 import 'material/selection_controls.dart';
 import 'scope.dart';
 import 'selection_toolbar.dart';
@@ -27,8 +28,9 @@ abstract class ZefyrSelectionControls {
   /// then returns `true` if the editable is enabled and current selection is
   /// collapsed.
   bool canCut(ZefyrScope scope) {
-    // TODO: check if editable is disabled
-    return scope.isEditable && !scope.selection.isCollapsed;
+    return scope.isEditable &&
+        scope.mode == ZefyrMode.edit &&
+        !scope.selection.isCollapsed;
   }
 
   /// Whether the current selection of the document managed by the given
@@ -42,9 +44,8 @@ abstract class ZefyrSelectionControls {
   /// Whether the current [Clipboard] content can be pasted into the document
   /// managed by the given [scope].
   bool canPaste(ZefyrScope scope) {
-    // TODO: check if editable is disabled
     // TODO: return false when clipboard is empty (prevented by async nature)
-    return scope.isEditable;
+    return scope.isEditable && scope.mode == ZefyrMode.edit;
   }
 
   /// Whether the current selection of the document managed by the given

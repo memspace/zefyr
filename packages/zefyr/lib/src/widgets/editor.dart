@@ -18,17 +18,20 @@ class ZefyrEditor extends StatefulWidget {
     @required this.controller,
     @required this.focusNode,
     this.autofocus: true,
-    this.enabled: true,
+    this.mode: ZefyrMode.edit,
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
     this.toolbarDelegate,
     this.imageDelegate,
     this.physics,
-  }) : super(key: key);
+  })  : assert(mode != null),
+        assert(controller != null),
+        assert(focusNode != null),
+        super(key: key);
 
   final ZefyrController controller;
   final FocusNode focusNode;
   final bool autofocus;
-  final bool enabled;
+  final ZefyrMode mode;
   final ZefyrToolbarDelegate toolbarDelegate;
   final ZefyrImageDelegate imageDelegate;
   final ScrollPhysics physics;
@@ -94,6 +97,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   @override
   void didUpdateWidget(ZefyrEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _scope.mode = widget.mode;
     _scope.controller = widget.controller;
     _scope.focusNode = widget.focusNode;
     if (widget.imageDelegate != oldWidget.imageDelegate) {
@@ -113,6 +117,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
 
     if (_scope == null) {
       _scope = ZefyrScope.editable(
+        mode: widget.mode,
         imageDelegate: _imageDelegate,
         controller: widget.controller,
         focusNode: widget.focusNode,
@@ -148,7 +153,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       focusNode: _scope.focusNode,
       imageDelegate: _scope.imageDelegate,
       autofocus: widget.autofocus,
-      enabled: widget.enabled,
+      mode: widget.mode,
       padding: widget.padding,
       physics: widget.physics,
     );

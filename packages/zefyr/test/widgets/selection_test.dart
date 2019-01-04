@@ -22,7 +22,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tapAt(offset);
       await tester.pumpAndSettle();
-      expect(find.text('Paste'), findsOneWidget);
+      expect(find.byIcon(Icons.content_paste), findsOneWidget);
     });
 
     testWidgets('hides when editor lost focus', (tester) async {

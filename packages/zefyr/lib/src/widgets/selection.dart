@@ -10,6 +10,7 @@ import 'package:zefyr/util.dart';
 
 import 'controller.dart';
 import 'editable_box.dart';
+import 'editable_text.dart';
 import 'scope.dart';
 import 'selection_controls.dart';
 
@@ -178,6 +179,15 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     return new Container(child: overlay);
   }
 
+  /// Whether selection toolbar should be hidden.
+  bool get shouldHideToolbar {
+    if (_scope.mode == ZefyrMode.view) return true;
+    final selection = _scope.selection;
+    final collapsedSelection = selection == null || selection.isCollapsed;
+    if (_scope.mode == ZefyrMode.select) return collapsedSelection;
+    return collapsedSelection || _scope.focusOwner != FocusOwner.editor;
+  }
+
   void _handleChange() {
     if (_selection != _scope.selection || _focusOwner != _scope.focusOwner) {
       _updateToolbar();
@@ -192,11 +202,13 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     final selection = _scope.selection;
     final focusOwner = _scope.focusOwner;
     setState(() {
-      if (focusOwner != FocusOwner.editor) {
+      if (shouldHideToolbar && isToolbarVisible) {
         hideToolbar();
       } else {
         if (_selection != selection) {
-          if (selection.isCollapsed && isToolbarVisible) hideToolbar();
+          if (selection.isCollapsed && isToolbarVisible) {
+            hideToolbar();
+          }
           _toolbar?.markNeedsBuild();
           if (!selection.isCollapsed && isToolbarHidden) showToolbar();
         } else {
@@ -281,7 +293,8 @@ class SelectionHandleDriver extends StatefulWidget {
     Key key,
     @required this.position,
     @required this.selectionOverlay,
-  }) : super(key: key);
+  })  : assert(selectionOverlay != null),
+        super(key: key);
 
   final _SelectionHandlePosition position;
   final _ZefyrSelectionOverlayState selectionOverlay;
@@ -341,16 +354,21 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
     super.dispose();
   }
 
+  /// Whether selection handle should be shown.
+  bool get shouldHideHandle {
+    if (_scope.mode == ZefyrMode.view) return true;
+    final collapsedSelection = selection == null || selection.isCollapsed;
+    if (_scope.mode == ZefyrMode.select) return collapsedSelection;
+    return collapsedSelection || _scope.focusOwner != FocusOwner.editor;
+  }
+
   //
   // Overridden members
   //
 
   @override
   Widget build(BuildContext context) {
-    if (selection == null ||
-        selection.isCollapsed ||
-        widget.selectionOverlay == null ||
-        _scope.focusOwner != FocusOwner.editor) {
+    if (shouldHideHandle) {
       return new Container();
     }
     final block = _scope.renderContext.boxForTextOffset(documentOffset);

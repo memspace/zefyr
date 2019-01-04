@@ -4,6 +4,7 @@ import 'package:notus/notus.dart';
 
 import 'controller.dart';
 import 'cursor_timer.dart';
+import 'editable_text.dart';
 import 'editor.dart';
 import 'image.dart';
 import 'render_context.dart';
@@ -33,15 +34,18 @@ class ZefyrScope extends ChangeNotifier {
   ///
   /// Normally used in [ZefyrEditor].
   ZefyrScope.editable({
+    @required ZefyrMode mode,
     @required ZefyrController controller,
     @required ZefyrImageDelegate imageDelegate,
     @required FocusNode focusNode,
     @required FocusScopeNode focusScope,
-  })  : assert(controller != null),
+  })  : assert(mode != null),
+        assert(controller != null),
         assert(imageDelegate != null),
         assert(focusNode != null),
         assert(focusScope != null),
         isEditable = true,
+        _mode = mode,
         _controller = controller,
         _imageDelegate = imageDelegate,
         _focusNode = focusNode,
@@ -66,6 +70,16 @@ class ZefyrScope extends ChangeNotifier {
     assert(value != null);
     if (_imageDelegate != value) {
       _imageDelegate = value;
+      notifyListeners();
+    }
+  }
+
+  ZefyrMode _mode;
+  ZefyrMode get mode => _mode;
+  set mode(ZefyrMode value) {
+    assert(value != null);
+    if (_mode != value) {
+      _mode = value;
       notifyListeners();
     }
   }
@@ -143,6 +157,14 @@ class ZefyrScope extends ChangeNotifier {
       // focus state changes, see [_handleFocusChange].
     }
   }
+  
+  /// Returns `true` if user is allowed to select a range of text based on
+  /// the current value of [mode].
+  ///
+  /// See also:
+  ///
+  ///   - [ZefyrMode] for details on when selection is allowed.
+  bool get isSelectionEnabled => _mode != ZefyrMode.view;
 
   FocusOwner get focusOwner {
     assert(isEditable);

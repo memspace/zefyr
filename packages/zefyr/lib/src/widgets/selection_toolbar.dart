@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 
-/// Manages a copy/paste text selection toolbar.
+/// Represents a text selection toolbar in Zefyr widgets.
 class ZefyrTextSelectionToolbar extends StatelessWidget {
   const ZefyrTextSelectionToolbar({
     Key key,
