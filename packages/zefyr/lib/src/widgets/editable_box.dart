@@ -77,6 +77,8 @@ class RenderEditableProxyBox extends RenderBox
     this.child = child;
   }
 
+  bool _isDirty = true;
+
   ContainerNode get node => _node;
   ContainerNode _node;
   void set node(ContainerNode value) {
@@ -155,6 +157,7 @@ class RenderEditableProxyBox extends RenderBox
     super.attach(owner);
     _showCursor.addListener(markNeedsPaint);
     _renderContext.addBox(this);
+    _renderContext.markDirty(this, _isDirty);
   }
 
   @override
@@ -171,12 +174,14 @@ class RenderEditableProxyBox extends RenderBox
     _caretPainter.layout(preferredLineHeight);
     // Indicate to render context that this object can be used by other
     // layers (selection overlay, for instance).
+    _isDirty = false;
     _renderContext.markDirty(this, false);
   }
 
   @override
   void markNeedsLayout() {
     // Temporarily remove this object from the render context.
+    _isDirty = true;
     _renderContext.markDirty(this, true);
     super.markNeedsLayout();
   }
