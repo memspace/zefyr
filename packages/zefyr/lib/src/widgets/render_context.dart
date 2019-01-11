@@ -103,6 +103,7 @@ class ZefyrRenderContext extends ChangeNotifier {
   /// method picks a box with shortest vertical distance to this [point].
   RenderEditableProxyBox closestBoxForGlobalPoint(Offset point) {
     assert(!_disposed);
+    if (_activeBoxes.isEmpty) return null;
     RenderEditableProxyBox box = boxForGlobalPoint(point);
     if (box != null) return box;
 
