@@ -23,14 +23,14 @@ void main() {
     setUp(() {
       WidgetsFlutterBinding.ensureInitialized();
       renderContext = ZefyrRenderContext();
-      final rt = RenderEditableParagraph(
+      final rt = RenderZefyrParagraph(
         text,
-        node: doc.root.children.first,
+        node: doc.root.children.first as LineNode,
         textDirection: TextDirection.ltr,
       );
       p = RenderEditableProxyBox(
         child: rt,
-        node: doc.root.children.first,
+        node: doc.root.children.first as LineNode,
         layerLink: LayerLink(),
         renderContext: renderContext,
         showCursor: ValueNotifier<bool>(true),
