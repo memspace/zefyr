@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:notus/notus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'editor.dart';
+import 'scope.dart';
 import 'theme.dart';
 import 'toolbar.dart';
 
@@ -94,7 +94,7 @@ class ZefyrButton extends StatelessWidget {
     }
   }
 
-  Color _getColor(ZefyrEditorScope editor, ZefyrToolbarTheme theme) {
+  Color _getColor(ZefyrScope editor, ZefyrToolbarTheme theme) {
     if (isAttributeAction) {
       final attribute = kZefyrToolbarAttributeActions[action];
       final isToggled = (attribute is NotusAttribute)
@@ -106,7 +106,7 @@ class ZefyrButton extends StatelessWidget {
   }
 
   VoidCallback _getPressedHandler(
-      ZefyrEditorScope editor, ZefyrToolbarState toolbar) {
+      ZefyrScope editor, ZefyrToolbarState toolbar) {
     if (onPressed != null) {
       return onPressed;
     } else if (isAttributeAction) {
@@ -123,7 +123,7 @@ class ZefyrButton extends StatelessWidget {
     return null;
   }
 
-  void _toggleAttribute(NotusAttribute attribute, ZefyrEditorScope editor) {
+  void _toggleAttribute(NotusAttribute attribute, ZefyrScope editor) {
     final isToggled = editor.selectionStyle.containsSame(attribute);
     if (isToggled) {
       editor.formatSelection(attribute.unset);
@@ -303,7 +303,7 @@ class _LinkButtonState extends State<LinkButton> {
   final TextEditingController _inputController = TextEditingController();
   Key _inputKey;
   bool _formatError = false;
-  ZefyrEditorScope _editor;
+  ZefyrScope _editor;
 
   bool get isEditing => _inputKey != null;
 
@@ -491,7 +491,7 @@ class _LinkInput extends StatefulWidget {
 class _LinkInputState extends State<_LinkInput> {
   final FocusNode _focusNode = FocusNode();
 
-  ZefyrEditorScope _editor;
+  ZefyrScope _editor;
   bool _didAutoFocus = false;
 
   @override
@@ -505,15 +505,15 @@ class _LinkInputState extends State<_LinkInput> {
     final toolbar = ZefyrToolbar.of(context);
 
     if (_editor != toolbar.editor) {
-      _editor?.setToolbarFocusNode(null);
+      _editor?.toolbarFocusNode = null;
       _editor = toolbar.editor;
-      _editor.setToolbarFocusNode(_focusNode);
+      _editor.toolbarFocusNode = _focusNode;
     }
   }
 
   @override
   void dispose() {
-    _editor?.setToolbarFocusNode(null);
+    _editor?.toolbarFocusNode = null;
     _focusNode.dispose();
     _editor = null;
     super.dispose();

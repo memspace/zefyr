@@ -1,3 +1,21 @@
+## Unreleased
+
+* Added non-scrollable `ZefyrView` widget which allows previewing Notus documents inside
+  layouts using their own scrollables like ListView.
+* Breaking change: renamed `EditableRichText` to `ZefyrRichText`. User code is unlikely to be
+  affected unless you've extended Zefyr with custom implementations of block widgets.
+* Breaking change: renamed `RenderEditableParagraph` to `RenderZefyrParagraph`. User code is
+  unlikely to be affected unless you've extended Zefyr with custom implementations of block widgets.
+* Added `ZefyrScope` class - replaces previously used scope objects `ZefyrEditableTextScope` and
+  `ZefyrEditorScope`. Unified all shared resources under one class.
+* Breaking change: removed `ZefyrEditor.of` and `ZefyrEditableText.of` static methods.
+  Use `ZefyrScope.of` instead.
+
+## 0.3.1
+
+- Fixed autofocus not being triggered when set to `true` for the first time.
+- Allow customizing cursor color via ZefyrTheme.
+
 ## 0.3.0
 
 This version introduces new widget `ZefyrScaffold` which allows embedding Zefyr in custom

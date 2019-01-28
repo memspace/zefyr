@@ -10,13 +10,12 @@ import 'package:zefyr/util.dart';
 
 import 'controller.dart';
 import 'editable_box.dart';
-import 'editable_text.dart';
-import 'editor.dart';
+import 'scope.dart';
 
 RenderEditableBox _getEditableBox(HitTestResult result) {
   for (var entry in result.path) {
     if (entry.target is RenderEditableBox) {
-      return entry.target;
+      return entry.target as RenderEditableBox;
     }
   }
   return null;
@@ -73,14 +72,14 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   void showToolbar() {
-    final editable = ZefyrEditableText.of(context);
-    assert(editable != null);
+    final scope = ZefyrScope.of(context);
+    assert(scope != null);
     final toolbarOpacity = _toolbarController.view;
     _toolbar = new OverlayEntry(
       builder: (context) => new FadeTransition(
             opacity: toolbarOpacity,
             child: new _SelectionToolbar(
-              editable: editable,
+              scope: scope,
               controls: widget.controls,
               delegate: this,
             ),
@@ -117,7 +116,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final editor = ZefyrEditor.of(context);
+    final editor = ZefyrScope.of(context);
     if (_editor != editor) {
       _editor?.removeListener(_handleChange);
       _editor = editor;
@@ -174,7 +173,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   OverlayEntry _toolbar;
   AnimationController _toolbarController;
 
-  ZefyrEditorScope _editor;
+  ZefyrScope _editor;
   TextSelection _selection;
   FocusOwner _focusOwner;
 
@@ -190,9 +189,9 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     if (!mounted) {
       return;
     }
-    final editor = ZefyrEditor.of(context);
-    final selection = editor.selection;
-    final focusOwner = editor.focusOwner;
+
+    final selection = _editor.selection;
+    final focusOwner = _editor.focusOwner;
     setState(() {
       if (focusOwner != FocusOwner.editor) {
         hideToolbar();
@@ -233,8 +232,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
     RenderEditableProxyBox box = _getEditableBox(result);
     if (box == null) {
-      final editable = ZefyrEditableText.of(context);
-      box = editable.renderContext.closestBoxForGlobalPoint(globalPoint);
+      box = _editor.renderContext.closestBoxForGlobalPoint(globalPoint);
     }
     if (box == null) return null;
 
@@ -295,6 +293,8 @@ class SelectionHandleDriver extends StatefulWidget {
 }
 
 class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
+  ZefyrScope _scope;
+
   /// Current document selection.
   TextSelection get selection => _selection;
   TextSelection _selection;
@@ -327,8 +327,19 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final editable = ZefyrEditableText.of(context);
-    _selection = editable.selection;
+    final scope = ZefyrScope.of(context);
+    if (_scope != scope) {
+      _scope?.removeListener(_handleScopeChange);
+      _scope = scope;
+      _scope.addListener(_handleScopeChange);
+    }
+    _selection = _scope.selection;
+  }
+
+  @override
+  void dispose() {
+    _scope?.removeListener(_handleScopeChange);
+    super.dispose();
   }
 
   //
@@ -337,15 +348,13 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
 
   @override
   Widget build(BuildContext context) {
-    final editor = ZefyrEditor.of(context);
-    final editable = ZefyrEditableText.of(context);
     if (selection == null ||
         selection.isCollapsed ||
         widget.controls == null ||
-        editor.focusOwner != FocusOwner.editor) {
+        _scope.focusOwner != FocusOwner.editor) {
       return new Container();
     }
-    final block = editable.renderContext.boxForTextOffset(documentOffset);
+    final block = _scope.renderContext.boxForTextOffset(documentOffset);
     final position = getPosition(block);
     Widget handle;
     if (position == null) {
@@ -388,6 +397,14 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
 
   Offset _dragPosition;
 
+  void _handleScopeChange() {
+    if (_selection != _scope.selection) {
+      setState(() {
+        _selection = _scope.selection;
+      });
+    }
+  }
+
   void _handleDragStart(DragStartDetails details) {
     _dragPosition = details.globalPosition;
   }
@@ -395,9 +412,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
   void _handleDragUpdate(DragUpdateDetails details) {
     _dragPosition += details.delta;
     final globalPoint = _dragPosition;
-    final editor = ZefyrEditor.of(context);
-    final editable = ZefyrEditableText.of(context);
-    final paragraph = editable.renderContext.boxForGlobalPoint(globalPoint);
+    final paragraph = _scope.renderContext.boxForGlobalPoint(globalPoint);
     if (paragraph == null) {
       return;
     }
@@ -414,7 +429,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
     }
 
     if (newSelection != _selection) {
-      editor.updateSelection(newSelection, source: ChangeSource.local);
+      _scope.updateSelection(newSelection, source: ChangeSource.local);
     }
   }
 }
@@ -422,12 +437,12 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
 class _SelectionToolbar extends StatefulWidget {
   const _SelectionToolbar({
     Key key,
-    @required this.editable,
+    @required this.scope,
     @required this.controls,
     @required this.delegate,
   }) : super(key: key);
 
-  final ZefyrEditableTextScope editable;
+  final ZefyrScope scope;
   final TextSelectionControls controls;
   final TextSelectionDelegate delegate;
 
@@ -436,7 +451,7 @@ class _SelectionToolbar extends StatefulWidget {
 }
 
 class _SelectionToolbarState extends State<_SelectionToolbar> {
-  ZefyrEditableTextScope get editable => widget.editable;
+  ZefyrScope get editable => widget.scope;
   TextSelection get selection => widget.delegate.textEditingValue.selection;
 
   @override
@@ -452,7 +467,6 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
       return Container();
     }
     final boxes = block.getEndpointsForSelection(selection);
-
     // Find the horizontal midpoint, just above the selected text.
     final Offset midpoint = new Offset(
       (boxes.length == 1)
@@ -465,7 +479,6 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
       block.localToGlobal(Offset.zero),
       block.localToGlobal(block.size.bottomRight(Offset.zero)),
     );
-
     final toolbar = widget.controls
         .buildToolbar(context, editingRegion, midpoint, widget.delegate);
     return new CompositedTransformFollower(

@@ -85,5 +85,6 @@ RenderEditableProxyBox createParagraph(ZefyrRenderContext viewport) {
     showCursor: showCursor,
     selection: selection,
     selectionColor: selectionColor,
+    cursorColor: Color(0),
   );
 }

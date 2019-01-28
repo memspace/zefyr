@@ -46,7 +46,7 @@ void main() {
     test('json serialization', () {
       final original = dartconfDoc();
       final jsonData = json.encode(original);
-      final doc = NotusDocument.fromJson(json.decode(jsonData));
+      final doc = NotusDocument.fromJson(json.decode(jsonData) as List);
       expect(doc.toDelta(), original.toDelta());
       expect(json.encode(doc), jsonData);
     });

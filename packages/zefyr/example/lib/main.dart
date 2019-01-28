@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'src/form.dart';
 import 'src/full_page.dart';
+import 'src/view.dart';
 
 void main() {
   runApp(new ZefyrApp());
@@ -20,6 +21,7 @@ class ZefyrApp extends StatelessWidget {
       routes: {
         "/fullPage": buildFullPage,
         "/form": buildFormPage,
+        "/view": buildViewPage,
       },
     );
   }
@@ -30,6 +32,10 @@ class ZefyrApp extends StatelessWidget {
 
   Widget buildFormPage(BuildContext context) {
     return FormEmbeddedScreen();
+  }
+
+  Widget buildViewPage(BuildContext context) {
+    return ViewScreen();
   }
 }
 
@@ -56,6 +62,12 @@ class HomePage extends StatelessWidget {
           FlatButton(
             onPressed: () => nav.pushNamed('/form'),
             child: Text('Embedded in a form'),
+            color: Colors.lightBlue,
+            textColor: Colors.white,
+          ),
+          FlatButton(
+            onPressed: () => nav.pushNamed('/view'),
+            child: Text('Read-only embeddable view'),
             color: Colors.lightBlue,
             textColor: Colors.white,
           ),

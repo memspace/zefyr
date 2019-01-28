@@ -122,7 +122,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Embed style attribute.
   static const embed = const EmbedAttributeBuilder._();
 
-  factory NotusAttribute._fromKeyValue(String key, T value) {
+  static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key))
       throw new ArgumentError.value(
           key, 'No attribute with key "$key" registered.');
@@ -166,7 +166,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
       new NotusAttribute<T>._(key, scope, value);
 
   @override
-  bool operator ==(other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! NotusAttribute<T>) return false;
     NotusAttribute<T> typedOther = other;
@@ -190,11 +190,11 @@ class NotusStyle {
 
   final Map<String, NotusAttribute> _data;
 
-  static NotusStyle fromJson(Map data) {
+  static NotusStyle fromJson(Map<String, dynamic> data) {
     if (data == null) return new NotusStyle();
 
-    final result = data.map((key, value) {
-      var attr = new NotusAttribute._fromKeyValue(key, value);
+    final result = data.map((String key, dynamic value) {
+      var attr = NotusAttribute._fromKeyValue(key, value);
       return new MapEntry<String, NotusAttribute>(key, attr);
     });
     return new NotusStyle._(result);
@@ -228,7 +228,7 @@ class NotusStyle {
   /// [attribute].
   bool containsSame(NotusAttribute attribute) {
     assert(attribute != null);
-    return get(attribute) == attribute;
+    return get<dynamic>(attribute) == attribute;
   }
 
   /// Returns value of specified attribute [key] in this set.
@@ -290,11 +290,11 @@ class NotusStyle {
   /// Returns JSON-serializable representation of this style.
   Map<String, dynamic> toJson() => _data.isEmpty
       ? null
-      : _data.map(
-          (_, value) => new MapEntry<String, dynamic>(value.key, value.value));
+      : _data.map<String, dynamic>((String _, NotusAttribute value) =>
+          new MapEntry<String, dynamic>(value.key, value.value));
 
   @override
-  bool operator ==(other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! NotusStyle) return false;
     NotusStyle typedOther = other;

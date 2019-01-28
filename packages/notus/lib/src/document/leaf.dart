@@ -52,7 +52,7 @@ abstract class LeafNode extends Node
     assert(index >= 0 && index <= length);
     if (index == 0) return this;
     if (index == length && isLast) return null;
-    if (index == length && !isLast) return next;
+    if (index == length && !isLast) return next as LeafNode;
 
     String text = _value;
     _value = text.substring(0, index);
@@ -124,7 +124,7 @@ abstract class LeafNode extends Node
   }
 
   @override
-  LineNode get parent => super.parent;
+  LineNode get parent => super.parent as LineNode;
 
   @override
   int get length => _value.length;
