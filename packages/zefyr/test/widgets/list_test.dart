@@ -11,7 +11,7 @@ void main() {
   group('$ZefyrList', () {
     testWidgets('format as list', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.format_list_bulleted);
       BlockNode block = editor.document.root.children.first;
       expect(block.style.get(NotusAttribute.block),

@@ -69,6 +69,7 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
         showCursor: scope.showCursor,
         selection: scope.selection,
         selectionColor: theme.selectionColor,
+        cursorColor: theme.cursorColor,
       );
       content = CompositedTransformTarget(link: _link, child: content);
     }

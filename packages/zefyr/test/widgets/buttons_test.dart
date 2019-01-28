@@ -13,7 +13,7 @@ void main() {
   group('$ZefyrButton', () {
     testWidgets('toggle style', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.updateSelection(base: 5, extent: 10);
       await editor.tapButtonWithIcon(Icons.format_bold);
 
@@ -31,7 +31,7 @@ void main() {
     testWidgets('toggle state for different styles of the same attribute',
         (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
 
       await editor.tapButtonWithIcon(Icons.format_list_bulleted);
       expect(editor.document.root.children.first, isInstanceOf<BlockNode>());
@@ -46,7 +46,7 @@ void main() {
   group('$HeadingButton', () {
     testWidgets('toggle menu', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.format_size);
 
       expect(find.text('H1'), findsOneWidget);
@@ -60,7 +60,7 @@ void main() {
 
     testWidgets('toggle styles', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.format_size);
       await editor.tapButtonWithText('H3');
       LineNode line = editor.document.root.children.first;
@@ -71,7 +71,7 @@ void main() {
 
     testWidgets('close overlay', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.format_size);
       expect(find.text('H1'), findsOneWidget);
       await editor.tapButtonWithIcon(Icons.close);
@@ -82,7 +82,7 @@ void main() {
   group('$LinkButton', () {
     testWidgets('disabled when selection is collapsed', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.link);
       expect(find.byIcon(Icons.link_off), findsNothing);
     });
@@ -90,7 +90,7 @@ void main() {
     testWidgets('enabled and toggles menu with non-empty selection',
         (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.updateSelection(base: 5, extent: 10);
       await editor.tapButtonWithIcon(Icons.link);
       expect(find.byIcon(Icons.link_off), findsOneWidget);
@@ -98,7 +98,7 @@ void main() {
 
     testWidgets('auto cancels edit on selection update', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.updateSelection(base: 5, extent: 10);
       await editor.tapButtonWithIcon(Icons.link);
       await tester
@@ -111,7 +111,7 @@ void main() {
 
     testWidgets('editing link', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.updateSelection(base: 5, extent: 10);
 
       await editor.tapButtonWithIcon(Icons.link);
@@ -160,7 +160,7 @@ void main() {
 
     testWidgets('toggle overlay', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
 
       expect(find.byIcon(Icons.photo_camera), findsOneWidget);
@@ -170,7 +170,7 @@ void main() {
 
     testWidgets('pick from camera', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
       await editor.tapButtonWithIcon(Icons.photo_camera);
       expect(log, hasLength(1));
@@ -189,7 +189,7 @@ void main() {
 
     testWidgets('pick from gallery', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
       await editor.tapButtonWithIcon(Icons.photo_library);
       expect(log, hasLength(1));
