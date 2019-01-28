@@ -49,7 +49,6 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
         toggleColor: Colors.grey.shade900,
         iconColor: Colors.white,
         disabledIconColor: Colors.grey.shade500,
-
       ),
     );
 
