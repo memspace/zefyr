@@ -1,6 +1,7 @@
-## Unreleased
+## 0.3.1
 
 - Fixed autofocus not being triggered when set to `true` for the first time.
+- Allow customizing cursor color via ZefyrTheme.
 
 ## 0.3.0
 

@@ -60,6 +60,7 @@ class ZefyrThemeData {
   final HeadingTheme headingTheme;
   final BlockTheme blockTheme;
   final Color selectionColor;
+  final Color cursorColor;
 
   /// Size of indentation for blocks.
   final double indentSize;
@@ -88,6 +89,7 @@ class ZefyrThemeData {
       headingTheme: new HeadingTheme.fallback(),
       blockTheme: new BlockTheme.fallback(),
       selectionColor: Colors.lightBlueAccent.shade100,
+      cursorColor: Colors.black,
       indentSize: 16.0,
       toolbarTheme: new ZefyrToolbarTheme.fallback(context),
     );
@@ -101,6 +103,7 @@ class ZefyrThemeData {
     this.headingTheme,
     this.blockTheme,
     this.selectionColor,
+    this.cursorColor,
     this.indentSize,
     this.toolbarTheme,
   });
@@ -114,6 +117,7 @@ class ZefyrThemeData {
     HeadingTheme headingTheme,
     BlockTheme blockTheme,
     Color selectionColor,
+    Color cursorColor,
     double indentSize,
     ZefyrToolbarTheme toolbarTheme,
   }) {
@@ -125,6 +129,7 @@ class ZefyrThemeData {
       headingTheme: headingTheme ?? this.headingTheme,
       blockTheme: blockTheme ?? this.blockTheme,
       selectionColor: selectionColor ?? this.selectionColor,
+      cursorColor: cursorColor ?? this.cursorColor,
       indentSize: indentSize ?? this.indentSize,
       toolbarTheme: toolbarTheme ?? this.toolbarTheme,
     );
@@ -139,6 +144,7 @@ class ZefyrThemeData {
       headingTheme: other.headingTheme,
       blockTheme: other.blockTheme,
       selectionColor: other.selectionColor,
+      cursorColor: other.cursorColor,
       indentSize: other.indentSize,
       toolbarTheme: other.toolbarTheme,
     );

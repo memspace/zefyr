@@ -65,6 +65,7 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
         showCursor: editable.showCursor,
         selection: editable.selection,
         selectionColor: theme.selectionColor,
+        cursorColor: theme.cursorColor,
       );
     }
 
@@ -153,6 +154,7 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
         showCursor: editable.showCursor,
         selection: editable.selection,
         selectionColor: theme.selectionColor,
+        cursorColor: theme.cursorColor,
       );
     } else if (embed.type == EmbedType.image) {
       return new EditableBox(
@@ -163,6 +165,7 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
         showCursor: editable.showCursor,
         selection: editable.selection,
         selectionColor: theme.selectionColor,
+        cursorColor: theme.cursorColor,
       );
     } else {
       throw new UnimplementedError('Unimplemented embed type ${embed.type}');
