@@ -56,7 +56,7 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
         decoration: InputDecoration(labelText: 'Description'),
         controller: _controller,
         focusNode: _focusNode,
-        autofocus: false,
+        autofocus: true,
         imageDelegate: new CustomImageDelegate(),
         physics: ClampingScrollPhysics(),
       ),
