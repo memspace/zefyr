@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fixed autofocus not being triggered when set to `true` for the first time.
+
 ## 0.3.0
 
 This version introduces new widget `ZefyrScaffold` which allows embedding Zefyr in custom

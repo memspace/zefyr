@@ -21,12 +21,18 @@ class EditorSandBox {
     FocusNode focusNode,
     NotusDocument document,
     ZefyrThemeData theme,
+    bool autofocus: false,
   }) {
     focusNode ??= FocusNode();
     document ??= NotusDocument.fromDelta(delta);
     var controller = ZefyrController(document);
 
-    Widget widget = _ZefyrSandbox(controller: controller, focusNode: focusNode);
+    Widget widget = _ZefyrSandbox(
+      controller: controller,
+      focusNode: focusNode,
+      autofocus: autofocus,
+    );
+
     if (theme != null) {
       widget = ZefyrTheme(data: theme, child: widget);
     }
@@ -60,11 +66,19 @@ class EditorSandBox {
     return tester.pumpAndSettle();
   }
 
-  Future<void> tapEditor() async {
+  Future<void> pump() async {
     await tester.pumpWidget(widget);
+  }
+
+  Future<void> tap() async {
     await tester.tap(find.byType(ZefyrParagraph).first);
     await tester.pumpAndSettle();
     expect(focusNode.hasFocus, isTrue);
+  }
+
+  Future<void> pumpAndTap() async {
+    await pump();
+    await tap();
   }
 
   Future<void> tapHideKeyboardButton() async {
@@ -101,10 +115,12 @@ class EditorSandBox {
 }
 
 class _ZefyrSandbox extends StatefulWidget {
-  const _ZefyrSandbox({Key key, this.controller, this.focusNode})
+  const _ZefyrSandbox(
+      {Key key, this.controller, this.focusNode, this.autofocus})
       : super(key: key);
   final ZefyrController controller;
   final FocusNode focusNode;
+  final bool autofocus;
 
   @override
   _ZefyrSandboxState createState() => _ZefyrSandboxState();
@@ -119,6 +135,7 @@ class _ZefyrSandboxState extends State<_ZefyrSandbox> {
       controller: widget.controller,
       focusNode: widget.focusNode,
       enabled: _enabled,
+      autofocus: widget.autofocus,
     );
   }
 
