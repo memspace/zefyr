@@ -15,6 +15,11 @@
   states. The `mode` field is set to `ZefyrMode.edit` by default which provides similar behavior
   as the removed `enabled` field.
 
+## 0.3.1
+
+- Fixed autofocus not being triggered when set to `true` for the first time.
+- Allow customizing cursor color via ZefyrTheme.
+
 ## 0.3.0
 
 This version introduces new widget `ZefyrScaffold` which allows embedding Zefyr in custom

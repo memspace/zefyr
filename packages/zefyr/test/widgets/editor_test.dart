@@ -22,7 +22,7 @@ void main() {
       var theme = ZefyrThemeData(linkStyle: TextStyle(color: Colors.red));
       var editor =
           new EditorSandBox(tester: tester, document: doc, theme: theme);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       // TODO: figure out why this extra pump is needed here
       await tester.pumpAndSettle();
       ZefyrRichText p = tester.widget(find.byType(ZefyrRichText).first);
@@ -31,7 +31,7 @@ void main() {
 
     testWidgets('collapses selection when unfocused', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.updateSelection(base: 0, extent: 3);
       expect(editor.findSelectionHandle(), findsNWidgets(2));
       await editor.tapHideKeyboardButton();
@@ -41,7 +41,7 @@ void main() {
 
     testWidgets('toggle enabled state', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.updateSelection(base: 0, extent: 3);
       await editor.disable();
       ZefyrEditor widget = tester.widget(find.byType(ZefyrEditor));

@@ -47,7 +47,7 @@ void main() {
 
     testWidgets('embed image', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
       await editor.tapButtonWithIcon(Icons.photo_camera);
       LineNode line = editor.document.root.children.last;
@@ -63,7 +63,7 @@ void main() {
     testWidgets('tap on left side of image puts caret before it',
         (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
       await editor.tapButtonWithIcon(Icons.photo_camera);
       await editor.updateSelection(base: 0, extent: 0);
@@ -77,7 +77,7 @@ void main() {
 
     testWidgets('tap right side of image puts caret after it', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
       await editor.tapButtonWithIcon(Icons.photo_camera);
       await editor.updateSelection(base: 0, extent: 0);
@@ -93,7 +93,7 @@ void main() {
 
     testWidgets('selects on long press', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
       await editor.tapButtonWithIcon(Icons.photo_camera);
       await editor.updateSelection(base: 0, extent: 0);
