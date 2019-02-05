@@ -36,6 +36,41 @@ enum ZefyrToolbarAction {
   confirm,
 }
 
+final kDefaultButtonIcons = {
+  ZefyrToolbarAction.bold: Icons.format_bold,
+  ZefyrToolbarAction.italic: Icons.format_italic,
+  ZefyrToolbarAction.link: Icons.link,
+  ZefyrToolbarAction.unlink: Icons.link_off,
+  ZefyrToolbarAction.clipboardCopy: Icons.content_copy,
+  ZefyrToolbarAction.openInBrowser: Icons.open_in_new,
+  ZefyrToolbarAction.heading: Icons.format_size,
+  ZefyrToolbarAction.bulletList: Icons.format_list_bulleted,
+  ZefyrToolbarAction.numberList: Icons.format_list_numbered,
+  ZefyrToolbarAction.code: Icons.code,
+  ZefyrToolbarAction.quote: Icons.format_quote,
+  ZefyrToolbarAction.horizontalRule: Icons.remove,
+  ZefyrToolbarAction.image: Icons.photo,
+  ZefyrToolbarAction.cameraImage: Icons.photo_camera,
+  ZefyrToolbarAction.galleryImage: Icons.photo_library,
+  ZefyrToolbarAction.hideKeyboard: Icons.keyboard_hide,
+  ZefyrToolbarAction.close: Icons.close,
+  ZefyrToolbarAction.confirm: Icons.check,
+};
+
+final kSpecialIconSizes = {
+  ZefyrToolbarAction.unlink: 20.0,
+  ZefyrToolbarAction.clipboardCopy: 20.0,
+  ZefyrToolbarAction.openInBrowser: 20.0,
+  ZefyrToolbarAction.close: 20.0,
+  ZefyrToolbarAction.confirm: 20.0,
+};
+
+final kDefaultButtonTexts = {
+  ZefyrToolbarAction.headingLevel1: 'H1',
+  ZefyrToolbarAction.headingLevel2: 'H2',
+  ZefyrToolbarAction.headingLevel3: 'H3',
+};
+
 final kZefyrToolbarAttributeActions = <ZefyrToolbarAction, NotusAttributeKey>{
   ZefyrToolbarAction.bold: NotusAttribute.bold,
   ZefyrToolbarAction.italic: NotusAttribute.italic,
@@ -56,8 +91,9 @@ abstract class ZefyrToolbarDelegate {
   /// Builds toolbar button for specified [action].
   ///
   /// Returned widget is usually an instance of [ZefyrButton].
-  Widget buildButton(BuildContext context, ZefyrToolbarAction action,
-      {VoidCallback onPressed});
+  List<Widget> buildButtons(BuildContext context,ZefyrScope editor);
+
+  Widget buildButton(BuildContext context, ZefyrToolbarAction action,ZefyrScope editor, {VoidCallback onPressed});
 }
 
 /// Scaffold for [ZefyrToolbar].
@@ -77,8 +113,7 @@ class ZefyrToolbarScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context).toolbarTheme;
     final toolbar = ZefyrToolbar.of(context);
-    final constraints =
-        BoxConstraints.tightFor(height: ZefyrToolbar.kToolbarHeight);
+    final constraints = BoxConstraints.tightFor(height: ZefyrToolbar.kToolbarHeight);
     final children = <Widget>[
       Expanded(child: body),
     ];
@@ -86,7 +121,7 @@ class ZefyrToolbarScaffold extends StatelessWidget {
     if (trailing != null) {
       children.add(trailing);
     } else if (autoImplyTrailing) {
-      children.add(toolbar.buildButton(context, ZefyrToolbarAction.close));
+      children.add(toolbar._delegate.buildButton(context, ZefyrToolbarAction.close,null));
     }
     return new Container(
       constraints: constraints,
@@ -113,8 +148,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
   final bool autoHide;
 
   static ZefyrToolbarState of(BuildContext context) {
-    final _ZefyrToolbarScope scope =
-        context.inheritFromWidgetOfExactType(_ZefyrToolbarScope);
+    final _ZefyrToolbarScope scope = context.inheritFromWidgetOfExactType(_ZefyrToolbarScope);
     return scope?.toolbar;
   }
 
@@ -126,8 +160,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _ZefyrToolbarScope extends InheritedWidget {
-  _ZefyrToolbarScope({Key key, @required Widget child, @required this.toolbar})
-      : super(key: key, child: child);
+  _ZefyrToolbarScope({Key key, @required Widget child, @required this.toolbar}) : super(key: key, child: child);
 
   final ZefyrToolbarState toolbar;
 
@@ -137,8 +170,7 @@ class _ZefyrToolbarScope extends InheritedWidget {
   }
 }
 
-class ZefyrToolbarState extends State<ZefyrToolbar>
-    with SingleTickerProviderStateMixin {
+class ZefyrToolbarState extends State<ZefyrToolbar> with SingleTickerProviderStateMixin {
   final Key _toolbarKey = UniqueKey();
   final Key _overlayKey = UniqueKey();
 
@@ -158,10 +190,10 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     });
   }
 
-  Widget buildButton(BuildContext context, ZefyrToolbarAction action,
-      {VoidCallback onPressed}) {
-    return _delegate.buildButton(context, action, onPressed: onPressed);
-  }
+//  Widget buildButton(BuildContext context, ZefyrToolbarAction action,
+//      {VoidCallback onPressed}) {
+//    return _delegate.buildButton(context, action, onPressed: onPressed);
+//  }
 
   Future<void> showOverlay(WidgetBuilder builder) async {
     assert(_overlayBuilder == null);
@@ -193,8 +225,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
   void initState() {
     super.initState();
     _delegate = widget.delegate ?? new _DefaultZefyrToolbarDelegate();
-    _overlayAnimation = new AnimationController(
-        vsync: this, duration: Duration(milliseconds: 100));
+    _overlayAnimation = new AnimationController(vsync: this, duration: Duration(milliseconds: 100));
     _selection = editor.selection;
   }
 
@@ -220,8 +251,8 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     // new state each time we toggle overlay.
     final toolbar = ZefyrToolbarScaffold(
       key: _toolbarKey,
-      body: ZefyrButtonList(buttons: _buildButtons(context)),
-      trailing: buildButton(context, ZefyrToolbarAction.hideKeyboard),
+      body: ZefyrButtonList(buttons: widget.delegate.buildButtons(context,editor)),
+      trailing: widget.delegate.buildButton(context, ZefyrToolbarAction.hideKeyboard,null),
     );
 
     layers.add(toolbar);
@@ -237,8 +268,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
       layers.add(overlay);
     }
 
-    final constraints =
-        BoxConstraints.tightFor(height: ZefyrToolbar.kToolbarHeight);
+    final constraints = BoxConstraints.tightFor(height: ZefyrToolbar.kToolbarHeight);
     return _ZefyrToolbarScope(
       toolbar: this,
       child: Container(
@@ -248,20 +278,8 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     );
   }
 
-  List<Widget> _buildButtons(BuildContext context) {
-    final buttons = <Widget>[
-      buildButton(context, ZefyrToolbarAction.bold),
-      buildButton(context, ZefyrToolbarAction.italic),
-      LinkButton(),
-      HeadingButton(),
-      buildButton(context, ZefyrToolbarAction.bulletList),
-      buildButton(context, ZefyrToolbarAction.numberList),
-      buildButton(context, ZefyrToolbarAction.quote),
-      buildButton(context, ZefyrToolbarAction.code),
-      buildButton(context, ZefyrToolbarAction.horizontalRule),
-      ImageButton(),
-    ];
-    return buttons;
+  Widget buildButton(BuildContext context, ZefyrToolbarAction action, {VoidCallback onPressed}) {
+    return _delegate.buildButton(context, action,widget.editor, onPressed: onPressed);
   }
 }
 
@@ -300,12 +318,8 @@ class _ZefyrButtonListState extends State<ZefyrButtonList> {
       physics: ClampingScrollPhysics(),
     );
 
-    final leftArrow = _showLeftArrow
-        ? Icon(Icons.arrow_left, size: 18.0, color: color)
-        : null;
-    final rightArrow = _showRightArrow
-        ? Icon(Icons.arrow_right, size: 18.0, color: color)
-        : null;
+    final leftArrow = _showLeftArrow ? Icon(Icons.arrow_left, size: 18.0, color: color) : null;
+    final rightArrow = _showRightArrow ? Icon(Icons.arrow_right, size: 18.0, color: color) : null;
     return Row(
       children: <Widget>[
         SizedBox(
@@ -325,53 +339,31 @@ class _ZefyrButtonListState extends State<ZefyrButtonList> {
 
   void _handleScroll() {
     setState(() {
-      _showLeftArrow =
-          _controller.position.minScrollExtent != _controller.position.pixels;
-      _showRightArrow =
-          _controller.position.maxScrollExtent != _controller.position.pixels;
+      _showLeftArrow = _controller.position.minScrollExtent != _controller.position.pixels;
+      _showRightArrow = _controller.position.maxScrollExtent != _controller.position.pixels;
     });
   }
 }
 
 class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
-  static const kDefaultButtonIcons = {
-    ZefyrToolbarAction.bold: Icons.format_bold,
-    ZefyrToolbarAction.italic: Icons.format_italic,
-    ZefyrToolbarAction.link: Icons.link,
-    ZefyrToolbarAction.unlink: Icons.link_off,
-    ZefyrToolbarAction.clipboardCopy: Icons.content_copy,
-    ZefyrToolbarAction.openInBrowser: Icons.open_in_new,
-    ZefyrToolbarAction.heading: Icons.format_size,
-    ZefyrToolbarAction.bulletList: Icons.format_list_bulleted,
-    ZefyrToolbarAction.numberList: Icons.format_list_numbered,
-    ZefyrToolbarAction.code: Icons.code,
-    ZefyrToolbarAction.quote: Icons.format_quote,
-    ZefyrToolbarAction.horizontalRule: Icons.remove,
-    ZefyrToolbarAction.image: Icons.photo,
-    ZefyrToolbarAction.cameraImage: Icons.photo_camera,
-    ZefyrToolbarAction.galleryImage: Icons.photo_library,
-    ZefyrToolbarAction.hideKeyboard: Icons.keyboard_hide,
-    ZefyrToolbarAction.close: Icons.close,
-    ZefyrToolbarAction.confirm: Icons.check,
-  };
-
-  static const kSpecialIconSizes = {
-    ZefyrToolbarAction.unlink: 20.0,
-    ZefyrToolbarAction.clipboardCopy: 20.0,
-    ZefyrToolbarAction.openInBrowser: 20.0,
-    ZefyrToolbarAction.close: 20.0,
-    ZefyrToolbarAction.confirm: 20.0,
-  };
-
-  static const kDefaultButtonTexts = {
-    ZefyrToolbarAction.headingLevel1: 'H1',
-    ZefyrToolbarAction.headingLevel2: 'H2',
-    ZefyrToolbarAction.headingLevel3: 'H3',
-  };
+  @override
+  List<Widget> buildButtons(BuildContext context,ZefyrScope editor) {
+    final buttons = <Widget>[
+      buildButton(context, ZefyrToolbarAction.bold,null),
+      buildButton(context, ZefyrToolbarAction.italic,null),
+      LinkButton(),
+      HeadingButton(),
+      buildButton(context, ZefyrToolbarAction.bulletList,null),
+      buildButton(context, ZefyrToolbarAction.numberList,null),
+      buildButton(context, ZefyrToolbarAction.quote,null),
+      buildButton(context, ZefyrToolbarAction.code,null),
+      buildButton(context, ZefyrToolbarAction.horizontalRule,null),
+    ];
+    return buttons;
+  }
 
   @override
-  Widget buildButton(BuildContext context, ZefyrToolbarAction action,
-      {VoidCallback onPressed}) {
+  Widget buildButton(BuildContext context, ZefyrToolbarAction action, ZefyrScope editor,{VoidCallback onPressed}) {
     final theme = Theme.of(context);
     if (kDefaultButtonIcons.containsKey(action)) {
       final icon = kDefaultButtonIcons[action];
@@ -385,8 +377,7 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     } else {
       final text = kDefaultButtonTexts[action];
       assert(text != null);
-      final style = theme.textTheme.caption
-          .copyWith(fontWeight: FontWeight.bold, fontSize: 14.0);
+      final style = theme.textTheme.caption.copyWith(fontWeight: FontWeight.bold, fontSize: 14.0);
       return ZefyrButton.text(
         action: action,
         text: text,

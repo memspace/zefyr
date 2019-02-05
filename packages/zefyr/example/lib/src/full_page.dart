@@ -86,7 +86,8 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
             controller: _controller,
             focusNode: _focusNode,
             enabled: _editing,
-            imageDelegate: new CustomImageDelegate(),
+            embedWidgetDelegate: new CustomEmbedWidgetDelegate(),
+            toolbarDelegate: CustomToolBarDelegate(),
           ),
         ),
       ),
@@ -106,10 +107,91 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
   }
 }
 
-/// Custom image delegate used by this example to load image from application
-/// assets.
-///
-/// Default image delegate only supports [FileImage]s.
+class CustomToolBarDelegate implements ZefyrToolbarDelegate{
+  @override
+  Widget buildButton(BuildContext context, ZefyrToolbarAction action,ZefyrScope editor, {onPressed}) {
+    final theme = Theme.of(context);
+    if (kDefaultButtonIcons.containsKey(action)) {
+      final icon = kDefaultButtonIcons[action];
+      final size = kSpecialIconSizes[action];
+      return ZefyrButton.icon(
+        action: action,
+        icon: icon,
+        iconSize: size,
+        onPressed: onPressed,
+      );
+    } else {
+      final text = kDefaultButtonTexts[action];
+      assert(text != null);
+      final style = theme.textTheme.caption.copyWith(fontWeight: FontWeight.bold, fontSize: 14.0);
+      return ZefyrButton.text(
+        action: action,
+        text: text,
+        style: style,
+        onPressed: onPressed,
+      );
+    }
+  }
+
+  @override
+  List<Widget> buildButtons(BuildContext context,ZefyrScope editor) {
+    final buttons = <Widget>[
+      buildButton(context, ZefyrToolbarAction.bold,editor),
+      buildButton(context, ZefyrToolbarAction.italic,editor),
+      buildRefCard(context,editor),
+      LinkButton(),
+      HeadingButton(),
+      buildButton(context, ZefyrToolbarAction.bulletList,editor),
+      buildButton(context, ZefyrToolbarAction.numberList,editor),
+      buildButton(context, ZefyrToolbarAction.quote,editor),
+      buildButton(context, ZefyrToolbarAction.code,editor),
+      buildButton(context, ZefyrToolbarAction.horizontalRule,editor),
+
+    ];
+    return buttons;
+  }
+
+  Widget buildRefCard(BuildContext context,ZefyrScope editor){
+    return ZefyrButton.icon(icon: Icons.add_circle,onPressed: (){
+      var a = {"text":"EmbedContainer"};
+      var attribute = EmbedAttribute.custom("card", a);
+      final isToggled = editor.selectionStyle.containsSame(attribute);
+      if (isToggled) {
+        editor.formatSelection(attribute.unset);
+      } else {
+        editor.formatSelection(attribute);
+      }
+    },);
+  }
+}
+
+class CustomEmbedWidgetDelegate implements EmbedWidgetDelegate{
+
+  @override
+  Widget buildWidget(BuildContext context, EmbedNode node, {onPressed}) {
+    EmbedAttribute embed = node.style.get(NotusAttribute.embed);
+
+    if (embed.type == EmbedAttribute.HorizontalRuleEmbed) {
+      return ZefyrHorizontalRule(node: node);
+    } else if (embed.type == EmbedAttribute.ImageEmbed) {
+      return ZefyrImage(node: node, delegate: CustomImageDelegate());
+    }else if (embed.type == 'card'){
+      var attribute = embed.value["attribute"] as Map<String,dynamic>;
+      return ZefyrEmbedContainer(node: node,child: Column(
+        children: <Widget>[
+          Text(attribute['text'] as String,style: TextStyle(fontSize: 22),),
+          Text(attribute['text'] as String,style: TextStyle(fontSize: 22),),
+        ],
+      )
+      );
+    }
+    else {
+      throw new UnimplementedError('Unimplemented embed type ${embed.type}');
+    }
+
+  }
+}
+
 class CustomImageDelegate extends ZefyrDefaultImageDelegate {
   @override
   Widget buildImage(BuildContext context, String imageSource) {
@@ -121,4 +203,8 @@ class CustomImageDelegate extends ZefyrDefaultImageDelegate {
       return super.buildImage(context, imageSource);
     }
   }
+
+
 }
+
+

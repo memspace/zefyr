@@ -141,14 +141,18 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
 
   Widget buildEmbed(BuildContext context, ZefyrScope scope) {
     EmbedNode node = widget.node.children.single;
-    EmbedAttribute embed = node.style.get(NotusAttribute.embed);
-
-    if (embed.type == EmbedType.horizontalRule) {
-      return ZefyrHorizontalRule(node: node);
-    } else if (embed.type == EmbedType.image) {
-      return ZefyrImage(node: node, delegate: scope.imageDelegate);
-    } else {
-      throw new UnimplementedError('Unimplemented embed type ${embed.type}');
-    }
+    return scope.embedWidgetDelegate.buildWidget(context, node);
   }
+}
+
+abstract class EmbedWidgetDelegate {
+  Widget buildWidget(BuildContext context, EmbedNode node, {VoidCallback onPressed});
+}
+
+class DefaultEmbedWidgetDelegate implements EmbedWidgetDelegate{
+  @override
+  Widget buildWidget(BuildContext context, EmbedNode node, {VoidCallback onPressed}) {
+    return Container();
+  }
+
 }

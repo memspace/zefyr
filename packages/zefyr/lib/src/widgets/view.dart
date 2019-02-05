@@ -13,9 +13,9 @@ import 'theme.dart';
 /// Non-scrollable read-only view of Notus rich text documents.
 class ZefyrView extends StatefulWidget {
   final NotusDocument document;
-  final ZefyrImageDelegate imageDelegate;
+  final EmbedWidgetDelegate embedWidgetDelegate;
 
-  const ZefyrView({Key key, @required this.document, this.imageDelegate})
+  const ZefyrView({Key key, @required this.document, this.embedWidgetDelegate})
       : super(key: key);
 
   @override
@@ -26,18 +26,16 @@ class ZefyrViewState extends State<ZefyrView> {
   ZefyrScope _scope;
   ZefyrThemeData _themeData;
 
-  ZefyrImageDelegate get imageDelegate => widget.imageDelegate;
-
   @override
   void initState() {
     super.initState();
-    _scope = ZefyrScope.view(imageDelegate: widget.imageDelegate);
+    _scope = ZefyrScope.view(embedWidgetDelegate: widget.embedWidgetDelegate);
   }
 
   @override
   void didUpdateWidget(ZefyrView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _scope.imageDelegate = widget.imageDelegate;
+    _scope.embedWidgetDelegate = widget.embedWidgetDelegate;
   }
 
   @override

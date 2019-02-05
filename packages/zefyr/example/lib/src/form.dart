@@ -57,7 +57,7 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
         controller: _controller,
         focusNode: _focusNode,
         autofocus: false,
-        imageDelegate: new CustomImageDelegate(),
+        embedWidgetDelegate: new DefaultEmbedWidgetDelegate(),
         physics: ClampingScrollPhysics(),
       ),
     );

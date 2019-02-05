@@ -15,7 +15,7 @@ void main() {
       final doc = NotusDocument();
       scope = ZefyrScope.editable(
         controller: ZefyrController(doc),
-        imageDelegate: ZefyrDefaultImageDelegate(),
+        embedWidgetDelegate: DefaultEmbedWidgetDelegate(),
         focusNode: FocusNode(),
         focusScope: FocusScopeNode(),
       );
@@ -26,11 +26,11 @@ void main() {
       scope.addListener(() {
         notified = true;
       });
-      final delegate = ZefyrDefaultImageDelegate();
-      scope.imageDelegate = delegate;
+      final delegate = DefaultEmbedWidgetDelegate();
+      scope.embedWidgetDelegate = delegate;
       expect(notified, isTrue);
       notified = false;
-      scope.imageDelegate = delegate;
+      scope.embedWidgetDelegate = delegate;
       expect(notified, isFalse);
     });
 

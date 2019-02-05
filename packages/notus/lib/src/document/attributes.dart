@@ -398,30 +398,27 @@ class EmbedAttributeBuilder
 }
 
 /// Type of embedded content.
-enum EmbedType { horizontalRule, image }
+//enum EmbedType { horizontalRule, image }
 
 class EmbedAttribute extends NotusAttribute<Map<String, dynamic>> {
   static const _kValueEquality = const MapEquality<String, dynamic>();
   static const _kEmbed = 'embed';
-  static const _kHorizontalRuleEmbed = 'hr';
-  static const _kImageEmbed = 'image';
+  static const String HorizontalRuleEmbed = 'hr';
+  static const String ImageEmbed = 'image';
 
   EmbedAttribute._(Map<String, dynamic> value)
       : super._(_kEmbed, NotusAttributeScope.inline, value);
 
   EmbedAttribute.horizontalRule()
-      : this._(<String, dynamic>{'type': _kHorizontalRuleEmbed});
+      : this._(<String, dynamic>{'type': HorizontalRuleEmbed});
 
   EmbedAttribute.image(String source)
-      : this._(<String, dynamic>{'type': _kImageEmbed, 'source': source});
+      : this._(<String, dynamic>{'type': ImageEmbed, 'source': source});
 
+  EmbedAttribute.custom(String type,Map<String, dynamic> attribute)
+      : this._(<String, dynamic>{'type': type,'attribute':attribute});
   /// Type of this embed.
-  EmbedType get type {
-    if (value['type'] == _kHorizontalRuleEmbed) return EmbedType.horizontalRule;
-    if (value['type'] == _kImageEmbed) return EmbedType.image;
-    assert(false, 'Unknown embed attribute value $value.');
-    return null;
-  }
+  String get type =>  value['type'] as String;
 
   @override
   NotusAttribute<Map<String, dynamic>> get unset => new EmbedAttribute._(null);

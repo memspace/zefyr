@@ -59,7 +59,7 @@ class _ViewScreen extends State<ViewScreen> {
               padding: const EdgeInsets.all(16.0),
               child: ZefyrView(
                 document: doc,
-                imageDelegate: new CustomImageDelegate(),
+                embedWidgetDelegate: new DefaultEmbedWidgetDelegate(),
               ),
             )
           ],

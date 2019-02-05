@@ -20,11 +20,11 @@ import 'toolbar.dart';
 class ZefyrButton extends StatelessWidget {
   /// Creates a toolbar button with an icon.
   ZefyrButton.icon({
-    @required this.action,
+    this.action,
     @required IconData icon,
     double iconSize,
     this.onPressed,
-  })  : assert(action != null),
+  })  :
         assert(icon != null),
         _icon = icon,
         _iconSize = iconSize,
@@ -41,7 +41,7 @@ class ZefyrButton extends StatelessWidget {
     @required String text,
     TextStyle style,
     this.onPressed,
-  })  : assert(action != null),
+  })  :
         assert(text != null),
         _icon = null,
         _iconSize = null,
@@ -142,7 +142,7 @@ class ZefyrButton extends StatelessWidget {
 class RawZefyrButton extends StatelessWidget {
   const RawZefyrButton({
     Key key,
-    @required this.action,
+    this.action,
     @required this.child,
     @required this.color,
     @required this.onPressed,
@@ -241,13 +241,18 @@ class _HeadingButtonState extends State<HeadingButton> {
 /// When pressed, this button displays overlay toolbar with three
 /// buttons for each heading level.
 class ImageButton extends StatefulWidget {
-  const ImageButton({Key key}) : super(key: key);
 
+  const ImageButton({Key key, this.pickFromCamera, this.pickFromGallery}) : super(key: key);
+
+  final VoidCallback pickFromCamera;
+  final VoidCallback pickFromGallery;
   @override
   _ImageButtonState createState() => _ImageButtonState();
 }
 
 class _ImageButtonState extends State<ImageButton> {
+
+
   @override
   Widget build(BuildContext context) {
     final toolbar = ZefyrToolbar.of(context);
@@ -269,27 +274,27 @@ class _ImageButtonState extends State<ImageButton> {
       children: <Widget>[
         SizedBox(width: 8.0),
         toolbar.buildButton(context, ZefyrToolbarAction.cameraImage,
-            onPressed: _pickFromCamera),
+            onPressed: widget.pickFromCamera),
         toolbar.buildButton(context, ZefyrToolbarAction.galleryImage,
-            onPressed: _pickFromGallery),
+            onPressed: widget.pickFromGallery),
       ],
     );
     return ZefyrToolbarScaffold(body: buttons);
   }
 
-  void _pickFromCamera() async {
-    final editor = ZefyrToolbar.of(context).editor;
-    final image = await editor.imageDelegate.pickImage(ImageSource.camera);
-    if (image != null)
-      editor.formatSelection(NotusAttribute.embed.image(image));
-  }
-
-  void _pickFromGallery() async {
-    final editor = ZefyrToolbar.of(context).editor;
-    final image = await editor.imageDelegate.pickImage(ImageSource.gallery);
-    if (image != null)
-      editor.formatSelection(NotusAttribute.embed.image(image));
-  }
+//  void _pickFromCamera() async {
+//    final editor = ZefyrToolbar.of(context).editor;
+//    final image = await editor.imageDelegate.pickImage(ImageSource.camera);
+//    if (image != null)
+//      editor.formatSelection(NotusAttribute.embed.image(image));
+//  }
+//
+//  void _pickFromGallery() async {
+//    final editor = ZefyrToolbar.of(context).editor;
+//    final image = await editor.imageDelegate.pickImage(ImageSource.gallery);
+//    if (image != null)
+//      editor.formatSelection(NotusAttribute.embed.image(image));
+//  }
 }
 
 class LinkButton extends StatefulWidget {

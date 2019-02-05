@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zefyr/src/widgets/common.dart';
 
 import 'controller.dart';
 import 'editor.dart';
@@ -17,7 +18,7 @@ class ZefyrField extends StatefulWidget {
   final bool autofocus;
   final bool enabled;
   final ZefyrToolbarDelegate toolbarDelegate;
-  final ZefyrImageDelegate imageDelegate;
+  final EmbedWidgetDelegate embedWidgetDelegate;
   final ScrollPhysics physics;
 
   const ZefyrField({
@@ -29,7 +30,7 @@ class ZefyrField extends StatefulWidget {
     this.autofocus: false,
     this.enabled,
     this.toolbarDelegate,
-    this.imageDelegate,
+    this.embedWidgetDelegate,
     this.physics,
   }) : super(key: key);
 
@@ -47,7 +48,7 @@ class _ZefyrFieldState extends State<ZefyrField> {
       autofocus: widget.autofocus,
       enabled: widget.enabled ?? true,
       toolbarDelegate: widget.toolbarDelegate,
-      imageDelegate: widget.imageDelegate,
+      embedWidgetDelegate: widget.embedWidgetDelegate,
       physics: widget.physics,
     );
 

@@ -10,7 +10,6 @@ import 'common.dart';
 import 'controller.dart';
 import 'cursor_timer.dart';
 import 'editor.dart';
-import 'image.dart';
 import 'input.dart';
 import 'list.dart';
 import 'paragraph.dart';
@@ -32,7 +31,7 @@ class ZefyrEditableText extends StatefulWidget {
     Key key,
     @required this.controller,
     @required this.focusNode,
-    @required this.imageDelegate,
+    @required this.embedWidgetDelegate,
     this.autofocus: true,
     this.enabled: true,
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -41,7 +40,7 @@ class ZefyrEditableText extends StatefulWidget {
 
   final ZefyrController controller;
   final FocusNode focusNode;
-  final ZefyrImageDelegate imageDelegate;
+  final EmbedWidgetDelegate embedWidgetDelegate;
   final bool autofocus;
   final bool enabled;
   final ScrollPhysics physics;
