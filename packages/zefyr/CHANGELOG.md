@@ -11,6 +11,11 @@
 * Breaking change: removed `ZefyrEditor.of` and `ZefyrEditableText.of` static methods.
   Use `ZefyrScope.of` instead.
 
+## 0.3.1
+
+- Fixed autofocus not being triggered when set to `true` for the first time.
+- Allow customizing cursor color via ZefyrTheme.
+
 ## 0.3.0
 
 This version introduces new widget `ZefyrScaffold` which allows embedding Zefyr in custom

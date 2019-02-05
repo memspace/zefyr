@@ -36,6 +36,7 @@ void main() {
         showCursor: ValueNotifier<bool>(true),
         selection: TextSelection.collapsed(offset: 0),
         selectionColor: Color(0),
+        cursorColor: Color(0),
       );
     });
 

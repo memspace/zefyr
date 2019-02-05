@@ -11,7 +11,7 @@ void main() {
   group('$ZefyrHorizontalRule', () {
     testWidgets('format as horizontal rule', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.remove);
 
       LineNode line = editor.document.root.children.last;
@@ -21,7 +21,7 @@ void main() {
     testWidgets('tap left side of horizontal rule puts caret before it',
         (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.remove);
       await editor.updateSelection(base: 0, extent: 0);
 
@@ -35,7 +35,7 @@ void main() {
     testWidgets('tap right side of horizontal rule puts caret after it',
         (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.remove);
       await editor.updateSelection(base: 0, extent: 0);
 
@@ -51,7 +51,7 @@ void main() {
     testWidgets('selects on long press',
         (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.remove);
       await editor.updateSelection(base: 0, extent: 0);
 
