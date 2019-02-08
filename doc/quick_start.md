@@ -48,8 +48,8 @@ class MyWidget extends StatefulWidget {
 }
 
 class MyWidgetState extends State<MyWidget> {
-  final ZefyrController _controller;
-  final FocusNode _focusNode;
+  ZefyrController _controller;
+  FocusNode _focusNode;
 
   @override
   void initState() {
