@@ -11,7 +11,7 @@ void main() {
   group('$ZefyrQuote', () {
     testWidgets('format as quote', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.format_quote);
 
       BlockNode block = editor.document.root.children.first;

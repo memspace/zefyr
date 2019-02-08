@@ -12,7 +12,7 @@ void main() {
   group('$ZefyrSelectionOverlay', () {
     testWidgets('double tap caret shows toolbar', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
 
       RenderZefyrParagraph renderObject =
           tester.firstRenderObject(find.byType(ZefyrRichText));
@@ -27,7 +27,7 @@ void main() {
 
     testWidgets('hides when editor lost focus', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       await editor.updateSelection(base: 0, extent: 5);
       expect(editor.findSelectionHandle(), findsNWidgets(2));
       await editor.unfocus();
@@ -36,7 +36,7 @@ void main() {
 
     testWidgets('tap on padding area finds closest paragraph', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       editor.controller
           .updateSelection(new TextSelection.collapsed(offset: 10));
       await tester.pumpAndSettle();
@@ -54,7 +54,7 @@ void main() {
 
     testWidgets('tap on empty space finds closest paragraph', (tester) async {
       final editor = new EditorSandBox(tester: tester);
-      await editor.tapEditor();
+      await editor.pumpAndTap();
       editor.controller.replaceText(10, 1, '\n',
           selection: new TextSelection.collapsed(offset: 0));
       await tester.pumpAndSettle();

@@ -20,6 +20,7 @@ class EditableBox extends SingleChildRenderObjectWidget {
     @required this.showCursor,
     @required this.selection,
     @required this.selectionColor,
+    @required this.cursorColor,
   }) : super(child: child);
 
   final ContainerNode node;
@@ -28,6 +29,7 @@ class EditableBox extends SingleChildRenderObjectWidget {
   final ValueNotifier<bool> showCursor;
   final TextSelection selection;
   final Color selectionColor;
+  final Color cursorColor;
 
   @override
   RenderEditableProxyBox createRenderObject(BuildContext context) {
@@ -38,6 +40,7 @@ class EditableBox extends SingleChildRenderObjectWidget {
       showCursor: showCursor,
       selection: selection,
       selectionColor: selectionColor,
+      cursorColor: cursorColor,
     );
   }
 
@@ -50,7 +53,8 @@ class EditableBox extends SingleChildRenderObjectWidget {
       ..renderContext = renderContext
       ..showCursor = showCursor
       ..selection = selection
-      ..selectionColor = selectionColor;
+      ..selectionColor = selectionColor
+      ..cursorColor = cursorColor;
   }
 }
 
@@ -67,6 +71,7 @@ class RenderEditableProxyBox extends RenderBox
     @required ValueNotifier<bool> showCursor,
     @required TextSelection selection,
     @required Color selectionColor,
+    @required Color cursorColor,
   })  : _node = node,
         _layerLink = layerLink,
         _renderContext = renderContext,
@@ -75,6 +80,16 @@ class RenderEditableProxyBox extends RenderBox
         _selectionColor = selectionColor,
         super() {
     this.child = child;
+    _cursorPainter = CursorPainter(cursorColor);
+  }
+
+  CursorPainter _cursorPainter;
+
+  set cursorColor(Color value) {
+    if (_cursorPainter.color != value) {
+      _cursorPainter.color = value;
+      markNeedsPaint();
+    }
   }
 
   bool _isDirty = true;
@@ -182,7 +197,7 @@ class RenderEditableProxyBox extends RenderBox
   @mustCallSuper
   void performLayout() {
     super.performLayout();
-    _caretPainter.layout(preferredLineHeight);
+    _cursorPainter.layout(preferredLineHeight);
     // Indicate to render context that this object can be used by other
     // layers (selection overlay, for instance).
     _isDirty = false;
@@ -207,16 +222,14 @@ class RenderEditableProxyBox extends RenderBox
       paintSelection(context, offset, selection, selectionColor);
     }
     if (isCaretVisible) {
-      _paintCaret(context, offset);
+      _paintCursor(context, offset);
     }
   }
 
-  final CaretPainter _caretPainter = new CaretPainter();
-
-  void _paintCaret(PaintingContext context, Offset offset) {
+  void _paintCursor(PaintingContext context, Offset offset) {
     Offset caretOffset =
-        getOffsetForCaret(_selection.extent, _caretPainter.prototype);
-    _caretPainter.paint(context.canvas, caretOffset + offset);
+        getOffsetForCaret(_selection.extent, _cursorPainter.prototype);
+    _cursorPainter.paint(context.canvas, caretOffset + offset);
   }
 
   @override

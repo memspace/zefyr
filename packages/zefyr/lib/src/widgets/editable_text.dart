@@ -81,6 +81,17 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       FocusScope.of(context).requestFocus(focusNode);
   }
 
+  void focusOrUnfocusIfNeeded() {
+    if (!_didAutoFocus && widget.autofocus && widget.enabled) {
+      FocusScope.of(context).autofocus(focusNode);
+      _didAutoFocus = true;
+    }
+    if (!widget.enabled && focusNode.hasFocus) {
+      _didAutoFocus = false;
+      focusNode.unfocus();
+    }
+  }
+
   //
   // Overridden members of State
   //
@@ -124,14 +135,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   void didUpdateWidget(ZefyrEditableText oldWidget) {
     super.didUpdateWidget(oldWidget);
     _updateSubscriptions(oldWidget);
-    if (!_didAutoFocus && widget.autofocus && widget.enabled) {
-      FocusScope.of(context).autofocus(focusNode);
-      _didAutoFocus = true;
-    }
-    if (!widget.enabled && focusNode.hasFocus) {
-      _didAutoFocus = false;
-      focusNode.unfocus();
-    }
+    focusOrUnfocusIfNeeded();
   }
 
   @override
@@ -148,6 +152,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       _cursorTimer = scope.cursorTimer;
       _cursorTimer.startOrStop(focusNode, selection);
     }
+    focusOrUnfocusIfNeeded();
   }
 
   @override
