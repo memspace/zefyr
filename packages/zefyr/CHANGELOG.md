@@ -1,3 +1,11 @@
+## 0.4.0
+
+* Breaking change: upgraded `image_picker` to `^0.5.0` and `url_launcher` to `^5.0.0` which
+  requires migration to Android X. You must migrate your app in order to use this version.
+  For details on how to migrate see:
+  - https://flutter.io/docs/development/packages-and-plugins/androidx-compatibility
+  - https://developer.android.com/jetpack/androidx/migrate
+
 ## 0.3.1
 
 - Fixed autofocus not being triggered when set to `true` for the first time.
