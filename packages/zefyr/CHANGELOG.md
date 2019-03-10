@@ -1,7 +1,8 @@
-## Unreleased
+## 0.5.0
 
-* Added non-scrollable `ZefyrView` widget which allows previewing Notus documents inside
-  layouts using their own scrollables like ListView.
+* Updated to support Flutter 1.2
+* Experimental: Added non-scrollable `ZefyrView` widget which allows previewing Notus documents
+  inside layouts using their own scrollables like ListView.
 * Breaking change: renamed `EditableRichText` to `ZefyrRichText`. User code is unlikely to be
   affected unless you've extended Zefyr with custom implementations of block widgets.
 * Breaking change: renamed `RenderEditableParagraph` to `RenderZefyrParagraph`. User code is
