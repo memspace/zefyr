@@ -59,7 +59,6 @@ class ZefyrThemeData {
   final StyleTheme paragraphTheme;
   final HeadingTheme headingTheme;
   final BlockTheme blockTheme;
-  final Color horizontalRuleColor;
   final Color selectionColor;
   final Color cursorColor;
 
@@ -89,7 +88,6 @@ class ZefyrThemeData {
           new StyleTheme(textStyle: paragraphStyle, padding: padding),
       headingTheme: new HeadingTheme.fallback(),
       blockTheme: new BlockTheme.fallback(),
-      horizontalRuleColor: Colors.grey.shade200,
       selectionColor: Colors.lightBlueAccent.shade100,
       cursorColor: Colors.black,
       indentSize: 16.0,
@@ -104,7 +102,6 @@ class ZefyrThemeData {
     this.paragraphTheme,
     this.headingTheme,
     this.blockTheme,
-    this.horizontalRuleColor,
     this.selectionColor,
     this.cursorColor,
     this.indentSize,
@@ -119,7 +116,6 @@ class ZefyrThemeData {
     StyleTheme paragraphTheme,
     HeadingTheme headingTheme,
     BlockTheme blockTheme,
-    Color horizontalRuleColor,
     Color selectionColor,
     Color cursorColor,
     double indentSize,
@@ -132,7 +128,6 @@ class ZefyrThemeData {
       paragraphTheme: paragraphTheme ?? this.paragraphTheme,
       headingTheme: headingTheme ?? this.headingTheme,
       blockTheme: blockTheme ?? this.blockTheme,
-      horizontalRuleColor: horizontalRuleColor?? this.horizontalRuleColor,
       selectionColor: selectionColor ?? this.selectionColor,
       cursorColor: cursorColor ?? this.cursorColor,
       indentSize: indentSize ?? this.indentSize,
@@ -148,7 +143,6 @@ class ZefyrThemeData {
       paragraphTheme: other.paragraphTheme,
       headingTheme: other.headingTheme,
       blockTheme: other.blockTheme,
-      horizontalRuleColor: other.horizontalRuleColor,
       selectionColor: other.selectionColor,
       cursorColor: other.cursorColor,
       indentSize: other.indentSize,
@@ -238,7 +232,6 @@ class BlockTheme {
       quote: new StyleTheme(
         textStyle: new TextStyle(color: Colors.grey.shade700),
         padding: padding,
-        backgroundColor: Colors.grey.shade300,
       ),
       code: new StyleTheme(
         textStyle: new TextStyle(
@@ -248,7 +241,6 @@ class BlockTheme {
           height: 1.25,
         ),
         padding: padding,
-        backgroundColor: Colors.blueGrey.shade50,
       ),
     );
   }
@@ -265,14 +257,10 @@ class StyleTheme {
   /// Padding to apply around lines of text.
   final EdgeInsets padding;
 
-  /// Background color of this theme
-  final Color backgroundColor;
-
   /// Creates a new [StyleTheme].
   StyleTheme({
     this.textStyle,
     this.padding,
-    this.backgroundColor,
   });
 }
 

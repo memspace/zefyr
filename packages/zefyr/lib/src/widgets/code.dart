@@ -28,7 +28,7 @@ class ZefyrCode extends StatelessWidget {
       child: new Container(
         // TODO: make decorations configurable
         decoration: BoxDecoration(
-          color: theme.blockTheme.code.backgroundColor,
+          color: Colors.blueGrey.shade50,
           borderRadius: BorderRadius.circular(3.0),
         ),
         padding: const EdgeInsets.all(16.0),
