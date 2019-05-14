@@ -411,10 +411,7 @@ class _LinkButtonState extends State<LinkButton> {
     final editor = ZefyrToolbar.of(context).editor;
     var link = getLink();
     assert(link != null);
-    if (await canLaunch(link)) {
-      editor.hideKeyboard();
-      await launch(link, forceWebView: true);
-    }
+    await ZefyrToolbar.of(context).editor.onLaunchUrl(link);
   }
 
   void _handleInputChange() {

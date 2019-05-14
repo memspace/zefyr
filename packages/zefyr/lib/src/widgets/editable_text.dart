@@ -33,6 +33,7 @@ class ZefyrEditableText extends StatefulWidget {
     @required this.controller,
     @required this.focusNode,
     @required this.imageDelegate,
+    @required this.onLaunchUrl,
     this.autofocus: true,
     this.enabled: true,
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -42,6 +43,7 @@ class ZefyrEditableText extends StatefulWidget {
   final ZefyrController controller;
   final FocusNode focusNode;
   final ZefyrImageDelegate imageDelegate;
+  final Function onLaunchUrl;
   final bool autofocus;
   final bool enabled;
   final ScrollPhysics physics;

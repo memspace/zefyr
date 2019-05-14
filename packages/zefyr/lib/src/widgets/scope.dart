@@ -24,10 +24,14 @@ class ZefyrScope extends ChangeNotifier {
   /// Creates a view-only scope.
   ///
   /// Normally used in [ZefyrView].
-  ZefyrScope.view({@required ZefyrImageDelegate imageDelegate})
-      : assert(imageDelegate != null),
+  ZefyrScope.view({
+    @required ZefyrImageDelegate imageDelegate,
+    @required Future<void> onLaunchUrl(String url),
+  })  : assert(imageDelegate != null),
+        assert(onLaunchUrl != null),
         isEditable = false,
-        _imageDelegate = imageDelegate;
+        _imageDelegate = imageDelegate,
+        _onLaunchUrl = onLaunchUrl;
 
   /// Creates editable scope.
   ///
@@ -35,15 +39,18 @@ class ZefyrScope extends ChangeNotifier {
   ZefyrScope.editable({
     @required ZefyrController controller,
     @required ZefyrImageDelegate imageDelegate,
+    @required Future<void> onLaunchUrl(String url),
     @required FocusNode focusNode,
     @required FocusScopeNode focusScope,
   })  : assert(controller != null),
         assert(imageDelegate != null),
+        assert(onLaunchUrl != null),
         assert(focusNode != null),
         assert(focusScope != null),
         isEditable = true,
         _controller = controller,
         _imageDelegate = imageDelegate,
+        _onLaunchUrl = onLaunchUrl,
         _focusNode = focusNode,
         _focusScope = focusScope,
         _cursorTimer = CursorTimer(),
@@ -66,6 +73,16 @@ class ZefyrScope extends ChangeNotifier {
     assert(value != null);
     if (_imageDelegate != value) {
       _imageDelegate = value;
+      notifyListeners();
+    }
+  }
+
+  Function _onLaunchUrl;
+  Function get onLaunchUrl => _onLaunchUrl;
+  set onLaunchUrl(Future<void> func(String url)) {
+    assert(func != null);
+    if (_onLaunchUrl != func) {
+      _onLaunchUrl = func;
       notifyListeners();
     }
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'code.dart';
 import 'common.dart';
@@ -16,9 +17,14 @@ import 'theme.dart';
 class ZefyrView extends StatefulWidget {
   final NotusDocument document;
   final ZefyrImageDelegate imageDelegate;
+  final Function onLaunchUrl;
 
-  const ZefyrView({Key key, @required this.document, this.imageDelegate})
-      : super(key: key);
+  const ZefyrView({
+    Key key,
+    @required this.document,
+    this.imageDelegate,
+    this.onLaunchUrl,
+  })  : super(key: key);
 
   @override
   ZefyrViewState createState() => ZefyrViewState();
@@ -29,17 +35,22 @@ class ZefyrViewState extends State<ZefyrView> {
   ZefyrThemeData _themeData;
 
   ZefyrImageDelegate get imageDelegate => widget.imageDelegate;
+  Function get onLaunchUrl => widget.onLaunchUrl;
 
   @override
   void initState() {
     super.initState();
-    _scope = ZefyrScope.view(imageDelegate: widget.imageDelegate);
+    _scope = ZefyrScope.view(
+      imageDelegate: widget.imageDelegate ?? new ZefyrDefaultImageDelegate(),
+      onLaunchUrl: widget.onLaunchUrl ?? _launchUrl,
+    );
   }
 
   @override
   void didUpdateWidget(ZefyrView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _scope.imageDelegate = widget.imageDelegate;
+    _scope.imageDelegate = widget.imageDelegate ?? new ZefyrDefaultImageDelegate();
+    _scope.onLaunchUrl = widget.onLaunchUrl ?? _launchUrl;
   }
 
   @override
@@ -103,5 +114,11 @@ class ZefyrViewState extends State<ZefyrView> {
     }
 
     throw new UnimplementedError('Block format $blockStyle.');
+  }
+
+  Future<void> _launchUrl(String link) async {
+    if(await canLaunch(link)) {
+      await launch(link, forceWebView: true);
+    }
   }
 }
