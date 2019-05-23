@@ -1,7 +1,8 @@
-## Unreleased
+## 0.5.0
 
-* Added non-scrollable `ZefyrView` widget which allows previewing Notus documents inside
-  layouts using their own scrollables like ListView.
+* Updated to support Flutter 1.2
+* Experimental: Added non-scrollable `ZefyrView` widget which allows previewing Notus documents
+  inside layouts using their own scrollables like ListView.
 * Breaking change: renamed `EditableRichText` to `ZefyrRichText`. User code is unlikely to be
   affected unless you've extended Zefyr with custom implementations of block widgets.
 * Breaking change: renamed `RenderEditableParagraph` to `RenderZefyrParagraph`. User code is
@@ -14,6 +15,14 @@
   with new `mode` field of type `ZefyrMode` which is a enum of either `edit`, `select` or `view`
   states. The `mode` field is set to `ZefyrMode.edit` by default which provides similar behavior
   as the removed `enabled` field.
+
+## 0.4.0
+
+* Breaking change: upgraded `image_picker` to `^0.5.0` and `url_launcher` to `^5.0.0` which
+  requires migration to Android X. You must migrate your app in order to use this version.
+  For details on how to migrate see:
+  - https://flutter.io/docs/development/packages-and-plugins/androidx-compatibility
+  - https://developer.android.com/jetpack/androidx/migrate
 
 ## 0.3.1
 

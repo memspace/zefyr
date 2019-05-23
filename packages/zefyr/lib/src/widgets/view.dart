@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
 
 import 'code.dart';
@@ -11,6 +12,7 @@ import 'scope.dart';
 import 'theme.dart';
 
 /// Non-scrollable read-only view of Notus rich text documents.
+@experimental
 class ZefyrView extends StatefulWidget {
   final NotusDocument document;
   final ZefyrImageDelegate imageDelegate;
