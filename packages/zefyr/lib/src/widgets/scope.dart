@@ -61,7 +61,9 @@ class ZefyrScope extends ChangeNotifier {
   }
 
   ZefyrImageDelegate _imageDelegate;
+
   ZefyrImageDelegate get imageDelegate => _imageDelegate;
+
   set imageDelegate(ZefyrImageDelegate value) {
     assert(value != null);
     if (_imageDelegate != value) {
@@ -71,7 +73,9 @@ class ZefyrScope extends ChangeNotifier {
   }
 
   ZefyrController _controller;
+
   ZefyrController get controller => _controller;
+
   set controller(ZefyrController value) {
     assert(isEditable && value != null);
     if (_controller != value) {
@@ -85,7 +89,9 @@ class ZefyrScope extends ChangeNotifier {
   }
 
   FocusNode _focusNode;
+
   FocusNode get focusNode => _focusNode;
+
   set focusNode(FocusNode value) {
     assert(isEditable && value != null);
     if (_focusNode != value) {
@@ -97,7 +103,9 @@ class ZefyrScope extends ChangeNotifier {
   }
 
   FocusScopeNode _focusScope;
+
   FocusScopeNode get focusScope => _focusScope;
+
   set focusScope(FocusScopeNode value) {
     assert(isEditable && value != null);
     if (_focusScope != value) {
@@ -106,14 +114,18 @@ class ZefyrScope extends ChangeNotifier {
   }
 
   CursorTimer _cursorTimer;
+
   CursorTimer get cursorTimer => _cursorTimer;
+
   ValueNotifier<bool> get showCursor => cursorTimer.value;
 
   ZefyrRenderContext _renderContext;
+
   ZefyrRenderContext get renderContext => _renderContext;
 
   NotusStyle get selectionStyle => _selectionStyle;
   NotusStyle _selectionStyle;
+
   TextSelection get selection => _selection;
   TextSelection _selection;
 
@@ -167,6 +179,18 @@ class ZefyrScope extends ChangeNotifier {
     assert(isEditable);
     assert(!_disposed);
     _controller.formatSelection(value);
+  }
+
+  void undo() {
+    assert(isEditable);
+    assert(!_disposed);
+    _controller.undo();
+  }
+
+  void redo() {
+    assert(isEditable);
+    assert(!_disposed);
+    _controller.redo();
   }
 
   void focus() {

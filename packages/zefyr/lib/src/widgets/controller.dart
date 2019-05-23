@@ -137,8 +137,7 @@ class ZefyrController extends ChangeNotifier {
     // the change. This is needed in cases when format operation actually
     // inserts data into the document (e.g. embeds).
     final base = change.transformPosition(_selection.baseOffset);
-    final extent =
-        change.transformPosition(_selection.extentOffset);
+    final extent = change.transformPosition(_selection.extentOffset);
     final adjustedSelection =
         _selection.copyWith(baseOffset: base, extentOffset: extent);
     if (_selection != adjustedSelection) {
@@ -152,6 +151,16 @@ class ZefyrController extends ChangeNotifier {
     int index = _selection.start;
     int length = _selection.end - index;
     formatText(index, length, attribute);
+  }
+
+  void undo() {
+    document.undo();
+    updateSelection(TextSelection.collapsed(offset: document.length));
+  }
+
+  void redo() {
+    document.redo();
+    updateSelection(TextSelection.collapsed(offset: document.length));
   }
 
   NotusStyle getSelectionStyle() {

@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'dart:async';
 
+import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 import 'document/attributes.dart';
@@ -40,12 +41,15 @@ class NotusDocument {
   /// Creates new empty Notus document.
   NotusDocument()
       : _heuristics = NotusHeuristics.fallback,
-        _delta = new Delta()..insert('\n') {
+        _history = NotusHistory(),
+        _delta = new Delta()
+          ..insert('\n') {
     _loadDocument(_delta);
   }
 
   NotusDocument.fromJson(List data)
       : _heuristics = NotusHeuristics.fallback,
+        _history = NotusHistory(),
         _delta = Delta.fromJson(data) {
     _loadDocument(_delta);
   }
@@ -53,11 +57,21 @@ class NotusDocument {
   NotusDocument.fromDelta(Delta delta)
       : assert(delta != null),
         _heuristics = NotusHeuristics.fallback,
+        _history = NotusHistory(),
         _delta = delta {
     _loadDocument(_delta);
   }
 
   final NotusHeuristics _heuristics;
+
+  NotusHistory _history;
+
+  set history(NotusHistory value) {
+    _history?.clear();
+    _history = value;
+  }
+
+  NotusHistory get history => _history;
 
   /// The root node of this document tree.
   RootNode get root => _root;
@@ -70,7 +84,7 @@ class NotusDocument {
   Stream<NotusChange> get changes => _controller.stream;
 
   final StreamController<NotusChange> _controller =
-      new StreamController.broadcast();
+  new StreamController.broadcast();
 
   /// Returns contents of this document as [Delta].
   Delta toDelta() => new Delta.from(_delta);
@@ -92,6 +106,7 @@ class NotusDocument {
   /// Closes [changes] stream.
   void close() {
     _controller.close();
+    _history.clear();
   }
 
   /// Inserts [text] in this document at specified [index].
@@ -135,7 +150,7 @@ class NotusDocument {
   /// Returns an instance of [Delta] actually composed into this document.
   Delta replace(int index, int length, String text) {
     assert(index >= 0 && (text.isNotEmpty || length > 0),
-        'With index $index, length $length and text "$text"');
+    'With index $index, length $length and text "$text"');
     Delta delta = new Delta();
     // We have to compose before applying delete rules
     // Otherwise delete would be operating on stale document snapshot.
@@ -203,7 +218,7 @@ class NotusDocument {
   /// of this document.
   ///
   /// In case the [change] is invalid, behavior of this method is unspecified.
-  void compose(Delta change, ChangeSource source) {
+  void compose(Delta change, ChangeSource source, {bool history}) {
     _checkMutable();
     change.trim();
     assert(change.isNotEmpty);
@@ -212,7 +227,7 @@ class NotusDocument {
     final before = toDelta();
     for (final Operation op in change.toList()) {
       final attributes =
-          op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
+      op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
       if (op.isInsert) {
         _root.insert(offset, op.data, attributes);
       } else if (op.isDelete) {
@@ -228,7 +243,9 @@ class NotusDocument {
       throw new StateError('Compose produced inconsistent results. '
           'This is likely due to a bug in the library. Tried to compose change $change from $source.');
     }
-    _controller.add(new NotusChange(before, change, source));
+    final notusChange = new NotusChange(before, change, source);
+    _controller.add(notusChange);
+    if (history != true) _history?.handleDocChange(notusChange);
   }
 
   //
@@ -243,7 +260,7 @@ class NotusDocument {
 
   void _checkMutable() {
     assert(!_controller.isClosed,
-        'Cannot modify Notus document after it was closed.');
+    'Cannot modify Notus document after it was closed.');
   }
 
   String _sanitizeString(String value) {
@@ -257,16 +274,17 @@ class NotusDocument {
   /// Loads [document] delta into this document.
   void _loadDocument(Delta doc) {
     assert(doc.last.data.endsWith('\n'),
-        'Invalid document delta. Document delta must always end with a line-break.');
+    'Invalid document delta. Document delta must always end with a line-break.');
     int offset = 0;
     for (final Operation op in doc.toList()) {
       final style =
-          op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
+      op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
       if (op.isInsert) {
         _root.insert(offset, op.data, style);
       } else {
         throw new ArgumentError.value(doc,
-            "Document Delta can only contain insert operations but ${op.key} found.");
+            "Document Delta can only contain insert operations but ${op
+                .key} found.");
       }
       offset += op.length;
     }
@@ -279,5 +297,15 @@ class NotusDocument {
         _root.childCount > 1) {
       _root.remove(node);
     }
+  }
+
+  void undo() {
+    assert(_history != null);
+    _history.undo(this);
+  }
+
+  void redo() {
+    assert(_history != null);
+    _history.redo(this);
   }
 }
