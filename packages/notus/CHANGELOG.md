@@ -1,3 +1,7 @@
+## 0.1.4
+
+* redo && undo func
+
 ## 0.1.3
 
 - Fixed handling of user input around embeds.

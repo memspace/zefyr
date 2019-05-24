@@ -300,12 +300,10 @@ class NotusDocument {
   }
 
   void undo() {
-    assert(_history != null);
-    _history.undo(this);
+    _history?.undo(this);
   }
 
   void redo() {
-    assert(_history != null);
-    _history.redo(this);
+    _history?.redo(this);
   }
 }
