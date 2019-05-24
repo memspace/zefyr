@@ -17,6 +17,10 @@ dependencies:
   notus: ^0.1.0
   meta: ^1.1.0
 
+dependency_overrides:
+  notus:
+    path: '../notus'
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
