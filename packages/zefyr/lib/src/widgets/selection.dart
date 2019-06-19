@@ -72,14 +72,12 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   void showToolbar() {
-    final scope = ZefyrScope.of(context);
-    assert(scope != null);
     final toolbarOpacity = _toolbarController.view;
     _toolbar = new OverlayEntry(
       builder: (context) => new FadeTransition(
             opacity: toolbarOpacity,
             child: new _SelectionToolbar(
-              scope: scope,
+              scope: _editor,
               controls: widget.controls,
               delegate: this,
             ),
@@ -273,6 +271,19 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     );
     widget.controller.updateSelection(selection, source: ChangeSource.local);
   }
+
+  // TODO: these methods should also take into account enabled state.
+  @override
+  bool get copyEnabled => _editor.isEditable;
+
+  @override
+  bool get cutEnabled => _editor.isEditable;
+
+  @override
+  bool get pasteEnabled => _editor.isEditable;
+
+  @override
+  bool get selectAllEnabled => _editor.isEditable;
 }
 
 enum _SelectionHandlePosition { base, extent }
