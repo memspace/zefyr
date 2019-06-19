@@ -86,14 +86,14 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   // New public members
   //
 
-  /// Focus node of this widget.
-  FocusNode get focusNode => widget.focusNode;
-
   /// Document controlled by this widget.
   NotusDocument get document => widget.controller.document;
 
   /// Current text selection.
   TextSelection get selection => widget.controller.selection;
+
+  FocusNode _focusNode;
+  FocusAttachment _focusAttachment;
 
   /// Express interest in interacting with the keyboard.
   ///
@@ -103,20 +103,20 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   /// focus, the control will then attach to the keyboard and request that the
   /// keyboard become visible.
   void requestKeyboard() {
-    if (focusNode.hasFocus)
+    if (_focusNode.hasFocus)
       _input.openConnection(widget.controller.plainTextEditingValue);
     else
-      FocusScope.of(context).requestFocus(focusNode);
+      FocusScope.of(context).requestFocus(_focusNode);
   }
 
   void focusOrUnfocusIfNeeded() {
     if (!_didAutoFocus && widget.autofocus && widget.mode == ZefyrMode.edit) {
-      FocusScope.of(context).autofocus(focusNode);
+      FocusScope.of(context).autofocus(_focusNode);
       _didAutoFocus = true;
     }
-    if (widget.mode != ZefyrMode.edit && focusNode.hasFocus) {
+    if (widget.mode != ZefyrMode.edit && _focusNode.hasFocus) {
       _didAutoFocus = false;
-      focusNode.unfocus();
+      _focusNode.unfocus();
     }
   }
 
@@ -126,7 +126,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).reparentIfNeeded(focusNode);
+    _focusAttachment.reparent();
     super.build(context); // See AutomaticKeepAliveState.
 
     Widget body = ListBody(children: _buildChildren(context));
@@ -147,7 +147,9 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   @override
   void initState() {
+    _focusNode = widget.focusNode;
     super.initState();
+    _focusAttachment = _focusNode.attach(context);
     _input = new InputConnectionController(_handleRemoteValueChange);
     _updateSubscriptions();
   }
@@ -155,6 +157,11 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   @override
   void didUpdateWidget(ZefyrEditableText oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (_focusNode != widget.focusNode) {
+      _focusAttachment.detach();
+      _focusNode = widget.focusNode;
+      _focusAttachment = _focusNode.attach(context);
+    }
     _updateSubscriptions(oldWidget);
     focusOrUnfocusIfNeeded();
   }
@@ -171,13 +178,14 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     if (_cursorTimer != scope.cursorTimer) {
       _cursorTimer?.stop();
       _cursorTimer = scope.cursorTimer;
-      _cursorTimer.startOrStop(focusNode, selection);
+      _cursorTimer.startOrStop(_focusNode, selection);
     }
     focusOrUnfocusIfNeeded();
   }
 
   @override
   void dispose() {
+    _focusAttachment.detach();
     _cancelSubscriptions();
     super.dispose();
   }
@@ -187,7 +195,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   //
 
   @override
-  bool get wantKeepAlive => focusNode.hasFocus;
+  bool get wantKeepAlive => _focusNode.hasFocus;
 
   //
   // Private members
@@ -235,7 +243,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   void _updateSubscriptions([ZefyrEditableText oldWidget]) {
     if (oldWidget == null) {
       widget.controller.addListener(_handleLocalValueChange);
-      focusNode.addListener(_handleFocusChange);
+      _focusNode.addListener(_handleFocusChange);
       return;
     }
 
@@ -254,7 +262,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   void _cancelSubscriptions() {
     _renderContext.removeListener(_handleRenderContextChange);
     widget.controller.removeListener(_handleLocalValueChange);
-    focusNode.removeListener(_handleFocusChange);
+    _focusNode.removeListener(_handleFocusChange);
     _input.closeConnection();
     _cursorTimer.stop();
   }
@@ -267,7 +275,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       requestKeyboard();
     }
     _input.updateRemoteValue(widget.controller.plainTextEditingValue);
-    _cursorTimer.startOrStop(focusNode, selection);
+    _cursorTimer.startOrStop(_focusNode, selection);
     setState(() {
       // nothing to update internally.
     });
@@ -275,8 +283,8 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   void _handleFocusChange() {
     _input.openOrCloseConnection(
-        focusNode, widget.controller.plainTextEditingValue);
-    _cursorTimer.startOrStop(focusNode, selection);
+        _focusNode, widget.controller.plainTextEditingValue);
+    _cursorTimer.startOrStop(_focusNode, selection);
     updateKeepAlive();
   }
 

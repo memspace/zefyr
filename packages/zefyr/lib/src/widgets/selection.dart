@@ -284,6 +284,22 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     );
     _scope.controller.updateSelection(selection, source: ChangeSource.local);
   }
+
+  @override
+  // TODO: implement copyEnabled
+  bool get copyEnabled => true;
+
+  @override
+  // TODO: implement cutEnabled
+  bool get cutEnabled => true;
+
+  @override
+  // TODO: implement pasteEnabled
+  bool get pasteEnabled => true;
+
+  @override
+  // TODO: implement selectAllEnabled
+  bool get selectAllEnabled => true;
 }
 
 enum _SelectionHandlePosition { base, extent }
@@ -467,19 +483,35 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
     }
     final boxes = block.getEndpointsForSelection(selection);
     // Find the horizontal midpoint, just above the selected text.
-    final Offset midpoint = new Offset(
+    Offset midpoint = new Offset(
       (boxes.length == 1)
           ? (boxes[0].start + boxes[0].end) / 2.0
           : (boxes[0].start + boxes[1].start) / 2.0,
       boxes[0].bottom - block.preferredLineHeight,
     );
+    List<TextSelectionPoint> endpoints;
+    if (boxes.length == 1) {
+      midpoint = Offset((boxes[0].start + boxes[0].end) / 2.0,
+          boxes[0].bottom - block.preferredLineHeight);
+      final Offset start = Offset(boxes[0].start, block.preferredLineHeight);
+      endpoints = <TextSelectionPoint>[TextSelectionPoint(start, null)];
+    } else {
+      midpoint = Offset((boxes[0].start + boxes[1].start) / 2.0,
+          boxes[0].bottom - block.preferredLineHeight);
+      final Offset start = Offset(boxes.first.start, boxes.first.bottom);
+      final Offset end = Offset(boxes.last.end, boxes.last.bottom);
+      endpoints = <TextSelectionPoint>[
+        TextSelectionPoint(start, boxes.first.direction),
+        TextSelectionPoint(end, boxes.last.direction),
+      ];
+    }
 
     final Rect editingRegion = new Rect.fromPoints(
       block.localToGlobal(Offset.zero),
       block.localToGlobal(block.size.bottomRight(Offset.zero)),
     );
     final toolbar = controls.buildToolbar(
-        context, editingRegion, midpoint, widget.selectionOverlay);
+        context, editingRegion, midpoint, endpoints, widget.selectionOverlay);
     return new CompositedTransformFollower(
       link: block.layerLink,
       showWhenUnlinked: false,

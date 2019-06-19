@@ -146,11 +146,11 @@ class InputConnectionController implements TextInputClient {
       final diff = fastDiff(oldText, text, cursorPosition);
       onValueChanged(diff.start, diff.deleted, diff.inserted, value.selection);
     } catch (e, trace) {
-      FlutterError.reportError(new FlutterErrorDetails(
+      FlutterError.reportError(FlutterErrorDetails(
         exception: e,
         stack: trace,
         library: 'Zefyr',
-        context: 'while updating editing value',
+        context: ErrorSummary('while updating editing value'),
       ));
       rethrow;
     }

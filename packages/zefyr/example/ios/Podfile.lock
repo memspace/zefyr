@@ -19,10 +19,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
-  image_picker: ee00aab0487cedc80a304085219503cc6d0f2e22
-  url_launcher: 92b89c1029a0373879933c21642958c874539095
+  Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
+  image_picker: 16e5fec1fbc87fd3b297c53e4048521eaf17cd06
+  url_launcher: 0067ddb8f10d36786672aa0722a21717dba3a298
 
 PODFILE CHECKSUM: 1e5af4103afd21ca5ead147d7b81d06f494f51a2
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.7.2

@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
@@ -26,7 +27,7 @@ abstract class ZefyrSelectionControls {
   /// Returns `false` if the document is managed by a read-only [ZefyrView].
   /// If provided [scope] represents an editable view like [ZefyrEditor]
   /// then returns `true` if the editable is enabled and current selection is
-  /// collapsed.
+  /// not collapsed.
   bool canCut(ZefyrScope scope) {
     return scope.isEditable &&
         scope.mode == ZefyrMode.edit &&
@@ -187,24 +188,42 @@ class ZefyrSelectionControlsAdapter extends TextSelectionControls {
   }
 
   @override
-  Widget buildToolbar(BuildContext context, Rect globalEditableRegion,
-      Offset position, TextSelectionDelegate delegate) {
+  Widget buildToolbar(
+    BuildContext context,
+    Rect globalEditableRegion,
+    Offset position,
+    List<TextSelectionPoint> endpoints,
+    TextSelectionDelegate delegate,
+  ) {
     assert(debugCheckHasMediaQuery(context));
     return ConstrainedBox(
-        constraints: BoxConstraints.tight(globalEditableRegion.size),
-        child: CustomSingleChildLayout(
-          delegate: _TextSelectionToolbarLayout(
-            MediaQuery.of(context).size,
-            globalEditableRegion,
-            position,
-          ),
-          child: _controls.buildToolbar(context, _scope),
-        ));
+      constraints: BoxConstraints.tight(globalEditableRegion.size),
+      child: CustomSingleChildLayout(
+        delegate: _TextSelectionToolbarLayout(
+          MediaQuery.of(context).size,
+          globalEditableRegion,
+          position,
+        ),
+        child: _controls.buildToolbar(context, _scope),
+      ),
+    );
   }
 
   @override
   Size get handleSize => Size(MaterialTextSelectionHandle.kHandleSize,
       MaterialTextSelectionHandle.kHandleSize);
+
+  @override
+  Offset getHandleAnchor(TextSelectionHandleType type, double textLineHeight) {
+    // TODO: implement getHandleAnchor
+    return null;
+  }
+
+  @override
+  Size getHandleSize(double textLineHeight) {
+    // TODO: implement getHandleSize
+    return null;
+  }
 }
 
 /// Centers the toolbar around the given position, ensuring that it remains on
