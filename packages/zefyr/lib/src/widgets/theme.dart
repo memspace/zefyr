@@ -278,35 +278,38 @@ class ZefyrToolbarTheme {
   /// Color of button icons in disabled state.
   final Color disabledIconColor;
 
+  /// The border of toolbar
+  final Border border;
+
   /// Creates fallback theme for editor toolbars.
   factory ZefyrToolbarTheme.fallback(BuildContext context) {
     final theme = Theme.of(context);
     return ZefyrToolbarTheme._(
-      color: theme.primaryColorLight,
-      toggleColor: theme.primaryColor,
-      iconColor: theme.primaryIconTheme.color,
-      disabledIconColor: theme.primaryColor,
-    );
+        color: theme.primaryColorLight,
+        toggleColor: theme.primaryColor,
+        iconColor: theme.primaryIconTheme.color,
+        disabledIconColor: theme.primaryColor,
+        border: Border.fromBorderSide(BorderSide.none));
   }
 
-  ZefyrToolbarTheme._({
-    @required this.color,
-    @required this.toggleColor,
-    @required this.iconColor,
-    @required this.disabledIconColor,
-  });
+  ZefyrToolbarTheme._(
+      {@required this.color,
+      @required this.toggleColor,
+      @required this.iconColor,
+      @required this.disabledIconColor,
+      this.border});
 
-  ZefyrToolbarTheme copyWith({
-    Color color,
-    Color toggleColor,
-    Color iconColor,
-    Color disabledIconColor,
-  }) {
+  ZefyrToolbarTheme copyWith(
+      {Color color,
+      Color toggleColor,
+      Color iconColor,
+      Color disabledIconColor,
+      Border border}) {
     return ZefyrToolbarTheme._(
-      color: color ?? this.color,
-      toggleColor: toggleColor ?? this.toggleColor,
-      iconColor: iconColor ?? this.iconColor,
-      disabledIconColor: disabledIconColor ?? this.disabledIconColor,
-    );
+        color: color ?? this.color,
+        toggleColor: toggleColor ?? this.toggleColor,
+        iconColor: iconColor ?? this.iconColor,
+        disabledIconColor: disabledIconColor ?? this.disabledIconColor,
+        border: border ?? this.border);
   }
 }
