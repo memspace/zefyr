@@ -1,9 +1,11 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import 'editable_box.dart';
 import 'horizontal_rule.dart';
@@ -120,10 +122,15 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     final TextNode segment = node;
     final attrs = segment.style;
 
-    return new TextSpan(
-      text: segment.value,
-      style: _getTextStyle(attrs, theme),
-    );
+    return attrs.contains(NotusAttribute.link)
+        ? LinkTextSpan(
+            style: _getTextStyle(attrs, theme),
+            text: segment.value,
+            url: attrs.value(NotusAttribute.link))
+        : TextSpan(
+            text: segment.value,
+            style: _getTextStyle(attrs, theme),
+          );
   }
 
   TextStyle _getTextStyle(NotusStyle style, ZefyrThemeData theme) {
@@ -152,4 +159,13 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
       throw new UnimplementedError('Unimplemented embed type ${embed.type}');
     }
   }
+}
+
+class LinkTextSpan extends TextSpan {
+  LinkTextSpan({TextStyle style, String url, String text})
+      : super(
+            style: style,
+            text: text ?? url,
+            recognizer: new TapGestureRecognizer()
+              ..onTap = () => launcher.launch(url));
 }
