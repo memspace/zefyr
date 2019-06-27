@@ -58,6 +58,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   //
   // New public members
   //
+  FocusAttachment _focusAttachment;
 
   /// Focus node of this widget.
   FocusNode get focusNode => widget.focusNode;
@@ -99,7 +100,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).reparentIfNeeded(focusNode);
+    _focusAttachment.reparent();
     super.build(context); // See AutomaticKeepAliveState.
 
     Widget body = ListBody(children: _buildChildren(context));
@@ -129,6 +130,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   void initState() {
     super.initState();
     _input = new InputConnectionController(_handleRemoteValueChange);
+    _focusAttachment = widget.focusNode.attach(context);
     _updateSubscriptions();
   }
 
@@ -137,6 +139,11 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     super.didUpdateWidget(oldWidget);
     _updateSubscriptions(oldWidget);
     focusOrUnfocusIfNeeded();
+    if (widget.focusNode != oldWidget.focusNode) {
+      _focusAttachment?.detach();
+      _focusAttachment = widget.focusNode.attach(context);
+      updateKeepAlive();
+    }
   }
 
   @override
@@ -159,6 +166,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   @override
   void dispose() {
     _cancelSubscriptions();
+    _focusAttachment.detach();
     super.dispose();
   }
 

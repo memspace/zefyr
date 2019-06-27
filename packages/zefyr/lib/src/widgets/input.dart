@@ -150,7 +150,10 @@ class InputConnectionController implements TextInputClient {
         exception: e,
         stack: trace,
         library: 'Zefyr',
-        context: 'while updating editing value',
+        context: ErrorDescription('while updating editing value'),
+        informationCollector: () sync* {
+          yield ErrorDescription('while updating editing value');
+        },
       ));
       rethrow;
     }

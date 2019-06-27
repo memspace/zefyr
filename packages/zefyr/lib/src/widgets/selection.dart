@@ -71,19 +71,20 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     _toolbarController.stop();
   }
 
-  void showToolbar() {
+  void showToolbar(RenderEditableProxyBox renderObject, Offset paintOffset) {
     final scope = ZefyrScope.of(context);
     assert(scope != null);
     final toolbarOpacity = _toolbarController.view;
     _toolbar = new OverlayEntry(
       builder: (context) => new FadeTransition(
-            opacity: toolbarOpacity,
-            child: new _SelectionToolbar(
-              scope: scope,
-              controls: widget.controls,
-              delegate: this,
-            ),
-          ),
+        opacity: toolbarOpacity,
+        child: new _SelectionToolbar(
+          scope: scope,
+          controls: widget.controls,
+          delegate: this,
+          renderObject: renderObject,
+        ),
+      ),
     );
     widget.overlay.insert(_toolbar);
     _toolbarController.forward(from: 0.0);
@@ -186,9 +187,20 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   void _updateToolbar() {
+    assert(_lastTapDownPosition != null);
+    final globalPoint = _lastTapDownPosition;
     if (!mounted) {
       return;
     }
+
+    HitTestResult result = new HitTestResult();
+    WidgetsBinding.instance.hitTest(result, globalPoint);
+
+    RenderEditableProxyBox box = _getEditableBox(result);
+    if (box == null) {
+      box = _editor.renderContext.closestBoxForGlobalPoint(globalPoint);
+    }
+    if (box == null) return;
 
     final selection = _editor.selection;
     final focusOwner = _editor.focusOwner;
@@ -199,10 +211,11 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
         if (_selection != selection) {
           if (selection.isCollapsed && isToolbarVisible) hideToolbar();
           _toolbar?.markNeedsBuild();
-          if (!selection.isCollapsed && isToolbarHidden) showToolbar();
+          if (!selection.isCollapsed && isToolbarHidden)
+            showToolbar(box, globalPoint);
         } else {
           if (!selection.isCollapsed && isToolbarHidden) {
-            showToolbar();
+            showToolbar(box, globalPoint);
           } else if (isToolbarVisible) {
             _toolbar?.markNeedsBuild();
           }
@@ -247,7 +260,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
       if (isToolbarVisible) {
         hideToolbar();
       } else {
-        showToolbar();
+        showToolbar(box, globalPoint);
       }
     } else {
       _didCaretTap = true;
@@ -273,6 +286,19 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     );
     widget.controller.updateSelection(selection, source: ChangeSource.local);
   }
+
+  @override
+  // TODO: implement copyEnabled
+  bool get copyEnabled => true;
+
+  @override
+  bool get cutEnabled => true;
+
+  @override
+  bool get pasteEnabled => true;
+
+  @override
+  bool get selectAllEnabled => true;
 }
 
 enum _SelectionHandlePosition { base, extent }
@@ -435,16 +461,20 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver> {
 }
 
 class _SelectionToolbar extends StatefulWidget {
-  const _SelectionToolbar({
-    Key key,
-    @required this.scope,
-    @required this.controls,
-    @required this.delegate,
-  }) : super(key: key);
+  const _SelectionToolbar(
+      {Key key,
+      @required this.scope,
+      @required this.controls,
+      @required this.delegate,
+      @required this.renderObject,
+      @required this.paintOffset})
+      : super(key: key);
 
   final ZefyrScope scope;
   final TextSelectionControls controls;
   final TextSelectionDelegate delegate;
+  final RenderEditableProxyBox renderObject;
+  final Offset paintOffset;
 
   @override
   _SelectionToolbarState createState() => new _SelectionToolbarState();
@@ -479,8 +509,23 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
       block.localToGlobal(Offset.zero),
       block.localToGlobal(block.size.bottomRight(Offset.zero)),
     );
-    final toolbar = widget.controls
-        .buildToolbar(context, editingRegion, midpoint, widget.delegate);
+
+    final Offset start =
+        Offset(boxes.first.start, boxes.first.bottom) + widget.paintOffset;
+    final Offset end =
+        Offset(boxes.last.end, boxes.last.bottom) + widget.paintOffset;
+    final List<TextSelectionPoint> endpoints = <TextSelectionPoint>[
+      TextSelectionPoint(start, boxes.first.direction),
+      TextSelectionPoint(end, boxes.last.direction),
+    ];
+
+    final toolbar = widget.controls.buildToolbar(
+        context,
+        editingRegion,
+        widget.renderObject.preferredLineHeight,
+        midpoint,
+        endpoints,
+        widget.delegate);
     return new CompositedTransformFollower(
       link: block.layerLink,
       showWhenUnlinked: false,
