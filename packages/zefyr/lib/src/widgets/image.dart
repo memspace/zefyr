@@ -31,8 +31,10 @@ class ZefyrDefaultImageDelegate implements ZefyrImageDelegate<ImageSource> {
     final file = RegExp(r"^(http(s)?:\/\/){1}").hasMatch(imageSource)
         ? CachedNetworkImage(imageUrl: imageSource)
         : File.fromUri(Uri.parse(imageSource));
-    final ImageProvider image = file is File ? FileImage(file) : file;
-    return Image(image: image);
+    final image = file != null && file is File
+        ? Image(image: FileImage(file))
+        : file ?? Container();
+    return image;
   }
 
   @override
