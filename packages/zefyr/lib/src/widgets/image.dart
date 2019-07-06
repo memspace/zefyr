@@ -6,6 +6,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,8 +28,10 @@ abstract class ZefyrImageDelegate<S> {
 class ZefyrDefaultImageDelegate implements ZefyrImageDelegate<ImageSource> {
   @override
   Future<Widget> buildImage(BuildContext context, String imageSource) async {
-    final file = new File.fromUri(Uri.parse(imageSource));
-    final image = new FileImage(file);
+    final file = imageSource.startsWith(r"^(http(s)?:\/\/.)")
+        ? CachedNetworkImage(imageUrl: imageSource)
+        : File.fromUri(Uri.parse(imageSource));
+    final image = FileImage(file);
     return Image(image: image);
   }
 
