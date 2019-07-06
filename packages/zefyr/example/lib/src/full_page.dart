@@ -113,7 +113,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
 /// Default image delegate only supports [FileImage]s.
 class CustomImageDelegate extends ZefyrDefaultImageDelegate {
   @override
-  Widget buildImage(BuildContext context, String imageSource) {
+  Future<Widget> buildImage(BuildContext context, String imageSource) async {
     // We use custom "asset" scheme to distinguish asset images from other files.
     if (imageSource.startsWith('asset://')) {
       final asset = new AssetImage(imageSource.replaceFirst('asset://', ''));

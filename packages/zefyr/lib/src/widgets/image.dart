@@ -15,7 +15,7 @@ import 'editable_box.dart';
 
 abstract class ZefyrImageDelegate<S> {
   /// Builds image widget for specified [imageSource] and [context].
-  Widget buildImage(BuildContext context, String imageSource);
+  Future<Widget> buildImage(BuildContext context, String imageSource);
 
   /// Picks an image from specified [source].
   ///
@@ -26,7 +26,7 @@ abstract class ZefyrImageDelegate<S> {
 
 class ZefyrDefaultImageDelegate implements ZefyrImageDelegate<ImageSource> {
   @override
-  Widget buildImage(BuildContext context, String imageSource) {
+  Future<Widget> buildImage(BuildContext context, String imageSource) async {
     final file = new File.fromUri(Uri.parse(imageSource));
     final image = new FileImage(file);
     return Image(image: image);
