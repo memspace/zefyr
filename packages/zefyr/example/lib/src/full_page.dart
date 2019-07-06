@@ -117,7 +117,7 @@ class CustomImageDelegate extends ZefyrDefaultImageDelegate {
     // We use custom "asset" scheme to distinguish asset images from other files.
     if (imageSource.startsWith('asset://')) {
       final asset = new AssetImage(imageSource.replaceFirst('asset://', ''));
-      return new Image(image: asset);
+      return Image(image: asset);
     } else {
       return super.buildImage(context, imageSource);
     }

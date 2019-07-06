@@ -29,7 +29,7 @@ class ZefyrDefaultImageDelegate implements ZefyrImageDelegate<ImageSource> {
   Widget buildImage(BuildContext context, String imageSource) {
     final file = new File.fromUri(Uri.parse(imageSource));
     final image = new FileImage(file);
-    return new Image(image: image);
+    return Image(image: image);
   }
 
   @override
@@ -57,16 +57,31 @@ class _ZefyrImageState extends State<ZefyrImage> {
     return attribute.value['source'] as String;
   }
 
+  Widget image;
+
+  @override
+  void initState() {
+    buildImage();
+    super.initState();
+  }
+
+  Future<void> buildImage() async {
+    final Widget imageWidget = imageSource == null || imageSource.isEmpty
+        ? Container()
+        : await widget.delegate.buildImage(context, imageSource);
+    setState(() {
+      image = imageWidget;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (imageSource == null || imageSource.isEmpty) {
-      return Container();
-    }
-    final image = widget.delegate.buildImage(context, imageSource);
-    return _EditableImage(
-      child: image,
-      node: widget.node,
-    );
+    return image != null && image is Image
+        ? _EditableImage(
+            child: image,
+            node: widget.node,
+          )
+        : Container();
   }
 }
 
