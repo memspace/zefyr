@@ -27,9 +27,6 @@ abstract class ZefyrImageDelegate<S> {
 class ZefyrDefaultImageDelegate implements ZefyrImageDelegate<ImageSource> {
   @override
   Widget buildImage(BuildContext context, String imageSource) {
-    if (imageSource == null || imageSource.isEmpty) {
-      return Container();
-    }
     final file = new File.fromUri(Uri.parse(imageSource));
     final image = new FileImage(file);
     return new Image(image: image);
@@ -62,6 +59,9 @@ class _ZefyrImageState extends State<ZefyrImage> {
 
   @override
   Widget build(BuildContext context) {
+    if (imageSource == null || imageSource.isEmpty) {
+      return Container();
+    }
     final image = widget.delegate.buildImage(context, imageSource);
     return _EditableImage(
       child: image,
