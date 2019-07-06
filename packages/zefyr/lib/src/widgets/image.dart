@@ -8,8 +8,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:notus/notus.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:notus/notus.dart';
 
 import 'editable_box.dart';
 
@@ -27,6 +27,9 @@ abstract class ZefyrImageDelegate<S> {
 class ZefyrDefaultImageDelegate implements ZefyrImageDelegate<ImageSource> {
   @override
   Widget buildImage(BuildContext context, String imageSource) {
+    if (imageSource == null || imageSource.isEmpty) {
+      return Container();
+    }
     final file = new File.fromUri(Uri.parse(imageSource));
     final image = new FileImage(file);
     return new Image(image: image);
