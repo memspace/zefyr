@@ -28,7 +28,7 @@ abstract class ZefyrImageDelegate<S> {
 class ZefyrDefaultImageDelegate implements ZefyrImageDelegate<ImageSource> {
   @override
   Future<Widget> buildImage(BuildContext context, String imageSource) async {
-    final file = imageSource.startsWith(r"^(http(s)?:\/\/){1}")
+    final file = RegExp(r"^(http(s)?:\/\/){1}").hasMatch(imageSource)
         ? CachedNetworkImage(imageUrl: imageSource)
         : File.fromUri(Uri.parse(imageSource));
     final image = FileImage(file);
