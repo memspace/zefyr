@@ -15,7 +15,7 @@ import 'editable_box.dart';
 
 abstract class ZefyrImageDelegate<S> {
   /// Builds image widget for specified [imageSource] and [context].
-  Future<Widget> buildImage(BuildContext context, String imageSource);
+  Widget buildImage(BuildContext context, String imageSource);
 
   /// Picks an image from specified [source].
   ///
@@ -26,14 +26,10 @@ abstract class ZefyrImageDelegate<S> {
 
 class ZefyrDefaultImageDelegate implements ZefyrImageDelegate<ImageSource> {
   @override
-  Future<Widget> buildImage(BuildContext context, String imageSource) async {
-    final file = RegExp(r"^(http(s)?:\/\/){1}").hasMatch(imageSource)
-        ? Image.network(imageSource)
-        : File.fromUri(Uri.parse(imageSource));
-    final image = file != null && file is File
-        ? Image(image: FileImage(file))
-        : file ?? Container();
-    return image;
+  Widget buildImage(BuildContext context, String imageSource) {
+    final file = new File.fromUri(Uri.parse(imageSource));
+    final image = new FileImage(file);
+    return new Image(image: image);
   }
 
   @override
@@ -61,31 +57,13 @@ class _ZefyrImageState extends State<ZefyrImage> {
     return attribute.value['source'] as String;
   }
 
-  Widget image;
-
-  @override
-  void initState() {
-    buildImage();
-    super.initState();
-  }
-
-  Future<void> buildImage() async {
-    final Widget imageWidget = imageSource == null || imageSource.isEmpty
-        ? Container()
-        : await widget.delegate.buildImage(context, imageSource);
-    setState(() {
-      image = imageWidget;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return image != null && image is Image
-        ? _EditableImage(
-            child: image,
-            node: widget.node,
-          )
-        : Container();
+    final image = widget.delegate.buildImage(context, imageSource);
+    return _EditableImage(
+      child: image,
+      node: widget.node,
+    );
   }
 }
 
