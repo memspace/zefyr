@@ -71,19 +71,32 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     _toolbarController.stop();
   }
 
-  void showToolbar(RenderEditableProxyBox renderObject, Offset paintOffset) {
+  void showToolbar() {
     final scope = ZefyrScope.of(context);
     assert(scope != null);
     final toolbarOpacity = _toolbarController.view;
+    Offset paintOffset = _lastTapDownPosition != null
+        ? _lastTapDownPosition
+        : _longPressPosition != null ? _longPressPosition : null;
+    RenderEditableProxyBox renderObject = _editor?.renderContext
+        ?.boxForTextOffset(_editor?.selection?.baseOffset);
     _toolbar = new OverlayEntry(
       builder: (context) => new FadeTransition(
         opacity: toolbarOpacity,
-        child: new _SelectionToolbar(
-          scope: scope,
-          controls: widget.controls,
-          delegate: this,
-          renderObject: renderObject,
-        ),
+        child: paintOffset != null
+            ? _SelectionToolbar(
+                scope: scope,
+                controls: widget.controls,
+                delegate: this,
+                renderObject: renderObject,
+                paintOffset: paintOffset,
+              )
+            : _SelectionToolbar(
+                scope: scope,
+                controls: widget.controls,
+                delegate: this,
+                renderObject: renderObject,
+              ),
       ),
     );
     widget.overlay.insert(_toolbar);
@@ -187,21 +200,9 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   void _updateToolbar() {
-    assert(_lastTapDownPosition != null);
-    final globalPoint = _lastTapDownPosition;
     if (!mounted) {
       return;
     }
-
-    HitTestResult result = new HitTestResult();
-    WidgetsBinding.instance.hitTest(result, globalPoint);
-
-    RenderEditableProxyBox box = _getEditableBox(result);
-    if (box == null) {
-      box = _editor.renderContext.closestBoxForGlobalPoint(globalPoint);
-    }
-    if (box == null) return;
-
     final selection = _editor.selection;
     final focusOwner = _editor.focusOwner;
     setState(() {
@@ -211,11 +212,10 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
         if (_selection != selection) {
           if (selection.isCollapsed && isToolbarVisible) hideToolbar();
           _toolbar?.markNeedsBuild();
-          if (!selection.isCollapsed && isToolbarHidden)
-            showToolbar(box, globalPoint);
+          if (!selection.isCollapsed && isToolbarHidden) showToolbar();
         } else {
           if (!selection.isCollapsed && isToolbarHidden) {
-            showToolbar(box, globalPoint);
+            showToolbar();
           } else if (isToolbarVisible) {
             _toolbar?.markNeedsBuild();
           }
@@ -227,13 +227,17 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   void _handleTapDown(TapDownDetails details) {
-    _lastTapDownPosition = details.globalPosition;
+    setState(() {
+      _lastTapDownPosition = details.globalPosition;
+    });
   }
 
   void _handleTapCancel() {
-    // longPress arrives after tapCancel, so remember the tap position.
-    _longPressPosition = _lastTapDownPosition;
-    _lastTapDownPosition = null;
+    setState(() {
+      // longPress arrives after tapCancel, so remember the tap position.
+      _longPressPosition = _lastTapDownPosition;
+      _lastTapDownPosition = null;
+    });
   }
 
   void _handleTap() {
@@ -260,7 +264,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
       if (isToolbarVisible) {
         hideToolbar();
       } else {
-        showToolbar(box, globalPoint);
+        showToolbar();
       }
     } else {
       _didCaretTap = true;
@@ -270,7 +274,6 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
   void _handleLongPress() {
     final Offset globalPoint = _longPressPosition;
-    _longPressPosition = null;
     HitTestResult result = new HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
     final box = _getEditableBox(result);
@@ -466,8 +469,8 @@ class _SelectionToolbar extends StatefulWidget {
       @required this.scope,
       @required this.controls,
       @required this.delegate,
-      @required this.renderObject,
-      @required this.paintOffset})
+      this.renderObject,
+      this.paintOffset})
       : super(key: key);
 
   final ZefyrScope scope;
