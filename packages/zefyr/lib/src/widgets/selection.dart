@@ -77,26 +77,22 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     final toolbarOpacity = _toolbarController.view;
     Offset paintOffset = _lastTapDownPosition != null
         ? _lastTapDownPosition
-        : _longPressPosition != null ? _longPressPosition : null;
+        : _longPressPosition != null
+            ? _longPressPosition
+            : Offset(_editor.selection.baseOffset.toDouble(),
+                _editor.selection.extentOffset.toDouble());
     RenderEditableProxyBox renderObject = _editor?.renderContext
         ?.boxForTextOffset(_editor?.selection?.baseOffset);
     _toolbar = new OverlayEntry(
       builder: (context) => new FadeTransition(
         opacity: toolbarOpacity,
-        child: paintOffset != null
-            ? _SelectionToolbar(
-                scope: scope,
-                controls: widget.controls,
-                delegate: this,
-                renderObject: renderObject,
-                paintOffset: paintOffset,
-              )
-            : _SelectionToolbar(
-                scope: scope,
-                controls: widget.controls,
-                delegate: this,
-                renderObject: renderObject,
-              ),
+        child: _SelectionToolbar(
+          scope: scope,
+          controls: widget.controls,
+          delegate: this,
+          renderObject: renderObject,
+          paintOffset: paintOffset,
+        ),
       ),
     );
     widget.overlay.insert(_toolbar);
@@ -236,7 +232,6 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     setState(() {
       // longPress arrives after tapCancel, so remember the tap position.
       _longPressPosition = _lastTapDownPosition;
-      _lastTapDownPosition = null;
     });
   }
 
