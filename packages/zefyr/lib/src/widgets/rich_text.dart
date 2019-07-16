@@ -176,12 +176,8 @@ class RenderZefyrParagraph extends RenderParagraph
     return result;
   }
 
-  //
-  // Overridden members
-  //
-
   @override
-  void set text(TextSpan value) {
+  void set text(InlineSpan value) {
     _prototypePainter.text = new TextSpan(text: '.', style: value.style);
     _selectionRects = null;
     super.text = value;

@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/services.dart';
+import 'package:flutter/src/foundation/diagnostics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:zefyr/util.dart';
 
@@ -147,11 +148,11 @@ class InputConnectionController implements TextInputClient {
       onValueChanged(diff.start, diff.deleted, diff.inserted, value.selection);
     } catch (e, trace) {
       FlutterError.reportError(new FlutterErrorDetails(
-        exception: e,
-        stack: trace,
-        library: 'Zefyr',
-        context: 'while updating editing value',
-      ));
+          exception: e,
+          stack: trace,
+          library: 'Zefyr',
+//        context: 'while updating editing value',
+          context: new TextNode()));
       rethrow;
     }
   }
@@ -168,4 +169,27 @@ class InputConnectionController implements TextInputClient {
   void updateFloatingCursor(RawFloatingCursorPoint point) {
     // TODO: implement updateFloatingCursor
   }
+}
+
+class TextNode extends DiagnosticsNode {
+  @override
+  List<DiagnosticsNode> getChildren() {
+    // TODO: implement getChildren
+    return null;
+  }
+
+  @override
+  List<DiagnosticsNode> getProperties() {
+    // TODO: implement getProperties
+    return null;
+  }
+
+  @override
+  String toDescription({TextTreeConfiguration parentConfiguration}) {
+    // TODO: implement toDescription
+    return null;
+  }
+
+  @override
+  Object get value => 'while updating editing value';
 }

@@ -99,7 +99,9 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).reparentIfNeeded(focusNode);
+//    var reparentIfNeeded = FocusScope.of(context).reparentIfNeeded(focusNode);
+
+    _nodeAttachment.reparent();
     super.build(context); // See AutomaticKeepAliveState.
 
     Widget body = ListBody(children: _buildChildren(context));
@@ -125,9 +127,12 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     return Stack(fit: StackFit.expand, children: layers);
   }
 
+  FocusAttachment _nodeAttachment;
   @override
   void initState() {
     super.initState();
+//    FocusScopeNode _node = focusNode;
+    _nodeAttachment = focusNode.attach(context);
     _input = new InputConnectionController(_handleRemoteValueChange);
     _updateSubscriptions();
   }

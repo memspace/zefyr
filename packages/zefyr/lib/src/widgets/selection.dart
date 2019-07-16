@@ -273,6 +273,18 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     );
     widget.controller.updateSelection(selection, source: ChangeSource.local);
   }
+
+  @override
+  bool get copyEnabled => true;
+
+  @override
+  bool get cutEnabled => true;
+
+  @override
+  bool get pasteEnabled => true;
+
+  @override
+  bool get selectAllEnabled => true;
 }
 
 enum _SelectionHandlePosition { base, extent }
@@ -479,8 +491,18 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
       block.localToGlobal(Offset.zero),
       block.localToGlobal(block.size.bottomRight(Offset.zero)),
     );
-    final toolbar = widget.controls
-        .buildToolbar(context, editingRegion, midpoint, widget.delegate);
+//    final toolbar = widget.controls
+//        .buildToolbar(context, editingRegion, midpoint, widget.delegate);
+    final Offset endpoint = new Offset(
+      (boxes.length == 1)
+          ? (boxes[0].start + boxes[0].end)
+          : (boxes[0].start + boxes[1].start),
+      boxes[0].bottom - block.preferredLineHeight,
+    );
+    final TextSelectionPoint textEndpoint =
+        new TextSelectionPoint(endpoint, TextDirection.ltr);
+    final toolbar = widget.controls.buildToolbar(
+        context, editingRegion, 0.0, midpoint, [textEndpoint], widget.delegate);
     return new CompositedTransformFollower(
       link: block.layerLink,
       showWhenUnlinked: false,
