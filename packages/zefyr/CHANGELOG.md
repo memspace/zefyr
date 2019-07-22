@@ -1,3 +1,7 @@
+## 0.6.0
+
+* Updated to support Flutter 1.7.8
+
 ## 0.5.0
 
 * Updated to support Flutter 1.2
