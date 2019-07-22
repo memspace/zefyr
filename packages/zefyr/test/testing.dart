@@ -110,7 +110,7 @@ class EditorSandBox {
   Finder findSelectionHandle() {
     return find.descendant(
         of: find.byType(SelectionHandleDriver),
-        matching: find.byType(Positioned));
+        matching: find.byType(GestureDetector));
   }
 }
 
