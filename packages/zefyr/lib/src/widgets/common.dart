@@ -1,9 +1,11 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
+import 'package:flutter/gestures.dart';
 
 import 'editable_box.dart';
 import 'horizontal_rule.dart';
@@ -110,9 +112,20 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
 
   TextSpan buildText(BuildContext context) {
     final theme = ZefyrTheme.of(context);
-    final List<TextSpan> children = widget.node.children
+
+    List<TextSpan> children;
+
+    if(ZefyrScope.of(context).isEditable) {
+      children = widget.node.children
         .map((node) => _segmentToTextSpan(node, theme))
         .toList(growable: false);
+    } else {
+      children = widget.node.children
+        .map((node) => _segmentToTextSpanView(node, theme))
+        .toList(growable: true);
+      children.add(TextSpan(text: ' ', style: TextStyle(fontSize: 1.0)));
+    }
+
     return new TextSpan(style: widget.style, children: children);
   }
 
@@ -123,6 +136,21 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     return new TextSpan(
       text: segment.value,
       style: _getTextStyle(attrs, theme),
+    );
+  }
+
+  TextSpan _segmentToTextSpanView(Node node, ZefyrThemeData theme) {
+    final TextNode segment = node;
+    final attrs = segment.style;
+
+    return new TextSpan(
+      text: segment.value,
+      style: _getTextStyle(attrs, theme),
+      recognizer: (attrs.contains(NotusAttribute.link) ?
+        (new TapGestureRecognizer()..onTap = () async {
+          var link = attrs.get(NotusAttribute.link).value;
+          await ZefyrScope.of(context).onLaunchUrl(link);
+        }) : null),
     );
   }
 

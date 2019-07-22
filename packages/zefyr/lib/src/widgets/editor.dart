@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'controller.dart';
 import 'editable_text.dart';
@@ -22,6 +23,7 @@ class ZefyrEditor extends StatefulWidget {
     this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
     this.toolbarDelegate,
     this.imageDelegate,
+    this.onLaunchUrl,
     this.physics,
   }) : super(key: key);
 
@@ -31,6 +33,7 @@ class ZefyrEditor extends StatefulWidget {
   final bool enabled;
   final ZefyrToolbarDelegate toolbarDelegate;
   final ZefyrImageDelegate imageDelegate;
+  final Function onLaunchUrl;
   final ScrollPhysics physics;
 
   /// Padding around editable area.
@@ -42,6 +45,7 @@ class ZefyrEditor extends StatefulWidget {
 
 class _ZefyrEditorState extends State<ZefyrEditor> {
   ZefyrImageDelegate _imageDelegate;
+  Function _onLaunchUrl;
   ZefyrScope _scope;
   ZefyrThemeData _themeData;
   GlobalKey<ZefyrToolbarState> _toolbarKey;
@@ -85,10 +89,18 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
     }
   }
 
+  Future<void> _launchUrl(String link) async {
+    if(await canLaunch(link)) {
+      await launch(link, forceWebView: true);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _imageDelegate = widget.imageDelegate ?? new ZefyrDefaultImageDelegate();
+
+    _onLaunchUrl = widget.onLaunchUrl ?? _launchUrl;
   }
 
   @override
@@ -99,6 +111,11 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
     if (widget.imageDelegate != oldWidget.imageDelegate) {
       _imageDelegate = widget.imageDelegate ?? new ZefyrDefaultImageDelegate();
       _scope.imageDelegate = _imageDelegate;
+    }
+
+    if (widget.onLaunchUrl != oldWidget.onLaunchUrl) {
+      _onLaunchUrl = widget.onLaunchUrl ?? _launchUrl;
+      _scope.onLaunchUrl = _onLaunchUrl;
     }
   }
 
@@ -114,6 +131,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
     if (_scope == null) {
       _scope = ZefyrScope.editable(
         imageDelegate: _imageDelegate,
+        onLaunchUrl: _onLaunchUrl,
         controller: widget.controller,
         focusNode: widget.focusNode,
         focusScope: FocusScope.of(context),
@@ -147,6 +165,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       controller: _scope.controller,
       focusNode: _scope.focusNode,
       imageDelegate: _scope.imageDelegate,
+      onLaunchUrl: _scope.onLaunchUrl,
       autofocus: widget.autofocus,
       enabled: widget.enabled,
       padding: widget.padding,
