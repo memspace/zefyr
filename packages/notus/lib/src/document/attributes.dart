@@ -94,7 +94,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   // Line attributes
 
   /// Heading style attribute.
-  static const heading = const HeadingAttributeBuilder._();  
+  static const heading = const HeadingAttributeBuilder._();
 
   /// Alias for [NotusAttribute.heading.level1].
   static NotusAttribute<int> get h1 => heading.level1;
@@ -104,7 +104,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.heading.level3].
   static NotusAttribute<int> get h3 => heading.level3;
- 
+
   /// Block attribute
   static const block = const BlockAttributeBuilder._();
 
@@ -133,11 +133,6 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     final builder = _registry[key];
     return builder.withValue(value);
   }
-
-  // NotusAttribute.register(String key, NotusAttributeScope scope, dynamic value){
-  //   print ('trying to register [\'$key\']: $value');
-  //   ._(key, scope, value);
-  // }
 
   const NotusAttribute._(this.key, this.scope, this.value);
 
@@ -203,7 +198,7 @@ class NotusStyle {
     if (data == null) return new NotusStyle();
 
     final result = data.map((String key, dynamic value) {
-      var attr = NotusAttribute._fromKeyValue(key, value) ?? 'test';
+      var attr = NotusAttribute._fromKeyValue(key, value);
       return new MapEntry<String, NotusAttribute>(key, attr);
     });
     return new NotusStyle._(result);
@@ -369,10 +364,9 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
 /// [NotusAttribute.block] instead.
 class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kBlock = 'block';
-  
-  const BlockAttributeBuilder._() : super._(_kBlock, NotusAttributeScope.inline);
+  const BlockAttributeBuilder._() : super._(_kBlock, NotusAttributeScope.line);
 
-   /// Formats a block of lines as a bullet list.
+  /// Formats a block of lines as a bullet list.
   NotusAttribute<String> get bulletList =>
       new NotusAttribute<String>._(key, scope, 'ul');
 
@@ -409,7 +403,7 @@ class EmbedAttributeBuilder
 
 /// Type of embedded content.
 enum EmbedType { horizontalRule, image }
-//TODO:Chris: make this a custom attribute
+
 class EmbedAttribute extends NotusAttribute<Map<String, dynamic>> {
   static const _kValueEquality = const MapEquality<String, dynamic>();
   static const _kEmbed = 'embed';

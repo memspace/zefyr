@@ -6,7 +6,6 @@ import 'package:notus/notus.dart';
 
 void main() {
   final doc = new NotusDocument();
-
   // Modify this document with insert, delete and format operations
   doc.insert(
       0, 'Notus package provides rich text document model for Zefyr editor');
