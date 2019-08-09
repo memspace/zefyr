@@ -11,7 +11,7 @@ void main() {
       0, 'Notus package provides rich text document model for Zefyr editor');
   doc.format(0, 5, NotusAttribute.bold); // Makes first word bold.
   doc.format(0, 0, NotusAttribute.h1); // Makes first line a heading.
-  doc.format(15, 23, NotusAttribute.custom.withValue('customAttribute'));
+  doc.format(15, 23, NotusAttribute.custom.withValue('customAttribute')); // Adds a non-UI custom attribute
   doc.delete(23, 10); // Deletes "rich text " segment.
 
   // Collects style attributes at 1 character in this document.
