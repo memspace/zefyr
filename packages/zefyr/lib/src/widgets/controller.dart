@@ -98,6 +98,13 @@ class ZefyrController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Replaces [length] characters in the document starting at [index] with
+  /// provided [text].
+  ///
+  /// Resulting change is registered as produced by user action, e.g.
+  /// using [ChangeSource.local].
+  ///
+  /// Optionally updates selection if provided.
   void replaceText(int index, int length, String text,
       {TextSelection selection}) {
     Delta delta;

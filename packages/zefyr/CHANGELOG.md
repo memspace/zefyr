@@ -1,3 +1,16 @@
+## 0.7.0
+
+This release contains breaking changes.
+
+* Breaking change: `ZefyrEditor.enabled` field replaced by `ZefyrEditor.mode` which can take
+  one of three default values:
+    - `ZefyrMode.edit`: the same as `enabled: true`, all editing controls are available to the user
+    - `ZefyrMode.select`: user can't modify text itself, but allowed to select it and optionally
+       apply formatting.
+    - `ZefyrMode.view`: the same as `enabled: false`, read-only.
+* Added optional `selectionControls` field to `ZefyrEditor` and `ZefyrEditableText`. If not provided
+  then by default uses platform-specific implementation.
+
 ## 0.6.0
 
 * Updated to support Flutter 1.7.8

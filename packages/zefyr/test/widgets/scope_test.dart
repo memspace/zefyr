@@ -14,6 +14,7 @@ void main() {
       WidgetsFlutterBinding.ensureInitialized();
       final doc = NotusDocument();
       scope = ZefyrScope.editable(
+        mode: ZefyrMode.edit,
         controller: ZefyrController(doc),
         imageDelegate: ZefyrDefaultImageDelegate(),
         focusNode: FocusNode(),
