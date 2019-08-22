@@ -19,6 +19,7 @@ export 'src/widgets/field.dart';
 export 'src/widgets/horizontal_rule.dart';
 export 'src/widgets/image.dart';
 export 'src/widgets/list.dart';
+export 'src/widgets/mode.dart';
 export 'src/widgets/paragraph.dart';
 export 'src/widgets/quote.dart';
 export 'src/widgets/scaffold.dart';

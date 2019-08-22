@@ -1,3 +1,6 @@
+// Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
@@ -6,6 +9,7 @@ import 'code.dart';
 import 'common.dart';
 import 'image.dart';
 import 'list.dart';
+import 'mode.dart';
 import 'paragraph.dart';
 import 'quote.dart';
 import 'scope.dart';
@@ -33,7 +37,10 @@ class ZefyrViewState extends State<ZefyrView> {
   @override
   void initState() {
     super.initState();
-    _scope = ZefyrScope.view(imageDelegate: widget.imageDelegate);
+    _scope = ZefyrScope.view(
+      mode: ZefyrMode.view,
+      imageDelegate: widget.imageDelegate,
+    );
   }
 
   @override

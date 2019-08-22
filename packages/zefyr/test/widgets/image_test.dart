@@ -75,8 +75,7 @@ void main() {
       expect(editor.selection.extentOffset, embed.documentOffset);
     });
 
-    testWidgets('tap right side of image puts caret after it',
-        (tester) async {
+    testWidgets('tap right side of image puts caret after it', (tester) async {
       final editor = new EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
@@ -105,7 +104,7 @@ void main() {
       EmbedNode embed = line.children.single;
       expect(editor.selection.baseOffset, embed.documentOffset);
       expect(editor.selection.extentOffset, embed.documentOffset + 1);
-      expect(find.text('Paste'), findsOneWidget);
+      expect(find.text('PASTE'), findsOneWidget);
     });
   });
 }

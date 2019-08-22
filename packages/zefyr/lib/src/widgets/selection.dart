@@ -25,16 +25,10 @@ RenderEditableBox _getEditableBox(HitTestResult result) {
 
 /// Selection overlay controls selection handles and other gestures.
 class ZefyrSelectionOverlay extends StatefulWidget {
-  const ZefyrSelectionOverlay({
-    Key key,
-    @required this.controller,
-    @required this.controls,
-    @required this.overlay,
-  }) : super(key: key);
+  const ZefyrSelectionOverlay({Key key, @required this.controls})
+      : super(key: key);
 
-  final ZefyrController controller;
   final TextSelectionControls controls;
-  final OverlayState overlay;
 
   @override
   _ZefyrSelectionOverlayState createState() =>
@@ -43,16 +37,62 @@ class ZefyrSelectionOverlay extends StatefulWidget {
 
 class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     implements TextSelectionDelegate {
+  TextSelectionControls _controls;
+  TextSelectionControls get controls => _controls;
+
+  /// Global position of last TapDown event.
+  Offset _lastTapDownPosition;
+
+  /// Global position of last TapDown which is potentially a long press.
+  Offset _longPressPosition;
+
+  OverlayState _overlay;
+  OverlayEntry _toolbar;
+  AnimationController _toolbarController;
+
+  ZefyrScope _scope;
+  ZefyrScope get scope => _scope;
+  TextSelection _selection;
+  FocusOwner _focusOwner;
+
+  bool _didCaretTap = false;
+
+  /// Whether selection controls should be hidden.
+  bool get shouldHideControls {
+    if (!_scope.mode.canSelect) return true;
+    final selection = _scope.selection;
+    final isSelectionCollapsed = selection == null || selection.isCollapsed;
+    if (_scope.mode.canEdit) {
+      return isSelectionCollapsed || _scope.focusOwner != FocusOwner.editor;
+    }
+    return isSelectionCollapsed;
+  }
+
+  void showToolbar() {
+    final toolbarOpacity = _toolbarController.view;
+    _toolbar = OverlayEntry(
+      builder: (context) => FadeTransition(
+        opacity: toolbarOpacity,
+        child: _SelectionToolbar(selectionOverlay: this),
+      ),
+    );
+    _overlay.insert(_toolbar);
+    _toolbarController.forward(from: 0.0);
+  }
+
+  bool get isToolbarVisible => _toolbar != null;
+  bool get isToolbarHidden => _toolbar == null;
+
   @override
   TextEditingValue get textEditingValue =>
-      widget.controller.plainTextEditingValue;
+      _scope.controller.plainTextEditingValue;
 
   set textEditingValue(TextEditingValue value) {
     final cursorPosition = value.selection.extentOffset;
-    final oldText = widget.controller.document.toPlainText();
+    final oldText = _scope.controller.document.toPlainText();
     final newText = value.text;
     final diff = fastDiff(oldText, newText, cursorPosition);
-    widget.controller.replaceText(
+    _scope.controller.replaceText(
         diff.start, diff.deleted.length, diff.inserted,
         selection: value.selection);
   }
@@ -62,73 +102,60 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     // TODO: implement bringIntoView
   }
 
-  bool get isToolbarVisible => _toolbar != null;
-  bool get isToolbarHidden => _toolbar == null;
-
   @override
   void hideToolbar() {
     _didCaretTap = false; // reset double tap.
     _toolbar?.remove();
     _toolbar = null;
-    _toolbarController.stop();
-  }
-
-  void showToolbar() {
-    final toolbarOpacity = _toolbarController.view;
-    _toolbar = new OverlayEntry(
-      builder: (context) => new FadeTransition(
-        opacity: toolbarOpacity,
-        child: new _SelectionToolbar(
-          scope: _editor,
-          controls: widget.controls,
-          delegate: this,
-        ),
-      ),
-    );
-    widget.overlay.insert(_toolbar);
-    _toolbarController.forward(from: 0.0);
-  }
-
-  //
-  // Overridden members of State
-  //
-
-  @override
-  void initState() {
-    super.initState();
-    _toolbarController = new AnimationController(
-        duration: _kFadeDuration, vsync: widget.overlay);
+    _toolbarController?.stop();
   }
 
   static const Duration _kFadeDuration = const Duration(milliseconds: 150);
 
   @override
+  void initState() {
+    super.initState();
+    _controls = widget.controls;
+  }
+
+  @override
   void didUpdateWidget(ZefyrSelectionOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.overlay != widget.overlay) {
-      hideToolbar();
-      _toolbarController.dispose();
-      _toolbarController = new AnimationController(
-          duration: _kFadeDuration, vsync: widget.overlay);
-    }
+    _controls = widget.controls;
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final editor = ZefyrScope.of(context);
-    if (_editor != editor) {
-      _editor?.removeListener(_handleChange);
-      _editor = editor;
-      _editor.addListener(_handleChange);
-      _selection = _editor.selection;
-      _focusOwner = _editor.focusOwner;
+    final scope = ZefyrScope.of(context);
+    if (_scope != scope) {
+      _scope?.removeListener(_handleChange);
+      _scope = scope;
+      _scope.addListener(_handleChange);
+      _selection = _scope.selection;
+      _focusOwner = _scope.focusOwner;
     }
+
+    final overlay = Overlay.of(context, debugRequiredFor: widget);
+    if (_overlay != overlay) {
+      hideToolbar();
+      _overlay = overlay;
+      _toolbarController?.dispose();
+      _toolbarController = null;
+    }
+    if (_toolbarController == null) {
+      _toolbarController = AnimationController(
+        duration: _kFadeDuration,
+        vsync: _overlay,
+      );
+    }
+
+    _toolbar?.markNeedsBuild();
   }
 
   @override
   void dispose() {
-    _editor.removeListener(_handleChange);
+    _scope.removeListener(_handleChange);
     hideToolbar();
     _toolbarController.dispose();
     _toolbarController = null;
@@ -148,11 +175,11 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
         children: <Widget>[
           new SelectionHandleDriver(
             position: _SelectionHandlePosition.base,
-            controls: widget.controls,
+            selectionOverlay: this,
           ),
           new SelectionHandleDriver(
             position: _SelectionHandlePosition.extent,
-            controls: widget.controls,
+            selectionOverlay: this,
           ),
         ],
       ),
@@ -164,23 +191,8 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   // Private members
   //
 
-  /// Global position of last TapDown event.
-  Offset _lastTapDownPosition;
-
-  /// Global position of last TapDown which is potentially a long press.
-  Offset _longPressPosition;
-
-  OverlayEntry _toolbar;
-  AnimationController _toolbarController;
-
-  ZefyrScope _editor;
-  TextSelection _selection;
-  FocusOwner _focusOwner;
-
-  bool _didCaretTap = false;
-
   void _handleChange() {
-    if (_selection != _editor.selection || _focusOwner != _editor.focusOwner) {
+    if (_selection != _scope.selection || _focusOwner != _scope.focusOwner) {
       _updateToolbar();
     }
   }
@@ -190,14 +202,16 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
       return;
     }
 
-    final selection = _editor.selection;
-    final focusOwner = _editor.focusOwner;
+    final selection = _scope.selection;
+    final focusOwner = _scope.focusOwner;
     setState(() {
-      if (focusOwner != FocusOwner.editor) {
+      if (shouldHideControls && isToolbarVisible) {
         hideToolbar();
       } else {
         if (_selection != selection) {
-          if (selection.isCollapsed && isToolbarVisible) hideToolbar();
+          if (selection.isCollapsed && isToolbarVisible) {
+            hideToolbar();
+          }
           _toolbar?.markNeedsBuild();
           if (!selection.isCollapsed && isToolbarHidden) showToolbar();
         } else {
@@ -232,7 +246,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
     RenderEditableProxyBox box = _getEditableBox(result);
     if (box == null) {
-      box = _editor.renderContext.closestBoxForGlobalPoint(globalPoint);
+      box = _scope.renderContext.closestBoxForGlobalPoint(globalPoint);
     }
     if (box == null) return null;
 
@@ -252,7 +266,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     } else {
       _didCaretTap = true;
     }
-    widget.controller.updateSelection(selection, source: ChangeSource.local);
+    _scope.controller.updateSelection(selection, source: ChangeSource.local);
   }
 
   void _handleLongPress() {
@@ -271,21 +285,20 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
       baseOffset: word.start,
       extentOffset: word.end,
     );
-    widget.controller.updateSelection(selection, source: ChangeSource.local);
+    _scope.controller.updateSelection(selection, source: ChangeSource.local);
   }
 
-  // TODO: these methods should also take into account enabled state.
   @override
-  bool get copyEnabled => _editor.isEditable;
+  bool get copyEnabled => _scope.mode.canSelect && !_selection.isCollapsed;
 
   @override
-  bool get cutEnabled => _editor.isEditable;
+  bool get cutEnabled => _scope.mode.canEdit && !_selection.isCollapsed;
 
   @override
-  bool get pasteEnabled => _editor.isEditable;
+  bool get pasteEnabled => _scope.mode.canEdit;
 
   @override
-  bool get selectAllEnabled => _editor.isEditable;
+  bool get selectAllEnabled => _scope.mode.canSelect;
 }
 
 enum _SelectionHandlePosition { base, extent }
@@ -294,11 +307,12 @@ class SelectionHandleDriver extends StatefulWidget {
   const SelectionHandleDriver({
     Key key,
     @required this.position,
-    @required this.controls,
-  }) : super(key: key);
+    @required this.selectionOverlay,
+  })  : assert(selectionOverlay != null),
+        super(key: key);
 
   final _SelectionHandlePosition position;
-  final TextSelectionControls controls;
+  final _ZefyrSelectionOverlayState selectionOverlay;
 
   @override
   _SelectionHandleDriverState createState() =>
@@ -361,10 +375,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
 
   @override
   Widget build(BuildContext context) {
-    if (selection == null ||
-        selection.isCollapsed ||
-        widget.controls == null ||
-        _scope.focusOwner != FocusOwner.editor) {
+    if (widget.selectionOverlay.shouldHideControls) {
       return new Container();
     }
     final block = _scope.renderContext.boxForTextOffset(documentOffset);
@@ -404,11 +415,12 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
       point.dy.clamp(0.0, viewport.height),
     );
 
-    final Offset handleAnchor = widget.controls.getHandleAnchor(
+    final Offset handleAnchor =
+        widget.selectionOverlay.controls.getHandleAnchor(
       type,
       block.preferredLineHeight,
     );
-    final Size handleSize = widget.controls.getHandleSize(
+    final Size handleSize = widget.selectionOverlay.controls.getHandleSize(
       block.preferredLineHeight,
     );
     final Rect handleRect = Rect.fromLTWH(
@@ -451,7 +463,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
               right: padding.right,
               bottom: padding.bottom,
             ),
-            child: widget.controls.buildHandle(
+            child: widget.selectionOverlay.controls.buildHandle(
               context,
               type,
               block.preferredLineHeight,
@@ -525,22 +537,20 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
 class _SelectionToolbar extends StatefulWidget {
   const _SelectionToolbar({
     Key key,
-    @required this.scope,
-    @required this.controls,
-    @required this.delegate,
+    @required this.selectionOverlay,
   }) : super(key: key);
 
-  final ZefyrScope scope;
-  final TextSelectionControls controls;
-  final TextSelectionDelegate delegate;
+  final _ZefyrSelectionOverlayState selectionOverlay;
 
   @override
   _SelectionToolbarState createState() => new _SelectionToolbarState();
 }
 
 class _SelectionToolbarState extends State<_SelectionToolbar> {
-  ZefyrScope get editable => widget.scope;
-  TextSelection get selection => widget.delegate.textEditingValue.selection;
+  TextSelectionControls get controls => widget.selectionOverlay.controls;
+  ZefyrScope get scope => widget.selectionOverlay.scope;
+  TextSelection get selection =>
+      widget.selectionOverlay.textEditingValue.selection;
 
   @override
   Widget build(BuildContext context) {
@@ -549,8 +559,7 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
 
   Widget _buildToolbar(BuildContext context) {
     final base = selection.baseOffset;
-    // TODO: Editable is not refreshed and may contain stale renderContext instance.
-    final block = editable.renderContext.boxForTextOffset(base);
+    final block = scope.renderContext.boxForTextOffset(base);
     if (block == null) {
       return Container();
     }
@@ -584,8 +593,13 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
       block.localToGlobal(block.size.bottomRight(Offset.zero)),
     );
 
-    final toolbar = widget.controls.buildToolbar(context, editingRegion,
-        block.preferredLineHeight, midpoint, endpoints, widget.delegate);
+    final toolbar = controls.buildToolbar(
+        context,
+        editingRegion,
+        block.preferredLineHeight,
+        midpoint,
+        endpoints,
+        widget.selectionOverlay);
     return new CompositedTransformFollower(
       link: block.layerLink,
       showWhenUnlinked: false,
