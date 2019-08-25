@@ -1,8 +1,8 @@
 # Summary
 
-## [About](README.md)
+## About
 
-## [Quick Start](doc/quick-start.md)
+## Quick Start
 
 ## Concepts
 
@@ -10,4 +10,4 @@
 * [Attributes](doc/attributes.md)
 * [Heuristic rules](doc/heuristics.md)
 
-## [FAQ](doc/faq.md)
+## FAQ
