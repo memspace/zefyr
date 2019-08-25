@@ -128,5 +128,5 @@ fairly simple and predictable.
 Learn more about other building blocks of Notus documents in
 documentation for [attributes][] and [heuristics][].
 
-[heuristics]: /doc/heuristics.md
-[attributes]: /doc/attributes.md
+[heuristics]: heuristics.md
+[attributes]: attributes.md
