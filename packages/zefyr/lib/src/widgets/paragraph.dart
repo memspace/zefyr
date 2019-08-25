@@ -22,7 +22,7 @@ class ZefyrParagraph extends StatelessWidget {
     if (blockStyle != null) {
       style = style.merge(blockStyle);
     }
-    return new RawZefyrLine(
+    return RawZefyrLine(
       node: node,
       style: style,
       padding: theme.paragraphTheme.padding,
@@ -46,7 +46,7 @@ class ZefyrHeading extends StatelessWidget {
     if (blockStyle != null) {
       style = style.merge(blockStyle);
     }
-    return new RawZefyrLine(
+    return RawZefyrLine(
       node: node,
       style: style,
       padding: theme.padding,
@@ -63,6 +63,6 @@ class ZefyrHeading extends StatelessWidget {
     } else if (style == NotusAttribute.heading.level3) {
       return theme.headingTheme.level3;
     }
-    throw new UnimplementedError('Unsupported heading style $style');
+    throw UnimplementedError('Unsupported heading style $style');
   }
 }

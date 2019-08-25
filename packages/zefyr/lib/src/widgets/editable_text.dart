@@ -76,7 +76,7 @@ class ZefyrEditableText extends StatefulWidget {
   final EdgeInsets padding;
 
   @override
-  _ZefyrEditableTextState createState() => new _ZefyrEditableTextState();
+  _ZefyrEditableTextState createState() => _ZefyrEditableTextState();
 }
 
 class _ZefyrEditableTextState extends State<ZefyrEditableText>
@@ -160,7 +160,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     _focusNode = widget.focusNode;
     super.initState();
     _focusAttachment = _focusNode.attach(context);
-    _input = new InputConnectionController(_handleRemoteValueChange);
+    _input = InputConnectionController(_handleRemoteValueChange);
     _updateSubscriptions();
   }
 
@@ -228,26 +228,26 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   Widget _defaultChildBuilder(BuildContext context, Node node) {
     if (node is LineNode) {
       if (node.hasEmbed) {
-        return new RawZefyrLine(node: node);
+        return RawZefyrLine(node: node);
       } else if (node.style.contains(NotusAttribute.heading)) {
-        return new ZefyrHeading(node: node);
+        return ZefyrHeading(node: node);
       }
-      return new ZefyrParagraph(node: node);
+      return ZefyrParagraph(node: node);
     }
 
     final BlockNode block = node;
     final blockStyle = block.style.get(NotusAttribute.block);
     if (blockStyle == NotusAttribute.block.code) {
-      return new ZefyrCode(node: block);
+      return ZefyrCode(node: block);
     } else if (blockStyle == NotusAttribute.block.bulletList) {
-      return new ZefyrList(node: block);
+      return ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.numberList) {
-      return new ZefyrList(node: block);
+      return ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.quote) {
-      return new ZefyrQuote(node: block);
+      return ZefyrQuote(node: block);
     }
 
-    throw new UnimplementedError('Block format $blockStyle.');
+    throw UnimplementedError('Block format $blockStyle.');
   }
 
   void _updateSubscriptions([ZefyrEditableText oldWidget]) {

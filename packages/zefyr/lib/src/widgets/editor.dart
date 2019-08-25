@@ -70,7 +70,7 @@ class ZefyrEditor extends StatefulWidget {
   final EdgeInsets padding;
 
   @override
-  _ZefyrEditorState createState() => new _ZefyrEditorState();
+  _ZefyrEditorState createState() => _ZefyrEditorState();
 }
 
 class _ZefyrEditorState extends State<ZefyrEditor> {
@@ -178,7 +178,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
 
   @override
   Widget build(BuildContext context) {
-    Widget editable = new ZefyrEditableText(
+    Widget editable = ZefyrEditableText(
       controller: _scope.controller,
       focusNode: _scope.focusNode,
       imageDelegate: _scope.imageDelegate,

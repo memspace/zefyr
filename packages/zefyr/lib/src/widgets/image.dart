@@ -75,7 +75,7 @@ class _EditableImage extends SingleChildRenderObjectWidget {
 
   @override
   RenderEditableImage createRenderObject(BuildContext context) {
-    return new RenderEditableImage(node: node);
+    return RenderEditableImage(node: node);
   }
 
   @override
@@ -129,16 +129,16 @@ class RenderEditableImage extends RenderBox
     if (local.isCollapsed) {
       final dx = local.extentOffset == 0 ? _childOffset.dx : size.width;
       return [
-        new ui.TextBox.fromLTRBD(
+        ui.TextBox.fromLTRBD(
             dx, 0.0, dx, size.height - kPaddingBottom, TextDirection.ltr),
       ];
     }
 
     final rect = _childRect;
     return [
-      new ui.TextBox.fromLTRBD(
+      ui.TextBox.fromLTRBD(
           rect.left, rect.top, rect.left, rect.bottom, TextDirection.ltr),
-      new ui.TextBox.fromLTRBD(
+      ui.TextBox.fromLTRBD(
           rect.right, rect.top, rect.right, rect.bottom, TextDirection.ltr),
     ];
   }
@@ -150,13 +150,13 @@ class RenderEditableImage extends RenderBox
     if (offset.dx > size.width / 2) {
       position++;
     }
-    return new TextPosition(offset: position);
+    return TextPosition(offset: position);
   }
 
   @override
   TextRange getWordBoundary(TextPosition position) {
     final start = _node.documentOffset;
-    return new TextRange(start: start, end: start + 1);
+    return TextRange(start: start, end: start + 1);
   }
 
   @override
@@ -169,10 +169,10 @@ class RenderEditableImage extends RenderBox
   @override
   Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
     final pos = position.offset - node.documentOffset;
-    Offset caretOffset = _childOffset - new Offset(kHorizontalPadding, 0.0);
+    Offset caretOffset = _childOffset - Offset(kHorizontalPadding, 0.0);
     if (pos == 1) {
-      caretOffset = caretOffset +
-          new Offset(_lastChildSize.width + kHorizontalPadding, 0.0);
+      caretOffset =
+          caretOffset + Offset(_lastChildSize.width + kHorizontalPadding, 0.0);
     }
     return caretOffset;
   }
@@ -183,12 +183,12 @@ class RenderEditableImage extends RenderBox
     final localSelection = getLocalSelection(selection);
     assert(localSelection != null);
     if (!localSelection.isCollapsed) {
-      final Paint paint = new Paint()
+      final Paint paint = Paint()
         ..color = selectionColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3.0;
-      final rect = new Rect.fromLTWH(
-          0.0, 0.0, _lastChildSize.width, _lastChildSize.height);
+      final rect =
+          Rect.fromLTWH(0.0, 0.0, _lastChildSize.width, _lastChildSize.height);
       context.canvas.drawRect(rect.shift(offset + _childOffset), paint);
     }
   }
@@ -204,12 +204,12 @@ class RenderEditableImage extends RenderBox
   Offset get _childOffset {
     final dx = (size.width - _lastChildSize.width) / 2 + kHorizontalPadding;
     final dy = (size.height - _lastChildSize.height - kPaddingBottom) / 2;
-    return new Offset(dx, dy);
+    return Offset(dx, dy);
   }
 
   Rect get _childRect {
-    return new Rect.fromLTWH(_childOffset.dx, _childOffset.dy,
-        _lastChildSize.width, _lastChildSize.height);
+    return Rect.fromLTWH(_childOffset.dx, _childOffset.dy, _lastChildSize.width,
+        _lastChildSize.height);
   }
 
   @override
@@ -226,8 +226,7 @@ class RenderEditableImage extends RenderBox
       );
       child.layout(childConstraints, parentUsesSize: true);
       _lastChildSize = child.size;
-      size = new Size(
-          constraints.maxWidth, _lastChildSize.height + kPaddingBottom);
+      size = Size(constraints.maxWidth, _lastChildSize.height + kPaddingBottom);
     } else {
       performResize();
     }
