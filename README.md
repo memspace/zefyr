@@ -9,19 +9,12 @@ request or found a bug, please file it at the [issue tracker][].
 
 ### Documentation
 
-* [Quick Start][quick_start]
-* [Data Format and Document Model][data_and_document]
-* [Style attributes][attributes]
-* [Heuristic rules][heuristics]
-* [Images][images]
-* [FAQ][faq]
-
-[quick_start]: /doc/quick_start.md
-[data_and_document]: /doc/data_and_document.md
-[attributes]: /doc/attributes.md
-[heuristics]: /doc/heuristics.md
-[images]: /doc/images.md
-[faq]: /doc/faq.md
+* [Quick Start](doc/quick-start.md)
+* [Data Format and Document Model](doc/data-and-document.md)
+* [Style attributes](doc/attributes.md)
+* [Heuristic rules](doc/heuristics.md)
+* [Images](doc/images.md)
+* [FAQ](doc/faq.md)
 
 ## Clean and modern look
 
@@ -52,7 +45,7 @@ collaborative editing use cases or whenever there is a need for
 conflict-free resolution of changes.
 
 > Zefyr editor uses Quill.js **Delta** as underlying data format. Read
-> more about Zefyr and Deltas in our [documentation][data_and_document].
+> more about Zefyr and Deltas in our [documentation](doc/data-and-document.md).
 > Make sure to checkout [official documentation][delta] for Delta format
 > as well.
 
