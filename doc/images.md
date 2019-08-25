@@ -166,9 +166,3 @@ class MyAppPageState extends State<MyAppPage> {
   }
 }
 ```
-
-### Previous
-
-* [Heuristics][heuristics]
-
-[heuristics]: /doc/heuristics.md

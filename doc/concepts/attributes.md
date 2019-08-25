@@ -117,15 +117,3 @@ The `block` attribute in Notus documents is line-scoped. To change a
 group of lines from "bullet list" to "number list" we need to update
 block style on each of the lines individually. Zefyr editor abstracts
 away such details with help of [heuristic rules][heuristics].
-
-### Next up
-
-* [Heuristics][heuristics]
-
-[heuristics]: /doc/heuristics.md
-
-### Previous
-
-* [Data Format and Document Model][data_and_document]
-
-[data_and_document]: /doc/data_and_document.md

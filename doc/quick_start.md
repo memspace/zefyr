@@ -75,9 +75,3 @@ class MyWidgetState extends State<MyWidget> {
 
 In following sections you will learn more about document
 model, Deltas, attributes and other aspects of the editor.
-
-### Next
-
-* [Data Format and Document Model][data_and_docs]
-
-[data_and_docs]: /doc/data_and_document.md

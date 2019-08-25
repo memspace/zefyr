@@ -130,11 +130,3 @@ documentation for [attributes][] and [heuristics][].
 
 [heuristics]: /doc/heuristics.md
 [attributes]: /doc/attributes.md
-
-### Next
-
-* [Attributes](/doc/attributes.md)
-
-### Previous
-
-* [Usage](/doc/usage.md)
