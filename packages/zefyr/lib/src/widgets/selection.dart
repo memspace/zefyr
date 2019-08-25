@@ -31,8 +31,7 @@ class ZefyrSelectionOverlay extends StatefulWidget {
   final TextSelectionControls controls;
 
   @override
-  _ZefyrSelectionOverlayState createState() =>
-      new _ZefyrSelectionOverlayState();
+  _ZefyrSelectionOverlayState createState() => _ZefyrSelectionOverlayState();
 }
 
 class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
@@ -164,27 +163,27 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
   @override
   Widget build(BuildContext context) {
-    final overlay = new GestureDetector(
+    final overlay = GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTapDown: _handleTapDown,
       onTap: _handleTap,
       onTapCancel: _handleTapCancel,
       onLongPress: _handleLongPress,
-      child: new Stack(
+      child: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          new SelectionHandleDriver(
+          SelectionHandleDriver(
             position: _SelectionHandlePosition.base,
             selectionOverlay: this,
           ),
-          new SelectionHandleDriver(
+          SelectionHandleDriver(
             position: _SelectionHandlePosition.extent,
             selectionOverlay: this,
           ),
         ],
       ),
     );
-    return new Container(child: overlay);
+    return Container(child: overlay);
   }
 
   //
@@ -241,7 +240,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     assert(_lastTapDownPosition != null);
     final globalPoint = _lastTapDownPosition;
     _lastTapDownPosition = null;
-    HitTestResult result = new HitTestResult();
+    HitTestResult result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
 
     RenderEditableProxyBox box = _getEditableBox(result);
@@ -252,7 +251,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
     final localPoint = box.globalToLocal(globalPoint);
     final position = box.getPositionForOffset(localPoint);
-    final selection = new TextSelection.collapsed(
+    final selection = TextSelection.collapsed(
       offset: position.offset,
       affinity: position.affinity,
     );
@@ -272,7 +271,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   void _handleLongPress() {
     final Offset globalPoint = _longPressPosition;
     _longPressPosition = null;
-    HitTestResult result = new HitTestResult();
+    HitTestResult result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
     final box = _getEditableBox(result);
     if (box == null) {
@@ -281,7 +280,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     final localPoint = box.globalToLocal(globalPoint);
     final position = box.getPositionForOffset(localPoint);
     final word = box.getWordBoundary(position);
-    final selection = new TextSelection(
+    final selection = TextSelection(
       baseOffset: word.start,
       extentOffset: word.end,
     );
@@ -315,8 +314,7 @@ class SelectionHandleDriver extends StatefulWidget {
   final _ZefyrSelectionOverlayState selectionOverlay;
 
   @override
-  _SelectionHandleDriverState createState() =>
-      new _SelectionHandleDriverState();
+  _SelectionHandleDriverState createState() => _SelectionHandleDriverState();
 }
 
 class _SelectionHandleDriverState extends State<SelectionHandleDriver>
@@ -376,7 +374,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
   @override
   Widget build(BuildContext context) {
     if (widget.selectionOverlay.shouldHideControls) {
-      return new Container();
+      return Container();
     }
     final block = _scope.renderContext.boxForTextOffset(documentOffset);
     if (block == null) {
@@ -543,7 +541,7 @@ class _SelectionToolbar extends StatefulWidget {
   final _ZefyrSelectionOverlayState selectionOverlay;
 
   @override
-  _SelectionToolbarState createState() => new _SelectionToolbarState();
+  _SelectionToolbarState createState() => _SelectionToolbarState();
 }
 
 class _SelectionToolbarState extends State<_SelectionToolbar> {
@@ -565,7 +563,7 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
     }
     final boxes = block.getEndpointsForSelection(selection);
     // Find the horizontal midpoint, just above the selected text.
-    Offset midpoint = new Offset(
+    Offset midpoint = Offset(
       (boxes.length == 1)
           ? (boxes[0].start + boxes[0].end) / 2.0
           : (boxes[0].start + boxes[1].start) / 2.0,
@@ -588,7 +586,7 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
       ];
     }
 
-    final Rect editingRegion = new Rect.fromPoints(
+    final Rect editingRegion = Rect.fromPoints(
       block.localToGlobal(Offset.zero),
       block.localToGlobal(block.size.bottomRight(Offset.zero)),
     );
@@ -600,7 +598,7 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
         midpoint,
         endpoints,
         widget.selectionOverlay);
-    return new CompositedTransformFollower(
+    return CompositedTransformFollower(
       link: block.layerLink,
       showWhenUnlinked: false,
       offset: -editingRegion.topLeft,

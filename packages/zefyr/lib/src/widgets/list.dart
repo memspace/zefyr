@@ -31,15 +31,15 @@ class ZefyrList extends StatelessWidget {
         : theme.blockTheme.bulletList.padding;
     padding = padding.copyWith(left: theme.indentSize);
 
-    return new Padding(
+    return Padding(
       padding: padding,
-      child: new Column(children: items),
+      child: Column(children: items),
     );
   }
 
   Widget _buildItem(Node node, int index) {
     LineNode line = node;
-    return new ZefyrListItem(index: index, node: line);
+    return ZefyrListItem(index: index, node: line);
   }
 }
 
@@ -66,10 +66,10 @@ class ZefyrListItem extends StatelessWidget {
       final headingTheme = ZefyrHeading.themeOf(node, context);
       textStyle = headingTheme.textStyle;
       padding = headingTheme.padding;
-      content = new ZefyrHeading(node: node);
+      content = ZefyrHeading(node: node);
     } else {
       textStyle = theme.paragraphTheme.textStyle;
-      content = new RawZefyrLine(node: node, style: textStyle);
+      content = RawZefyrLine(node: node, style: textStyle);
     }
 
     Widget bullet =

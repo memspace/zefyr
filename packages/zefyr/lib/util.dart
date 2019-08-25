@@ -12,8 +12,8 @@ import 'package:quill_delta/quill_delta.dart';
 export 'src/fast_diff.dart';
 
 int getPositionDelta(Delta user, Delta actual) {
-  final userIter = new DeltaIterator(user);
-  final actualIter = new DeltaIterator(actual);
+  final userIter = DeltaIterator(user);
+  final actualIter = DeltaIterator(actual);
   int diff = 0;
   while (userIter.hasNext || actualIter.hasNext) {
     num length = math.min(userIter.peekLength(), actualIter.peekLength());
@@ -26,7 +26,7 @@ int getPositionDelta(Delta user, Delta actual) {
     } else if (userOp.isDelete && actualOp.isRetain) {
       diff += userOp.length;
     } else if (userOp.isRetain && actualOp.isInsert) {
-      if (actualOp.data.startsWith('\n') ) {
+      if (actualOp.data.startsWith('\n')) {
         // At this point user input reached its end (retain). If a heuristic
         // rule inserts a new line we should keep cursor on it's original position.
         continue;
