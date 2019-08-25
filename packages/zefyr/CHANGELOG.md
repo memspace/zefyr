@@ -10,6 +10,14 @@ This release contains breaking changes.
     - `ZefyrMode.view`: the same as `enabled: false`, read-only.
 * Added optional `selectionControls` field to `ZefyrEditor` and `ZefyrEditableText`. If not provided
   then by default uses platform-specific implementation.
+* Added support for "selectAll" action in selection toolbar.
+* Breaking change: removed `ZefyrDefaultImageDelegate` as well as dependency on
+  `image_picker` plugin. Users are required to provide their own implementation. If image delegate
+  is not provided then image toolbar button is disabled.
+* Breaking change: added `ZefyrImageDelegate.cameraSource` and `ZefyrImageDelegate.gallerySource`
+  fields. For users of `image_picker` plugin these should return `ImageSource.camera` and
+  `ImageSource.gallery` respectively. See documentation on implementing image support for more
+  details.
 
 ## 0.6.0
 

@@ -121,7 +121,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   @override
   void initState() {
     super.initState();
-    _imageDelegate = widget.imageDelegate ?? new ZefyrDefaultImageDelegate();
+    _imageDelegate = widget.imageDelegate;
   }
 
   @override
@@ -131,7 +131,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
     _scope.controller = widget.controller;
     _scope.focusNode = widget.focusNode;
     if (widget.imageDelegate != oldWidget.imageDelegate) {
-      _imageDelegate = widget.imageDelegate ?? new ZefyrDefaultImageDelegate();
+      _imageDelegate = widget.imageDelegate;
       _scope.imageDelegate = _imageDelegate;
     }
   }

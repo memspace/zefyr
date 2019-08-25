@@ -3,7 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:notus/notus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -279,14 +278,16 @@ class _ImageButtonState extends State<ImageButton> {
 
   void _pickFromCamera() async {
     final editor = ZefyrToolbar.of(context).editor;
-    final image = await editor.imageDelegate.pickImage(ImageSource.camera);
+    final image =
+        await editor.imageDelegate.pickImage(editor.imageDelegate.cameraSource);
     if (image != null)
       editor.formatSelection(NotusAttribute.embed.image(image));
   }
 
   void _pickFromGallery() async {
     final editor = ZefyrToolbar.of(context).editor;
-    final image = await editor.imageDelegate.pickImage(ImageSource.gallery);
+    final image = await editor.imageDelegate
+        .pickImage(editor.imageDelegate.gallerySource);
     if (image != null)
       editor.formatSelection(NotusAttribute.embed.image(image));
   }
