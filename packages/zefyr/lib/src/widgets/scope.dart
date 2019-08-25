@@ -25,11 +25,9 @@ class ZefyrScope extends ChangeNotifier {
   /// Creates a view-only scope.
   ///
   /// Normally used in [ZefyrView].
-  ZefyrScope.view({
-    @required ZefyrMode mode,
-    @required ZefyrImageDelegate imageDelegate,
-  })  : assert(imageDelegate != null),
-        isEditable = false,
+  ZefyrScope.view({ZefyrImageDelegate imageDelegate})
+      : isEditable = false,
+        _mode = ZefyrMode.view,
         _imageDelegate = imageDelegate;
 
   /// Creates editable scope.
@@ -38,12 +36,11 @@ class ZefyrScope extends ChangeNotifier {
   ZefyrScope.editable({
     @required ZefyrMode mode,
     @required ZefyrController controller,
-    @required ZefyrImageDelegate imageDelegate,
     @required FocusNode focusNode,
     @required FocusScopeNode focusScope,
+    ZefyrImageDelegate imageDelegate,
   })  : assert(mode != null),
         assert(controller != null),
-        assert(imageDelegate != null),
         assert(focusNode != null),
         assert(focusScope != null),
         isEditable = true,
@@ -69,7 +66,6 @@ class ZefyrScope extends ChangeNotifier {
   ZefyrImageDelegate _imageDelegate;
   ZefyrImageDelegate get imageDelegate => _imageDelegate;
   set imageDelegate(ZefyrImageDelegate value) {
-    assert(value != null);
     if (_imageDelegate != value) {
       _imageDelegate = value;
       notifyListeners();

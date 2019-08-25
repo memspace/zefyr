@@ -9,7 +9,6 @@ import 'code.dart';
 import 'common.dart';
 import 'image.dart';
 import 'list.dart';
-import 'mode.dart';
 import 'paragraph.dart';
 import 'quote.dart';
 import 'scope.dart';
@@ -37,10 +36,7 @@ class ZefyrViewState extends State<ZefyrView> {
   @override
   void initState() {
     super.initState();
-    _scope = ZefyrScope.view(
-      mode: ZefyrMode.view,
-      imageDelegate: widget.imageDelegate,
-    );
+    _scope = ZefyrScope.view(imageDelegate: widget.imageDelegate);
   }
 
   @override
