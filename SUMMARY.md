@@ -1,5 +1,7 @@
 # Summary
 
+* [Quick Start](doc/quick-start.md)
+
 ## Concepts
 
 * [Data Format and Document Model](doc/concepts/data-and-document.md)
