@@ -9,7 +9,7 @@ request or found a bug, please file it at the [issue tracker][].
 
 ### Documentation
 
-* [Quick Start](doc/quick-start.md)
+* [Quick Start](./doc/quick-start.md)
 * [Data Format and Document Model](doc/concepts/data-and-document.md)
 * [Style attributes](doc/concepts/attributes.md)
 * [Heuristic rules](doc/concepts/heuristics.md)
