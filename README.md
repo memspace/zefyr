@@ -7,15 +7,6 @@ request or found a bug, please file it at the [issue tracker][].
 
 [issue tracker]: https://github.com/memspace/zefyr/issues
 
-### Documentation
-
-* [Quick Start](doc/quick-start.md)
-* [Data Format and Document Model](doc/concepts/data-and-document.md)
-* [Style attributes](doc/concepts/attributes.md)
-* [Heuristic rules](doc/concepts/heuristics.md)
-* [Images](doc/images.md)
-* [FAQ](doc/faq.md)
-
 ## Clean and modern look
 
 Zefyr's rich text editor is built with simplicity and flexibility in
@@ -45,7 +36,7 @@ collaborative editing use cases or whenever there is a need for
 conflict-free resolution of changes.
 
 > Zefyr editor uses Quill.js **Delta** as underlying data format. Read
-> more about Zefyr and Deltas in our [documentation](doc/data-and-document.md).
+> more about Zefyr and Deltas in our [documentation](doc/concepts/data-and-document.md).
 > Make sure to checkout [official documentation][delta] for Delta format
 > as well.
 

@@ -18,7 +18,7 @@ essentially JSON, and is human readable.
 [Delta]: https://quilljs.com/docs/delta/
 [ot]: https://en.wikipedia.org/wiki/Operational_transformation
 [github-delta]: https://github.com/quilljs/delta
-[pub-delta]: https://pub.dartlang.com/packages/quill_delta
+[pub-delta]: https://pub.dev/packages/quill_delta
 
 ### Deltas quick start
 

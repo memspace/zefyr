@@ -1,7 +1,7 @@
 ## Style Attributes
 
 > If you haven't yet, read introduction to Zefyr document model called
-> Notus [here](data-and-document.md);
+> Notus [here](data-and-document.md).
 
 Style attributes in Notus documents are simple key-value pairs, where
 keys identify the attribute and value describes the style applied, for
