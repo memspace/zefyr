@@ -1,4 +1,4 @@
-## Images
+## Embedding Images
 
 > Note that Image API is considered experimental and is likely to be
 > changed in backward incompatible ways. If this happens all changes will be
