@@ -91,13 +91,9 @@ for more details.
 Notus documents are represented as a tree of nodes. There are 3 main
 types of nodes:
 
-* `LeafNode` - a leaf node which represents a segment of styled text
-  within a document. There are two kinds of leaf nodes - text and
-  embeds.
-* `LineNode` - represents an individual line of text within a document.
-  Line nodes are containers for leaf nodes.
-* `Block` - represents a group of adjacent lines which share the same
-  style. Examples of blocks include lists, quotes or code blocks.
+* `LeafNode` - a leaf node which represents a segment of styled text within a document. There are two kinds of leaf nodes - text and embeds.
+* `LineNode` - represents an individual line of text within a document. Line nodes are containers for leaf nodes.
+* `Block` - represents a group of adjacent lines which share the same style. Examples of blocks include lists, quotes or code blocks.
 
 Given above description, here is ASCII-style visualization of a Notus
 document tree:
