@@ -2,8 +2,10 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
+
 import 'src/form.dart';
 import 'src/full_page.dart';
+import 'src/quick_start.dart';
 import 'src/view.dart';
 
 void main() {
@@ -16,12 +18,13 @@ class ZefyrApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Zefyr Editor',
-      theme: ThemeData(primarySwatch: Colors.cyan),
+//      theme: ThemeData(primarySwatch: Colors.cyan),
       home: HomePage(),
       routes: {
         "/fullPage": buildFullPage,
         "/form": buildFormPage,
         "/view": buildViewPage,
+        "/quick-start": buildQuickStart,
       },
     );
   }
@@ -36,6 +39,10 @@ class ZefyrApp extends StatelessWidget {
 
   Widget buildViewPage(BuildContext context) {
     return ViewScreen();
+  }
+
+  Widget buildQuickStart(BuildContext context) {
+    return EditorPage();
   }
 }
 
@@ -68,6 +75,12 @@ class HomePage extends StatelessWidget {
           FlatButton(
             onPressed: () => nav.pushNamed('/view'),
             child: Text('Read-only embeddable view'),
+            color: Colors.lightBlue,
+            textColor: Colors.white,
+          ),
+          FlatButton(
+            onPressed: () => nav.pushNamed('/quick-start'),
+            child: Text('Quick Start Tutorial'),
             color: Colors.lightBlue,
             textColor: Colors.white,
           ),

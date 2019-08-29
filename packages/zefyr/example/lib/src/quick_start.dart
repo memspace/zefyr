@@ -1,30 +1,3 @@
-## Quick Start
-
-Zefyr project consists of two packages:
-
-1. [zefyr](https://pub.dev/packages/zefyr) - Flutter package which provides the UI part.
-2. [notus](https://pub.dev/packages/notus) - platform-agnostic package which provides document model used in Zefyr editor.
-
-### Installation
-
-> We assume that you already installed [Flutter](https://flutter.dev/docs/get-started/install) and created a [project](https://flutter.dev/docs/get-started/test-drive).
-
-Add `zefyr` package as a dependency to `pubspec.yaml` of your project:
-
-```yaml
-dependencies:
-  zefyr: [latest_version]
-```
-
-And run `flutter packages get`, this installs both `zefyr` and `notus` packages.
-
-### Usage
-
-We start by creating a `StatefulWidget` that will be responsible for handling
-all the state and interactions with Zefyr. In this example we'll assume
-that there is dedicated editor page in our app:
-
-```dart
 import 'package:flutter/material.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
@@ -75,13 +48,3 @@ class EditorPageState extends State<EditorPage> {
     return NotusDocument.fromDelta(delta);
   }
 }
-```
-
-In the above example we created a page with an AppBar and Zefyr editor in its
-body. We also initialize editor with a simple one-line document. Here is how
-it might look when we run the app and navigate to editor page:
-
-<img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-screen-01.png" width="375">
-
-At this point we can already edit the document and apply styles, however if
-we navigate back from this page our changes will be lost. Let's fix this.
