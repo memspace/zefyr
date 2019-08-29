@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
@@ -28,7 +31,17 @@ class EditorPageState extends State<EditorPage> {
     // Note that the editor requires special `ZefyrScaffold` widget to be
     // present somewhere up the widget tree.
     return Scaffold(
-      appBar: AppBar(title: Text("Editor page")),
+      appBar: AppBar(
+        title: Text("Editor page"),
+        actions: <Widget>[
+          Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.save),
+              onPressed: () => _saveDocument(context),
+            ),
+          )
+        ],
+      ),
       body: ZefyrScaffold(
         child: ZefyrEditor(
           padding: EdgeInsets.all(16),
@@ -43,8 +56,24 @@ class EditorPageState extends State<EditorPage> {
   NotusDocument _loadDocument() {
     // For simplicity we hardcode a simple document with one line of text
     // saying "Zefyr Quick Start".
-    final Delta delta = Delta()..insert("Zefyr Quick Start\n");
+//    final Delta delta = Delta()..insert("Zefyr Quick Start\n");
     // Note that delta must always end with newline.
-    return NotusDocument.fromDelta(delta);
+//    return NotusDocument.fromDelta(delta);
+
+    final file = File(Directory.systemTemp.path + "/quick_start.json");
+    final contents = file.readAsStringSync();
+    return NotusDocument.fromJson(jsonDecode(contents));
+  }
+
+  void _saveDocument(BuildContext context) {
+    // Notus documents can be easily serialized to JSON by passing to
+    // `jsonEncode` directly:
+    final contents = jsonEncode(_controller.document);
+    // For this example we save our document to a temporary file.
+    final file = File(Directory.systemTemp.path + "/quick_start.json");
+    // And show a snack bar on success.
+    file.writeAsString(contents).then((_) {
+      Scaffold.of(context).showSnackBar(SnackBar(content: Text("Saved.")));
+    });
   }
 }
