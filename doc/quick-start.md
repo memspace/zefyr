@@ -2,12 +2,13 @@
 
 Zefyr project consists of two packages:
 
-1. [zefyr](https://pub.dev/packages/zefyr) - Flutter package which provides the UI part.
-2. [notus](https://pub.dev/packages/notus) - platform-agnostic package which provides document model used in Zefyr editor.
+1. [zefyr](https://pub.dev/packages/zefyr) - Flutter package which provides all necessary UI widgets
+2. [notus](https://pub.dev/packages/notus) - package containing document model used by `zefyr` package. `notus` package is platform-agnostic and can be used outside of Flutter apps (web or server-side Dart projects).
 
 ### Installation
 
-> We assume that you already installed [Flutter](https://flutter.dev/docs/get-started/install) and created a [project](https://flutter.dev/docs/get-started/test-drive).
+Before installing Zefyr make sure that you installed [Flutter](https://flutter.dev/docs/get-started/install)
+and created a [project](https://flutter.dev/docs/get-started/test-drive).
 
 Add `zefyr` package as a dependency to `pubspec.yaml` of your project:
 
@@ -109,7 +110,7 @@ class EditorPageState extends State<EditorPage> {
 ```
 
 > Notice that we pass `BuildContext` to `_saveDocument`. This is required
-> to get access to our page's `Scaffold` state, so that we can show `SnackBar`.
+> to get access to our page's `Scaffold` state, so that we can show a `SnackBar`.
 
 Now we just need to add a button to the AppBar, so we need to modify `build`
 method as follows:
@@ -117,7 +118,7 @@ method as follows:
 ```dart
 class EditorPageState extends State<EditorPage> {
 
-  // ... replace build method with following
+  // ... replace build() method with following
 
   @override
   Widget build(BuildContext context) {
