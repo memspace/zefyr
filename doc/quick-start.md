@@ -146,9 +146,7 @@ class HomePage extends StatelessWidget {
 
 Here is how it might look when we run the app and navigate to editor page:
 
-<video width="600" src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-rec-01.mp4" type="video/mp4" loop>
-  Your browser does not support the video tag.
-</video>
+<img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-rec-01.gif" width="600">
 
 At this point we can already edit the document and apply styles, however if
 we navigate back from this page our changes will be lost. Let's fix this and
