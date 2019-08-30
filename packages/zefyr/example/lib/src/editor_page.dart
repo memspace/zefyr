@@ -56,13 +56,13 @@ class EditorPageState extends State<EditorPage> {
   NotusDocument _loadDocument() {
     // For simplicity we hardcode a simple document with one line of text
     // saying "Zefyr Quick Start".
-//    final Delta delta = Delta()..insert("Zefyr Quick Start\n");
-    // Note that delta must always end with newline.
-//    return NotusDocument.fromDelta(delta);
+    final Delta delta = Delta()..insert("Zefyr Quick Start\n");
+//     Note that delta must always end with newline.
+    return NotusDocument.fromDelta(delta);
 
-    final file = File(Directory.systemTemp.path + "/quick_start.json");
-    final contents = file.readAsStringSync();
-    return NotusDocument.fromJson(jsonDecode(contents));
+//    final file = File(Directory.systemTemp.path + "/quick_start.json");
+//    final contents = file.readAsStringSync();
+//    return NotusDocument.fromJson(jsonDecode(contents));
   }
 
   void _saveDocument(BuildContext context) {

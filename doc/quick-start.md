@@ -3,11 +3,11 @@
 In this tutorial you'll create a simple Flutter app that supports rich text
 editing with Zefyr. What you'll learn:
 
-* How to create a new screen with Zefyr editor
-* Basic widget layout required by Zefyr editor
+* How to create a new screen for the editor
+* Basic widget layout required by Zefyr
 * How to load and save documents using JSON serialization
 
-### Create a project
+### 01. Create a new Flutter project
 
 If you haven't installed Flutter yet then [install it first](https://flutter.dev/docs/get-started/install).
 
@@ -20,12 +20,7 @@ $ cd myapp
 
 For more methods of creating a project see [official documentation](https://flutter.dev/docs/get-started/test-drive).
 
-### Add Zefyr to your project
-
-Zefyr consists of two packages:
-
-1. [zefyr](https://pub.dev/packages/zefyr) - Flutter package which provides all necessary UI widgets
-2. [notus](https://pub.dev/packages/notus) - package containing document model used by `zefyr` package. `notus` package is platform-agnostic and can be used outside of Flutter apps (web or server-side Dart projects).
+### 02. Add Zefyr to your new project
 
 Add `zefyr` package as a dependency to `pubspec.yaml` of your new project:
 
@@ -34,9 +29,15 @@ dependencies:
   zefyr: [latest_version]
 ```
 
-And run `flutter packages get`, this installs both `zefyr` and `notus` packages.
+And run `flutter packages get`.
+This installs [zefyr](https://pub.dev/packages/zefyr) and all required
+dependencies, including [notus](https://pub.dev/packages/notus) package which
+implements Zefyr's document model.
 
-### Create editor page
+> Notus package is platform-agnostic and can be used outside of Flutter apps,
+> that is, on the web or server-side.
+
+### 03. Create editor page
 
 We start by creating a `StatefulWidget` that will be responsible for handling
 all the state and interactions with Zefyr. In this example we'll assume
@@ -74,7 +75,7 @@ class EditorPageState extends State<EditorPage> {
   @override
   Widget build(BuildContext context) {
     // Note that the editor requires special `ZefyrScaffold` widget to be
-    // present somewhere up the widget tree.
+    // one of its parents.
     return Scaffold(
       appBar: AppBar(title: Text("Editor page")),
       body: ZefyrScaffold(
@@ -91,14 +92,14 @@ class EditorPageState extends State<EditorPage> {
   NotusDocument _loadDocument() {
     // For simplicity we hardcode a simple document with one line of text
     // saying "Zefyr Quick Start".
+    // (Note that delta must always end with newline.)
     final Delta delta = Delta()..insert("Zefyr Quick Start\n");
-    // Note that delta must always end with newline.
     return NotusDocument.fromDelta(delta);
   }
 }
 ```
 
-In the above example we created a page with an AppBar and Zefyr editor in its
+Above example widget creates a page with an `AppBar` and Zefyr editor in its
 body. We also initialize our editor with a simple one-line document.
 
 Now we need to wire it up with our app. Open `lib/main.dart` and replace
@@ -125,11 +126,29 @@ class QuickStartApp extends StatelessWidget {
     );
   }
 }
+
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final navigator = Navigator.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text("Quick Start")),
+      body: Center(
+        child: FlatButton(
+          child: Text("Open editor"),
+          onPressed: () => navigator.pushNamed("/editor"),
+        ),
+      ),
+    );
+  }
+}
 ```
 
 Here is how it might look when we run the app and navigate to editor page:
 
-<img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-screen-01.png" width="375">
+<video width="600" src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-rec-01.mp4" type="video/mp4" loop>
+  Your browser does not support the video tag.
+</video>
 
 At this point we can already edit the document and apply styles, however if
 we navigate back from this page our changes will be lost. Let's fix this and
