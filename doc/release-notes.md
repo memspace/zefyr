@@ -1,6 +1,6 @@
 # Release notes
 
-Current version of Zefyr editor is `0.7` ([changelog](packages/zefyr/CHANGELOG.md)).
+Current version of Zefyr editor is `0.7` ([changelog](./../packages/zefyr/CHANGELOG.md)).
 
 ### 0.7
 
