@@ -148,6 +148,8 @@ Here is how it might look when we run the app and navigate to editor page:
 
 <img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-rec-01.gif" width="600">
 
+### 04. Save document to a JSON file
+
 At this point we can already edit the document and apply styles, however if
 we navigate back from this page our changes will be lost. Let's fix this and
 add a button which saves the document to the device's file system.
@@ -227,12 +229,111 @@ class EditorPageState extends State<EditorPage> {
 }
 ```
 
-We have to use `Builder` here for our icon button because we need access to
-build context which has access to `Scaffold` widget's state.
+We have to use `Builder` here for our icon button because we need `BuildContext`
+which has access to `Scaffold` widget's state.
 
 Now we can reload our app, hit "Save" button and see the snack bar.
 
 <img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-rec-02.gif" width="600">
 
+### 05. Load document from a JSON file
+
 Since we now have this document saved to a file, let's update our
 `_loadDocument` method to load saved file if it exists.
+
+```dart
+class EditorPageState extends State<EditorPage> {
+
+  // change: replace _loadDocument() method with following
+
+  /// Loads the document asynchronously from a file if it exists, otherwise
+  /// returns default document.
+  Future<NotusDocument> _loadDocument() async {
+    final file = File(Directory.systemTemp.path + "/quick_start.json");
+    if (await file.exists()) {
+      final contents = file.readAsStringSync();
+      return NotusDocument.fromJson(jsonDecode(contents));
+    }
+    final Delta delta = Delta()..insert("Zefyr Quick Start\n");
+    return NotusDocument.fromDelta(delta);
+  }
+}
+```
+
+We had to convert this method to be __async__ because file system operations
+are asynchronous. This breaks our `initState` logic so we need to fix it next.
+However we can no longer initialize `ZefyrController` in `initState` and
+therefore can't display the editor until document is loaded.
+
+A common way to fix this is to show loader animation while we are reading our
+document from file. But first, we still need to update `initState` method:
+
+```dart
+class EditorPageState extends State<EditorPage> {
+
+  // change: replace initState() method with following
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = new FocusNode();
+    _loadDocument().then((document) {
+      setState(() {
+        _controller = new ZefyrController(document);
+      });
+    });
+  }
+}
+```
+
+We initialize `_controller` only when our document is fully loaded from file
+system. An important part here is to update `_controller` field inside of
+`setState` call as required by Flutter's stateful widgets.
+
+The only thing left is to update `build()` method to show loader animation:
+
+```dart
+class EditorPageState extends State<EditorPage> {
+
+  // change: replace build() method with following
+
+  @override
+  Widget build(BuildContext context) {
+    // If _controller is null we show Material Design loader, otherwise
+    // display Zefyr editor.
+    final Widget body = (_controller == null)
+        ? Center(child: CircularProgressIndicator())
+        : ZefyrScaffold(
+            child: ZefyrEditor(
+              padding: EdgeInsets.all(16),
+              controller: _controller,
+              focusNode: _focusNode,
+            ),
+          );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Editor page"),
+        actions: <Widget>[
+          Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.save),
+              onPressed: () => _saveDocument(context),
+            ),
+          )
+        ],
+      ),
+      body: body,
+    );
+  }
+}
+```
+
+If we save changes now and reload the app we should see something like this:
+
+<img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-rec-03.gif" width="600">
+
+Note that in your test you'll likely not notice loading animation at all. This
+is because reading a tiny file from disk is too fast. For the above recording
+we added an artificial delay of 1 second in order to demonstrate loading. We'll
+leave this task to you as an exercise.

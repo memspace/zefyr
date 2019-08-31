@@ -20,16 +20,26 @@ class EditorPageState extends State<EditorPage> {
   @override
   void initState() {
     super.initState();
-    // Here we must load the document and pass it to Zefyr controller.
-    final document = _loadDocument();
-    _controller = new ZefyrController(document);
     _focusNode = new FocusNode();
+    _loadDocument().then((document) {
+      setState(() {
+        _controller = new ZefyrController(document);
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Note that the editor requires special `ZefyrScaffold` widget to be
-    // present somewhere up the widget tree.
+    final Widget body = (_controller == null)
+        ? Center(child: CircularProgressIndicator())
+        : ZefyrScaffold(
+            child: ZefyrEditor(
+              padding: EdgeInsets.all(16),
+              controller: _controller,
+              focusNode: _focusNode,
+            ),
+          );
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Editor page"),
@@ -42,27 +52,22 @@ class EditorPageState extends State<EditorPage> {
           )
         ],
       ),
-      body: ZefyrScaffold(
-        child: ZefyrEditor(
-          padding: EdgeInsets.all(16),
-          controller: _controller,
-          focusNode: _focusNode,
-        ),
-      ),
+      body: body,
     );
   }
 
-  /// Loads the document to be edited in Zefyr.
-  NotusDocument _loadDocument() {
-    // For simplicity we hardcode a simple document with one line of text
-    // saying "Zefyr Quick Start".
+  /// Loads the document asynchronously from a file if it exists, otherwise
+  /// returns default document.
+  Future<NotusDocument> _loadDocument() async {
+    final file = File(Directory.systemTemp.path + "/quick_start.json");
+    if (await file.exists()) {
+      final contents = await file
+          .readAsString()
+          .then((data) => Future.delayed(Duration(seconds: 1), () => data));
+      return NotusDocument.fromJson(jsonDecode(contents));
+    }
     final Delta delta = Delta()..insert("Zefyr Quick Start\n");
-//     Note that delta must always end with newline.
     return NotusDocument.fromDelta(delta);
-
-//    final file = File(Directory.systemTemp.path + "/quick_start.json");
-//    final contents = file.readAsStringSync();
-//    return NotusDocument.fromJson(jsonDecode(contents));
   }
 
   void _saveDocument(BuildContext context) {
