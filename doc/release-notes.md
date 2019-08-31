@@ -16,7 +16,7 @@ articles and tutorials will be added in future releases.
 
 Highlights of this release include:
 
-* Zefyr no longer depends in `image_picker` package. This introduced breaking
+* Zefyr no longer depends on `image_picker` package. This introduced breaking
   changes described in the changelog.
 * Selection overlay has been refactored to enable customization work in
   follow up releases.
@@ -24,4 +24,4 @@ Highlights of this release include:
   replaces previous `enabled` field (breaking change).
 
 For more details on breaking changes and upgrade instructions please read
-[changelog](packages/zefyr/CHANGELOG.md).
+[changelog](./../packages/zefyr/CHANGELOG.md).
