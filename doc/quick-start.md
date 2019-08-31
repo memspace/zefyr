@@ -150,18 +150,23 @@ Here is how it might look when we run the app and navigate to editor page:
 
 At this point we can already edit the document and apply styles, however if
 we navigate back from this page our changes will be lost. Let's fix this and
-add a button which saves the document to device's file system.
+add a button which saves the document to the device's file system.
 
-First we need a function to save the document:
+First we need a function to save the document. Update `lib/src/editor_page.dart`
+as follows:
 
 ```dart
+// change: add these two lines to imports section at the top of the file
+import 'dart:convert'; // access to jsonEncode()
+import 'dart:io'; // access to File and Directory classes
+
 class EditorPageState extends State<EditorPage> {
 
-  // ... add after _loadDocument()
+  // change: add after _loadDocument()
 
   void _saveDocument(BuildContext context) {
     // Notus documents can be easily serialized to JSON by passing to
-    // `jsonEncode` directly:
+    // `jsonEncode` directly
     final contents = jsonEncode(_controller.document);
     // For this example we save our document to a temporary file.
     final file = File(Directory.systemTemp.path + "/quick_start.json");
@@ -173,8 +178,16 @@ class EditorPageState extends State<EditorPage> {
 }
 ```
 
-> Notice that we pass `BuildContext` to `_saveDocument`. This is required
-> to get access to our page's `Scaffold` state, so that we can show a `SnackBar`.
+This function converts our document using `jsonEncode()` function and writes
+the result to a file `quick_start.json` in the system's temporary directory.
+
+Note that `File.writeAsString` is an asynchronous method and returns Dart's
+`Future`. This is why we register a completion callback with a call to
+`Future.then`.
+
+One more important bit here is that we pass `BuildContext` argument to
+`_saveDocument`. This is required to get access to our page's `Scaffold` state,
+so that we can show a `SnackBar`.
 
 Now we just need to add a button to the AppBar, so we need to modify `build`
 method as follows:
@@ -182,7 +195,7 @@ method as follows:
 ```dart
 class EditorPageState extends State<EditorPage> {
 
-  // ... replace build() method with following
+  // change: replace build() method with following
 
   @override
   Widget build(BuildContext context) {
@@ -215,12 +228,11 @@ class EditorPageState extends State<EditorPage> {
 ```
 
 We have to use `Builder` here for our icon button because we need access to
-build context within the scope of this page's Scaffold. Everything else here
-should be straightforward.
+build context which has access to `Scaffold` widget's state.
 
 Now we can reload our app, hit "Save" button and see the snack bar.
 
-<img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-screen-02.png" width="375">
+<img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-rec-02.gif" width="600">
 
 Since we now have this document saved to a file, let's update our
 `_loadDocument` method to load saved file if it exists.
