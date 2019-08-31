@@ -20,7 +20,7 @@ $ cd myapp
 
 For more methods of creating a project see [official documentation](https://flutter.dev/docs/get-started/test-drive).
 
-### 02. Add Zefyr to your new project
+### 02. Add Zefyr to your project
 
 Add `zefyr` package as a dependency to `pubspec.yaml` of your new project:
 
@@ -34,8 +34,8 @@ This installs [zefyr](https://pub.dev/packages/zefyr) and all required
 dependencies, including [notus](https://pub.dev/packages/notus) package which
 implements Zefyr's document model.
 
-> Notus package is platform-agnostic and can be used outside of Flutter apps,
-> that is, on the web or server-side.
+> Notus package is platform-agnostic and can be used outside of Flutter apps
+> (in web or server-side Dart projects).
 
 ### 03. Create editor page
 
@@ -68,8 +68,8 @@ class EditorPageState extends State<EditorPage> {
     super.initState();
     // Here we must load the document and pass it to Zefyr controller.
     final document = _loadDocument();
-    _controller = new ZefyrController(document);
-    _focusNode = new FocusNode();
+    _controller = ZefyrController(document);
+    _focusNode = FocusNode();
   }
 
   @override
@@ -251,7 +251,7 @@ class EditorPageState extends State<EditorPage> {
   Future<NotusDocument> _loadDocument() async {
     final file = File(Directory.systemTemp.path + "/quick_start.json");
     if (await file.exists()) {
-      final contents = file.readAsStringSync();
+      final contents = await file.readAsString();
       return NotusDocument.fromJson(jsonDecode(contents));
     }
     final Delta delta = Delta()..insert("Zefyr Quick Start\n");
@@ -265,7 +265,7 @@ are asynchronous. This breaks our `initState` logic so we need to fix it next.
 However we can no longer initialize `ZefyrController` in `initState` and
 therefore can't display the editor until document is loaded.
 
-A common way to fix this is to show loader animation while we are reading our
+One way to fix this is to show loader animation while we are reading our
 document from file. But first, we still need to update `initState` method:
 
 ```dart
@@ -276,19 +276,19 @@ class EditorPageState extends State<EditorPage> {
   @override
   void initState() {
     super.initState();
-    _focusNode = new FocusNode();
+    _focusNode = FocusNode();
     _loadDocument().then((document) {
       setState(() {
-        _controller = new ZefyrController(document);
+        _controller = ZefyrController(document);
       });
     });
   }
 }
 ```
 
-We initialize `_controller` only when our document is fully loaded from file
+We initialize `_controller` only when our document is fully loaded from the file
 system. An important part here is to update `_controller` field inside of
-`setState` call as required by Flutter's stateful widgets.
+`setState` call as required by Flutter's `StatefulWidget`'s contract.
 
 The only thing left is to update `build()` method to show loader animation:
 
@@ -333,7 +333,8 @@ If we save changes now and reload the app we should see something like this:
 
 <img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-rec-03.gif" width="600">
 
-Note that in your test you'll likely not notice loading animation at all. This
-is because reading a tiny file from disk is too fast. For the above recording
-we added an artificial delay of 1 second in order to demonstrate loading. We'll
-leave this task to you as an exercise.
+Note that in your tests you'll likely not notice any loading animation at all.
+This is because reading a tiny file from disk is too fast. For the above
+recording we added an artificial delay of 1 second in order to demonstrate
+loading. If you'd like to replicate this, we'll leave implementation of this
+task to you as an exercise.

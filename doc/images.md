@@ -166,3 +166,6 @@ class MyAppPageState extends State<MyAppPage> {
   }
 }
 ```
+
+When `imageDelegate` field is set to non-null value it automatically enables
+image selection button in Zefyr's style toolbar.
