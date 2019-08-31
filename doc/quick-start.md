@@ -148,7 +148,7 @@ Here is how it might look when we run the app and navigate to editor page:
 
 <img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-rec-01.gif" width="600">
 
-### 04. Save document to a JSON file
+### 04. Save document to JSON file
 
 At this point we can already edit the document and apply styles, however if
 we navigate back from this page our changes will be lost. Let's fix this and
@@ -236,7 +236,7 @@ Now we can reload our app, hit "Save" button and see the snack bar.
 
 <img src="https://github.com/memspace/zefyr/raw/gitbook/assets/quick-start-rec-02.gif" width="600">
 
-### 05. Load document from a JSON file
+### 05. Load document from JSON file
 
 Since we now have this document saved to a file, let's update our
 `_loadDocument` method to load saved file if it exists.
