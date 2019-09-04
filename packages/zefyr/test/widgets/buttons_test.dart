@@ -182,6 +182,7 @@ void main() {
             'source': 0,
             'maxWidth': null,
             'maxHeight': null,
+            'imageQuality': null,
           },
         ),
       );
@@ -201,6 +202,7 @@ void main() {
             'source': 1,
             'maxWidth': null,
             'maxHeight': null,
+            'imageQuality': null,
           },
         ),
       );
