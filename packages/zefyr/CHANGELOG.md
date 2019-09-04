@@ -1,3 +1,9 @@
+## 0.6.1
+
+* Relaxed dependency constraint on `image_picker` library to allow latest version. Note that
+  Zefyr 0.7 will stop depending on `image_picker` and introduce some breaking changes, which will
+  be described here when 0.7 is released.
+
 ## 0.6.0
 
 * Updated to support Flutter 1.7.8
