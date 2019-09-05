@@ -98,6 +98,13 @@ class ZefyrController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Replaces [length] characters in the document starting at [index] with
+  /// provided [text].
+  ///
+  /// Resulting change is registered as produced by user action, e.g.
+  /// using [ChangeSource.local].
+  ///
+  /// Optionally updates selection if provided.
   void replaceText(int index, int length, String text,
       {TextSelection selection}) {
     Delta delta;
@@ -112,7 +119,7 @@ class ZefyrController extends ChangeNotifier {
       } else {
         // need to transform selection position in case actual delta
         // is different from user's version (in deletes and inserts).
-        Delta user = new Delta()
+        Delta user = Delta()
           ..retain(index)
           ..insert(text)
           ..delete(length);
@@ -137,8 +144,7 @@ class ZefyrController extends ChangeNotifier {
     // the change. This is needed in cases when format operation actually
     // inserts data into the document (e.g. embeds).
     final base = change.transformPosition(_selection.baseOffset);
-    final extent =
-        change.transformPosition(_selection.extentOffset);
+    final extent = change.transformPosition(_selection.extentOffset);
     final adjustedSelection =
         _selection.copyWith(baseOffset: base, extentOffset: extent);
     if (_selection != adjustedSelection) {
@@ -161,10 +167,10 @@ class ZefyrController extends ChangeNotifier {
   }
 
   TextEditingValue get plainTextEditingValue {
-    return new TextEditingValue(
+    return TextEditingValue(
       text: document.toPlainText(),
       selection: selection,
-      composing: new TextRange.collapsed(0),
+      composing: TextRange.collapsed(0),
     );
   }
 

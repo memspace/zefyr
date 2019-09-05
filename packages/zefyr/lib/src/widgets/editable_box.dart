@@ -33,7 +33,7 @@ class EditableBox extends SingleChildRenderObjectWidget {
 
   @override
   RenderEditableProxyBox createRenderObject(BuildContext context) {
-    return new RenderEditableProxyBox(
+    return RenderEditableProxyBox(
       node: node,
       layerLink: layerLink,
       renderContext: renderContext,
@@ -238,7 +238,7 @@ class RenderEditableProxyBox extends RenderBox
   @override
   bool hitTest(HitTestResult result, {Offset position}) {
     if (size.contains(position)) {
-      result.add(new BoxHitTestEntry(this, position));
+      result.add(BoxHitTestEntry(this, position));
       return true;
     }
     return false;

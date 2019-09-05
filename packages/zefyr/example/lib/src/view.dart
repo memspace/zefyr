@@ -1,3 +1,7 @@
+// Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -5,6 +9,7 @@ import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 
 import 'full_page.dart';
+import 'images.dart';
 
 class ViewScreen extends StatefulWidget {
   @override
@@ -66,22 +71,5 @@ class _ViewScreen extends State<ViewScreen> {
         ),
       ),
     );
-  }
-}
-
-/// Custom image delegate used by this example to load image from application
-/// assets.
-///
-/// Default image delegate only supports [FileImage]s.
-class CustomImageDelegate extends ZefyrDefaultImageDelegate {
-  @override
-  Widget buildImage(BuildContext context, String imageSource) {
-    // We use custom "asset" scheme to distinguish asset images from other files.
-    if (imageSource.startsWith('asset://')) {
-      final asset = new AssetImage(imageSource.replaceFirst('asset://', ''));
-      return new Image(image: asset);
-    } else {
-      return super.buildImage(context, imageSource);
-    }
   }
 }

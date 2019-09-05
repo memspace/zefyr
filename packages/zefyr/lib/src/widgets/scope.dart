@@ -6,6 +6,7 @@ import 'controller.dart';
 import 'cursor_timer.dart';
 import 'editor.dart';
 import 'image.dart';
+import 'mode.dart';
 import 'render_context.dart';
 import 'view.dart';
 
@@ -24,24 +25,26 @@ class ZefyrScope extends ChangeNotifier {
   /// Creates a view-only scope.
   ///
   /// Normally used in [ZefyrView].
-  ZefyrScope.view({@required ZefyrImageDelegate imageDelegate})
-      : assert(imageDelegate != null),
-        isEditable = false,
+  ZefyrScope.view({ZefyrImageDelegate imageDelegate})
+      : isEditable = false,
+        _mode = ZefyrMode.view,
         _imageDelegate = imageDelegate;
 
   /// Creates editable scope.
   ///
   /// Normally used in [ZefyrEditor].
   ZefyrScope.editable({
+    @required ZefyrMode mode,
     @required ZefyrController controller,
-    @required ZefyrImageDelegate imageDelegate,
     @required FocusNode focusNode,
     @required FocusScopeNode focusScope,
-  })  : assert(controller != null),
-        assert(imageDelegate != null),
+    ZefyrImageDelegate imageDelegate,
+  })  : assert(mode != null),
+        assert(controller != null),
         assert(focusNode != null),
         assert(focusScope != null),
         isEditable = true,
+        _mode = mode,
         _controller = controller,
         _imageDelegate = imageDelegate,
         _focusNode = focusNode,
@@ -63,9 +66,18 @@ class ZefyrScope extends ChangeNotifier {
   ZefyrImageDelegate _imageDelegate;
   ZefyrImageDelegate get imageDelegate => _imageDelegate;
   set imageDelegate(ZefyrImageDelegate value) {
-    assert(value != null);
     if (_imageDelegate != value) {
       _imageDelegate = value;
+      notifyListeners();
+    }
+  }
+
+  ZefyrMode _mode;
+  ZefyrMode get mode => _mode;
+  set mode(ZefyrMode value) {
+    assert(value != null);
+    if (_mode != value) {
+      _mode = value;
       notifyListeners();
     }
   }
