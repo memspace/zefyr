@@ -10,3 +10,8 @@
   * [Heuristic rules](doc/concepts/heuristics.md)
 * [Embedding Images](doc/images.md)
 * [FAQ](doc/faq.md)
+
+## Community
+
+* [Contribute on Github](https://github.com/memspace/zefyr)
+* [Discuss on Spectrum](https://spectrum.chat/zefyr)
