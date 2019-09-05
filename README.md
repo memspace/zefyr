@@ -7,6 +7,9 @@
 Zefyr is currently in **early preview**. If you have a feature
 request or found a bug, please file it at the [issue tracker][].
 
+For questions and general discussions check out our
+[Spectrum community](https://spectrum.chat/zefyr).
+
 [issue tracker]: https://github.com/memspace/zefyr/issues
 
 ## Clean and modern look
