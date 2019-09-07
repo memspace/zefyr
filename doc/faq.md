@@ -1,6 +1,6 @@
 ## Frequently asked questions
 
-### Are Notus documents compatible with Quill documents?
+### Q: Are Notus documents compatible with Quill documents?
 
 Short answer is no. Even though Notus uses Quill Delta as underlying
 representation for its documents there are at least differences in

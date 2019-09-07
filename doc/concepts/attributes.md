@@ -1,7 +1,7 @@
 ## Style Attributes
 
 > If you haven't yet, read introduction to Zefyr document model called
-> Notus [here][data_and_document];
+> Notus [here](data-and-document.md).
 
 Style attributes in Notus documents are simple key-value pairs, where
 keys identify the attribute and value describes the style applied, for
@@ -116,16 +116,4 @@ a friendly user experience without this extra level in a document model.
 The `block` attribute in Notus documents is line-scoped. To change a
 group of lines from "bullet list" to "number list" we need to update
 block style on each of the lines individually. Zefyr editor abstracts
-away such details with help of [heuristic rules][heuristics].
-
-### Next up
-
-* [Heuristics][heuristics]
-
-[heuristics]: /doc/heuristics.md
-
-### Previous
-
-* [Data Format and Document Model][data_and_document]
-
-[data_and_document]: /doc/data_and_document.md
+away such details with help of [heuristic rules](heuristics.md).

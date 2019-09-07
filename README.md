@@ -1,27 +1,16 @@
-# Zefyr [![Build Status](https://travis-ci.com/memspace/zefyr.svg?branch=master)](https://travis-ci.com/memspace/zefyr) [![codecov](https://codecov.io/gh/memspace/zefyr/branch/master/graph/badge.svg)](https://codecov.io/gh/memspace/zefyr)
+# About Zefyr
+
+[![Build Status](https://travis-ci.com/memspace/zefyr.svg?branch=master)](https://travis-ci.com/memspace/zefyr) [![codecov](https://codecov.io/gh/memspace/zefyr/branch/master/graph/badge.svg)](https://codecov.io/gh/memspace/zefyr)
 
 *Soft and gentle rich text editing for Flutter applications.*
 
 Zefyr is currently in **early preview**. If you have a feature
 request or found a bug, please file it at the [issue tracker][].
 
+For questions and general discussions check out our
+[Spectrum community](https://spectrum.chat/zefyr).
+
 [issue tracker]: https://github.com/memspace/zefyr/issues
-
-### Documentation
-
-* [Quick Start][quick_start]
-* [Data Format and Document Model][data_and_document]
-* [Style attributes][attributes]
-* [Heuristic rules][heuristics]
-* [Images][images]
-* [FAQ][faq]
-
-[quick_start]: /doc/quick_start.md
-[data_and_document]: /doc/data_and_document.md
-[attributes]: /doc/attributes.md
-[heuristics]: /doc/heuristics.md
-[images]: /doc/images.md
-[faq]: /doc/faq.md
 
 ## Clean and modern look
 
@@ -52,7 +41,7 @@ collaborative editing use cases or whenever there is a need for
 conflict-free resolution of changes.
 
 > Zefyr editor uses Quill.js **Delta** as underlying data format. Read
-> more about Zefyr and Deltas in our [documentation][data_and_document].
+> more about Zefyr and Deltas in our [documentation](doc/concepts/data-and-document.md).
 > Make sure to checkout [official documentation][delta] for Delta format
 > as well.
 

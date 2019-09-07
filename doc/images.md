@@ -1,4 +1,4 @@
-## Images
+## Embedding Images
 
 > Note that Image API is considered experimental and is likely to be
 > changed in backward incompatible ways. If this happens all changes will be
@@ -167,8 +167,5 @@ class MyAppPageState extends State<MyAppPage> {
 }
 ```
 
-### Previous
-
-* [Heuristics][heuristics]
-
-[heuristics]: /doc/heuristics.md
+When `imageDelegate` field is set to non-null value it automatically enables
+image selection button in Zefyr's style toolbar.

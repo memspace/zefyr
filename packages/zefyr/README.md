@@ -15,8 +15,7 @@ For documentation see [https://github.com/memspace/zefyr](https://github.com/mem
 
 Official releases of Zefyr can be installed from Dart's Pub package repository.
 
-> Note that versions from Pub track stable channel of Flutter. If you are on master channel
-> check out instructions below in this document.
+> Note that versions from Pub track stable channel of Flutter.
 
 
 To install Zefyr from Pub add `zefyr` package as a dependency to your `pubspec.yaml`:
@@ -28,20 +27,5 @@ dependencies:
 
 And run `flutter packages get`.
 
-#### Installing version of Zefyr compatible with master channel of Flutter.
-
-You need to add git dependency to your pubspec.yaml that points to `flutter-master` branch:
-
-```yaml
-dependencies:
-  zefyr:
-    git:
-      url: https://github.com/memspace/zefyr.git
-      ref: flutter-master
-      path: packages/zefyr
-```
-
-And run `flutter packages get`.
-
-Continue to [https://github.com/memspace/zefyr/blob/master/doc/quick_start.md](documentation) to
+Continue to [https://github.com/memspace/zefyr/blob/master/doc/concepts/quick_start.md](documentation) to
 learn more about Zefyr and how to use it in your projects.
