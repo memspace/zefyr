@@ -19,7 +19,7 @@ class ZefyrQuote extends StatelessWidget {
     final style = theme.blockTheme.quote.textStyle;
     List<Widget> items = [];
     for (var line in node.children) {
-      items.add(_buildLine(line, style, theme.indentSize));
+      items.add(_buildLine(line, style, theme));
     }
 
     return Padding(
@@ -31,7 +31,7 @@ class ZefyrQuote extends StatelessWidget {
     );
   }
 
-  Widget _buildLine(Node node, TextStyle blockStyle, double indentSize) {
+  Widget _buildLine(Node node, TextStyle blockStyle, ZefyrThemeData theme) {
     LineNode line = node;
 
     Widget content;
@@ -45,10 +45,10 @@ class ZefyrQuote extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          left: BorderSide(width: 4.0, color: Colors.grey.shade300),
+          left: BorderSide(width: 4.0, color: theme.blockTheme.quote.backgroundColor),
         ),
       ),
-      padding: EdgeInsets.only(left: indentSize),
+      padding: EdgeInsets.only(left: theme.indentSize),
       child: row,
     );
   }

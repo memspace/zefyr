@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
 import 'editable_box.dart';
+import 'theme.dart';
 
 class ZefyrHorizontalRule extends LeafRenderObjectWidget {
   ZefyrHorizontalRule({@required this.node}) : assert(node != null);
@@ -17,7 +18,7 @@ class ZefyrHorizontalRule extends LeafRenderObjectWidget {
 
   @override
   RenderHorizontalRule createRenderObject(BuildContext context) {
-    return new RenderHorizontalRule(node: node);
+    return new RenderHorizontalRule(node: node, context: context);
   }
 
   @override
@@ -34,7 +35,8 @@ class RenderHorizontalRule extends RenderEditableBox {
 
   RenderHorizontalRule({
     @required EmbedNode node,
-  }) : _node = node;
+    @required BuildContext context,
+  }) : _node = node, _context = context;
 
   @override
   EmbedNode get node => _node;
@@ -44,6 +46,8 @@ class RenderHorizontalRule extends RenderEditableBox {
     _node = value;
     markNeedsPaint();
   }
+
+  BuildContext _context;
 
   @override
   double get preferredLineHeight => size.height;
@@ -77,7 +81,7 @@ class RenderHorizontalRule extends RenderEditableBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     final rect = new Rect.fromLTWH(0.0, 0.0, size.width, _kThickness);
-    final paint = new ui.Paint()..color = Colors.grey.shade200;
+    final paint = new ui.Paint()..color = ZefyrTheme.of(_context).horizontalRuleColor;
     context.canvas.drawRect(rect.shift(offset), paint);
   }
 
