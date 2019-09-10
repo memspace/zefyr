@@ -1,3 +1,7 @@
+## 0.8.0
+
+* Updated to support Flutter 1.9.0 (#154)
+
 ## 0.7.0
 
 This release contains breaking changes.

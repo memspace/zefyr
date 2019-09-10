@@ -1,6 +1,10 @@
 # Release notes
 
-Current version of Zefyr editor is `0.7.0` ([changelog](./../packages/zefyr/CHANGELOG.md)).
+Current version of Zefyr editor is `0.8.0` ([changelog](./../packages/zefyr/CHANGELOG.md)).
+
+### 0.8.0
+
+This version updates Zefyr to support Flutter 1.9.x.
 
 ### 0.7.0
 
