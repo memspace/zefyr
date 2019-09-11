@@ -161,10 +161,24 @@ class NotusDocument {
   /// unchanged and no [NotusChange] is published to [changes] stream.
   Delta format(int index, int length, NotusAttribute attribute) {
     assert(index >= 0 && length >= 0 && attribute != null);
-    final change = _heuristics.applyFormatRules(this, index, length, attribute);
-    if (change.isNotEmpty) {
-      compose(change, ChangeSource.local);
+
+    Delta change = Delta();
+
+    if (attribute is EmbedAttribute && length > 0) {
+      // Must delete selected length of text before applying embed attribute
+      // since inserting an embed in non-empty selection is essentially a
+      // replace operation.
+      change = delete(index, length);
+      length = 0;
     }
+
+    final formatChange =
+        _heuristics.applyFormatRules(this, index, length, attribute);
+    if (formatChange.isNotEmpty) {
+      compose(formatChange, ChangeSource.local);
+      change = change.compose(formatChange);
+    }
+
     return change;
   }
 
