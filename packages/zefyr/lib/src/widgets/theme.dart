@@ -1,7 +1,6 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -67,6 +66,7 @@ class ZefyrThemeData {
   final ZefyrToolbarTheme toolbarTheme;
 
   factory ZefyrThemeData.fallback(BuildContext context) {
+    final ThemeData themeData = Theme.of(context);
     final defaultStyle = DefaultTextStyle.of(context);
     final paragraphStyle = defaultStyle.style.copyWith(
       fontSize: 16.0,
@@ -87,7 +87,7 @@ class ZefyrThemeData {
       paragraphTheme:
           new StyleTheme(textStyle: paragraphStyle, padding: padding),
       headingTheme: new HeadingTheme.fallback(),
-      blockTheme: new BlockTheme.fallback(),
+      blockTheme: new BlockTheme.fallback(themeData),
       selectionColor: Colors.lightBlueAccent.shade100,
       cursorColor: Colors.black,
       indentSize: 16.0,
@@ -224,8 +224,19 @@ class BlockTheme {
   });
 
   /// Creates fallback theme for blocks.
-  factory BlockTheme.fallback() {
+  factory BlockTheme.fallback(ThemeData themeData) {
     final padding = const EdgeInsets.only(bottom: 8.0);
+    String fontFamily;
+    switch (themeData.platform) {
+      case TargetPlatform.iOS:
+        fontFamily = 'Menlo';
+        break;
+      case TargetPlatform.android:
+      case TargetPlatform.fuchsia:
+        fontFamily = 'Roboto Mono';
+        break;
+    }
+
     return new BlockTheme(
       bulletList: new StyleTheme(padding: padding),
       numberList: new StyleTheme(padding: padding),
@@ -236,7 +247,7 @@ class BlockTheme {
       code: new StyleTheme(
         textStyle: new TextStyle(
           color: Colors.blueGrey.shade800,
-          fontFamily: Platform.isIOS ? 'Menlo' : 'Roboto Mono',
+          fontFamily: fontFamily,
           fontSize: 14.0,
           height: 1.25,
         ),

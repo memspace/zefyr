@@ -19,7 +19,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   image_picker: 16e5fec1fbc87fd3b297c53e4048521eaf17cd06
   url_launcher: 0067ddb8f10d36786672aa0722a21717dba3a298
 
