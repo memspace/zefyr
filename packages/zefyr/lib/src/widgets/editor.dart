@@ -139,11 +139,6 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final parentTheme = ZefyrTheme.of(context, nullOk: true);
-    final fallbackTheme = ZefyrThemeData.fallback(context);
-    _themeData = (parentTheme != null)
-        ? fallbackTheme.merge(parentTheme)
-        : fallbackTheme;
 
     if (_scope == null) {
       _scope = ZefyrScope.editable(
@@ -158,6 +153,12 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       final focusScope = FocusScope.of(context);
       _scope.focusScope = focusScope;
     }
+
+    final parentTheme = ZefyrTheme.of(context, nullOk: true);
+    final fallbackTheme = ZefyrThemeData.fallback(context, _scope);
+    _themeData = (parentTheme != null)
+        ? fallbackTheme.merge(parentTheme)
+        : fallbackTheme;
 
     final scaffold = ZefyrScaffold.of(context);
     if (_scaffold != scaffold) {

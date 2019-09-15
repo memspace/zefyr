@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
+import '../registry.dart';
 import 'controller.dart';
 import 'cursor_timer.dart';
 import 'editor.dart';
@@ -28,7 +29,8 @@ class ZefyrScope extends ChangeNotifier {
   ZefyrScope.view({ZefyrImageDelegate imageDelegate})
       : isEditable = false,
         _mode = ZefyrMode.view,
-        _imageDelegate = imageDelegate;
+        _imageDelegate = imageDelegate,
+        _registry = ZefyrRegistry();
 
   /// Creates editable scope.
   ///
@@ -50,7 +52,8 @@ class ZefyrScope extends ChangeNotifier {
         _focusNode = focusNode,
         _focusScope = focusScope,
         _cursorTimer = CursorTimer(),
-        _renderContext = ZefyrRenderContext() {
+        _renderContext = ZefyrRenderContext(),
+        _registry = ZefyrRegistry() {
     _selectionStyle = _controller.getSelectionStyle();
     _selection = _controller.selection;
     _controller.addListener(_handleControllerChange);
@@ -62,6 +65,9 @@ class ZefyrScope extends ChangeNotifier {
         context.inheritFromWidgetOfExactType(ZefyrScopeAccess);
     return widget.scope;
   }
+
+  ZefyrRegistry _registry;
+  ZefyrRegistry get registry => _registry;
 
   ZefyrImageDelegate _imageDelegate;
   ZefyrImageDelegate get imageDelegate => _imageDelegate;

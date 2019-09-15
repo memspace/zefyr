@@ -49,7 +49,7 @@ class ZefyrViewState extends State<ZefyrView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final parentTheme = ZefyrTheme.of(context, nullOk: true);
-    final fallbackTheme = ZefyrThemeData.fallback(context);
+    final fallbackTheme = ZefyrThemeData.fallback(context, _scope);
     _themeData = (parentTheme != null)
         ? fallbackTheme.merge(parentTheme)
         : fallbackTheme;

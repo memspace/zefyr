@@ -4,6 +4,7 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/registry.dart';
 
 import 'editable_box.dart';
 import 'horizontal_rule.dart';
@@ -109,35 +110,19 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
   }
 
   TextSpan buildText(BuildContext context) {
-    final theme = ZefyrTheme.of(context);
     final List<TextSpan> children = widget.node.children
-        .map((node) => _segmentToTextSpan(node, theme))
+        .map((node) => _segmentToTextSpan(context, node))
         .toList(growable: false);
     return TextSpan(style: widget.style, children: children);
   }
 
-  TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme) {
+  TextSpan _segmentToTextSpan(BuildContext context, Node node) {
+    final ZefyrRegistry registry = ZefyrScope.of(context).registry;
     final TextNode segment = node;
-    final attrs = segment.style;
-
     return TextSpan(
       text: segment.value,
-      style: _getTextStyle(attrs, theme),
+      style: registry.buildTextStyle(context, node),
     );
-  }
-
-  TextStyle _getTextStyle(NotusStyle style, ZefyrThemeData theme) {
-    TextStyle result = TextStyle();
-    if (style.containsSame(NotusAttribute.bold)) {
-      result = result.merge(theme.boldStyle);
-    }
-    if (style.containsSame(NotusAttribute.italic)) {
-      result = result.merge(theme.italicStyle);
-    }
-    if (style.contains(NotusAttribute.link)) {
-      result = result.merge(theme.linkStyle);
-    }
-    return result;
   }
 
   Widget buildEmbed(BuildContext context, ZefyrScope scope) {

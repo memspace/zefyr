@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
+import 'package:zefyr/src/registry.dart';
+import 'package:zefyr/zefyr.dart';
 
 /// Applies a Zefyr editor theme to descendant widgets.
 ///
@@ -52,9 +54,7 @@ class ZefyrTheme extends InheritedWidget {
 
 /// Holds colors and typography styles for [ZefyrEditor].
 class ZefyrThemeData {
-  final TextStyle boldStyle;
-  final TextStyle italicStyle;
-  final TextStyle linkStyle;
+  final Map<String, TextStyle> inlineStyles;
   final StyleTheme paragraphTheme;
   final HeadingTheme headingTheme;
   final BlockTheme blockTheme;
@@ -65,7 +65,8 @@ class ZefyrThemeData {
   final double indentSize;
   final ZefyrToolbarTheme toolbarTheme;
 
-  factory ZefyrThemeData.fallback(BuildContext context) {
+  factory ZefyrThemeData.fallback(BuildContext context, ZefyrScope scope) {
+    final ZefyrRegistry registry = scope.registry;
     final ThemeData themeData = Theme.of(context);
     final defaultStyle = DefaultTextStyle.of(context);
     final paragraphStyle = defaultStyle.style.copyWith(
@@ -74,16 +75,10 @@ class ZefyrThemeData {
       fontWeight: FontWeight.normal,
       color: Colors.grey.shade800,
     );
-    final padding = const EdgeInsets.only(bottom: 16.0);
-    final boldStyle = TextStyle(fontWeight: FontWeight.bold);
-    final italicStyle = TextStyle(fontStyle: FontStyle.italic);
-    final linkStyle =
-        TextStyle(color: Colors.blue, decoration: TextDecoration.underline);
+    const padding = EdgeInsets.only(bottom: 16.0);
 
     return ZefyrThemeData(
-      boldStyle: boldStyle,
-      italicStyle: italicStyle,
-      linkStyle: linkStyle,
+      inlineStyles: registry.defaultInlineStyles,
       paragraphTheme: StyleTheme(textStyle: paragraphStyle, padding: padding),
       headingTheme: HeadingTheme.fallback(),
       blockTheme: BlockTheme.fallback(themeData),
@@ -95,9 +90,7 @@ class ZefyrThemeData {
   }
 
   const ZefyrThemeData({
-    this.boldStyle,
-    this.italicStyle,
-    this.linkStyle,
+    this.inlineStyles,
     this.paragraphTheme,
     this.headingTheme,
     this.blockTheme,
@@ -108,10 +101,7 @@ class ZefyrThemeData {
   });
 
   ZefyrThemeData copyWith({
-    TextStyle textStyle,
-    TextStyle boldStyle,
-    TextStyle italicStyle,
-    TextStyle linkStyle,
+    Map<String, TextStyle> inlineStyles,
     StyleTheme paragraphTheme,
     HeadingTheme headingTheme,
     BlockTheme blockTheme,
@@ -121,9 +111,7 @@ class ZefyrThemeData {
     ZefyrToolbarTheme toolbarTheme,
   }) {
     return ZefyrThemeData(
-      boldStyle: boldStyle ?? this.boldStyle,
-      italicStyle: italicStyle ?? this.italicStyle,
-      linkStyle: linkStyle ?? this.linkStyle,
+      inlineStyles: inlineStyles ?? this.inlineStyles,
       paragraphTheme: paragraphTheme ?? this.paragraphTheme,
       headingTheme: headingTheme ?? this.headingTheme,
       blockTheme: blockTheme ?? this.blockTheme,
@@ -135,10 +123,10 @@ class ZefyrThemeData {
   }
 
   ZefyrThemeData merge(ZefyrThemeData other) {
+    final inlineThis = inlineStyles ?? {};
+    final inlineOther = other.inlineStyles ?? {};
     return copyWith(
-      boldStyle: other.boldStyle,
-      italicStyle: other.italicStyle,
-      linkStyle: other.linkStyle,
+      inlineStyles: inlineThis..addAll(inlineOther),
       paragraphTheme: other.paragraphTheme,
       headingTheme: other.headingTheme,
       blockTheme: other.blockTheme,
