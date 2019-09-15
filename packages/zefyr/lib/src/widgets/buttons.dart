@@ -280,16 +280,18 @@ class _ImageButtonState extends State<ImageButton> {
     final editor = ZefyrToolbar.of(context).editor;
     final image =
         await editor.imageDelegate.pickImage(editor.imageDelegate.cameraSource);
-    if (image != null)
+    if (image != null) {
       editor.formatSelection(NotusAttribute.embed.image(image));
+    }
   }
 
   void _pickFromGallery() async {
     final editor = ZefyrToolbar.of(context).editor;
     final image = await editor.imageDelegate
         .pickImage(editor.imageDelegate.gallerySource);
-    if (image != null)
+    if (image != null) {
       editor.formatSelection(NotusAttribute.embed.image(image));
+    }
   }
 }
 
@@ -480,7 +482,7 @@ class _LinkInput extends StatefulWidget {
   final bool formatError;
 
   const _LinkInput(
-      {Key key, @required this.controller, this.formatError: false})
+      {Key key, @required this.controller, this.formatError = false})
       : super(key: key);
 
   @override

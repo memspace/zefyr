@@ -66,7 +66,7 @@ class ZefyrToolbarScaffold extends StatelessWidget {
     Key key,
     @required this.body,
     this.trailing,
-    this.autoImplyTrailing: true,
+    this.autoImplyTrailing = true,
   }) : super(key: key);
 
   final Widget body;
@@ -102,7 +102,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
   const ZefyrToolbar({
     Key key,
     @required this.editor,
-    this.autoHide: true,
+    this.autoHide = true,
     this.delegate,
   }) : super(key: key);
 

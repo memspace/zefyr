@@ -109,7 +109,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     _toolbarController?.stop();
   }
 
-  static const Duration _kFadeDuration = const Duration(milliseconds: 150);
+  static const Duration _kFadeDuration = Duration(milliseconds: 150);
 
   @override
   void initState() {

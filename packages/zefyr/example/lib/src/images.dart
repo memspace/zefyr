@@ -34,7 +34,7 @@ class CustomImageDelegate implements ZefyrImageDelegate<ImageSource> {
       // Otherwise assume this is a file stored locally on user's device.
       final file = File.fromUri(Uri.parse(key));
       final image = FileImage(file);
-      return new Image(image: image);
+      return Image(image: image);
     }
   }
 }

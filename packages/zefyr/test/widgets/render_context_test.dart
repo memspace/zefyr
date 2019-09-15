@@ -13,7 +13,7 @@ void main() {
 
     setUp(() {
       WidgetsFlutterBinding.ensureInitialized();
-      context = new ZefyrRenderContext();
+      context = ZefyrRenderContext();
     });
 
     test('adds to dirty list first', () {
@@ -53,7 +53,7 @@ void main() {
 
     testWidgets('notifyListeners is delayed to next frame', (tester) async {
       var focusNode = FocusNode();
-      var controller = ZefyrController(new NotusDocument());
+      var controller = ZefyrController(NotusDocument());
       var widget = MaterialApp(
         home: ZefyrScaffold(
           child: ZefyrEditor(
@@ -71,14 +71,14 @@ void main() {
 }
 
 RenderEditableProxyBox createParagraph(ZefyrRenderContext viewport) {
-  final doc = new NotusDocument();
+  final doc = NotusDocument();
   doc.insert(0, 'This House Is A Circus');
   final LineNode node = doc.root.children.first;
-  final link = new LayerLink();
-  final showCursor = new ValueNotifier<bool>(true);
-  final selection = new TextSelection.collapsed(offset: 0);
+  final link = LayerLink();
+  final showCursor = ValueNotifier<bool>(true);
+  final selection = TextSelection.collapsed(offset: 0);
   final selectionColor = Colors.blue;
-  return new RenderEditableProxyBox(
+  return RenderEditableProxyBox(
     node: node,
     layerLink: link,
     renderContext: viewport,

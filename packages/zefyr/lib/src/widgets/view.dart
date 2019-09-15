@@ -86,25 +86,25 @@ class ZefyrViewState extends State<ZefyrView> {
   Widget _defaultChildBuilder(BuildContext context, Node node) {
     if (node is LineNode) {
       if (node.hasEmbed) {
-        return new RawZefyrLine(node: node);
+        return RawZefyrLine(node: node);
       } else if (node.style.contains(NotusAttribute.heading)) {
-        return new ZefyrHeading(node: node);
+        return ZefyrHeading(node: node);
       }
-      return new ZefyrParagraph(node: node);
+      return ZefyrParagraph(node: node);
     }
 
     final BlockNode block = node;
     final blockStyle = block.style.get(NotusAttribute.block);
     if (blockStyle == NotusAttribute.block.code) {
-      return new ZefyrCode(node: block);
+      return ZefyrCode(node: block);
     } else if (blockStyle == NotusAttribute.block.bulletList) {
-      return new ZefyrList(node: block);
+      return ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.numberList) {
-      return new ZefyrList(node: block);
+      return ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.quote) {
-      return new ZefyrQuote(node: block);
+      return ZefyrQuote(node: block);
     }
 
-    throw new UnimplementedError('Block format $blockStyle.');
+    throw UnimplementedError('Block format $blockStyle.');
   }
 }

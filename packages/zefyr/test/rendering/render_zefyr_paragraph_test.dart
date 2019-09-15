@@ -12,17 +12,17 @@ import 'package:zefyr/zefyr.dart';
 
 void main() {
   group('$RenderZefyrParagraph', () {
-    final doc = new NotusDocument();
+    final doc = NotusDocument();
     doc.insert(0, 'This House Is A Circus');
-    final text = new TextSpan(text: 'This House Is A Circus');
+    final text = TextSpan(text: 'This House Is A Circus');
 
     ZefyrRenderContext renderContext;
     RenderZefyrParagraph p;
 
     setUp(() {
       WidgetsFlutterBinding.ensureInitialized();
-      renderContext = new ZefyrRenderContext();
-      p = new RenderZefyrParagraph(
+      renderContext = ZefyrRenderContext();
+      p = RenderZefyrParagraph(
         text,
         node: doc.root.children.first as LineNode,
         textDirection: TextDirection.ltr,
@@ -30,11 +30,11 @@ void main() {
     });
 
     test('it registers with viewport', () {
-      var owner = new PipelineOwner();
+      var owner = PipelineOwner();
       expect(renderContext.active, isNot(contains(p)));
       p.attach(owner);
       expect(renderContext.dirty, contains(p));
-      p.layout(new BoxConstraints());
+      p.layout(BoxConstraints());
       expect(renderContext.active, contains(p));
     }, skip: 'TODO: move to RenderEditableProxyBox');
   });

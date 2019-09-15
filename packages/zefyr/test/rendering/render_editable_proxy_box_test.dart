@@ -41,7 +41,7 @@ void main() {
     });
 
     test('it registers with render context', () {
-      var owner = new PipelineOwner();
+      var owner = PipelineOwner();
       expect(renderContext.active, isNot(contains(p)));
       p.attach(owner);
       expect(renderContext.dirty, contains(p));

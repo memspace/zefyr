@@ -100,7 +100,7 @@ class RenderEditableImage extends RenderBox
   @override
   EmbedNode get node => _node;
   EmbedNode _node;
-  void set node(EmbedNode value) {
+  set node(EmbedNode value) {
     _node = value;
   }
 

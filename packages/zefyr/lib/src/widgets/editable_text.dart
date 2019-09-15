@@ -36,9 +36,9 @@ class ZefyrEditableText extends StatefulWidget {
     @required this.focusNode,
     @required this.imageDelegate,
     this.selectionControls,
-    this.autofocus: true,
-    this.mode: ZefyrMode.edit,
-    this.padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    this.autofocus = true,
+    this.mode = ZefyrMode.edit,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16.0),
     this.physics,
   })  : assert(mode != null),
         assert(controller != null),
@@ -102,10 +102,11 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   /// focus, the control will then attach to the keyboard and request that the
   /// keyboard become visible.
   void requestKeyboard() {
-    if (_focusNode.hasFocus)
+    if (_focusNode.hasFocus) {
       _input.openConnection(widget.controller.plainTextEditingValue);
-    else
+    } else {
       FocusScope.of(context).requestFocus(_focusNode);
+    }
   }
 
   void focusOrUnfocusIfNeeded() {

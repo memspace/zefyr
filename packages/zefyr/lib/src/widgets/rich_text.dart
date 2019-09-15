@@ -44,11 +44,11 @@ class RenderZefyrParagraph extends RenderParagraph
   RenderZefyrParagraph(
     TextSpan text, {
     @required LineNode node,
-    TextAlign textAlign: TextAlign.start,
+    TextAlign textAlign = TextAlign.start,
     @required TextDirection textDirection,
-    bool softWrap: true,
-    TextOverflow overflow: TextOverflow.clip,
-    double textScaleFactor: 1.0,
+    bool softWrap = true,
+    TextOverflow overflow = TextOverflow.clip,
+    double textScaleFactor = 1.0,
     int maxLines,
   })  : _node = node,
         _prototypePainter = TextPainter(
@@ -69,7 +69,7 @@ class RenderZefyrParagraph extends RenderParagraph
 
   LineNode get node => _node;
   LineNode _node;
-  void set node(LineNode value) {
+  set node(LineNode value) {
     _node = value;
   }
 
@@ -181,7 +181,7 @@ class RenderZefyrParagraph extends RenderParagraph
   //
 
   @override
-  void set text(InlineSpan value) {
+  set text(InlineSpan value) {
     _prototypePainter.text = TextSpan(text: '.', style: value.style);
     _selectionRects = null;
     super.text = value;
@@ -218,7 +218,7 @@ class RenderZefyrParagraph extends RenderParagraph
       _selectionRects = null;
     }
     _selectionRects ??= getBoxesForSelection(getLocalSelection(selection));
-    final Paint paint = new Paint()..color = selectionColor;
+    final Paint paint = Paint()..color = selectionColor;
     for (ui.TextBox box in _selectionRects) {
       context.canvas.drawRect(box.toRect().shift(offset), paint);
     }

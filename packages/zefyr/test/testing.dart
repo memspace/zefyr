@@ -7,7 +7,7 @@ import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/src/widgets/selection.dart';
 import 'package:zefyr/zefyr.dart';
 
-var delta = new Delta()..insert('This House Is A Circus\n');
+var delta = Delta()..insert('This House Is A Circus\n');
 
 class EditorSandBox {
   final WidgetTester tester;
@@ -21,7 +21,7 @@ class EditorSandBox {
     FocusNode focusNode,
     NotusDocument document,
     ZefyrThemeData theme,
-    bool autofocus: false,
+    bool autofocus = false,
     ZefyrImageDelegate imageDelegate,
   }) {
     focusNode ??= FocusNode();
@@ -57,7 +57,7 @@ class EditorSandBox {
 
   Future<void> updateSelection({int base, int extent}) {
     controller.updateSelection(
-      new TextSelection(baseOffset: base, extentOffset: extent),
+      TextSelection(baseOffset: base, extentOffset: extent),
     );
     return tester.pumpAndSettle();
   }
@@ -138,7 +138,7 @@ class _ZefyrSandboxState extends State<_ZefyrSandbox> {
 
   @override
   Widget build(BuildContext context) {
-    return new ZefyrEditor(
+    return ZefyrEditor(
       controller: widget.controller,
       focusNode: widget.focusNode,
       mode: _enabled ? ZefyrMode.edit : ZefyrMode.view,

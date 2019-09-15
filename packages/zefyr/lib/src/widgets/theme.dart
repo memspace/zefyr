@@ -41,7 +41,7 @@ class ZefyrTheme extends InheritedWidget {
   /// Returns `null` if there is no [ZefyrTheme] in the given build context
   /// and [nullOk] is set to `true`. If [nullOk] is set to `false` (default)
   /// then this method asserts.
-  static ZefyrThemeData of(BuildContext context, {bool nullOk: false}) {
+  static ZefyrThemeData of(BuildContext context, {bool nullOk = false}) {
     final ZefyrTheme widget = context.inheritFromWidgetOfExactType(ZefyrTheme);
     if (widget == null && nullOk) return null;
     assert(widget != null,
@@ -75,23 +75,22 @@ class ZefyrThemeData {
       color: Colors.grey.shade800,
     );
     final padding = const EdgeInsets.only(bottom: 16.0);
-    final boldStyle = new TextStyle(fontWeight: FontWeight.bold);
-    final italicStyle = new TextStyle(fontStyle: FontStyle.italic);
+    final boldStyle = TextStyle(fontWeight: FontWeight.bold);
+    final italicStyle = TextStyle(fontStyle: FontStyle.italic);
     final linkStyle =
         TextStyle(color: Colors.blue, decoration: TextDecoration.underline);
 
-    return new ZefyrThemeData(
+    return ZefyrThemeData(
       boldStyle: boldStyle,
       italicStyle: italicStyle,
       linkStyle: linkStyle,
-      paragraphTheme:
-          new StyleTheme(textStyle: paragraphStyle, padding: padding),
-      headingTheme: new HeadingTheme.fallback(),
-      blockTheme: new BlockTheme.fallback(themeData),
+      paragraphTheme: StyleTheme(textStyle: paragraphStyle, padding: padding),
+      headingTheme: HeadingTheme.fallback(),
+      blockTheme: BlockTheme.fallback(themeData),
       selectionColor: Colors.lightBlueAccent.shade100,
       cursorColor: Colors.black,
       indentSize: 16.0,
-      toolbarTheme: new ZefyrToolbarTheme.fallback(context),
+      toolbarTheme: ZefyrToolbarTheme.fallback(context),
     );
   }
 
@@ -121,7 +120,7 @@ class ZefyrThemeData {
     double indentSize,
     ZefyrToolbarTheme toolbarTheme,
   }) {
-    return new ZefyrThemeData(
+    return ZefyrThemeData(
       boldStyle: boldStyle ?? this.boldStyle,
       italicStyle: italicStyle ?? this.italicStyle,
       linkStyle: linkStyle ?? this.linkStyle,
@@ -237,15 +236,15 @@ class BlockTheme {
         break;
     }
 
-    return new BlockTheme(
-      bulletList: new StyleTheme(padding: padding),
-      numberList: new StyleTheme(padding: padding),
-      quote: new StyleTheme(
-        textStyle: new TextStyle(color: Colors.grey.shade700),
+    return BlockTheme(
+      bulletList: StyleTheme(padding: padding),
+      numberList: StyleTheme(padding: padding),
+      quote: StyleTheme(
+        textStyle: TextStyle(color: Colors.grey.shade700),
         padding: padding,
       ),
-      code: new StyleTheme(
-        textStyle: new TextStyle(
+      code: StyleTheme(
+        textStyle: TextStyle(
           color: Colors.blueGrey.shade800,
           fontFamily: fontFamily,
           fontSize: 14.0,

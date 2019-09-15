@@ -13,7 +13,7 @@ import 'images.dart';
 
 class ViewScreen extends StatefulWidget {
   @override
-  _ViewScreen createState() => new _ViewScreen();
+  _ViewScreen createState() => _ViewScreen();
 }
 
 final doc =
@@ -32,7 +32,7 @@ class _ViewScreen extends State<ViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = new ZefyrThemeData(
+    final theme = ZefyrThemeData(
       toolbarTheme: ZefyrToolbarTheme.fallback(context).copyWith(
         color: Colors.grey.shade800,
         toggleColor: Colors.grey.shade900,
@@ -64,7 +64,7 @@ class _ViewScreen extends State<ViewScreen> {
               padding: const EdgeInsets.all(16.0),
               child: ZefyrView(
                 document: doc,
-                imageDelegate: new CustomImageDelegate(),
+                imageDelegate: CustomImageDelegate(),
               ),
             )
           ],

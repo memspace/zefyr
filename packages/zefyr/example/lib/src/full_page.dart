@@ -27,7 +27,7 @@ class ZefyrLogo extends StatelessWidget {
 
 class FullPageEditorScreen extends StatefulWidget {
   @override
-  _FullPageEditorScreenState createState() => new _FullPageEditorScreenState();
+  _FullPageEditorScreenState createState() => _FullPageEditorScreenState();
 }
 
 final doc =
@@ -44,7 +44,7 @@ Delta getDelta() {
 class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
   final ZefyrController _controller =
       ZefyrController(NotusDocument.fromDelta(getDelta()));
-  final FocusNode _focusNode = new FocusNode();
+  final FocusNode _focusNode = FocusNode();
   bool _editing = false;
   StreamSubscription<NotusChange> _sub;
 
@@ -64,7 +64,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = new ZefyrThemeData(
+    final theme = ZefyrThemeData(
       cursorColor: Colors.blue,
       toolbarTheme: ZefyrToolbarTheme.fallback(context).copyWith(
         color: Colors.grey.shade800,
@@ -75,8 +75,8 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
     );
 
     final done = _editing
-        ? [new FlatButton(onPressed: _stopEditing, child: Text('DONE'))]
-        : [new FlatButton(onPressed: _startEditing, child: Text('EDIT'))];
+        ? [FlatButton(onPressed: _stopEditing, child: Text('DONE'))]
+        : [FlatButton(onPressed: _startEditing, child: Text('EDIT'))];
     return Scaffold(
       resizeToAvoidBottomPadding: true,
       appBar: AppBar(
@@ -93,7 +93,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
             controller: _controller,
             focusNode: _focusNode,
             mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
-            imageDelegate: new CustomImageDelegate(),
+            imageDelegate: CustomImageDelegate(),
           ),
         ),
       ),

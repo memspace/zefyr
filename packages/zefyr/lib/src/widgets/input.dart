@@ -13,7 +13,7 @@ class InputConnectionController implements TextInputClient {
       : assert(onValueChanged != null);
 
   //
-  // New public members
+  // public members
   //
 
   final RemoteValueChanged onValueChanged;

@@ -11,7 +11,7 @@ import '../testing.dart';
 void main() {
   group('$ZefyrSelectionOverlay', () {
     testWidgets('double tap caret shows toolbar', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
 
       RenderZefyrParagraph renderObject =
@@ -26,7 +26,7 @@ void main() {
     });
 
     testWidgets('hides when editor lost focus', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.updateSelection(base: 0, extent: 5);
       expect(editor.findSelectionHandle(), findsNWidgets(2));
@@ -35,10 +35,10 @@ void main() {
     });
 
     testWidgets('tap on padding area finds closest paragraph', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       editor.controller
-          .updateSelection(new TextSelection.collapsed(offset: 10));
+          .updateSelection(TextSelection.collapsed(offset: 10));
       await tester.pumpAndSettle();
       expect(editor.controller.selection.extentOffset, 10);
 
@@ -53,10 +53,10 @@ void main() {
     });
 
     testWidgets('tap on empty space finds closest paragraph', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       editor.controller.replaceText(10, 1, '\n',
-          selection: new TextSelection.collapsed(offset: 0));
+          selection: TextSelection.collapsed(offset: 0));
       await tester.pumpAndSettle();
       expect(editor.controller.document.toPlainText(),
           'This House\nIs A Circus\n');

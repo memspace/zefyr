@@ -20,10 +20,10 @@ class EditorPageState extends State<EditorPage> {
   @override
   void initState() {
     super.initState();
-    _focusNode = new FocusNode();
+    _focusNode = FocusNode();
     _loadDocument().then((document) {
       setState(() {
-        _controller = new ZefyrController(document);
+        _controller = ZefyrController(document);
       });
     });
   }

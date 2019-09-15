@@ -27,7 +27,7 @@ class ZefyrField extends StatefulWidget {
     this.height,
     this.controller,
     this.focusNode,
-    this.autofocus: false,
+    this.autofocus = false,
     this.mode,
     this.toolbarDelegate,
     this.imageDelegate,

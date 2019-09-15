@@ -15,7 +15,7 @@ class FormEmbeddedScreen extends StatefulWidget {
 
 class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
   final ZefyrController _controller = ZefyrController(NotusDocument());
-  final FocusNode _focusNode = new FocusNode();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
   }
 
   Widget buildEditor() {
-    final theme = new ZefyrThemeData(
+    final theme = ZefyrThemeData(
       toolbarTheme: ZefyrToolbarTheme.fallback(context).copyWith(
         color: Colors.grey.shade800,
         toggleColor: Colors.grey.shade900,
@@ -62,7 +62,7 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
         controller: _controller,
         focusNode: _focusNode,
         autofocus: true,
-        imageDelegate: new CustomImageDelegate(),
+        imageDelegate: CustomImageDelegate(),
         physics: ClampingScrollPhysics(),
       ),
     );

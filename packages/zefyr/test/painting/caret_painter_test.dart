@@ -10,14 +10,14 @@ import 'package:zefyr/src/widgets/caret.dart';
 void main() {
   group('$CursorPainter', () {
     test('prototype is null before layout', () {
-      var painter = new CursorPainter(Colors.black);
+      var painter = CursorPainter(Colors.black);
       expect(painter.prototype, isNull);
     });
 
     test('prototype is set after layout', () {
-      var painter = new CursorPainter(Colors.black);
+      var painter = CursorPainter(Colors.black);
       painter.layout(16.0);
-      expect(painter.prototype, new Rect.fromLTWH(0.0, 0.0, 1.0, 14.0));
+      expect(painter.prototype, Rect.fromLTWH(0.0, 0.0, 1.0, 14.0));
     });
   });
 }

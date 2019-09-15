@@ -8,7 +8,7 @@ import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/util.dart';
 
-const TextSelection _kZeroSelection = const TextSelection.collapsed(
+const TextSelection _kZeroSelection = TextSelection.collapsed(
   offset: 0,
   affinity: TextAffinity.upstream,
 );
@@ -48,14 +48,14 @@ class ZefyrController extends ChangeNotifier {
   ///
   /// [value] and [source] cannot be `null`.
   void updateSelection(TextSelection value,
-      {ChangeSource source: ChangeSource.remote}) {
+      {ChangeSource source = ChangeSource.remote}) {
     _updateSelectionSilent(value, source: source);
     notifyListeners();
   }
 
   // Updates selection without triggering notifications to listeners.
   void _updateSelectionSilent(TextSelection value,
-      {ChangeSource source: ChangeSource.remote}) {
+      {ChangeSource source = ChangeSource.remote}) {
     assert(value != null && source != null);
     _selection = value;
     _lastChangeSource = source;
@@ -76,7 +76,7 @@ class ZefyrController extends ChangeNotifier {
   ///
   /// If composing this change fails then this method throws [ComposeError].
   void compose(Delta change,
-      {TextSelection selection, ChangeSource source: ChangeSource.remote}) {
+      {TextSelection selection, ChangeSource source = ChangeSource.remote}) {
     if (change.isNotEmpty) {
       _document.compose(change, source);
     }

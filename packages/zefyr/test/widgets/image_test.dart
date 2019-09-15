@@ -12,7 +12,7 @@ import '../testing.dart';
 void main() {
   group('$ZefyrImage', () {
     testWidgets('embed image', (tester) async {
-      final editor = new EditorSandBox(
+      final editor = EditorSandBox(
         tester: tester,
         imageDelegate: _TestImageDelegate(),
       );
@@ -31,7 +31,7 @@ void main() {
 
     testWidgets('tap on left side of image puts caret before it',
         (tester) async {
-      final editor = new EditorSandBox(
+      final editor = EditorSandBox(
         tester: tester,
         imageDelegate: _TestImageDelegate(),
       );
@@ -48,7 +48,7 @@ void main() {
     });
 
     testWidgets('tap right side of image puts caret after it', (tester) async {
-      final editor = new EditorSandBox(
+      final editor = EditorSandBox(
         tester: tester,
         imageDelegate: _TestImageDelegate(),
       );
@@ -58,7 +58,7 @@ void main() {
       await editor.updateSelection(base: 0, extent: 0);
 
       final img = find.byType(ZefyrImage);
-      final offset = tester.getBottomRight(img) - new Offset(1.0, 1.0);
+      final offset = tester.getBottomRight(img) - Offset(1.0, 1.0);
       await tester.tapAt(offset);
       LineNode line = editor.document.root.children.last;
       EmbedNode embed = line.children.single;
@@ -67,7 +67,7 @@ void main() {
     });
 
     testWidgets('selects on long press', (tester) async {
-      final editor = new EditorSandBox(
+      final editor = EditorSandBox(
         tester: tester,
         imageDelegate: _TestImageDelegate(),
       );

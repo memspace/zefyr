@@ -96,19 +96,19 @@ class RenderEditableProxyBox extends RenderBox
 
   ContainerNode get node => _node;
   ContainerNode _node;
-  void set node(ContainerNode value) {
+  set node(ContainerNode value) {
     _node = value;
   }
 
   LayerLink get layerLink => _layerLink;
   LayerLink _layerLink;
-  void set layerLink(LayerLink value) {
+  set layerLink(LayerLink value) {
     if (_layerLink == value) return;
     _layerLink = value;
   }
 
   ZefyrRenderContext _renderContext;
-  void set renderContext(ZefyrRenderContext value) {
+  set renderContext(ZefyrRenderContext value) {
     if (_renderContext == value) return;
     if (attached) _renderContext.removeBox(this);
     _renderContext = value;
