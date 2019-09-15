@@ -19,14 +19,14 @@ void main() {
 
   group('$NotusMarkdownCodec.encode', () {
     test('split adjacent paragraphs', () {
-      final delta = new Delta()..insert('First line\nSecond line\n');
+      final delta = Delta()..insert('First line\nSecond line\n');
       final result = notusMarkdown.encode(delta);
       expect(result, 'First line\n\nSecond line\n\n');
     });
 
     test('bold italic', () {
       runFor(NotusAttribute<bool> attribute, String expected) {
-        final delta = new Delta()
+        final delta = Delta()
           ..insert('This ')
           ..insert('house', attribute.toJson())
           ..insert(' is a ')
@@ -44,10 +44,10 @@ void main() {
     test('intersecting inline styles', () {
       final b = NotusAttribute.bold.toJson();
       final i = NotusAttribute.italic.toJson();
-      final bi = new Map<String, dynamic>.from(b);
+      final bi = Map<String, dynamic>.from(b);
       bi.addAll(i);
 
-      final delta = new Delta()
+      final delta = Delta()
         ..insert('This ')
         ..insert('house', b)
         ..insert(' is a ', bi)
@@ -61,7 +61,7 @@ void main() {
     test('normalize inline styles', () {
       final b = NotusAttribute.bold.toJson();
       final i = NotusAttribute.italic.toJson();
-      final delta = new Delta()
+      final delta = Delta()
         ..insert('This')
         ..insert(' house ', b)
         ..insert('is a')
@@ -75,7 +75,7 @@ void main() {
     test('links', () {
       final b = NotusAttribute.bold.toJson();
       final link = NotusAttribute.link.fromString('https://github.com');
-      final delta = new Delta()
+      final delta = Delta()
         ..insert('This')
         ..insert(' house ', b)
         ..insert('is a')
@@ -88,9 +88,7 @@ void main() {
 
     test('heading styles', () {
       runFor(NotusAttribute<int> attribute, String source, String expected) {
-        final delta = new Delta()
-          ..insert(source)
-          ..insert('\n', attribute.toJson());
+        final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusMarkdown.encode(delta);
         expect(result, expected);
       }
@@ -102,9 +100,7 @@ void main() {
 
     test('block styles', () {
       runFor(NotusAttribute<String> attribute, String source, String expected) {
-        final delta = new Delta()
-          ..insert(source)
-          ..insert('\n', attribute.toJson());
+        final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusMarkdown.encode(delta);
         expect(result, expected);
       }
@@ -117,7 +113,7 @@ void main() {
 
     test('multiline blocks', () {
       runFor(NotusAttribute<String> attribute, String source, String expected) {
-        final delta = new Delta()
+        final delta = Delta()
           ..insert(source)
           ..insert('\n', attribute.toJson())
           ..insert(source)

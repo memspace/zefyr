@@ -24,8 +24,8 @@ class ResolveLineFormatRule extends FormatRule {
   Delta apply(Delta document, int index, int length, NotusAttribute attribute) {
     if (attribute.scope != NotusAttributeScope.line) return null;
 
-    Delta result = new Delta()..retain(index);
-    final iter = new DeltaIterator(document);
+    Delta result = Delta()..retain(index);
+    final iter = DeltaIterator(document);
     iter.skip(index);
 
     // Apply line styles to all line-break characters within range of this
@@ -56,7 +56,7 @@ class ResolveLineFormatRule extends FormatRule {
   }
 
   Delta _applyAttribute(String text, NotusAttribute attribute) {
-    final result = new Delta();
+    final result = Delta();
     int offset = 0;
     int lf = text.indexOf('\n');
     while (lf >= 0) {
@@ -79,8 +79,8 @@ class ResolveInlineFormatRule extends FormatRule {
   Delta apply(Delta document, int index, int length, NotusAttribute attribute) {
     if (attribute.scope != NotusAttributeScope.inline) return null;
 
-    Delta result = new Delta()..retain(index);
-    final iter = new DeltaIterator(document);
+    Delta result = Delta()..retain(index);
+    final iter = DeltaIterator(document);
     iter.skip(index);
 
     // Apply inline styles to all non-line-break characters within range of this
@@ -122,8 +122,8 @@ class FormatLinkAtCaretPositionRule extends FormatRule {
     // edge cases.
     if (length != 0) return null;
 
-    Delta result = new Delta();
-    final iter = new DeltaIterator(document);
+    Delta result = Delta();
+    final iter = DeltaIterator(document);
     final before = iter.skip(index);
     final after = iter.next();
     int startIndex = index;
@@ -157,7 +157,7 @@ class FormatEmbedsRule extends FormatRule {
 
     if (length == 1 && embed.isUnset) {
       // Remove the embed.
-      return new Delta()
+      return Delta()
         ..retain(index)
         ..delete(length);
     } else {
@@ -171,8 +171,8 @@ class FormatEmbedsRule extends FormatRule {
 
   Delta _insertEmbed(
       Delta document, int index, int length, EmbedAttribute embed) {
-    Delta result = new Delta()..retain(index);
-    final iter = new DeltaIterator(document);
+    Delta result = Delta()..retain(index);
+    final iter = DeltaIterator(document);
     final previous = iter.skip(index);
     iter.skip(length); // ignore deleted part.
     final target = iter.next();
@@ -200,7 +200,7 @@ class FormatEmbedsRule extends FormatRule {
 
   Map<String, dynamic> _getLineStyle(
       DeltaIterator iterator, Operation current) {
-    if (current.data.indexOf('\n') >= 0) {
+    if (current.data.contains('\n')) {
       return current.attributes;
     }
     // Continue looking for line-break.
