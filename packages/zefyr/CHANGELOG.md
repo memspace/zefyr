@@ -1,3 +1,7 @@
+## Unreleased
+
+* Breaking change: `boldStyle`, `italicStyle` and `linkStyle` replaced with `inlineStyles` in `ZefyrThemeData`. 
+
 ## 0.8.0
 
 * Updated to support Flutter 1.9.0 (#154)
