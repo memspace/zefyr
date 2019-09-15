@@ -37,8 +37,7 @@ void main() {
     testWidgets('tap on padding area finds closest paragraph', (tester) async {
       final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
-      editor.controller
-          .updateSelection(TextSelection.collapsed(offset: 10));
+      editor.controller.updateSelection(TextSelection.collapsed(offset: 10));
       await tester.pumpAndSettle();
       expect(editor.controller.selection.extentOffset, 10);
 

@@ -48,8 +48,7 @@ void main() {
       expect(editor.selection.extentOffset, embed.documentOffset + 1);
     });
 
-    testWidgets('selects on long press',
-        (tester) async {
+    testWidgets('selects on long press', (tester) async {
       final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.remove);

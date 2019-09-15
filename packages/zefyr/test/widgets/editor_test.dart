@@ -20,8 +20,7 @@ void main() {
         ..insert('\n');
       var doc = NotusDocument.fromDelta(delta);
       var theme = ZefyrThemeData(linkStyle: TextStyle(color: Colors.red));
-      var editor =
-          EditorSandBox(tester: tester, document: doc, theme: theme);
+      var editor = EditorSandBox(tester: tester, document: doc, theme: theme);
       await editor.pumpAndTap();
       // TODO: figure out why this extra pump is needed here
       await tester.pumpAndSettle();

@@ -58,8 +58,7 @@ void main() {
       expect(notified, isTrue);
       var expectedSelection = TextSelection.collapsed(offset: 10);
       expect(controller.selection, expectedSelection);
-      expect(
-          controller.document.toDelta(), Delta()..insert('More Words\n'));
+      expect(controller.document.toDelta(), Delta()..insert('More Words\n'));
       expect(controller.lastChangeSource, ChangeSource.remote);
     });
 
@@ -86,9 +85,7 @@ void main() {
       expect(notified, isTrue);
       expect(
         controller.document.toDelta(),
-        Delta()
-          ..insert('Words', NotusAttribute.bold.toJson())
-          ..insert('\n'),
+        Delta()..insert('Words', NotusAttribute.bold.toJson())..insert('\n'),
       );
       expect(controller.lastChangeSource, ChangeSource.local);
     });
@@ -104,9 +101,7 @@ void main() {
       expect(notified, isTrue);
       expect(
         controller.document.toDelta(),
-        Delta()
-          ..insert('Words', NotusAttribute.bold.toJson())
-          ..insert('\n'),
+        Delta()..insert('Words', NotusAttribute.bold.toJson())..insert('\n'),
       );
       expect(controller.lastChangeSource, ChangeSource.local);
     });

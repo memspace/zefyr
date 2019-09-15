@@ -27,8 +27,7 @@ void main() {
 
     testWidgets('initialize', (tester) async {
       await tester.pumpWidget(widget);
-      ZefyrRichText result =
-          tester.firstWidget(find.byType(ZefyrRichText));
+      ZefyrRichText result = tester.firstWidget(find.byType(ZefyrRichText));
       expect(result, isNotNull);
       expect(result.text.text, 'This House Is A Circus');
     });
