@@ -297,6 +297,35 @@ void main() {
       expect(doc.length, 21);
     });
 
+    test('insert text with toggled style enabled', () {
+      final doc = dartconfDoc();
+
+      doc.format(4, 0, NotusAttribute.bold);
+      doc.format(4, 0, NotusAttribute.italic);
+      doc.insert(4, 'b');
+
+      final expectedDoc = new Delta()
+        ..insert('Dart')
+        ..insert('b', {'b': true, 'i': true})
+        ..insert('Conf\nLos Angeles\n');
+      expect(doc.toDelta(), expectedDoc);
+    });
+
+    test('insert text with toggled style unset', () {
+      final doc = dartconfDoc();
+
+      doc.format(4, 0, NotusAttribute.bold);
+      doc.insert(4, 'b');
+      doc.format(5, 0, NotusAttribute.bold.unset);
+      doc.insert(5, 'u');
+
+      final expectedDoc = new Delta()
+        ..insert('Dart')
+        ..insert('b', b)
+        ..insert('uConf\nLos Angeles\n');
+      expect(doc.toDelta(), expectedDoc);
+    });
+
     test('insert text before embed', () {
       final doc = dartconfDoc();
       doc.format(8, 0, NotusAttribute.embed.horizontalRule);
