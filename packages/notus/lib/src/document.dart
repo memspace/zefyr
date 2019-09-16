@@ -66,6 +66,11 @@ class NotusDocument {
   /// Length of this document.
   int get length => _root.length;
 
+  /// Represent inline styles that got toogled by the tap of a button.
+  /// The key of the map is the char count index where the style got toggled.
+  Map<int, NotusStyle> _toggledStyles = new Map<int, NotusStyle>();
+  Map<int, NotusStyle> get toggledStyles => _toggledStyles;
+
   /// Stream of [NotusChange]s applied to this document.
   Stream<NotusChange> get changes => _controller.stream;
 
