@@ -161,12 +161,14 @@ class NotusDocument {
   /// Applies heuristic rules before modifying this document and
   /// produces a [NotusChange] with source set to [ChangeSource.local].
   ///
+  /// We may also update the toggledStyles attribute if the user tapped
+  /// on a button without any selection.
+  ///
   /// Returns an instance of [Delta] actually composed into this document.
   /// The returned [Delta] may be empty in which case this document remains
   /// unchanged and no [NotusChange] is published to [changes] stream.
   Delta format(int index, int length, NotusAttribute attribute) {
     assert(index >= 0 && length >= 0 && attribute != null);
-
     Delta change = Delta();
 
     if (attribute is EmbedAttribute && length > 0) {
@@ -179,11 +181,22 @@ class NotusDocument {
 
     final formatChange =
         _heuristics.applyFormatRules(this, index, length, attribute);
-    if (formatChange.isNotEmpty) {
+
+    if (formatChange.isEmpty) {
+      // If it's an inline style and the user has selected nothing.
+      if (attribute.isInline && length == 0) {
+        // We create an entry in our toggledStyles if we don't have any yet.
+        if (!toggledStyles.containsKey(index)) {
+          toggledStyles[index] = new NotusStyle();
+        }
+
+        // And we add the attribute to it. It will be used later upon insertion
+        toggledStyles[index] = toggledStyles[index].put(attribute);
+      }
+    } else {
       compose(formatChange, ChangeSource.local);
       change = change.compose(formatChange);
     }
-
     return change;
   }
 
