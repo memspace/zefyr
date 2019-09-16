@@ -238,6 +238,14 @@ void main() {
       expect(style, isNotNull);
     });
 
+    test('collectStyle with toggled style', () {
+      final doc = dartconfDoc();
+      doc.format(4, 0, NotusAttribute.bold);
+
+      final style = doc.collectStyle(4, 0);
+      expect(style, new NotusStyle().merge(NotusAttribute.bold));
+    });
+
     test('insert embed after line-break', () {
       final doc = dartconfDoc();
       doc.format(9, 0, NotusAttribute.embed.horizontalRule);
