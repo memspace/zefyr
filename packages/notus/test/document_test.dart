@@ -23,6 +23,7 @@ NotusDocument dartconfEmbedDoc() {
   return NotusDocument.fromDelta(delta);
 }
 
+final b = NotusAttribute.bold.toJson();
 final ul = NotusAttribute.ul.toJson();
 final h1 = NotusAttribute.h1.toJson();
 
