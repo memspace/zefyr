@@ -210,10 +210,17 @@ class NotusDocument {
   ///   every line within this range (partially included lines are counted).
   /// - inline attribute X is included in the result only if it exists
   ///   for every character within this range (line-break characters excluded).
+  ///
+  /// Finally, if nothing is selected but the cursor is at a place where we've
+  /// toggled an attribute, we also merge those in our style before returning.
   NotusStyle collectStyle(int index, int length) {
     var result = lookupLine(index);
     LineNode line = result.node;
-    return line.collectStyle(result.offset, length);
+    var lineStyle = line.collectStyle(result.offset, length);
+    if (length == 0 && toggledStyles.containsKey(index)) {
+      lineStyle = lineStyle.mergeAll(toggledStyles[index]);
+    }
+    return lineStyle;
   }
 
   /// Returns [LineNode] located at specified character [offset].
