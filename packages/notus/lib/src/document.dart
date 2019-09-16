@@ -104,13 +104,47 @@ class NotusDocument {
   /// This method applies heuristic rules before modifying this document and
   /// produces a [NotusChange] with source set to [ChangeSource.local].
   ///
+  /// It also applies the toggleStyle if any and update the [NotusChange].
+  ///
   /// Returns an instance of [Delta] actually composed into this document.
   Delta insert(int index, String text) {
     assert(index >= 0);
     assert(text.isNotEmpty);
     text = _sanitizeString(text);
     if (text.isEmpty) return Delta();
-    final change = _heuristics.applyInsertRules(this, index, text);
+
+    var change = _heuristics.applyInsertRules(this, index, text);
+
+    // If we are inserting somewhere where we've toggled an attribute,
+    // and it's a classical insert operation, we are going to want to
+    // apply the toggled style to the inserted text.
+    if (toggledStyles.containsKey(index) && change.length == 2 && change[1].isInsert) {
+      // Extract the style and applying it
+      // will propagate it automatically to future characters.
+      var style = toggledStyles.remove(index);
+
+      // Extract the operations to reconstruct change after.
+      var operations = change.toList().map((op) => op.toJson()).toList();
+
+      // Compose attributes handle the "unsetting" of styles.
+      operations[1][Operation.attributesKey] = Delta.composeAttributes(change[1].attributes, style.toJson());
+
+      change = Delta.fromJson(operations);
+    }
+
+    // Update the rest of our toggledStyles map indexes
+    // as we've inserted a character.
+    _toggledStyles = toggledStyles.map((key, value) {
+      if (key < index) {
+        return new MapEntry(key, value);
+      }
+      return new MapEntry(key + text.length, value);
+    });
+
+    // Add the toogle here on the second change._opeartion (insert)?
+    // Ideally, I think making like it's in the selection would be ideal.
+    // also look for the _selection index and this.length
+
     compose(change, ChangeSource.local);
     return change;
   }
