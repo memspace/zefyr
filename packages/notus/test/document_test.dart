@@ -23,7 +23,6 @@ NotusDocument dartconfEmbedDoc() {
   return NotusDocument.fromDelta(delta);
 }
 
-final b = NotusAttribute.bold.toJson();
 final ul = NotusAttribute.ul.toJson();
 final h1 = NotusAttribute.h1.toJson();
 
@@ -323,6 +322,18 @@ void main() {
     test('replace text with embed', () {
       final doc = dartconfDoc();
       doc.format(4, 4, NotusAttribute.embed.horizontalRule);
+      expect(doc.root.children, hasLength(3));
+      expect(doc.root.children.elementAt(0).toPlainText(), 'Dart\n');
+      expect(doc.root.children.elementAt(1).toPlainText(),
+          '${EmbedNode.kPlainTextPlaceholder}\n');
+      expect(doc.root.children.elementAt(2).toPlainText(), 'Los Angeles\n');
+    });
+
+    test('replace embed with embed', () {
+      final doc = dartconfDoc();
+      doc.format(4, 4, NotusAttribute.embed.horizontalRule);
+      doc.format(5, 1, NotusAttribute.embed.horizontalRule);
+
       expect(doc.root.children, hasLength(3));
       expect(doc.root.children.elementAt(0).toPlainText(), 'Dart\n');
       expect(doc.root.children.elementAt(1).toPlainText(),
