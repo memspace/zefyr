@@ -211,10 +211,20 @@ class ZefyrController extends ChangeNotifier {
     formatText(index, length, attribute);
   }
 
+  /// Returns style of specified text range.
+  ///
+  /// if nothing is selected but the cursor is at a place where we've
+  /// toggled an attribute, we also merge those in our style before returning.
   NotusStyle getSelectionStyle() {
     int start = _selection.start;
     int length = _selection.end - start;
-    return _document.collectStyle(start, length);
+    var lineStyle = _document.collectStyle(start, length);
+
+    if (length == 0 && toggledStyles.containsKey(start)) {
+      lineStyle = lineStyle.mergeAll(toggledStyles[start]);
+    }
+
+    return lineStyle;
   }
 
   TextEditingValue get plainTextEditingValue {
