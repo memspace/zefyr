@@ -86,6 +86,9 @@ void main() {
       expect(
         controller.document.toDelta(),
         Delta()..insert('Words', NotusAttribute.bold.toJson())..insert('\n'),
+      );
+      expect(controller.lastChangeSource, ChangeSource.local);
+    });
 
     test('formatText with toggled style enabled', () {
       bool notified = false;
