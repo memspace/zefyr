@@ -239,14 +239,6 @@ void main() {
       expect(style, isNotNull);
     });
 
-    test('collectStyle with toggled style', () {
-      final doc = dartconfDoc();
-      doc.format(4, 0, NotusAttribute.bold);
-
-      final style = doc.collectStyle(4, 0);
-      expect(style, new NotusStyle().merge(NotusAttribute.bold));
-    });
-
     test('insert embed after line-break', () {
       final doc = dartconfDoc();
       doc.format(9, 0, NotusAttribute.embed.horizontalRule);
@@ -306,35 +298,6 @@ void main() {
       expect(doc.length, 21);
     });
 
-    test('insert text with toggled style enabled', () {
-      final doc = dartconfDoc();
-
-      doc.format(4, 0, NotusAttribute.bold);
-      doc.format(4, 0, NotusAttribute.italic);
-      doc.insert(4, 'b');
-
-      final expectedDoc = new Delta()
-        ..insert('Dart')
-        ..insert('b', {'b': true, 'i': true})
-        ..insert('Conf\nLos Angeles\n');
-      expect(doc.toDelta(), expectedDoc);
-    });
-
-    test('insert text with toggled style unset', () {
-      final doc = dartconfDoc();
-
-      doc.format(4, 0, NotusAttribute.bold);
-      doc.insert(4, 'b');
-      doc.format(5, 0, NotusAttribute.bold.unset);
-      doc.insert(5, 'u');
-
-      final expectedDoc = new Delta()
-        ..insert('Dart')
-        ..insert('b', b)
-        ..insert('uConf\nLos Angeles\n');
-      expect(doc.toDelta(), expectedDoc);
-    });
-
     test('insert text before embed', () {
       final doc = dartconfDoc();
       doc.format(8, 0, NotusAttribute.embed.horizontalRule);
@@ -360,18 +323,6 @@ void main() {
     test('replace text with embed', () {
       final doc = dartconfDoc();
       doc.format(4, 4, NotusAttribute.embed.horizontalRule);
-      expect(doc.root.children, hasLength(3));
-      expect(doc.root.children.elementAt(0).toPlainText(), 'Dart\n');
-      expect(doc.root.children.elementAt(1).toPlainText(),
-          '${EmbedNode.kPlainTextPlaceholder}\n');
-      expect(doc.root.children.elementAt(2).toPlainText(), 'Los Angeles\n');
-    });
-
-    test('replace embed with embed', () {
-      final doc = dartconfDoc();
-      doc.format(4, 4, NotusAttribute.embed.horizontalRule);
-      doc.format(5, 1, NotusAttribute.embed.horizontalRule);
-
       expect(doc.root.children, hasLength(3));
       expect(doc.root.children.elementAt(0).toPlainText(), 'Dart\n');
       expect(doc.root.children.elementAt(1).toPlainText(),

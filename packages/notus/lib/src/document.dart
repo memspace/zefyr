@@ -66,11 +66,6 @@ class NotusDocument {
   /// Length of this document.
   int get length => _root.length;
 
-  /// Represent inline styles that got toogled by the tap of a button.
-  /// The key of the map is the char count index where the style got toggled.
-  Map<int, NotusStyle> _toggledStyles = new Map<int, NotusStyle>();
-  Map<int, NotusStyle> get toggledStyles => _toggledStyles;
-
   /// Stream of [NotusChange]s applied to this document.
   Stream<NotusChange> get changes => _controller.stream;
 
@@ -104,47 +99,13 @@ class NotusDocument {
   /// This method applies heuristic rules before modifying this document and
   /// produces a [NotusChange] with source set to [ChangeSource.local].
   ///
-  /// It also applies the toggleStyle if any and update the [NotusChange].
-  ///
   /// Returns an instance of [Delta] actually composed into this document.
   Delta insert(int index, String text) {
     assert(index >= 0);
     assert(text.isNotEmpty);
     text = _sanitizeString(text);
-    if (text.isEmpty) return Delta();
-
-    var change = _heuristics.applyInsertRules(this, index, text);
-
-    // If we are inserting somewhere where we've toggled an attribute,
-    // and it's a classical insert operation, we are going to want to
-    // apply the toggled style to the inserted text.
-    if (toggledStyles.containsKey(index) && change.length == 2 && change[1].isInsert) {
-      // Extract the style and applying it
-      // will propagate it automatically to future characters.
-      var style = toggledStyles.remove(index);
-
-      // Extract the operations to reconstruct change after.
-      var operations = change.toList().map((op) => op.toJson()).toList();
-
-      // Compose attributes handle the "unsetting" of styles.
-      operations[1][Operation.attributesKey] = Delta.composeAttributes(change[1].attributes, style.toJson());
-
-      change = Delta.fromJson(operations);
-    }
-
-    // Update the rest of our toggledStyles map indexes
-    // as we've inserted a character.
-    _toggledStyles = toggledStyles.map((key, value) {
-      if (key < index) {
-        return new MapEntry(key, value);
-      }
-      return new MapEntry(key + text.length, value);
-    });
-
-    // Add the toogle here on the second change._opeartion (insert)?
-    // Ideally, I think making like it's in the selection would be ideal.
-    // also look for the _selection index and this.length
-
+    if (text.isEmpty) return new Delta();
+    final change = _heuristics.applyInsertRules(this, index, text);
     compose(change, ChangeSource.local);
     return change;
   }
@@ -195,41 +156,14 @@ class NotusDocument {
   /// Applies heuristic rules before modifying this document and
   /// produces a [NotusChange] with source set to [ChangeSource.local].
   ///
-  /// We may also update the toggledStyles attribute if the user tapped
-  /// on a button without any selection.
-  ///
   /// Returns an instance of [Delta] actually composed into this document.
   /// The returned [Delta] may be empty in which case this document remains
   /// unchanged and no [NotusChange] is published to [changes] stream.
   Delta format(int index, int length, NotusAttribute attribute) {
     assert(index >= 0 && length >= 0 && attribute != null);
-    Delta change = Delta();
-
-    if (attribute is EmbedAttribute && length > 0) {
-      // Must delete selected length of text before applying embed attribute
-      // since inserting an embed in non-empty selection is essentially a
-      // replace operation.
-      change = delete(index, length);
-      length = 0;
-    }
-
-    final formatChange =
-        _heuristics.applyFormatRules(this, index, length, attribute);
-
-    if (formatChange.isEmpty) {
-      // If it's an inline style and the user has selected nothing.
-      if (attribute.isInline && length == 0) {
-        // We create an entry in our toggledStyles if we don't have any yet.
-        if (!toggledStyles.containsKey(index)) {
-          toggledStyles[index] = new NotusStyle();
-        }
-
-        // And we add the attribute to it. It will be used later upon insertion
-        toggledStyles[index] = toggledStyles[index].put(attribute);
-      }
-    } else {
-      compose(formatChange, ChangeSource.local);
-      change = change.compose(formatChange);
+    final change = _heuristics.applyFormatRules(this, index, length, attribute);
+    if (change.isNotEmpty) {
+      compose(change, ChangeSource.local);
     }
     return change;
   }
@@ -244,17 +178,10 @@ class NotusDocument {
   ///   every line within this range (partially included lines are counted).
   /// - inline attribute X is included in the result only if it exists
   ///   for every character within this range (line-break characters excluded).
-  ///
-  /// Finally, if nothing is selected but the cursor is at a place where we've
-  /// toggled an attribute, we also merge those in our style before returning.
   NotusStyle collectStyle(int index, int length) {
     var result = lookupLine(index);
     LineNode line = result.node;
-    var lineStyle = line.collectStyle(result.offset, length);
-    if (length == 0 && toggledStyles.containsKey(index)) {
-      lineStyle = lineStyle.mergeAll(toggledStyles[index]);
-    }
-    return lineStyle;
+    return line.collectStyle(result.offset, length);
   }
 
   /// Returns [LineNode] located at specified character [offset].
