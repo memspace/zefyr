@@ -111,6 +111,8 @@ class ZefyrController extends ChangeNotifier {
   /// Resulting change is registered as produced by user action, e.g.
   /// using [ChangeSource.local].
   ///
+  /// It also applies the toggledStyle if any.
+  ///
   /// Optionally updates selection if provided.
   void replaceText(int index, int length, String text,
       {TextSelection selection}) {
@@ -118,6 +120,34 @@ class ZefyrController extends ChangeNotifier {
 
     if (length > 0 || text.isNotEmpty) {
       delta = document.replace(index, length, text);
+      if (delta != null) {
+        // If we are inserting somewhere where we've toggled an attribute,
+        // and it's a classical insert operation, we are going to want to
+        // apply the toggled style to the inserted text.
+        if (
+          toggledStyles.containsKey(index)
+          && delta.length == 2
+          && delta[1].isInsert
+        ) {
+          // Extract the style.
+          var style = toggledStyles.remove(index);
+
+          // Apply it.
+          Delta retainDelta = new Delta()
+            ..retain(index)
+            ..retain(1 , style.toJson());
+          document.compose(retainDelta, ChangeSource.local);
+        }
+
+        // Update the rest of our toggledStyles map indexes
+        // as we've inserted a character.
+        _toggledStyles = toggledStyles.map((key, value) {
+          if (key < index) {
+            return new MapEntry(key, value);
+          }
+          return new MapEntry(key + text.length, value);
+        });
+      }
     }
 
     if (selection != null) {
