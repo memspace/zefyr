@@ -44,12 +44,11 @@ class ZefyrController extends ChangeNotifier {
   /// Source of the last text or selection change.
   ChangeSource get lastChangeSource => _lastChangeSource;
 
-  /// The styles that got toogled by the tap of a button,
-  /// outside of the scope of already existing scope.
-  /// The key of the map is the char count index
-  /// where the style got toggled.
-  Map<int, NotusStyle> _toggledStyles = new Map<int, NotusStyle>();
-  Map<int, NotusStyle> get toggledStyles => _toggledStyles;
+  /// Store any styles attribute that got toggled by the tap of a button
+  /// and that has not been applied yet.
+  /// It gets reseted after each format action within the [document].
+  NotusStyle get toggledStyles => _toggledStyles;
+  NotusStyle _toggledStyles = new NotusStyle();
 
   /// Updates selection with specified [value].
   ///
