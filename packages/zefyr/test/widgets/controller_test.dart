@@ -96,16 +96,20 @@ void main() {
         notified = true;
       });
       controller.replaceText(0, 0, 'Words');
-      controller.formatText(1, 0, NotusAttribute.bold);
-      controller.replaceText(1, 0, 'B');
+      controller.formatText(2, 0, NotusAttribute.bold);
+      // Test that doing nothing does reset the toggledStyle.
+      controller.replaceText(2, 0, '');
+      controller.replaceText(2, 0, 'n');
+      controller.formatText(3, 0, NotusAttribute.bold);
+      controller.replaceText(3, 0, 'B');
       expect(notified, isTrue);
 
       expect(
         controller.document.toDelta(),
         new Delta()
-          ..insert('W')
+          ..insert('Won')
           ..insert('B', NotusAttribute.bold.toJson())
-          ..insert('ords')
+          ..insert('rds')
           ..insert('\n'),
       );
       expect(controller.lastChangeSource, ChangeSource.local);
