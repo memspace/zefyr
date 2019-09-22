@@ -110,7 +110,8 @@ class ZefyrController extends ChangeNotifier {
   /// Resulting change is registered as produced by user action, e.g.
   /// using [ChangeSource.local].
   ///
-  /// It also applies the toggledStyle if any.
+  /// It also applies the toggledStyle if needed. And then it resets it
+  /// in any cases as we don't want to keep it except on inserts.
   ///
   /// Optionally updates selection if provided.
   void replaceText(int index, int length, String text,
@@ -119,35 +120,23 @@ class ZefyrController extends ChangeNotifier {
 
     if (length > 0 || text.isNotEmpty) {
       delta = document.replace(index, length, text);
-      if (delta != null) {
-        // If we are inserting somewhere where we've toggled an attribute,
-        // and it's a classical insert operation, we are going to want to
-        // apply the toggled style to the inserted text.
-        if (
-          toggledStyles.containsKey(index)
-          && delta.length == 2
-          && delta[1].isInsert
-        ) {
-          // Extract the style.
-          var style = toggledStyles.remove(index);
-
-          // Apply it.
-          Delta retainDelta = new Delta()
-            ..retain(index)
-            ..retain(1 , style.toJson());
-          document.compose(retainDelta, ChangeSource.local);
-        }
-
-        // Update the rest of our toggledStyles map indexes
-        // as we've inserted a character.
-        _toggledStyles = toggledStyles.map((key, value) {
-          if (key < index) {
-            return new MapEntry(key, value);
-          }
-          return new MapEntry(key + text.length, value);
-        });
+      // If the delta is a classical insert operation and we have toggled
+      // some style, then we apply it to our document.
+      if (
+        delta != null
+        && toggledStyles.isNotEmpty
+        && delta.length == 2 && delta[1].isInsert
+      ) {
+        // Apply it.
+        Delta retainDelta = new Delta()
+          ..retain(index)
+          ..retain(1 , toggledStyles.toJson());
+        document.compose(retainDelta, ChangeSource.local);
       }
     }
+
+    // Always reset it after any user action, even if it has not been applied.
+    _toggledStyles = new NotusStyle();
 
     if (selection != null) {
       if (delta == null) {
@@ -181,13 +170,8 @@ class ZefyrController extends ChangeNotifier {
       length == 0
       && (attribute.key == NotusAttribute.bold.key || attribute.key == NotusAttribute.italic.key)
     ) {
-      // We create an entry in our toggledStyles if we don't have any yet.
-      if (!toggledStyles.containsKey(index)) {
-        toggledStyles[index] = new NotusStyle();
-      }
-
-      // And we add the attribute to it. It will be used later upon insertion
-      toggledStyles[index] = toggledStyles[index].put(attribute);
+      // Add the attribute to our toggledStyle. It will be used later upon insertion.
+      _toggledStyles = toggledStyles.put(attribute);
     }
 
     // Transform selection against the composed change and give priority to
@@ -212,16 +196,14 @@ class ZefyrController extends ChangeNotifier {
 
   /// Returns style of specified text range.
   ///
-  /// if nothing is selected but the cursor is at a place where we've
-  /// toggled an attribute, we also merge those in our style before returning.
+  /// If nothing is selected but we've toggled an attribute,
+  ///  we also merge those in our style before returning.
   NotusStyle getSelectionStyle() {
     int start = _selection.start;
     int length = _selection.end - start;
     var lineStyle = _document.collectStyle(start, length);
 
-    if (length == 0 && toggledStyles.containsKey(start)) {
-      lineStyle = lineStyle.mergeAll(toggledStyles[start]);
-    }
+    lineStyle = lineStyle.mergeAll(toggledStyles);
 
     return lineStyle;
   }
