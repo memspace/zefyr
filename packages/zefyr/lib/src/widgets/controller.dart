@@ -122,15 +122,14 @@ class ZefyrController extends ChangeNotifier {
       delta = document.replace(index, length, text);
       // If the delta is a classical insert operation and we have toggled
       // some style, then we apply it to our document.
-      if (
-        delta != null
-        && toggledStyles.isNotEmpty
-        && delta.length == 2 && delta[1].isInsert
-      ) {
+      if (delta != null &&
+          toggledStyles.isNotEmpty &&
+          delta.length == 2 &&
+          delta[1].isInsert) {
         // Apply it.
         Delta retainDelta = new Delta()
           ..retain(index)
-          ..retain(1 , toggledStyles.toJson());
+          ..retain(1, toggledStyles.toJson());
         document.compose(retainDelta, ChangeSource.local);
       }
     }
@@ -166,10 +165,9 @@ class ZefyrController extends ChangeNotifier {
     final change = document.format(index, length, attribute);
     _lastChangeSource = ChangeSource.local;
 
-    if (
-      length == 0
-      && (attribute.key == NotusAttribute.bold.key || attribute.key == NotusAttribute.italic.key)
-    ) {
+    if (length == 0 &&
+        (attribute.key == NotusAttribute.bold.key ||
+            attribute.key == NotusAttribute.italic.key)) {
       // Add the attribute to our toggledStyle. It will be used later upon insertion.
       _toggledStyles = toggledStyles.put(attribute);
     }
