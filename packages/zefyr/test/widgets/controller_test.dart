@@ -90,6 +90,54 @@ void main() {
       expect(controller.lastChangeSource, ChangeSource.local);
     });
 
+    test('formatText with toggled style enabled', () {
+      bool notified = false;
+      controller.addListener(() {
+        notified = true;
+      });
+      controller.replaceText(0, 0, 'Words');
+      controller.formatText(2, 0, NotusAttribute.bold);
+      // Test that doing nothing does reset the toggledStyle.
+      controller.replaceText(2, 0, '');
+      controller.replaceText(2, 0, 'n');
+      controller.formatText(3, 0, NotusAttribute.bold);
+      controller.replaceText(3, 0, 'B');
+      expect(notified, isTrue);
+
+      expect(
+        controller.document.toDelta(),
+        new Delta()
+          ..insert('Won')
+          ..insert('B', NotusAttribute.bold.toJson())
+          ..insert('rds')
+          ..insert('\n'),
+      );
+      expect(controller.lastChangeSource, ChangeSource.local);
+    });
+
+    test('insert text with toggled style unset', () {
+      bool notified = false;
+      controller.addListener(() {
+        notified = true;
+      });
+      controller.replaceText(0, 0, 'Words');
+      controller.formatText(1, 0, NotusAttribute.bold);
+      controller.replaceText(1, 0, 'B');
+      controller.formatText(2, 0, NotusAttribute.bold.unset);
+      controller.replaceText(2, 0, 'u');
+
+      expect(notified, isTrue);
+      expect(
+        controller.document.toDelta(),
+        new Delta()
+          ..insert('W')
+          ..insert('B', NotusAttribute.bold.toJson())
+          ..insert('uords')
+          ..insert('\n'),
+      );
+      expect(controller.lastChangeSource, ChangeSource.local);
+    });
+
     test('formatSelection', () {
       bool notified = false;
       controller.addListener(() {
@@ -110,6 +158,15 @@ void main() {
       var selection = TextSelection.collapsed(offset: 3);
       controller.replaceText(0, 0, 'Words', selection: selection);
       controller.formatText(0, 5, NotusAttribute.bold);
+      var result = controller.getSelectionStyle();
+      expect(result.values, [NotusAttribute.bold]);
+    });
+
+    test('getSelectionStyle with toggled style', () {
+      var selection = new TextSelection.collapsed(offset: 3);
+      controller.replaceText(0, 0, 'Words', selection: selection);
+      controller.formatText(3, 0, NotusAttribute.bold);
+
       var result = controller.getSelectionStyle();
       expect(result.values, [NotusAttribute.bold]);
     });
