@@ -26,39 +26,35 @@ void main() {
       expect(result, expected);
     });
 
-    test('decode italic with container attribute', () {
-      final i = NotusAttribute.italic.toJson();
-      final ic = Map<String, dynamic>.from(i);
-      ic.addAll(NotusAttribute.container.withValue({
-        "i": {"foo": "bar"}
-      }).toJson());
-      final delta = Delta()..insert('txt', ic)..insert('\n');
-      final html = '<i foo="bar">txt</i>\n';
+    test('decode italic attribute', () {
+      final i = NotusAttribute.italic.key;
+      final attributes = {i: true};
+      final delta = Delta()..insert('txt', attributes)..insert('\n');
+      final html = '<i>txt</i>\n';
       final result = notusHTML.decode(html);
       expect(result.toString(), delta.toString());
     });
-    test('decode bold with container attribute', () {
-      final b = NotusAttribute.bold.toJson();
-      final bc = Map<String, dynamic>.from(b);
-      bc.addAll(NotusAttribute.container.withValue({
-        "b": {"foo": "bar"}
-      }).toJson());
-      final delta = Delta()..insert('txt', bc)..insert('\n');
-      final html = '<b foo="bar">txt</b>\n';
+
+    test('decode bold attribute', () {
+      final b = NotusAttribute.bold.key;
+      final attributes = {b: true};
+      final delta = Delta()..insert('txt', attributes)..insert('\n');
+      final html = '<b>txt</b>\n';
       final result = notusHTML.decode(html);
       expect(result.toString(), delta.toString());
     });
-    test('decode multiple container attribute', () {
-      final b = NotusAttribute.bold.toJson();
-      final bc = Map<String, dynamic>.from(b);
-      bc.addAll(NotusAttribute.container.withValue({
-        "b": {"foo": "bar", "hidden": null}
-      }).toJson());
-      final delta = Delta()..insert('txt', bc)..insert('\n');
-      final html = '<b foo="bar" hidden>txt</b>\n';
-      final result = notusHTML.decode(html);
-      expect(result.toString(), delta.toString());
-    });
+
+//    test('decode multiple container attribute', () {
+//      final b = NotusAttribute.bold.toJson();
+//      final bc = Map<String, dynamic>.from(b);
+//      bc.addAll(NotusAttribute.container.withValue({
+//        "b": {"foo": "bar", "hidden": null}
+//      }).toJson());
+//      final delta = Delta()..insert('txt', bc)..insert('\n');
+//      final html = '<b foo="bar" hidden>txt</b>\n';
+//      final result = notusHTML.decode(html);
+//      expect(result.toString(), delta.toString());
+//    });
 
     test('empty text', () {
       final delta = Delta()..insert('\n');
@@ -188,9 +184,6 @@ void main() {
     test('decode heading styles with container attribute', () {
       runFor(NotusAttribute<int> attribute, String source, String html) {
         final attr = attribute.toJson();
-        attr.addAll(NotusAttribute.container.withValue({
-          "heading": {"foo": "bar"}
-        }).toJson());
         final delta = new Delta()..insert(source)..insert('\n', attr);
         final result = notusHTML.decode(html);
         expect(result.toString(), delta.toString());
@@ -203,11 +196,7 @@ void main() {
 
     test('decode singe block with container: quote', () {
       runFor(NotusAttribute<String> attribute, String source, String html) {
-        var attr = attribute.toJson();
-        attr.addAll(NotusAttribute.container.withValue({
-          "block": {"foo": "bar"}
-        }).toJson());
-        final delta = Delta()..insert(source)..insert('\n', attr);
+        final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusHTML.decode(html);
         expect(result.toString(), delta.toString());
       }
@@ -215,13 +204,10 @@ void main() {
       runFor(NotusAttribute.bq, 'item',
           '<blockquote foo="bar">\nitem\n</blockquote>\n');
     });
+
     test('decode singe block with container: list', () {
       runFor(NotusAttribute<String> attribute, String source, String html) {
-        var attr = NotusAttribute.container.withValue({
-          "block": {"foo": "bar"}
-        }).toJson();
-        attr.addAll(attribute.toJson());
-        final delta = Delta()..insert(source)..insert('\n', attr);
+        final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusHTML.decode(html);
         expect(result.toString(), delta.toString());
       }
@@ -344,9 +330,6 @@ void main() {
             "insert": String.fromCharCode(8203),
             "attributes": {
               "embed": {"type": "hr"},
-              "container": {
-                "embed": {"foo": "bar"}
-              }
             },
           },
         ])
@@ -366,39 +349,35 @@ void main() {
       expect(result, 'First line\nSecond line\n');
     });
 
-    test('encode italic with container attribute', () {
+    test('encode italic attribute', () {
       final i = NotusAttribute.italic.toJson();
       final ic = Map<String, dynamic>.from(i);
-      ic.addAll(NotusAttribute.container.withValue({
-        "i": {"foo": "bar"}
-      }).toJson());
       final delta = Delta()..insert('txt', ic)..insert('\n');
-      final expected = '<i foo="bar">txt</i>\n';
+      final expected = '<i>txt</i>\n';
       final result = notusHTML.encode(delta);
       expect(result.toString(), expected.toString());
     });
-    test('encode bold with container attribute', () {
+
+    test('encode bold attribute', () {
       final b = NotusAttribute.bold.toJson();
       final bc = Map<String, dynamic>.from(b);
-      bc.addAll(NotusAttribute.container.withValue({
-        "b": {"foo": "bar"}
-      }).toJson());
       final delta = Delta()..insert('txt', bc)..insert('\n');
-      final expected = '<b foo="bar">txt</b>\n';
+      final expected = '<b>txt</b>\n';
       final result = notusHTML.encode(delta);
       expect(result.toString(), expected.toString());
     });
-    test('encode bold with multiple container attribute', () {
-      final b = NotusAttribute.bold.toJson();
-      final bc = Map<String, dynamic>.from(b);
-      bc.addAll(NotusAttribute.container.withValue({
-        "b": {"foo": "bar", "hidden": null}
-      }).toJson());
-      final delta = Delta()..insert('txt', bc)..insert('\n');
-      final expected = '<b foo="bar" hidden>txt</b>\n';
-      final result = notusHTML.encode(delta);
-      expect(result.toString(), expected.toString());
-    });
+
+//    test('encode bold with multiple container attribute', () {
+//      final b = NotusAttribute.bold.toJson();
+//      final bc = Map<String, dynamic>.from(b);
+//      bc.addAll(NotusAttribute.container.withValue({
+//        "b": {"foo": "bar", "hidden": null}
+//      }).toJson());
+//      final delta = Delta()..insert('txt', bc)..insert('\n');
+//      final expected = '<b foo="bar" hidden>txt</b>\n';
+//      final result = notusHTML.encode(delta);
+//      expect(result.toString(), expected.toString());
+//    });
 
     test('encode bold italic', () {
       runFor(NotusAttribute<bool> attribute, String expected) {
@@ -540,39 +519,30 @@ void main() {
       runFor(NotusAttribute.h2, 'Title', '<h2>Title</h2>\n');
       runFor(NotusAttribute.h3, 'Title', '<h3>Title</h3>\n');
     });
-    test('encode heading styles with container attribute', () {
+    test('encode heading styles', () {
       runFor(NotusAttribute<int> attribute, String source, String expected) {
         final attr = attribute.toJson();
-        attr.addAll(NotusAttribute.container.withValue({
-          "heading": {"foo": "bar"}
-        }).toJson());
         final delta = new Delta()..insert(source)..insert('\n', attr);
         final result = notusHTML.encode(delta);
         expect(result, expected);
       }
 
-      runFor(NotusAttribute.h1, 'Title', '<h1 foo="bar">Title</h1>\n');
-      runFor(NotusAttribute.h2, 'Title', '<h2 foo="bar">Title</h2>\n');
-      runFor(NotusAttribute.h3, 'Title', '<h3 foo="bar">Title</h3>\n');
+      runFor(NotusAttribute.h1, 'Title', '<h1>Title</h1>\n');
+      runFor(NotusAttribute.h2, 'Title', '<h2>Title</h2>\n');
+      runFor(NotusAttribute.h3, 'Title', '<h3>Title</h3>\n');
     });
 
-    test('encode singe block with container', () {
+    test('encode singe block', () {
       runFor(NotusAttribute<String> attribute, String source, String expected) {
         var attr = attribute.toJson();
-        attr.addAll(NotusAttribute.container.withValue({
-          "block": {"foo": "bar"}
-        }).toJson());
         final delta = Delta()..insert(source)..insert('\n', attr);
         final result = notusHTML.encode(delta);
         expect(result, expected);
       }
 
-      runFor(
-          NotusAttribute.ul, 'item', '<ul foo="bar">\n<li>item</li>\n</ul>\n');
-      runFor(
-          NotusAttribute.ol, 'item', '<ol foo="bar">\n<li>item</li>\n</ol>\n');
-      runFor(NotusAttribute.bq, 'item',
-          '<blockquote foo="bar">item</blockquote>\n');
+      runFor(NotusAttribute.ul, 'item', '<ul>\n<li>item</li>\n</ul>\n');
+      runFor(NotusAttribute.ol, 'item', '<ol>\n<li>item</li>\n</ol>\n');
+      runFor(NotusAttribute.bq, 'item', '<blockquote>item</blockquote>\n');
     });
 
     test('encode block styles: ol, ul', () {
@@ -641,16 +611,13 @@ void main() {
 
       runFor('<hr />\n');
     });
-    test('encode hr with container attribute', () {
+    test('encode hr attribute', () {
       runFor(String expected) {
         final delta = Delta.fromJson([
           {
             "insert": "",
             "attributes": {
               "embed": {"type": "hr"},
-              "container": {
-                "embed": {"foo": "bar"}
-              }
             },
           },
         ])
@@ -659,7 +626,7 @@ void main() {
         expect(result, expected);
       }
 
-      runFor('<hr foo="bar" />\n');
+      runFor('<hr />\n');
     });
     test('encode multiline blocks', () {
       runFor(NotusAttribute<String> attribute, String source, String expected) {
@@ -678,8 +645,6 @@ void main() {
           '<ol>\n<li>text</li>\n<li>text</li>\n</ol>\n');
       runFor(
           NotusAttribute.bq, 'text', '<blockquote>text\ntext</blockquote>\n');
-
-      // runFor(NotusAttribute.code, 'text', '```\ntext\ntext\n```\n\n');
     });
 
     test('encode multiple styles', () {

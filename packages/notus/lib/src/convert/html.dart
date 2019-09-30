@@ -42,7 +42,6 @@ class deltaKeys {
   static const attributes = "attributes";
   static const heading = "heading";
   static const embed = "embed";
-  static const container = "container";
 }
 
 class htmlKeys {
@@ -99,6 +98,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
     NotusAttribute.ol: htmlKeys.orderedList,
   };
   Map<String, dynamic> container;
+
   String buildContainer(String key) {
     if (container == null || !container.containsKey(key)) {
       return '';
@@ -120,13 +120,6 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
       }
     });
     return buffer.toString();
-  }
-
-  Map<String, dynamic> getContainer(Map<String, dynamic> attr) {
-    if (attr != null && attr.containsKey(deltaKeys.container)) {
-      return attr[deltaKeys.container];
-    }
-    return null;
   }
 
   @override
@@ -198,7 +191,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
       final op = iterator.next();
 
       final lf = op.data.indexOf('\n');
-      container = getContainer(op.attributes);
+//      container = getContainer(op.attributes);
       if (lf == -1) {
         _handleSpan(removeZeroWidthSpace(op.data), op.attributes);
       } else {
@@ -476,30 +469,6 @@ class _HTMLNotusDecoder extends Converter<String, Delta> {
       }
       if (elem.localName == htmlKeys.image) {
         attr.remove(htmlKeys.imageSrc);
-      }
-      final deltaKeyForContainer =
-          htmlTagNameToDeltaAttributeName(elem.localName);
-      if (deltaKeyForContainer != null && attr.isNotEmpty) {
-        addContainerAttribute(attr, key, attrMap) {
-          if (attrMap.containsKey(deltaKeys.container)) {
-            attrMap[deltaKeys.container]
-                .addAll(Map<String, dynamic>.from({key: attr}));
-          } else {
-            attrMap[deltaKeys.container] =
-                Map<String, dynamic>.from({key: attr});
-          }
-        }
-
-        mapEmptyToNullForEmptyHtmlDataAttribute(attr) =>
-            attr.map((key, val) => MapEntry<String, dynamic>(
-                key, val is String && val.isEmpty ? null : val));
-
-        addContainerAttribute(
-            mapEmptyToNullForEmptyHtmlDataAttribute(attr),
-            deltaKeyForContainer,
-            isInlineAttribute(elem.localName)
-                ? deltaAttributeInline
-                : deltaAttributeLine);
       }
     }
     return Map<String, Map<String, dynamic>>.from({
