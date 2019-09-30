@@ -283,8 +283,6 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
       _writeBlockTag(buffer, attribute, close: close);
     } else if (attribute.key == NotusAttribute.embed.key) {
       _writeEmbedTag(buffer, attribute, close: close);
-    } else if (attribute.key == NotusAttribute.container.key) {
-      // do nothing
     } else {
       throw new ArgumentError('Cannot handle $attribute');
     }

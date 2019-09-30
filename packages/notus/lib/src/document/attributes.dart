@@ -40,6 +40,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 
   final String key;
   final NotusAttributeScope scope;
+
   NotusAttribute<T> get unset => NotusAttribute<T>._(key, scope, null);
   NotusAttribute<T> withValue(T value) =>
       NotusAttribute<T>._(key, scope, value);
@@ -77,7 +78,6 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.embed.key: NotusAttribute.embed,
-    NotusAttribute.container.key: NotusAttribute.container,
   };
 
   // Inline attributes
@@ -126,9 +126,6 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Embed style attribute.
   // ignore: const_eval_throws_exception
   static const embed = EmbedAttributeBuilder._();
-
-  /// Container attribute
-  static const container = const ContainerAttributeBuilder._();
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
@@ -337,6 +334,7 @@ class _ItalicAttribute extends NotusAttribute<bool> {
 /// [NotusAttribute.link] instead.
 class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kLink = 'a';
+
   const LinkAttributeBuilder._() : super._(_kLink, NotusAttributeScope.inline);
 
   /// Creates a link attribute with specified link [value].
@@ -350,6 +348,7 @@ class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
 /// [NotusAttribute.heading] instead.
 class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
   static const _kHeading = 'heading';
+
   const HeadingAttributeBuilder._()
       : super._(_kHeading, NotusAttributeScope.line);
 
@@ -369,6 +368,7 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
 /// [NotusAttribute.block] instead.
 class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kBlock = 'block';
+
   const BlockAttributeBuilder._() : super._(_kBlock, NotusAttributeScope.line);
 
   /// Formats a block of lines as a bullet list.
@@ -440,52 +440,6 @@ class EmbedAttribute extends NotusAttribute<Map<String, dynamic>> {
     if (identical(this, other)) return true;
     if (other is! EmbedAttribute) return false;
     EmbedAttribute typedOther = other;
-    return key == typedOther.key &&
-        scope == typedOther.scope &&
-        _kValueEquality.equals(value, typedOther.value);
-  }
-
-  @override
-  int get hashCode {
-    final objects = [key, scope];
-    if (value != null) {
-      final valueHashes =
-          value.entries.map((entry) => hash2(entry.key, entry.value));
-      objects.addAll(valueHashes);
-    } else {
-      objects.add(value);
-    }
-    return hashObjects(objects);
-  }
-}
-
-class ContainerAttributeBuilder
-    extends NotusAttributeBuilder<Map<String, dynamic>> {
-  const ContainerAttributeBuilder._()
-      : super._(ContainerAttribute._kContainer, NotusAttributeScope.inline);
-
-  @override
-  NotusAttribute<Map<String, dynamic>> get unset => ContainerAttribute._(null);
-
-  NotusAttribute<Map<String, dynamic>> withValue(Map<String, dynamic> value) =>
-      ContainerAttribute._(value);
-}
-
-class ContainerAttribute extends NotusAttribute<Map<String, dynamic>> {
-  static const _kValueEquality = const MapEquality<String, dynamic>();
-  static const _kContainer = 'container';
-
-  ContainerAttribute._(Map<String, dynamic> value)
-      : super._(_kContainer, NotusAttributeScope.inline, value);
-
-  @override
-  NotusAttribute<Map<String, dynamic>> get unset => ContainerAttribute._(null);
-
-  @override
-  bool operator ==(other) {
-    if (identical(this, other)) return true;
-    if (other is! ContainerAttribute) return false;
-    ContainerAttribute typedOther = other;
     return key == typedOther.key &&
         scope == typedOther.scope &&
         _kValueEquality.equals(value, typedOther.value);
