@@ -259,7 +259,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
       buildButton(context, ZefyrToolbarAction.quote),
       buildButton(context, ZefyrToolbarAction.code),
       buildButton(context, ZefyrToolbarAction.horizontalRule),
-      if (editor.imageDelegate != null) ImageButton(),
+      editor.imageDelegate != null ? ImageButton() : Container(),
     ];
     return buttons;
   }
