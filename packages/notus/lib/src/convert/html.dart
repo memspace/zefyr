@@ -270,7 +270,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
   }
 
   void _writeAttribute(StringBuffer buffer, NotusAttribute attribute,
-      {bool close: false}) {
+      {bool close = false}) {
     if (attribute == NotusAttribute.bold) {
       _writeBoldTag(buffer, close: close);
     } else if (attribute == NotusAttribute.italic) {
@@ -290,7 +290,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
 
   void _writeEmbedTag(
       StringBuffer buffer, NotusAttribute<Map<String, dynamic>> embed,
-      {bool close: false}) {
+      {bool close = false}) {
     if (embed.value[deltaKeys.type] == deltaKeys.image) {
       if (close) {
         return;
@@ -306,7 +306,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
     }
   }
 
-  void _writeBoldTag(StringBuffer buffer, {bool close: false}) {
+  void _writeBoldTag(StringBuffer buffer, {bool close = false}) {
     if (close) {
       buffer.write('</${htmlKeys.bold}>');
     } else {
@@ -314,7 +314,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
     }
   }
 
-  void _writeItalicTag(StringBuffer buffer, {bool close: false}) {
+  void _writeItalicTag(StringBuffer buffer, {bool close = false}) {
     if (close) {
       buffer.write('</${htmlKeys.italic}>');
     } else {
@@ -323,7 +323,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
   }
 
   void _writeLinkTag(StringBuffer buffer, NotusAttribute<String> link,
-      {bool close: false}) {
+      {bool close = false}) {
     if (close) {
       buffer.write('</${htmlKeys.anchor}>');
     } else {
@@ -333,7 +333,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
   }
 
   void _writeHeadingTag(StringBuffer buffer, NotusAttribute<int> heading,
-      {bool close: false}) {
+      {bool close = false}) {
     var level = heading.value;
     if (close) {
       buffer.write('</${htmlKeys.heading}$level>');
@@ -344,7 +344,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
   }
 
   void _writeBlockTag(StringBuffer buffer, NotusAttribute<String> block,
-      {bool close: false, bool start: false}) {
+      {bool close = false, bool start = false}) {
     if (block == NotusAttribute.code) {
       if (start) {
         buffer.write('<${htmlKeys.preformatted}${buildContainer(block.key)}>');
@@ -595,7 +595,7 @@ class _HTMLNotusDecoder extends Converter<String, Delta> {
     final deltaFormatList = List<Map<String, dynamic>>();
     void addPlainTextToDeltaList(text) {
       if (text.isNotEmpty && text != String.fromCharCode(8203)) {
-        if (0 < deltaFormatList.length &&
+        if (deltaFormatList.isNotEmpty &&
             deltaFormatList[deltaFormatList.length - 1][deltaKeys.attributes] ==
                 null) {
           deltaFormatList[deltaFormatList.length - 1][deltaKeys.insert] += text;
