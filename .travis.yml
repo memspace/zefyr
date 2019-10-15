@@ -14,7 +14,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - libstdc++6
-      - fonts-droid
+      - fonts-droid-fallback
 
 cache:
   directories:
