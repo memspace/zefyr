@@ -5,28 +5,28 @@ import 'package:notus/notus.dart';
 import 'package:test/test.dart';
 import 'package:quill_delta/quill_delta.dart';
 
-final ulAttrs = new NotusStyle().merge(NotusAttribute.ul);
-final olAttrs = new NotusStyle().merge(NotusAttribute.ol);
-final h1Attrs = new NotusStyle().merge(NotusAttribute.h1);
+final ulAttrs = NotusStyle().merge(NotusAttribute.ul);
+final olAttrs = NotusStyle().merge(NotusAttribute.ol);
+final h1Attrs = NotusStyle().merge(NotusAttribute.h1);
 
 void main() {
   group('$BlockNode', () {
     ContainerNode root;
     setUp(() {
-      root = new RootNode();
+      root = RootNode();
     });
 
     test('empty', () {
-      BlockNode node = new BlockNode();
+      BlockNode node = BlockNode();
       expect(node, isEmpty);
       expect(node.length, 0);
-      expect(node.style, new NotusStyle());
+      expect(node.style, NotusStyle());
     });
 
     test('toString', () {
-      LineNode line = new LineNode();
-      line.add(new TextNode('London "Grammar"'));
-      BlockNode block = new BlockNode();
+      LineNode line = LineNode();
+      line.add(TextNode('London "Grammar"'));
+      BlockNode block = BlockNode();
       block.applyAttribute(NotusAttribute.ul);
       block.add(line);
       final expected = '§ {ul}\n  └ ¶ ⟨London "Grammar"⟩ ⏎';
@@ -54,13 +54,12 @@ void main() {
 
       expect(root.childCount, 1);
       BlockNode block = root.first;
-      expect(block.style.get(NotusAttribute.block),
-          NotusAttribute.ul);
+      expect(block.style.get(NotusAttribute.block), NotusAttribute.ul);
       expect(block.childCount, 1);
       expect(block.first, const TypeMatcher<LineNode>());
 
       LineNode line = block.first;
-      Delta delta = new Delta()
+      Delta delta = Delta()
         ..insert('Hello world')
         ..insert('\n', ulAttrs.toJson());
       expect(line.toDelta(), delta);
@@ -72,8 +71,7 @@ void main() {
 
       expect(root.childCount, 2);
       BlockNode block = root.last;
-      expect(block.style.get(NotusAttribute.block),
-          NotusAttribute.ul);
+      expect(block.style.get(NotusAttribute.block), NotusAttribute.ul);
       expect(block.childCount, 1);
       expect(block.first, const TypeMatcher<LineNode>());
     });
@@ -85,8 +83,7 @@ void main() {
 
       expect(root.childCount, 1);
       BlockNode block = root.first;
-      expect(block.style.get(NotusAttribute.block),
-          NotusAttribute.ul);
+      expect(block.style.get(NotusAttribute.block), NotusAttribute.ul);
       expect(block.childCount, 2);
       expect(block.first, const TypeMatcher<LineNode>());
       expect(block.last, const TypeMatcher<LineNode>());
@@ -102,7 +99,7 @@ void main() {
       expect(root.childCount, 2);
       root.retain(28, 1, olAttrs);
       expect(root.childCount, 3);
-      final expected = new Delta()
+      final expected = Delta()
         ..insert('London Grammar Songs')
         ..insert('\n', NotusAttribute.h1.toJson())
         ..insert('Hey now')
@@ -124,7 +121,7 @@ void main() {
       expect(root.childCount, 2);
       root.retain(47, 1, olAttrs);
       expect(root.childCount, 3);
-      final expected = new Delta()
+      final expected = Delta()
         ..insert('London Grammar Songs')
         ..insert('\n', NotusAttribute.h1.toJson())
         ..insert('Hey now')
@@ -146,7 +143,7 @@ void main() {
       expect(root.childCount, 2);
       root.retain(35, 1, olAttrs);
       expect(root.childCount, 4);
-      final expected = new Delta()
+      final expected = Delta()
         ..insert('London Grammar Songs')
         ..insert('\n', NotusAttribute.h1.toJson())
         ..insert('Hey now')

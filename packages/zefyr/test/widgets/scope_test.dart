@@ -14,8 +14,8 @@ void main() {
       WidgetsFlutterBinding.ensureInitialized();
       final doc = NotusDocument();
       scope = ZefyrScope.editable(
+        mode: ZefyrMode.edit,
         controller: ZefyrController(doc),
-        imageDelegate: ZefyrDefaultImageDelegate(),
         focusNode: FocusNode(),
         focusScope: FocusScopeNode(),
       );
@@ -26,7 +26,7 @@ void main() {
       scope.addListener(() {
         notified = true;
       });
-      final delegate = ZefyrDefaultImageDelegate();
+      final delegate = _TestImageDelegate();
       scope.imageDelegate = delegate;
       expect(notified, isTrue);
       notified = false;
@@ -72,4 +72,22 @@ void main() {
       expect(notified, isTrue);
     });
   });
+}
+
+class _TestImageDelegate implements ZefyrImageDelegate<String> {
+  @override
+  Widget buildImage(BuildContext context, String key) {
+    return null;
+  }
+
+  @override
+  String get cameraSource => null;
+
+  @override
+  String get gallerySource => null;
+
+  @override
+  Future<String> pickImage(String source) {
+    return null;
+  }
 }

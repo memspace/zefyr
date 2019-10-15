@@ -33,7 +33,7 @@ class EditableBox extends SingleChildRenderObjectWidget {
 
   @override
   RenderEditableProxyBox createRenderObject(BuildContext context) {
-    return new RenderEditableProxyBox(
+    return RenderEditableProxyBox(
       node: node,
       layerLink: layerLink,
       renderContext: renderContext,
@@ -96,19 +96,19 @@ class RenderEditableProxyBox extends RenderBox
 
   ContainerNode get node => _node;
   ContainerNode _node;
-  void set node(ContainerNode value) {
+  set node(ContainerNode value) {
     _node = value;
   }
 
   LayerLink get layerLink => _layerLink;
   LayerLink _layerLink;
-  void set layerLink(LayerLink value) {
+  set layerLink(LayerLink value) {
     if (_layerLink == value) return;
     _layerLink = value;
   }
 
   ZefyrRenderContext _renderContext;
-  void set renderContext(ZefyrRenderContext value) {
+  set renderContext(ZefyrRenderContext value) {
     if (_renderContext == value) return;
     if (attached) _renderContext.removeBox(this);
     _renderContext = value;
@@ -238,7 +238,7 @@ class RenderEditableProxyBox extends RenderBox
   @override
   bool hitTest(HitTestResult result, {Offset position}) {
     if (size.contains(position)) {
-      result.add(new BoxHitTestEntry(this, position));
+      result.add(BoxHitTestEntry(this, position));
       return true;
     }
     return false;

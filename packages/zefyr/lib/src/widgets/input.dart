@@ -13,7 +13,7 @@ class InputConnectionController implements TextInputClient {
       : assert(onValueChanged != null);
 
   //
-  // New public members
+  // public members
   //
 
   final RemoteValueChanged onValueChanged;
@@ -37,7 +37,7 @@ class InputConnectionController implements TextInputClient {
       _lastKnownRemoteTextEditingValue = value;
       _textInputConnection = TextInput.attach(
         this,
-        new TextInputConfiguration(
+        TextInputConfiguration(
           inputType: TextInputType.multiline,
           obscureText: false,
           autocorrect: true,

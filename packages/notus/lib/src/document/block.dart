@@ -16,7 +16,7 @@ class BlockNode extends ContainerNode<LineNode>
     implements StyledNode {
   /// Creates new unmounted [BlockNode] with the same attributes.
   BlockNode clone() {
-    final node = new BlockNode();
+    final node = BlockNode();
     node.applyStyle(style);
     return node;
   }
@@ -49,20 +49,20 @@ class BlockNode extends ContainerNode<LineNode>
   }
 
   @override
-  LineNode get defaultChild => new LineNode();
+  LineNode get defaultChild => LineNode();
 
   @override
   Delta toDelta() {
     // Line nodes take care of incorporating block style into their delta.
     return children
         .map((child) => child.toDelta())
-        .fold(new Delta(), (a, b) => a.concat(b));
+        .fold(Delta(), (a, b) => a.concat(b));
   }
 
   @override
   String toString() {
     final block = style.value(NotusAttribute.block);
-    final buffer = new StringBuffer('§ {$block}\n');
+    final buffer = StringBuffer('§ {$block}\n');
     for (var child in children) {
       final tree = child.isLast ? '└' : '├';
       buffer.write('  $tree $child');

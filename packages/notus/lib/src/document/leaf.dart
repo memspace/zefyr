@@ -22,13 +22,13 @@ abstract class LeafNode extends Node
     LeafNode node;
     if (value == kZeroWidthSpace) {
       // Zero-width space is reserved for embed nodes.
-      node = new EmbedNode();
+      node = EmbedNode();
     } else {
       assert(
           !value.contains(kZeroWidthSpace),
           'Zero-width space is reserved for embed leaf nodes and cannot be used '
           'inside regular text nodes.');
-      node = new TextNode(value);
+      node = TextNode(value);
     }
     return node;
   }
@@ -56,7 +56,7 @@ abstract class LeafNode extends Node
 
     String text = _value;
     _value = text.substring(0, index);
-    final split = new LeafNode(text.substring(index));
+    final split = LeafNode(text.substring(index));
     split.applyStyle(style);
     insertAfter(split);
     return split;
@@ -131,7 +131,7 @@ abstract class LeafNode extends Node
 
   @override
   Delta toDelta() {
-    return new Delta()..insert(_value, style.toJson());
+    return Delta()..insert(_value, style.toJson());
   }
 
   @override
@@ -141,7 +141,7 @@ abstract class LeafNode extends Node
   void insert(int index, String value, NotusStyle style) {
     assert(index >= 0 && (index <= length), 'Index: $index, Length: $length.');
     assert(value.isNotEmpty);
-    final node = new LeafNode(value);
+    final node = LeafNode(value);
     if (index == length) {
       insertAfter(node);
     } else {
@@ -231,7 +231,7 @@ class TextNode extends LeafNode {
   TextNode([String content = '']) : super._(content);
 }
 
-final kZeroWidthSpace = new String.fromCharCode(0x200b);
+final kZeroWidthSpace = String.fromCharCode(0x200b);
 
 /// An embed node inside of a line in a Notus document.
 ///
@@ -248,7 +248,7 @@ final kZeroWidthSpace = new String.fromCharCode(0x200b);
 /// applying "bold" style to an image gives no effect, while adding a "link" to
 /// an image actually makes the image react to user's action.
 class EmbedNode extends LeafNode {
-  static final kPlainTextPlaceholder = new String.fromCharCode(0x200b);
+  static final kPlainTextPlaceholder = String.fromCharCode(0x200b);
 
   EmbedNode() : super._(kPlainTextPlaceholder);
 }

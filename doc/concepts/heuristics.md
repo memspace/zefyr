@@ -11,14 +11,12 @@ a new list item when user presses `Enter` key.
 In Notus (document model used by Zefyr editor), such rules are called
 *heuristic rules*. There are two main purposes for heuristic rules:
 
-1. User experience: rules like above-mentioned autoformatting of links
-   are here to make editing a user friendly process.
-2. Semantics preservation: this is mostly invisible for the user but
-  is very important nevertheless. There is a set of rules to make sure
-  that a document change conforms to the data format and model
-  semantics.
+1. User experience: rules like above-mentioned autoformatting of links are here to make editing a user friendly process.
+2. Semantics preservation: this is mostly invisible for the user but is very important nevertheless. There is a set of rules to make sure that a document change conforms to the data format and model semantics.
 
 Let's cover the second item in more detail.
+
+### Example heuristic rule
 
 Say, a user is editing following document (cursor position is indicated
 by pipe `|` character):
@@ -39,7 +37,8 @@ var change = doc.format(
 ```
 
 If we try to apply this change as-is it would have no effect or, more
-likely, result in an `AssertionError`. This is why all methods in
+likely, result in an `AssertionError` because we are trying to apply line style
+to a character in the middle of a line. This is why all methods in
 `NotusDocument` have an extra step which applies heuristic rules to
 the change (there is one method which skips this step, `compose`,
 read more on it later) before actually composing it.
@@ -62,40 +61,21 @@ what user intended to do.
 There are more similar scenarios which are covered by heuristic rules
 to ensure consistency with the document model and provide better UX.
 
-### `NotusDocument.compose()` and skipping heuristic rules.
+### `NotusDocument.compose()` and skipping heuristic rules
 
 The `compose()` method is the only method which skips the step of
 applying heuristic rules and therefore **should be used with great
 care** as it can result in corrupted document state.
 
-Use this method when you sure that the change you are about to compose
+Use this method when you are sure that the change you are about to compose
 conforms to the document model and data format semantics.
 
 This method exists mostly to enable following use cases:
 
-* **Collaborative editing**, when a change came from a different site and
-  has already been normalized by heuristic rules on that site. Care must
-  be taken to ensure that this change is based on the same revision
-  of the document, and if not, transformed against any local changes
-  before composing.
-* **Change history and revisioning**, when a change came from a revision
-  history stored on a server or a database. Similarly, care must be
-  taken to transform the change against any local (uncommitted) changes
-  before composing.
+* **Collaborative editing**, when a change came from a different site and has already been normalized by heuristic rules on that site. Care must be taken to ensure that this change is based on the same revision of the document, and if not, transformed against any local changes before composing.
+* **Change history and revisioning**, when a change came from a revision history stored on a server or a database. Similarly, care must be taken to transform the change against any local (uncommitted) changes before composing.
 
 When composing a change which came from a different site or server make
 sure to use `ChangeSource.remote` when calling `compose()`. This allows
 you to distinguish such changes from local changes made by the user
 when listening on `NotusDocument.changes` stream.
-
-### Next up
-
-* [Images][images]
-
-[images]: /doc/images.md
-
-### Previous
-
-* [Style attributes][attributes]
-
-[attributes]: /doc/attributes.md

@@ -10,12 +10,12 @@ final bold = NotusAttribute.bold.toJson();
 
 void main() {
   group('$CatchAllInsertRule', () {
-    final rule = new CatchAllInsertRule();
+    final rule = CatchAllInsertRule();
 
     test('applies change as-is', () {
-      final doc = new Delta()..insert('Document\n');
+      final doc = Delta()..insert('Document\n');
       final actual = rule.apply(doc, 8, '!');
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(8)
         ..insert('!');
       expect(actual, expected);
@@ -23,22 +23,22 @@ void main() {
   });
 
   group('$PreserveLineStyleOnSplitRule', () {
-    final rule = new PreserveLineStyleOnSplitRule();
+    final rule = PreserveLineStyleOnSplitRule();
 
     test('skips at the beginning of a document', () {
-      final doc = new Delta()..insert('One\n');
+      final doc = Delta()..insert('One\n');
       final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNull);
     });
 
     test('applies in a block', () {
-      final doc = new Delta()
+      final doc = Delta()
         ..insert('One and two')
         ..insert('\n', ul)
         ..insert('Three')
         ..insert('\n', ul);
       final actual = rule.apply(doc, 8, '\n');
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(8)
         ..insert('\n', ul);
       expect(actual, isNotNull);
@@ -50,12 +50,12 @@ void main() {
     final rule = const ResetLineFormatOnNewLineRule();
 
     test('applies when line-break is inserted at the end of line', () {
-      final doc = new Delta()
+      final doc = Delta()
         ..insert('Hello world')
         ..insert('\n', NotusAttribute.h1.toJson());
       final actual = rule.apply(doc, 11, '\n');
       expect(actual, isNotNull);
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(11)
         ..insert('\n', NotusAttribute.h1.toJson())
         ..retain(1, NotusAttribute.heading.unset.toJson());
@@ -63,20 +63,20 @@ void main() {
     });
 
     test('applies without style reset if not needed', () {
-      final doc = new Delta()..insert('Hello world\n');
+      final doc = Delta()..insert('Hello world\n');
       final actual = rule.apply(doc, 11, '\n');
       expect(actual, isNotNull);
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(11)
         ..insert('\n');
       expect(actual, expected);
     });
 
     test('applies at the beginning of a document', () {
-      final doc = new Delta()..insert('\n', NotusAttribute.h1.toJson());
+      final doc = Delta()..insert('\n', NotusAttribute.h1.toJson());
       final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNotNull);
-      final expected = new Delta()
+      final expected = Delta()
         ..insert('\n', NotusAttribute.h1.toJson())
         ..retain(1, NotusAttribute.heading.unset.toJson());
       expect(actual, expected);
@@ -85,10 +85,10 @@ void main() {
     test('applies and keeps block style', () {
       final style = NotusAttribute.ul.toJson();
       style.addAll(NotusAttribute.h1.toJson());
-      final doc = new Delta()..insert('Hello world')..insert('\n', style);
+      final doc = Delta()..insert('Hello world')..insert('\n', style);
       final actual = rule.apply(doc, 11, '\n');
       expect(actual, isNotNull);
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(11)
         ..insert('\n', style)
         ..retain(1, NotusAttribute.heading.unset.toJson());
@@ -96,12 +96,12 @@ void main() {
     });
 
     test('applies to a line in the middle of a document', () {
-      final doc = new Delta()
+      final doc = Delta()
         ..insert('Hello \nworld!\nMore lines here.')
         ..insert('\n', NotusAttribute.h2.toJson());
       final actual = rule.apply(doc, 30, '\n');
       expect(actual, isNotNull);
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(30)
         ..insert('\n', NotusAttribute.h2.toJson())
         ..retain(1, NotusAttribute.heading.unset.toJson());
@@ -110,18 +110,18 @@ void main() {
   });
 
   group('$AutoExitBlockRule', () {
-    final rule = new AutoExitBlockRule();
+    final rule = AutoExitBlockRule();
 
     test('applies when line-break is inserted on empty line in a block', () {
       final ul = NotusAttribute.ul.toJson();
-      final doc = new Delta()
+      final doc = Delta()
         ..insert('Item 1')
         ..insert('\n', ul)
         ..insert('Item 2')
         ..insert('\n\n', ul);
       final actual = rule.apply(doc, 14, '\n');
       expect(actual, isNotNull);
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(14)
         ..retain(1, NotusAttribute.block.unset.toJson());
       expect(actual, expected);
@@ -129,58 +129,57 @@ void main() {
 
     test('applies only on empty line', () {
       final ul = NotusAttribute.ul.toJson();
-      final doc = new Delta()..insert('Item 1')..insert('\n', ul);
+      final doc = Delta()..insert('Item 1')..insert('\n', ul);
       final actual = rule.apply(doc, 6, '\n');
       expect(actual, isNull);
     });
 
     test('applies at the beginning of a document', () {
       final ul = NotusAttribute.ul.toJson();
-      final doc = new Delta()..insert('\n', ul);
+      final doc = Delta()..insert('\n', ul);
       final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNotNull);
-      final expected = new Delta()
-        ..retain(1, NotusAttribute.block.unset.toJson());
+      final expected = Delta()..retain(1, NotusAttribute.block.unset.toJson());
       expect(actual, expected);
     });
 
     test('ignores non-empty line at the beginning of a document', () {
       final ul = NotusAttribute.ul.toJson();
-      final doc = new Delta()..insert('Text\n', ul);
+      final doc = Delta()..insert('Text\n', ul);
       final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNull);
     });
   });
 
   group('$PreserveInlineStylesRule', () {
-    final rule = new PreserveInlineStylesRule();
+    final rule = PreserveInlineStylesRule();
     test('apply', () {
-      final doc = new Delta()
+      final doc = Delta()
         ..insert('Doc with ')
         ..insert('bold', bold)
         ..insert(' text');
       final actual = rule.apply(doc, 13, 'er');
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(13)
         ..insert('er', bold);
       expect(expected, actual);
     });
 
     test('apply at the beginning of a document', () {
-      final doc = new Delta()..insert('Doc with ');
+      final doc = Delta()..insert('Doc with ');
       final actual = rule.apply(doc, 0, 'A ');
       expect(actual, isNull);
     });
   });
 
   group('$AutoFormatLinksRule', () {
-    final rule = new AutoFormatLinksRule();
+    final rule = AutoFormatLinksRule();
     final link = NotusAttribute.link.fromString('https://example.com').toJson();
 
     test('apply simple', () {
-      final doc = new Delta()..insert('Doc with link https://example.com');
+      final doc = Delta()..insert('Doc with link https://example.com');
       final actual = rule.apply(doc, 33, ' ');
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(14)
         ..retain(19, link)
         ..insert(' ');
@@ -188,15 +187,15 @@ void main() {
     });
 
     test('applies only to insert of single space', () {
-      final doc = new Delta()..insert('Doc with link https://example.com');
+      final doc = Delta()..insert('Doc with link https://example.com');
       final actual = rule.apply(doc, 33, '/');
       expect(actual, isNull);
     });
 
     test('applies for links at the beginning of line', () {
-      final doc = new Delta()..insert('Doc with link\nhttps://example.com');
+      final doc = Delta()..insert('Doc with link\nhttps://example.com');
       final actual = rule.apply(doc, 33, ' ');
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(14)
         ..retain(19, link)
         ..insert(' ');
@@ -204,7 +203,7 @@ void main() {
     });
 
     test('ignores if already formatted as link', () {
-      final doc = new Delta()
+      final doc = Delta()
         ..insert('Doc with link\n')
         ..insert('https://example.com', link);
       final actual = rule.apply(doc, 33, ' ');
@@ -213,16 +212,16 @@ void main() {
   });
 
   group('$PreserveBlockStyleOnPasteRule', () {
-    final rule = new PreserveBlockStyleOnPasteRule();
+    final rule = PreserveBlockStyleOnPasteRule();
 
     test('applies in a block', () {
-      final doc = new Delta()
+      final doc = Delta()
         ..insert('One and two')
         ..insert('\n', ul)
         ..insert('Three')
         ..insert('\n', ul);
       final actual = rule.apply(doc, 8, 'also \n');
-      final expected = new Delta()
+      final expected = Delta()
         ..retain(8)
         ..insert('also ')
         ..insert('\n', ul);

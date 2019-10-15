@@ -7,7 +7,7 @@ import 'src/full_page.dart';
 import 'src/view.dart';
 
 void main() {
-  runApp(new ZefyrApp());
+  runApp(ZefyrApp());
 }
 
 class ZefyrApp extends StatelessWidget {

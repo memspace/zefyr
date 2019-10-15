@@ -1,40 +1,54 @@
-## Images
+## Embedding Images
 
-> Note that described API is considered experimental and is likely to be
+> Note that Image API is considered experimental and is likely to be
 > changed in backward incompatible ways. If this happens all changes will be
 > described in detail in the changelog to simplify upgrading.
 
-Zefyr (and Notus) supports embedded images. In order to handle images in
+Zefyr supports embedding images. In order to handle images in
 your application you need to implement `ZefyrImageDelegate` interface which
 looks like this:
 
 ```dart
 abstract class ZefyrImageDelegate<S> {
-  /// Builds image widget for specified [imageSource] and [context].
-  Widget buildImage(BuildContext context, String imageSource);
+  /// Unique key to identify camera source.
+  S get cameraSource;
+
+  /// Unique key to identify gallery source.
+  S get gallerySource;
+
+  /// Builds image widget for specified image [key].
+  ///
+  /// The [key] argument contains value which was previously returned from
+  /// [pickImage].
+  Widget buildImage(BuildContext context, String key);
 
   /// Picks an image from specified [source].
   ///
   /// Returns unique string key for the selected image. Returned key is stored
   /// in the document.
+  ///
+  /// Depending on your application returned key may represent a path to
+  /// an image file on user's device, an HTTP link, or an identifier generated
+  /// by a file hosting service like AWS S3 or Google Drive.
   Future<String> pickImage(S source);
 }
 ```
 
-Zefyr comes with default implementation which exists mostly to provide an
-example and a starting point for your own version.
+There is no default implementation of this interface since resolving image
+sources is always application-specific.
 
-It is recommended to always have your own implementation specific to your
-application.
+> Note that prior to 0.7.0 Zefyr did provide simple default implementation of
+> `ZefyrImageDelegate` however it was removed as it introduced unnecessary
+> dependency on `image_picker` plugin.
 
 ### Implementing ZefyrImageDelegate
+
+For this example we will use [image_picker](https://pub.dev/packages/image_picker)
+plugin which allows us to select images from device's camera or photo gallery.
 
 Let's start from the `pickImage` method:
 
 ```dart
-// Currently Zefyr depends on image_picker plugin to show camera or image gallery.
-// (note that in future versions this may change so that users can choose their
-// own plugin and define custom sources)
 import 'package:image_picker/image_picker.dart';
 
 class MyAppZefyrImageDelegate implements ZefyrImageDelegate<ImageSource> {
@@ -53,17 +67,17 @@ camera or gallery), handling result of selection and returning a string value
 which essentially serves as an identifier for the image.
 
 Returned value is stored in the document Delta and later on used to build the
-appropriate `Widget`.
+appropriate image widget.
 
 It is up to the developer to define what this value represents.
 
 In the above example we simply return a full path to the file on user's device,
 e.g. `file:///Users/something/something/image.jpg`. Some other examples
-may include a web link, `https://myapp.com/images/some.jpg` or just some
-arbitrary string like an ID.
+may include a web link, `https://myapp.com/images/some.jpg` or an
+arbitrary string like an identifier of an image in a cloud storage like AWS S3.
 
 For instance, if you upload files to your server you can initiate this task
-in `pickImage`, for instance:
+in `pickImage` as follows:
 
 ```dart
 class MyAppZefyrImageDelegate implements ZefyrImageDelegate<ImageSource> {
@@ -84,7 +98,7 @@ class MyAppZefyrImageDelegate implements ZefyrImageDelegate<ImageSource> {
 
 Next we need to implement `buildImage`. This method takes `imageSource` argument
 which contains that same string you returned from `pickImage`. Here you can
-use this value to create a Flutter `Widget` which renders the image. Normally
+use this value to create a Flutter widget which renders the image. Normally
 you would return the standard `Image` widget from this method, but it is not
 a requirement. You are free to create a custom widget which, for instance,
 shows progress of upload operation that you initiated in the `pickImage` call.
@@ -97,18 +111,61 @@ class MyAppZefyrImageDelegate implements ZefyrImageDelegate<ImageSource> {
   // ...
 
   @override
-  Widget buildImage(BuildContext context, String imageSource) {
-    final file = new File.fromUri(Uri.parse(imageSource));
-    /// Create standard [FileImage] provider. If [imageSource] was an HTTP link
+  Widget buildImage(BuildContext context, String key) {
+    final file = File.fromUri(Uri.parse(key));
+    /// Create standard [FileImage] provider. If [key] was an HTTP link
     /// we could use [NetworkImage] instead.
-    final image = new FileImage(file);
-    return new Image(image: image);
+    final image = FileImage(file);
+    return Image(image: image);
   }
 }
 ```
 
-### Previous
+There is two more overrides we need to implement which configure source types
+used by Zefyr toolbar:
 
-* [Heuristics][heuristics]
+```dart
+class MyAppZefyrImageDelegate implements ZefyrImageDelegate<ImageSource> {
+  // ...
+  @override
+  ImageSource get cameraSource => ImageSource.camera;
 
-[heuristics]: /doc/heuristics.md
+  @override
+  ImageSource get gallerySource => ImageSource.gallery;
+}
+```
+
+Now our image delegate is ready to be used by Zefyr so the last step is to
+pass it to Zefyr editor:
+
+```dart
+import 'package:zefyr/zefyr.dart'
+
+class MyAppPageState extends State<MyAppPage> {
+  FocueNode _focusNode = FocusNode();
+  ZefyrController _controller;
+
+  // ...
+
+  @override
+  Widget build(BuildContext context) {
+    final editor = new ZefyrEditor(
+      focusNode: _focusNode,
+      controller: _controller,
+      imageDelegate: MyAppZefyrImageDelegate(),
+    );
+
+    // ... do more with this page's layout
+
+    return ZefyrScaffold(
+      child: Container(
+        // ... customize
+        child: editor,
+      )
+    );
+  }
+}
+```
+
+When `imageDelegate` field is set to non-null value it automatically enables
+image selection button in Zefyr's style toolbar.

@@ -10,15 +10,15 @@ import 'package:zefyr/zefyr.dart';
 
 void main() {
   group('$ZefyrRichText', () {
-    final doc = new NotusDocument();
+    final doc = NotusDocument();
     doc.insert(0, 'This House Is A Circus');
-    final text = new TextSpan(text: 'This House Is A Circus');
+    final text = TextSpan(text: 'This House Is A Circus');
 
     Widget widget;
     setUp(() {
-      widget = new Directionality(
+      widget = Directionality(
         textDirection: TextDirection.ltr,
-        child: new ZefyrRichText(
+        child: ZefyrRichText(
           node: doc.root.children.first as LineNode,
           text: text,
         ),
@@ -27,8 +27,7 @@ void main() {
 
     testWidgets('initialize', (tester) async {
       await tester.pumpWidget(widget);
-      ZefyrRichText result =
-          tester.firstWidget(find.byType(ZefyrRichText));
+      ZefyrRichText result = tester.firstWidget(find.byType(ZefyrRichText));
       expect(result, isNotNull);
       expect(result.text.text, 'This House Is A Circus');
     });

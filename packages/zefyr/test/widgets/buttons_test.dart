@@ -1,8 +1,9 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zefyr/src/widgets/buttons.dart';
 import 'package:zefyr/zefyr.dart';
@@ -12,7 +13,7 @@ import '../testing.dart';
 void main() {
   group('$ZefyrButton', () {
     testWidgets('toggle style', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.updateSelection(base: 5, extent: 10);
       await editor.tapButtonWithIcon(Icons.format_bold);
@@ -30,7 +31,7 @@ void main() {
 
     testWidgets('toggle state for different styles of the same attribute',
         (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
 
       await editor.tapButtonWithIcon(Icons.format_list_bulleted);
@@ -45,7 +46,7 @@ void main() {
 
   group('$HeadingButton', () {
     testWidgets('toggle menu', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.format_size);
 
@@ -59,7 +60,7 @@ void main() {
     });
 
     testWidgets('toggle styles', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.format_size);
       await editor.tapButtonWithText('H3');
@@ -70,7 +71,7 @@ void main() {
     });
 
     testWidgets('close overlay', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.format_size);
       expect(find.text('H1'), findsOneWidget);
@@ -81,7 +82,7 @@ void main() {
 
   group('$LinkButton', () {
     testWidgets('disabled when selection is collapsed', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.link);
       expect(find.byIcon(Icons.link_off), findsNothing);
@@ -89,7 +90,7 @@ void main() {
 
     testWidgets('enabled and toggles menu with non-empty selection',
         (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.updateSelection(base: 5, extent: 10);
       await editor.tapButtonWithIcon(Icons.link);
@@ -97,7 +98,7 @@ void main() {
     });
 
     testWidgets('auto cancels edit on selection update', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.updateSelection(base: 5, extent: 10);
       await editor.tapButtonWithIcon(Icons.link);
@@ -110,7 +111,7 @@ void main() {
     });
 
     testWidgets('editing link', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       await editor.updateSelection(base: 5, extent: 10);
 
@@ -145,21 +146,11 @@ void main() {
   });
 
   group('$ImageButton', () {
-    const MethodChannel channel =
-        const MethodChannel('plugins.flutter.io/image_picker');
-
-    final List<MethodCall> log = <MethodCall>[];
-
-    setUp(() {
-      channel.setMockMethodCallHandler((MethodCall methodCall) async {
-        log.add(methodCall);
-        return '/tmp/test.jpg';
-      });
-      log.clear();
-    });
-
     testWidgets('toggle overlay', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(
+        tester: tester,
+        imageDelegate: _TestImageDelegate(),
+      );
       await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
 
@@ -169,41 +160,43 @@ void main() {
     });
 
     testWidgets('pick from camera', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(
+        tester: tester,
+        imageDelegate: _TestImageDelegate(),
+      );
       await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
       await editor.tapButtonWithIcon(Icons.photo_camera);
-      expect(log, hasLength(1));
-      expect(
-        log.single,
-        isMethodCall(
-          'pickImage',
-          arguments: <String, dynamic>{
-            'source': 0,
-            'maxWidth': null,
-            'maxHeight': null,
-          },
-        ),
-      );
+      expect(find.byType(ZefyrImage), findsOneWidget);
     });
 
     testWidgets('pick from gallery', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(
+        tester: tester,
+        imageDelegate: _TestImageDelegate(),
+      );
       await editor.pumpAndTap();
       await editor.tapButtonWithIcon(Icons.photo);
       await editor.tapButtonWithIcon(Icons.photo_library);
-      expect(log, hasLength(1));
-      expect(
-        log.single,
-        isMethodCall(
-          'pickImage',
-          arguments: <String, dynamic>{
-            'source': 1,
-            'maxWidth': null,
-            'maxHeight': null,
-          },
-        ),
-      );
+      expect(find.byType(ZefyrImage), findsOneWidget);
     });
   });
+}
+
+class _TestImageDelegate implements ZefyrImageDelegate<String> {
+  @override
+  Widget buildImage(BuildContext context, String key) {
+    return Image.file(File(key));
+  }
+
+  @override
+  String get cameraSource => "camera";
+
+  @override
+  String get gallerySource => "gallery";
+
+  @override
+  Future<String> pickImage(String source) {
+    return Future.value("file:///tmp/test.jpg");
+  }
 }

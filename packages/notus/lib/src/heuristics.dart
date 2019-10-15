@@ -62,8 +62,7 @@ class NotusHeuristics {
       final result = rule.apply(delta, index, insert);
       if (result != null) return result..trim();
     }
-    throw new StateError(
-        'Failed to apply insert heuristic rules: none applied.');
+    throw StateError('Failed to apply insert heuristic rules: none applied.');
   }
 
   /// Applies heuristic rules to specified format operation based on current
@@ -75,8 +74,7 @@ class NotusHeuristics {
       final result = rule.apply(delta, index, length, value);
       if (result != null) return result..trim();
     }
-    throw new StateError(
-        'Failed to apply format heuristic rules: none applied.');
+    throw StateError('Failed to apply format heuristic rules: none applied.');
   }
 
   /// Applies heuristic rules to specified delete operation based on current
@@ -87,7 +85,6 @@ class NotusHeuristics {
       final result = rule.apply(delta, index, length);
       if (result != null) return result..trim();
     }
-    throw new StateError(
-        'Failed to apply delete heuristic rules: none applied.');
+    throw StateError('Failed to apply delete heuristic rules: none applied.');
   }
 }

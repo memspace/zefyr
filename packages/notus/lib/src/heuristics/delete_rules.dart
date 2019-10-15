@@ -22,7 +22,7 @@ class CatchAllDeleteRule extends DeleteRule {
 
   @override
   Delta apply(Delta document, int index, int length) {
-    return new Delta()
+    return Delta()
       ..retain(index)
       ..delete(length);
   }
@@ -39,12 +39,12 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
 
   @override
   Delta apply(Delta document, int index, int length) {
-    DeltaIterator iter = new DeltaIterator(document);
+    DeltaIterator iter = DeltaIterator(document);
     iter.skip(index);
     final target = iter.next(1);
     if (target.data != '\n') return null;
     iter.skip(length - 1);
-    final Delta result = new Delta()
+    final Delta result = Delta()
       ..retain(index)
       ..delete(length);
 
@@ -69,8 +69,8 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
 
   Map<String, dynamic> _unsetAttributes(Map<String, dynamic> attributes) {
     if (attributes == null) return null;
-    return attributes.map<String, dynamic>((String key, dynamic value) =>
-        new MapEntry<String, dynamic>(key, null));
+    return attributes.map<String, dynamic>(
+        (String key, dynamic value) => MapEntry<String, dynamic>(key, null));
   }
 }
 
@@ -80,7 +80,7 @@ class EnsureEmbedLineRule extends DeleteRule {
 
   @override
   Delta apply(Delta document, int index, int length) {
-    DeltaIterator iter = new DeltaIterator(document);
+    DeltaIterator iter = DeltaIterator(document);
 
     // First, check if line-break deleted after an embed.
     Operation op = iter.skip(index);
@@ -123,7 +123,7 @@ class EnsureEmbedLineRule extends DeleteRule {
     }
 
     if (foundEmbed) {
-      return new Delta()
+      return Delta()
         ..retain(index + indexDelta)
         ..delete(length + lengthDelta);
     }

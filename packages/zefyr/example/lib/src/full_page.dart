@@ -1,9 +1,15 @@
+// Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
+
+import 'images.dart';
 
 class ZefyrLogo extends StatelessWidget {
   @override
@@ -21,7 +27,7 @@ class ZefyrLogo extends StatelessWidget {
 
 class FullPageEditorScreen extends StatefulWidget {
   @override
-  _FullPageEditorScreenState createState() => new _FullPageEditorScreenState();
+  _FullPageEditorScreenState createState() => _FullPageEditorScreenState();
 }
 
 final doc =
@@ -38,7 +44,7 @@ Delta getDelta() {
 class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
   final ZefyrController _controller =
       ZefyrController(NotusDocument.fromDelta(getDelta()));
-  final FocusNode _focusNode = new FocusNode();
+  final FocusNode _focusNode = FocusNode();
   bool _editing = false;
   StreamSubscription<NotusChange> _sub;
 
@@ -58,7 +64,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = new ZefyrThemeData(
+    final theme = ZefyrThemeData(
       cursorColor: Colors.blue,
       toolbarTheme: ZefyrToolbarTheme.fallback(context).copyWith(
         color: Colors.grey.shade800,
@@ -69,8 +75,8 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
     );
 
     final done = _editing
-        ? [new FlatButton(onPressed: _stopEditing, child: Text('DONE'))]
-        : [new FlatButton(onPressed: _startEditing, child: Text('EDIT'))];
+        ? [FlatButton(onPressed: _stopEditing, child: Text('DONE'))]
+        : [FlatButton(onPressed: _startEditing, child: Text('EDIT'))];
     return Scaffold(
       resizeToAvoidBottomPadding: true,
       appBar: AppBar(
@@ -86,8 +92,8 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
           child: ZefyrEditor(
             controller: _controller,
             focusNode: _focusNode,
-            enabled: _editing,
-            imageDelegate: new CustomImageDelegate(),
+            mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
+            imageDelegate: CustomImageDelegate(),
           ),
         ),
       ),
@@ -104,22 +110,5 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
     setState(() {
       _editing = false;
     });
-  }
-}
-
-/// Custom image delegate used by this example to load image from application
-/// assets.
-///
-/// Default image delegate only supports [FileImage]s.
-class CustomImageDelegate extends ZefyrDefaultImageDelegate {
-  @override
-  Widget buildImage(BuildContext context, String imageSource) {
-    // We use custom "asset" scheme to distinguish asset images from other files.
-    if (imageSource.startsWith('asset://')) {
-      final asset = new AssetImage(imageSource.replaceFirst('asset://', ''));
-      return new Image(image: asset);
-    } else {
-      return super.buildImage(context, imageSource);
-    }
   }
 }

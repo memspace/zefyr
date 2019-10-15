@@ -4,8 +4,7 @@
 
 import 'package:test/test.dart';
 
-const isAssertionError = const TypeMatcher<AssertionError>();
+const isAssertionError = TypeMatcher<AssertionError>();
 
-const Matcher throwsAssertionError =
-    // ignore: deprecated_member_use
-    const Throws(isAssertionError);
+// ignore: deprecated_member_use
+const Matcher throwsAssertionError = Throws(isAssertionError);

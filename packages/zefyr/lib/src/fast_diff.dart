@@ -19,7 +19,7 @@ DiffResult fastDiff(String oldText, String newText, int cursorPosition) {
   }
   final String deleted = (start < end) ? oldText.substring(start, end) : '';
   final inserted = newText.substring(start, end + delta);
-  return new DiffResult(start, deleted, inserted);
+  return DiffResult(start, deleted, inserted);
 }
 
 /// A diff between two strings of text.

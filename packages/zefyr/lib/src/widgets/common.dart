@@ -35,11 +35,11 @@ class RawZefyrLine extends StatefulWidget {
   final EdgeInsets padding;
 
   @override
-  _RawZefyrLineState createState() => new _RawZefyrLineState();
+  _RawZefyrLineState createState() => _RawZefyrLineState();
 }
 
 class _RawZefyrLineState extends State<RawZefyrLine> {
-  final LayerLink _link = new LayerLink();
+  final LayerLink _link = LayerLink();
 
   @override
   Widget build(BuildContext context) {
@@ -113,21 +113,21 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     final List<TextSpan> children = widget.node.children
         .map((node) => _segmentToTextSpan(node, theme))
         .toList(growable: false);
-    return new TextSpan(style: widget.style, children: children);
+    return TextSpan(style: widget.style, children: children);
   }
 
   TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme) {
     final TextNode segment = node;
     final attrs = segment.style;
 
-    return new TextSpan(
+    return TextSpan(
       text: segment.value,
       style: _getTextStyle(attrs, theme),
     );
   }
 
   TextStyle _getTextStyle(NotusStyle style, ZefyrThemeData theme) {
-    TextStyle result = new TextStyle();
+    TextStyle result = TextStyle();
     if (style.containsSame(NotusAttribute.bold)) {
       result = result.merge(theme.boldStyle);
     }
@@ -149,7 +149,7 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     } else if (embed.type == EmbedType.image) {
       return ZefyrImage(node: node, delegate: scope.imageDelegate);
     } else {
-      throw new UnimplementedError('Unimplemented embed type ${embed.type}');
+      throw UnimplementedError('Unimplemented embed type ${embed.type}');
     }
   }
 }

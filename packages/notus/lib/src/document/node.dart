@@ -136,7 +136,7 @@ class LookupResult {
 /// Most of the operation handling logic is implemented by [LineNode] and
 /// [TextNode].
 abstract class ContainerNode<T extends Node> extends Node {
-  final LinkedList<Node> _children = new LinkedList<Node>();
+  final LinkedList<Node> _children = LinkedList<Node>();
 
   /// List of children.
   LinkedList<Node> get children => _children;
@@ -207,17 +207,17 @@ abstract class ContainerNode<T extends Node> extends Node {
   /// [LookupResult.offset] is set to relative offset within returned child node
   /// which points at the same character position in the document as the
   /// original [offset].
-  LookupResult lookup(int offset, {bool inclusive: false}) {
+  LookupResult lookup(int offset, {bool inclusive = false}) {
     assert(offset >= 0 && offset <= this.length);
 
     for (Node node in children) {
       final int length = node.length;
       if (offset < length || (inclusive && offset == length && (node.isLast))) {
-        return new LookupResult(node, offset);
+        return LookupResult(node, offset);
       }
       offset -= length;
     }
-    return new LookupResult(null, 0);
+    return LookupResult(null, 0);
   }
 
   //
@@ -275,7 +275,7 @@ abstract class StyledNode implements Node {
 abstract class StyledNodeMixin implements StyledNode {
   @override
   NotusStyle get style => _style;
-  NotusStyle _style = new NotusStyle();
+  NotusStyle _style = NotusStyle();
 
   /// Applies style [attribute] to this node.
   void applyAttribute(NotusAttribute attribute) {
@@ -291,14 +291,14 @@ abstract class StyledNodeMixin implements StyledNode {
 
   /// Clears style of this node.
   void clearStyle() {
-    _style = new NotusStyle();
+    _style = NotusStyle();
   }
 }
 
 /// Root node of document tree.
 class RootNode extends ContainerNode<ContainerNode<Node>> {
   @override
-  ContainerNode<Node> get defaultChild => new LineNode();
+  ContainerNode<Node> get defaultChild => LineNode();
 
   @override
   void optimize() {/* no-op */}
@@ -306,5 +306,5 @@ class RootNode extends ContainerNode<ContainerNode<Node>> {
   @override
   Delta toDelta() => children
       .map((child) => child.toDelta())
-      .fold(new Delta(), (a, b) => a.concat(b));
+      .fold(Delta(), (a, b) => a.concat(b));
 }

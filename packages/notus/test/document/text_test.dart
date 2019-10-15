@@ -5,9 +5,9 @@ import 'package:test/test.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:notus/notus.dart';
 
-final boldStyle = new NotusStyle().merge(NotusAttribute.bold);
-final boldUnsetStyle = new NotusStyle().put(NotusAttribute.bold.unset);
-final italicStyle = new NotusStyle().merge(NotusAttribute.italic);
+final boldStyle = NotusStyle().merge(NotusAttribute.bold);
+final boldUnsetStyle = NotusStyle().put(NotusAttribute.bold.unset);
+final italicStyle = NotusStyle().merge(NotusAttribute.italic);
 
 void main() {
   group('$TextNode', () {
@@ -15,16 +15,16 @@ void main() {
     TextNode node;
 
     setUp(() {
-      line = new LineNode();
-      node = new TextNode('London "Grammar"');
+      line = LineNode();
+      node = TextNode('London "Grammar"');
       line.add(node);
     });
 
     test('new empty text', () {
-      final node = new TextNode();
+      final node = TextNode();
       expect(node.value, isEmpty);
       expect(node.length, 0);
-      expect(node.style, new NotusStyle());
+      expect(node.style, NotusStyle());
       expect(node.toDelta(), isEmpty);
     });
 
@@ -37,8 +37,7 @@ void main() {
     test('new text with contents', () {
       expect(node.value, isNotEmpty);
       expect(node.length, 16);
-      expect(
-          node.toDelta().toList(), [new Operation.insert('London "Grammar"')]);
+      expect(node.toDelta().toList(), [Operation.insert('London "Grammar"')]);
     });
 
     test('insert at the end', () {
@@ -99,15 +98,15 @@ void main() {
       final b = boldStyle.toJson();
       expect(
         line.children.elementAt(0).toDelta(),
-        new Delta()..insert('Lon', b),
+        Delta()..insert('Lon', b),
       );
       expect(
         line.children.elementAt(1).toDelta(),
-        new Delta()..insert('don'),
+        Delta()..insert('don'),
       );
       expect(
         line.children.elementAt(2).toDelta(),
-        new Delta()..insert('don', b),
+        Delta()..insert('don', b),
       );
     });
   });

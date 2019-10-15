@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 /// Helper class that keeps state relevant to the editing cursor.
 class CursorTimer {
-  static const _kCursorBlinkHalfPeriod = const Duration(milliseconds: 500);
+  static const _kCursorBlinkHalfPeriod = Duration(milliseconds: 500);
 
   Timer _timer;
-  final ValueNotifier<bool> _showCursor = new ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _showCursor = ValueNotifier<bool>(false);
 
   ValueNotifier<bool> get value => _showCursor;
 
@@ -18,7 +18,7 @@ class CursorTimer {
   /// Starts cursor timer.
   void start() {
     _showCursor.value = true;
-    _timer = new Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
+    _timer = Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
   }
 
   /// Stops cursor timer.

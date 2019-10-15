@@ -7,8 +7,8 @@ import 'package:quill_delta/quill_delta.dart';
 import 'package:test/test.dart';
 
 NotusDocument dartconfDoc() {
-  Delta delta = new Delta()..insert('DartConf\nLos Angeles\n');
-  return new NotusDocument.fromDelta(delta);
+  Delta delta = Delta()..insert('DartConf\nLos Angeles\n');
+  return NotusDocument.fromDelta(delta);
 }
 
 final ul = NotusAttribute.ul.toJson();
@@ -18,7 +18,7 @@ void main() {
   group('$NotusHeuristics', () {
     test('ensures heuristics are applied', () {
       final doc = dartconfDoc();
-      final heuristics = new NotusHeuristics(
+      final heuristics = NotusHeuristics(
         formatRules: [],
         insertRules: [],
         deleteRules: [],

@@ -10,7 +10,7 @@ import '../testing.dart';
 void main() {
   group('$ZefyrEditableText', () {
     testWidgets('user input', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
       final currentValue = editor.document.toPlainText();
       await enterText(tester, 'Added $currentValue');
@@ -18,13 +18,13 @@ void main() {
     });
 
     testWidgets('autofocus', (tester) async {
-      final editor = new EditorSandBox(tester: tester, autofocus: true);
+      final editor = EditorSandBox(tester: tester, autofocus: true);
       await editor.pump();
       expect(editor.focusNode.hasFocus, isTrue);
     });
 
     testWidgets('no autofocus', (tester) async {
-      final editor = new EditorSandBox(tester: tester);
+      final editor = EditorSandBox(tester: tester);
       await editor.pump();
       expect(editor.focusNode.hasFocus, isFalse);
     });
@@ -34,9 +34,9 @@ void main() {
 Future<Null> enterText(WidgetTester tester, String text) async {
   return TestAsyncUtils.guard(() async {
     tester.testTextInput.updateEditingValue(
-      new TextEditingValue(
+      TextEditingValue(
         text: text,
-        selection: new TextSelection.collapsed(offset: 6),
+        selection: TextSelection.collapsed(offset: 6),
       ),
     );
     await tester.idle();

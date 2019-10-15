@@ -20,18 +20,8 @@ cache:
   directories:
     - $HOME/.pub-cache
 
-#env:
-#  - FLUTTER_VERSION=stable
-#  - FLUTTER_VERSION=master
-
-matrix:
-  include:
-    - name: "Master build"
-      if: branch = flutter-master
-      env: FLUTTER_VERSION=master
-    - name: "Stable build"
-      if: branch != flutter-master
-      env: FLUTTER_VERSION=stable
+env:
+  - FLUTTER_VERSION=stable
 
 before_script:
   - pwd

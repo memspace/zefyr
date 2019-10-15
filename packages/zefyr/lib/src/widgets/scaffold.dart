@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'editor.dart';
+
+/// Provides necessary layout for [ZefyrEditor].
 class ZefyrScaffold extends StatefulWidget {
   final Widget child;
 

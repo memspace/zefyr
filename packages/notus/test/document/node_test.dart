@@ -8,12 +8,12 @@ void main() {
   group('$Node', () {
     RootNode root;
     setUp(() {
-      root = new RootNode();
+      root = RootNode();
     });
 
     test('mounted', () {
-      LineNode line = new LineNode();
-      TextNode text = new TextNode();
+      LineNode line = LineNode();
+      TextNode text = TextNode();
       expect(text.mounted, isFalse);
       line.add(text);
       expect(text.mounted, isTrue);

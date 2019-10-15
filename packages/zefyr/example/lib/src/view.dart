@@ -1,3 +1,7 @@
+// Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -5,10 +9,11 @@ import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 
 import 'full_page.dart';
+import 'images.dart';
 
 class ViewScreen extends StatefulWidget {
   @override
-  _ViewScreen createState() => new _ViewScreen();
+  _ViewScreen createState() => _ViewScreen();
 }
 
 final doc =
@@ -27,7 +32,7 @@ class _ViewScreen extends State<ViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = new ZefyrThemeData(
+    final theme = ZefyrThemeData(
       toolbarTheme: ZefyrToolbarTheme.fallback(context).copyWith(
         color: Colors.grey.shade800,
         toggleColor: Colors.grey.shade900,
@@ -59,29 +64,12 @@ class _ViewScreen extends State<ViewScreen> {
               padding: const EdgeInsets.all(16.0),
               child: ZefyrView(
                 document: doc,
-                imageDelegate: new CustomImageDelegate(),
+                imageDelegate: CustomImageDelegate(),
               ),
             )
           ],
         ),
       ),
     );
-  }
-}
-
-/// Custom image delegate used by this example to load image from application
-/// assets.
-///
-/// Default image delegate only supports [FileImage]s.
-class CustomImageDelegate extends ZefyrDefaultImageDelegate {
-  @override
-  Widget buildImage(BuildContext context, String imageSource) {
-    // We use custom "asset" scheme to distinguish asset images from other files.
-    if (imageSource.startsWith('asset://')) {
-      final asset = new AssetImage(imageSource.replaceFirst('asset://', ''));
-      return new Image(image: asset);
-    } else {
-      return super.buildImage(context, imageSource);
-    }
   }
 }
