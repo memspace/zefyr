@@ -11,11 +11,108 @@ class NotusMarkdownCodec extends Codec<Delta, String> {
   const NotusMarkdownCodec();
 
   @override
-  Converter<String, Delta> get decoder =>
-      throw UnimplementedError('Decoding is not implemented yet.');
+  Converter<String, Delta> get decoder => _NotusMarkdownDecoder();
+//      throw UnimplementedError('Decoding is not implemented yet.');
 
   @override
   Converter<Delta, String> get encoder => _NotusMarkdownEncoder();
+}
+
+class _NotusMarkdownDecoder extends Converter<String, Delta> {
+  final RegExp _headingRegExp = RegExp(r'(#+) (.+)');
+  final RegExp _styleRegExp = RegExp(r'((?:\*|_){1,3})(.*?[^\1 ])\1');
+  final RegExp _linkRegExp = RegExp(r'\[([^\]]+)\]\(([^\)]+)\)');
+  final attributesByStyleLength = [null, {'i': true}, {'b': true }, {'i': true, 'b': true }];
+
+  @override
+  Delta convert(String input) {
+    final doc = NotusDocument();
+
+    final delta = new Delta();
+
+    final lines = input.split('\n');
+    var index = 0;
+
+    for (var line in lines) {
+      _handleLine(line, delta);
+      index++;
+    }
+
+    return delta;
+  }
+  
+  _handleLine(String line, Delta delta) {
+    line = line.trim();
+    var match = _headingRegExp.matchAsPrefix(line);
+    if (match != null) {
+      var attribute = NotusAttribute.heading.withValue(match.group(1).length);
+//        delta..insert(match.group(2));
+      _handleSpan(match.group(2), delta, false, null);
+      delta.insert('\n', attribute.toJson());
+    } else if (line.isNotEmpty) {
+      _handleSpan(line, delta, true, null);
+    }
+  } 
+
+  _handleSpan(String span, Delta delta, bool addNewLine, Map<String, dynamic> outerStyle) {
+    var start = _handleStyles(span, delta, outerStyle);
+    span = span.substring(start);
+    start = _handleLinks(span, delta, outerStyle);
+
+    var remaining = span.substring(start);
+    if (remaining.isNotEmpty) {
+      if (addNewLine) {
+        delta.insert('$remaining\n', outerStyle);
+      } else {
+        delta.insert(remaining, outerStyle);
+      }
+    } else if (addNewLine) {
+      delta.insert('\n', outerStyle);
+    }
+  }
+
+  _handleStyles(String span, Delta delta, Map<String, dynamic> outerStyle) {
+    var start = 0;
+
+    var matches = _styleRegExp.allMatches(span);
+    matches.forEach((match) {
+      if (match.start > start) {
+        delta.insert(span.substring(start, match.start), outerStyle);
+      }
+
+      var text = match.group(2);
+      var newStyle = attributesByStyleLength[match.group(1).length];
+      if (outerStyle != null) {
+        newStyle.addAll(outerStyle);
+      }
+      _handleSpan(text, delta, false, newStyle);
+      start = match.end;
+    });
+
+    return start;
+  }
+
+  _handleLinks(String span, Delta delta, Map<String, dynamic> outerStyle) {
+    var start = 0;
+
+    var matches = _linkRegExp.allMatches(span);
+    matches.forEach((match) {
+      if (match.start > start) {
+        delta.insert(span.substring(start, match.start)); //, outerStyle);
+      }
+
+      var text = match.group(1);
+      var href = match.group(2);
+      Map<String, dynamic> attributes = {'a': href}; // NotusAttribute.link.fromString(href).toJson();
+      if (outerStyle != null) {
+        attributes.addAll(outerStyle);
+      }
+      _handleSpan(text, delta, false, attributes);
+      start = match.end;
+    });
+
+    return start;
+  }
 }
 
 class _NotusMarkdownEncoder extends Converter<Delta, String> {
@@ -142,7 +239,7 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
       if (padding.isNotEmpty) buffer.write(padding);
     }
     // Now open any new styles.
-    for (var value in style.values) {
+    for (var value in style.values.toList().reversed) {
       if (value.scope == NotusAttributeScope.line) continue;
       if (currentStyle.containsSame(value)) continue;
       final originalText = text;
