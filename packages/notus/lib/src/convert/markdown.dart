@@ -22,7 +22,7 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
   final RegExp _headingRegExp = RegExp(r'(#+) (.+)');
   final RegExp _styleRegExp = RegExp(r'((?:\*|_){1,3})(.*?[^\1 ])\1');
   final RegExp _linkRegExp = RegExp(r'\[([^\]]+)\]\(([^\)]+)\)');
-  final attributesByStyleLength = [null, {'i': true}, {'b': true }, {'i': true, 'b': true }];
+  final List<Map<String, dynamic>> attributesByStyleLength = [null, {'i': true}, {'b': true }, {'i': true, 'b': true }];
 
   @override
   Delta convert(String input) {
@@ -77,11 +77,17 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     var matches = _styleRegExp.allMatches(span);
     matches.forEach((match) {
       if (match.start > start) {
-        delta.insert(span.substring(start, match.start), outerStyle);
+        if (span.substring(match.start - 1, match.start) == '[') {
+          delta.insert(span.substring(start, match.start - 1), outerStyle);
+          start = match.start - 1 + _handleLinks(span.substring(match.start - 1), delta, outerStyle);
+          return;
+        } else {
+          delta.insert(span.substring(start, match.start), outerStyle);
+        }
       }
 
       var text = match.group(2);
-      var newStyle = attributesByStyleLength[match.group(1).length];
+      Map<String, dynamic> newStyle = attributesByStyleLength[match.group(1).length];
       if (outerStyle != null) {
         newStyle.addAll(outerStyle);
       }

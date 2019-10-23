@@ -207,9 +207,15 @@ void main() {
       expect(delta.elementAt(1).attributes["b"], true);
       expect(delta.elementAt(1).attributes["a"], null);
 
+      expect(delta.elementAt(2).data, ' is a ');
+      expect(delta.elementAt(2).attributes, null);
+
       expect(delta.elementAt(3).data, 'circus');
       expect(delta.elementAt(3).attributes["b"], true);
       expect(delta.elementAt(3).attributes["a"], 'https://github.com');
+
+      expect(delta.elementAt(4).data, '\n');
+      expect(delta.length, 5);
 
       final andBack = notusMarkdown.encode(delta);
       expect(andBack, markdown);
