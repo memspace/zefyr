@@ -20,9 +20,9 @@ class NotusMarkdownCodec extends Codec<Delta, String> {
 class _NotusMarkdownDecoder extends Converter<String, Delta> {
   final List<Map<String, dynamic>> _attributesByStyleLength = [
     null,
-    {'i': true},            // _
-    {'b': true },           // **
-    {'i': true, 'b': true } // **_
+    {'i': true}, // _
+    {'b': true}, // **
+    {'i': true, 'b': true} // **_
   ];
   final RegExp _headingRegExp = RegExp(r'(#+) *(.+)');
   final RegExp _styleRegExp = RegExp(r'((?:\*|_){1,3})(.*?[^\1 ])\1');
@@ -46,7 +46,7 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
 
     return delta;
   }
-  
+
   _handleLine(String line, Delta delta, [Map<String, dynamic> attributes]) {
     if (_handleBlockQuote(line, delta, attributes)) {
       return;
@@ -65,7 +65,8 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
 
   /// Markdown supports headings and blocks within blocks (except for within code)
   /// but not blocks within headers, or ul within
-  bool _handleBlock(String line, Delta delta, [Map<String, dynamic> attributes]) {
+  bool _handleBlock(String line, Delta delta,
+      [Map<String, dynamic> attributes]) {
     var match;
 
     match = _codeRegExp.matchAsPrefix(line);
@@ -74,12 +75,16 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
       return true;
     }
     if (_inBlockStack) {
-      delta.insert(line + '\n', NotusAttribute.code.toJson()); // TODO: replace with?: {'quote': true})
+      delta.insert(
+          line + '\n',
+          NotusAttribute.code
+              .toJson()); // TODO: replace with?: {'quote': true})
       // Don't bother testing for code blocks within block stacks
       return true;
     }
 
-    if (_handleOrderedList(line, delta, attributes) || _handleUnorderedList(line, delta, attributes)) {
+    if (_handleOrderedList(line, delta, attributes) ||
+        _handleUnorderedList(line, delta, attributes)) {
       return true;
     }
 
@@ -87,11 +92,14 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
   }
 
   /// all blocks are supported within bq
-  bool _handleBlockQuote(String line, Delta delta, [Map<String, dynamic> attributes]) {
+  bool _handleBlockQuote(String line, Delta delta,
+      [Map<String, dynamic> attributes]) {
     var match = _bqRegExp.matchAsPrefix(line);
     if (match != null) {
       var span = match.group(1);
-      Map<String, dynamic> newAttributes = {'block': 'quote'}; // NotusAttribute.bq.toJson();
+      Map<String, dynamic> newAttributes = {
+        'block': 'quote'
+      }; // NotusAttribute.bq.toJson();
       if (attributes != null) {
         newAttributes.addAll(attributes);
       }
@@ -103,7 +111,8 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
   }
 
   /// ol is supported within ol and bq, but not supported within ul
-  bool _handleOrderedList(String line, Delta delta, [Map<String, dynamic> attributes]) {
+  bool _handleOrderedList(String line, Delta delta,
+      [Map<String, dynamic> attributes]) {
     var match = _olRegExp.matchAsPrefix(line);
     if (match != null) {
 // TODO: support nesting
@@ -120,10 +129,11 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     return false;
   }
 
-  bool _handleUnorderedList(String line, Delta delta, [Map<String, dynamic> attributes]) {
+  bool _handleUnorderedList(String line, Delta delta,
+      [Map<String, dynamic> attributes]) {
     var match = _ulRegExp.matchAsPrefix(line);
     if (match != null) {
-      var depth =  match.group(1).length / 3;
+      var depth = match.group(1).length / 3;
       var span = match.group(2);
       Map<String, dynamic> newAttributes = NotusAttribute.ul.toJson();
       if (attributes != null) {
@@ -135,12 +145,14 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     }
     return false;
   }
-  
+
   _handleHeading(String line, Delta delta, [Map<String, dynamic> attributes]) {
     var match = _headingRegExp.matchAsPrefix(line);
     if (match != null) {
       var level = match.group(1).length;
-      Map<String, dynamic> newAttributes = {'heading': level}; // NotusAttribute.heading.withValue(level).toJson();
+      Map<String, dynamic> newAttributes = {
+        'heading': level
+      }; // NotusAttribute.heading.withValue(level).toJson();
       if (attributes != null) {
         newAttributes.addAll(attributes);
       }
@@ -151,11 +163,12 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
 //      delta.insert('\n', attribute.toJson());
       return true;
     }
-    
+
     return false;
   }
 
-  _handleSpan(String span, Delta delta, bool addNewLine, Map<String, dynamic> outerStyle) {
+  _handleSpan(String span, Delta delta, bool addNewLine,
+      Map<String, dynamic> outerStyle) {
     var start = _handleStyles(span, delta, outerStyle);
     span = span.substring(start);
 
@@ -183,7 +196,9 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
       if (match.start > start) {
         if (span.substring(match.start - 1, match.start) == '[') {
           delta.insert(span.substring(start, match.start - 1), outerStyle);
-          start = match.start - 1 + _handleLinks(span.substring(match.start - 1), delta, outerStyle);
+          start = match.start -
+              1 +
+              _handleLinks(span.substring(match.start - 1), delta, outerStyle);
           return;
         } else {
           delta.insert(span.substring(start, match.start), outerStyle);
@@ -191,7 +206,8 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
       }
 
       var text = match.group(2);
-      var newStyle = Map<String, dynamic>.from(_attributesByStyleLength[match.group(1).length]);
+      var newStyle = Map<String, dynamic>.from(
+          _attributesByStyleLength[match.group(1).length]);
       if (outerStyle != null) {
         newStyle.addAll(outerStyle);
       }
@@ -213,7 +229,9 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
 
       var text = match.group(1);
       var href = match.group(2);
-      Map<String, dynamic> newAttributes = {'a': href}; // NotusAttribute.link.fromString(href).toJson();
+      Map<String, dynamic> newAttributes = {
+        'a': href
+      }; // NotusAttribute.link.fromString(href).toJson();
       if (outerStyle != null) {
         newAttributes.addAll(outerStyle);
       }

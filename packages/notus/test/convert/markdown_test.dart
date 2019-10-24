@@ -55,8 +55,12 @@ void main() {
         }
       }
 
-      runFor('Okay, _this is in italics_ and _so is all of _ this_ but this is not\n\n', true);
-      runFor('Okay, *this is in italics* and *so is all of _ this* but this is not\n\n', false);
+      runFor(
+          'Okay, _this is in italics_ and _so is all of _ this_ but this is not\n\n',
+          true);
+      runFor(
+          'Okay, *this is in italics* and *so is all of _ this* but this is not\n\n',
+          false);
     });
 
     test('bold', () {
@@ -80,14 +84,14 @@ void main() {
         final delta = notusMarkdown.decode(markdown);
         expect(delta.elementAt(0).data, 'Okay, ');
         expect(delta.elementAt(0).attributes, null);
-  
+
         expect(delta.elementAt(1).data, 'this is bold');
         expect(delta.elementAt(1).attributes["b"], true);
         expect(delta.elementAt(1).attributes["i"], null);
-        
+
         expect(delta.elementAt(3).data, 'so is all of __ this');
         expect(delta.elementAt(3).attributes["b"], true);
-  
+
         expect(delta.elementAt(4).data, ' but this is not\n');
         expect(delta.elementAt(4).attributes, null);
         if (testEncode) {
@@ -95,9 +99,13 @@ void main() {
           expect(andBack, markdown);
         }
       }
-      
-      runFor('Okay, **this is bold** and **so is all of __ this** but this is not\n\n', true);
-      runFor('Okay, __this is bold__ and __so is all of __ this__ but this is not\n\n', false);
+
+      runFor(
+          'Okay, **this is bold** and **so is all of __ this** but this is not\n\n',
+          true);
+      runFor(
+          'Okay, __this is bold__ and __so is all of __ this__ but this is not\n\n',
+          false);
     });
 
     test('intersecting inline styles', () {
@@ -162,9 +170,12 @@ void main() {
         }
       }
 
-      runFor('**this is bold** _this is in italics_ and **_this is both_**\n\n', true);
-      runFor('**this is bold** *this is in italics* and ***this is both***\n\n', false);
-      runFor('__this is bold__ _this is in italics_ and ___this is both___\n\n', false);
+      runFor('**this is bold** _this is in italics_ and **_this is both_**\n\n',
+          true);
+      runFor('**this is bold** *this is in italics* and ***this is both***\n\n',
+          false);
+      runFor('__this is bold__ _this is in italics_ and ___this is both___\n\n',
+          false);
     });
 
     test('link', () {
@@ -253,7 +264,8 @@ void main() {
 
     test('simple bq', () {
 //      var markdown = '> quote\n> > nested\n>#Heading\n>**bold**\n>_italics_\n>* bullet\n>1. 1st point\n>1. 2nd point\n\n';
-      var markdown = '> quote\n> # Heading in Quote\n> # **Styled** heading in _block quote_\n> **bold text**\n> _text in italics_\n\n';
+      var markdown =
+          '> quote\n> # Heading in Quote\n> # **Styled** heading in _block quote_\n> **bold text**\n> _text in italics_\n\n';
       final delta = notusMarkdown.decode(markdown);
 
       expect(delta.elementAt(0).data, 'quote\n');
