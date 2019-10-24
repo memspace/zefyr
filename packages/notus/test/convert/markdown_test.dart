@@ -221,36 +221,11 @@ void main() {
       expect(andBack, markdown);
     });
 
-    test('foo', () {
-      runFor(NotusAttribute<bool> attribute, String markdown) {
-        final delta = notusMarkdown.decode(markdown);
-//        expect(delta.elementAt(0).data, 'First line\nSecond line\n');
-        final andBack = notusMarkdown.encode(delta);
-        expect(andBack, markdown);
-
-//          ..insert('This ')
-//          ..insert('house', attribute.toJson())
-//          ..insert(' is a ')
-//          ..insert('circus', attribute.toJson())
-//          ..insert('\n');
-      }
-
-//      runFor(NotusAttribute.bold, 'This **house** is a __circus__\n\n');
-//      runFor(NotusAttribute.italic, 'This _house_ is a *circus*\n\n');
-//      runFor(NotusAttribute.bold, '*italic*\n\n');
-      runFor(NotusAttribute.bold, '_italic_\n\n');
-      runFor(NotusAttribute.bold, '**bold**\n\n');
-//      runFor(NotusAttribute.bold, '__bold__\n\n');
-      runFor(NotusAttribute.bold, '**_bold and italic_**\n\n');
-//      runFor(NotusAttribute.bold, '***italic and bold***\n\n');
-      runFor(NotusAttribute.bold, 'Here is some *italic * star* and _italic _ lodash_ and **bold * star** and __bold _ lodash__\n\n');
-    });
-
     test('heading styles', () {
       runFor(String markdown, int level) {
         final delta = notusMarkdown.decode(markdown);
-        expect(delta.elementAt(0).data, 'This is an H$level');
-        expect(delta.elementAt(1).attributes['heading'], level);
+        expect(delta.elementAt(0).data, 'This is an H$level\n');
+        expect(delta.elementAt(0).attributes['heading'], level);
         final andBack = notusMarkdown.encode(delta);
         expect(andBack, markdown);
       }
@@ -258,6 +233,90 @@ void main() {
       runFor('# This is an H1\n\n', 1);
       runFor('## This is an H2\n\n', 2);
       runFor('### This is an H3\n\n', 3);
+    });
+
+    test('ul', () {
+      var markdown = '* a bullet point\n* another bullet point\n\n';
+      final delta = notusMarkdown.decode(markdown);
+
+      final andBack = notusMarkdown.encode(delta);
+      expect(andBack, markdown);
+    });
+
+    test('ol', () {
+      var markdown = '1. 1st point\n1. 2nd point\n\n';
+      final delta = notusMarkdown.decode(markdown);
+
+      final andBack = notusMarkdown.encode(delta);
+      expect(andBack, markdown);
+    });
+
+    test('simple bq', () {
+//      var markdown = '> quote\n> > nested\n>#Heading\n>**bold**\n>_italics_\n>* bullet\n>1. 1st point\n>1. 2nd point\n\n';
+      var markdown = '> quote\n> # Heading in Quote\n> # **Styled** heading in _block quote_\n> **bold text**\n> _text in italics_\n\n';
+      final delta = notusMarkdown.decode(markdown);
+
+      expect(delta.elementAt(0).data, 'quote\n');
+      expect(delta.elementAt(0).attributes['block'], 'quote');
+      expect(delta.elementAt(0).attributes.length, 1);
+
+      expect(delta.elementAt(1).data, 'Heading in Quote\n');
+      expect(delta.elementAt(1).attributes['block'], 'quote');
+      expect(delta.elementAt(1).attributes['heading'], 1);
+      expect(delta.elementAt(1).attributes.length, 2);
+
+      expect(delta.elementAt(2).data, 'Styled');
+      expect(delta.elementAt(2).attributes['block'], 'quote');
+      expect(delta.elementAt(2).attributes['heading'], 1);
+      expect(delta.elementAt(2).attributes['b'], true);
+      expect(delta.elementAt(2).attributes.length, 3);
+
+      expect(delta.elementAt(3).data, ' heading in ');
+      expect(delta.elementAt(3).attributes['block'], 'quote');
+      expect(delta.elementAt(3).attributes['heading'], 1);
+      expect(delta.elementAt(3).attributes.length, 2);
+
+      expect(delta.elementAt(4).data, 'block quote');
+      expect(delta.elementAt(4).attributes['block'], 'quote');
+      expect(delta.elementAt(4).attributes['heading'], 1);
+      expect(delta.elementAt(4).attributes['i'], true);
+      expect(delta.elementAt(4).attributes.length, 3);
+
+      expect(delta.elementAt(6).data, 'bold text');
+      expect(delta.elementAt(6).attributes['block'], 'quote');
+      expect(delta.elementAt(6).attributes['b'], true);
+      expect(delta.elementAt(6).attributes.length, 2);
+
+      expect(delta.elementAt(8).data, 'text in italics');
+      expect(delta.elementAt(8).attributes['block'], 'quote');
+      expect(delta.elementAt(8).attributes['i'], true);
+      expect(delta.elementAt(8).attributes.length, 2);
+
+      final andBack = notusMarkdown.encode(delta);
+      expect(andBack, markdown);
+    });
+
+    /*test('nested bq', () {
+      var markdown = '> > nested\n>* bullet\n>1. 1st point\n>1. 2nd point\n\n';
+      final delta = notusMarkdown.decode(markdown);
+
+      final andBack = notusMarkdown.encode(delta);
+      expect(andBack, markdown);
+    });
+
+    test('code in bq', () {
+      var markdown = '> ```\n> print("Hello world!")\n> ```\n\n';
+      final delta = notusMarkdown.decode(markdown);
+
+      final andBack = notusMarkdown.encode(delta);
+      expect(andBack, markdown);
+    });*/
+
+    test('multiple styles', () {
+      final delta = notusMarkdown.decode(expectedMarkdown);
+//      expect(delta, doc);
+      final andBack = notusMarkdown.encode(delta);
+      expect(andBack, expectedMarkdown);
     });
   });
 
