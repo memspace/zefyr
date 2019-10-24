@@ -133,7 +133,7 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
       [Map<String, dynamic> attributes]) {
     var match = _ulRegExp.matchAsPrefix(line);
     if (match != null) {
-      var depth = match.group(1).length / 3;
+//      var depth = match.group(1).length / 3;
       var span = match.group(2);
       Map<String, dynamic> newAttributes = NotusAttribute.ul.toJson();
       if (attributes != null) {
