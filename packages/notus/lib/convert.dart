@@ -14,4 +14,4 @@ export 'src/convert/markdown.dart';
 /// Markdown codec for Notus documents.
 const NotusMarkdownCodec notusMarkdown = NotusMarkdownCodec();
 
-const NotusHTMLCodec notusHTML = const NotusHTMLCodec();
+const NotusHTMLCodec notusHTML = NotusHTMLCodec();

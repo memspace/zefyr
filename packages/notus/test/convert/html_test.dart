@@ -82,9 +82,9 @@ void main() {
     test('decode intersecting inline ', () {
       final b = NotusAttribute.bold.toJson();
       final i = NotusAttribute.italic.toJson();
-      final bi = new Map<String, dynamic>.from(b);
+      final bi = Map<String, dynamic>.from(b);
       bi.addAll(i);
-      final delta = new Delta()
+      final delta = Delta()
         ..insert('This')
         ..insert('house', b)
         ..insert('is a', bi)
@@ -98,20 +98,20 @@ void main() {
 
     test('decode a tag', () {
       final l = NotusAttribute.link.fromString('http://foo.com');
-      final delta = new Delta()..insert('a tag', l.toJson())..insert("\n");
+      final delta = Delta()..insert('a tag', l.toJson())..insert("\n");
       final html = '<a href="http://foo.com">a tag</a>\n';
       final result = notusHTML.decode(html);
       expect(result, delta);
     });
 
     test('decode br tag', () {
-      final delta = new Delta()..insert('\n')..insert("\n");
+      final delta = Delta()..insert('\n')..insert("\n");
       final html = '<br>\n';
       final result = notusHTML.decode(html);
       expect(result, delta);
     });
     test('decode nested br tag ', () {
-      final delta = new Delta()..insert('<b>a<br></b>')..insert("\n");
+      final delta = Delta()..insert('<b>a<br></b>')..insert("\n");
       final html = '<b>a<br></b>\n';
       final result = notusHTML.decode(html);
       expect(result, delta);
@@ -169,7 +169,7 @@ void main() {
     });
     test('decode heading styles', () {
       runFor(NotusAttribute<int> attribute, String source, String html) {
-        final delta = new Delta()
+        final delta = Delta()
           ..insert(source)
           ..insert('\n', attribute.toJson());
         final result = notusHTML.decode(html);
@@ -184,7 +184,7 @@ void main() {
     test('decode heading styles with container attribute', () {
       runFor(NotusAttribute<int> attribute, String source, String html) {
         final attr = attribute.toJson();
-        final delta = new Delta()..insert(source)..insert('\n', attr);
+        final delta = Delta()..insert(source)..insert('\n', attr);
         final result = notusHTML.decode(html);
         expect(result.toString(), delta.toString());
       }
@@ -220,7 +220,7 @@ void main() {
 
     test('decode singe block', () {
       runFor(NotusAttribute<String> attribute, String source, String html) {
-        final delta = new Delta()
+        final delta = Delta()
           ..insert(source)
           ..insert('\n', attribute.toJson());
         final result = notusHTML.decode(html);
@@ -290,9 +290,9 @@ void main() {
     test('decode complex intersecting inline ', () {
       final b = NotusAttribute.bold.toJson();
       final i = NotusAttribute.italic.toJson();
-      final bi = new Map<String, dynamic>.from(b);
-      final bia = new Map<String, dynamic>.from(b);
-      final biaimage = new Map<String, dynamic>.from(b);
+      final bi = Map<String, dynamic>.from(b);
+      final bia = Map<String, dynamic>.from(b);
+      final biaimage = Map<String, dynamic>.from(b);
       final l = NotusAttribute.link.fromString('https://github.com').toJson();
       bi.addAll(i);
       bia.addAll(i);
@@ -381,7 +381,7 @@ void main() {
 
     test('encode bold italic', () {
       runFor(NotusAttribute<bool> attribute, String expected) {
-        final delta = new Delta()
+        final delta = Delta()
           ..insert('This ')
           ..insert('house', attribute.toJson())
           ..insert(' is a ')
@@ -399,10 +399,10 @@ void main() {
     test('encode intersecting inline styles', () {
       final b = NotusAttribute.bold.toJson();
       final i = NotusAttribute.italic.toJson();
-      final bi = new Map<String, dynamic>.from(b);
+      final bi = Map<String, dynamic>.from(b);
       bi.addAll(i);
 
-      final delta = new Delta()
+      final delta = Delta()
         ..insert('This ')
         ..insert('house', b)
         ..insert(' is a ', bi)
@@ -480,7 +480,7 @@ void main() {
     test('encode normalize inline styles', () {
       final b = NotusAttribute.bold.toJson();
       final i = NotusAttribute.italic.toJson();
-      final delta = new Delta()
+      final delta = Delta()
         ..insert('This')
         ..insert(' house ', b)
         ..insert('is a')
@@ -494,7 +494,7 @@ void main() {
     test('encode links', () {
       final b = NotusAttribute.bold.toJson();
       final link = NotusAttribute.link.fromString('https://github.com');
-      final delta = new Delta()
+      final delta = Delta()
         ..insert('This')
         ..insert(' house ', b)
         ..insert('is a')
@@ -508,7 +508,7 @@ void main() {
 
     test('encode heading styles', () {
       runFor(NotusAttribute<int> attribute, String source, String expected) {
-        final delta = new Delta()
+        final delta = Delta()
           ..insert(source)
           ..insert('\n', attribute.toJson());
         final result = notusHTML.encode(delta);
@@ -522,7 +522,7 @@ void main() {
     test('encode heading styles', () {
       runFor(NotusAttribute<int> attribute, String source, String expected) {
         final attr = attribute.toJson();
-        final delta = new Delta()..insert(source)..insert('\n', attr);
+        final delta = Delta()..insert(source)..insert('\n', attr);
         final result = notusHTML.encode(delta);
         expect(result, expected);
       }
@@ -630,7 +630,7 @@ void main() {
     });
     test('encode multiline blocks', () {
       runFor(NotusAttribute<String> attribute, String source, String expected) {
-        final delta = new Delta()
+        final delta = Delta()
           ..insert(source)
           ..insert('\n', attribute.toJson())
           ..insert(source)
