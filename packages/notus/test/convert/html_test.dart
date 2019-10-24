@@ -169,9 +169,7 @@ void main() {
     });
     test('decode heading styles', () {
       runFor(NotusAttribute<int> attribute, String source, String html) {
-        final delta = Delta()
-          ..insert(source)
-          ..insert('\n', attribute.toJson());
+        final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusHTML.decode(html);
         expect(result, delta);
       }
@@ -220,9 +218,7 @@ void main() {
 
     test('decode singe block', () {
       runFor(NotusAttribute<String> attribute, String source, String html) {
-        final delta = Delta()
-          ..insert(source)
-          ..insert('\n', attribute.toJson());
+        final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusHTML.decode(html);
         expect(result, delta);
       }
@@ -508,9 +504,7 @@ void main() {
 
     test('encode heading styles', () {
       runFor(NotusAttribute<int> attribute, String source, String expected) {
-        final delta = Delta()
-          ..insert(source)
-          ..insert('\n', attribute.toJson());
+        final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusHTML.encode(delta);
         expect(result, expected);
       }
