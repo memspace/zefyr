@@ -89,13 +89,11 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static const italic = _ItalicAttribute();
 
   /// Link style attribute.
-  // ignore: const_eval_throws_exception
   static const link = LinkAttributeBuilder._();
 
   // Line attributes
 
   /// Heading style attribute.
-  // ignore: const_eval_throws_exception
   static const heading = HeadingAttributeBuilder._();
 
   /// Alias for [NotusAttribute.heading.level1].
@@ -108,7 +106,6 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static NotusAttribute<int> get h3 => heading.level3;
 
   /// Block attribute
-  // ignore: const_eval_throws_exception
   static const block = BlockAttributeBuilder._();
 
   /// Alias for [NotusAttribute.block.bulletList].
@@ -124,10 +121,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static NotusAttribute<String> get code => block.code;
 
   /// Embed style attribute.
-  // ignore: const_eval_throws_exception
   static const embed = EmbedAttributeBuilder._();
 
-  static NotusAttribute _fromKeyValue(String key, dynamic value) {
+  factory NotusAttribute._fromKeyValue(String key, T value) {
     if (!_registry.containsKey(key)) {
       throw ArgumentError.value(
           key, 'No attribute with key "$key" registered.');
@@ -176,7 +172,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
       NotusAttribute<T>._(key, scope, value);
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(other) {
     if (identical(this, other)) return true;
     if (other is! NotusAttribute<T>) return false;
     NotusAttribute<T> typedOther = other;
@@ -200,10 +196,10 @@ class NotusStyle {
 
   final Map<String, NotusAttribute> _data;
 
-  static NotusStyle fromJson(Map<String, dynamic> data) {
+  static NotusStyle fromJson(Map data) {
     if (data == null) return NotusStyle();
 
-    final result = data.map((String key, dynamic value) {
+    final result = data.map((key, value) {
       var attr = NotusAttribute._fromKeyValue(key, value);
       return MapEntry<String, NotusAttribute>(key, attr);
     });
@@ -238,7 +234,7 @@ class NotusStyle {
   /// [attribute].
   bool containsSame(NotusAttribute attribute) {
     assert(attribute != null);
-    return get<dynamic>(attribute) == attribute;
+    return get(attribute) == attribute;
   }
 
   /// Returns value of specified attribute [key] in this set.
@@ -300,11 +296,11 @@ class NotusStyle {
   /// Returns JSON-serializable representation of this style.
   Map<String, dynamic> toJson() => _data.isEmpty
       ? null
-      : _data.map<String, dynamic>((String _, NotusAttribute value) =>
-          MapEntry<String, dynamic>(value.key, value.value));
+      : _data
+          .map((_, value) => MapEntry<String, dynamic>(value.key, value.value));
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(other) {
     if (identical(this, other)) return true;
     if (other is! NotusStyle) return false;
     NotusStyle typedOther = other;
