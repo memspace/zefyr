@@ -340,6 +340,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
 
     final Offset paintOffset = Offset.zero;
     final List<ui.TextBox> boxes = block.getEndpointsForSelection(selection);
+    if (boxes.isEmpty) return null;
     final Offset start =
         Offset(boxes.first.start, boxes.first.bottom) + paintOffset;
     final Offset end = Offset(boxes.last.end, boxes.last.bottom) + paintOffset;
@@ -388,6 +389,8 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
     }
 
     final List<TextSelectionPoint> endpoints = getEndpointsForSelection(block);
+    if (endpoints == null || endpoints.isEmpty) return Container();
+
     Offset point;
     TextSelectionHandleType type;
 
@@ -562,6 +565,10 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
       return Container();
     }
     final boxes = block.getEndpointsForSelection(selection);
+    if (boxes.isEmpty) {
+      return Container();
+    }
+
     // Find the horizontal midpoint, just above the selected text.
     Offset midpoint = Offset(
       (boxes.length == 1)
