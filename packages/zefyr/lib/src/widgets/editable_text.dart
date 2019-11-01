@@ -105,6 +105,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     if (_focusNode.hasFocus) {
       _input.openConnection(widget.controller.plainTextEditingValue);
     } else {
+      FocusScope.of(context).unfocus(); 
       FocusScope.of(context).requestFocus(_focusNode);
     }
   }
