@@ -7,6 +7,7 @@
 .pub/
 packages
 pubspec.lock
+.dart_tool/
 coverage/
 ios/Flutter/Generated.xcconfig
 .flutter-plugins
