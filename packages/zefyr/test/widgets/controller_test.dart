@@ -184,20 +184,5 @@ void main() {
       );
       expect(controller.lastChangeSource, ChangeSource.local);
     });
-    test('formatText with toggled style for spell check', () {
-      bool notified = false;
-      controller.addListener(() {
-        notified = true;
-      });
-      controller.formatText(0, 0, NotusAttribute.bold);
-      controller.replaceText(0, 0, 'Spple');
-      controller.replaceText(0, 5, 'Apple');
-      expect(notified, isTrue);
-      expect(
-        controller.document.toDelta(),
-        Delta()..insert('Apple', NotusAttribute.bold.toJson())..insert('\n'),
-      );
-      expect(controller.lastChangeSource, ChangeSource.local);
-    });
   });
 }
