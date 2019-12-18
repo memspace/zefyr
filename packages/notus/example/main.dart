@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:notus/convert.dart';
 import 'package:notus/notus.dart';
 
 void main() {
@@ -20,6 +21,9 @@ void main() {
   doc.changes.listen((change) {
     print(change);
   });
+
+  final a = NotusHTMLCodec().encode(doc.toDelta());
+  print(a);
 
   // Dispose resources allocated by this document, e.g. closes "changes" stream.
   // After document is closed it cannot be modified.

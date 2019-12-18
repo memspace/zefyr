@@ -48,7 +48,7 @@ class ZefyrController extends ChangeNotifier {
   /// and that has not been applied yet.
   /// It gets reseted after each format action within the [document].
   NotusStyle get toggledStyles => _toggledStyles;
-  NotusStyle _toggledStyles = new NotusStyle();
+  NotusStyle _toggledStyles = NotusStyle();
 
   /// Updates selection with specified [value].
   ///
@@ -127,7 +127,7 @@ class ZefyrController extends ChangeNotifier {
           delta.length == 2 &&
           delta[1].isInsert) {
         // Apply it.
-        Delta retainDelta = new Delta()
+        Delta retainDelta = Delta()
           ..retain(index)
           ..retain(1, toggledStyles.toJson());
         document.compose(retainDelta, ChangeSource.local);
@@ -135,7 +135,7 @@ class ZefyrController extends ChangeNotifier {
     }
 
     // Always reset it after any user action, even if it has not been applied.
-    _toggledStyles = new NotusStyle();
+    _toggledStyles = NotusStyle();
 
     if (selection != null) {
       if (delta == null) {
