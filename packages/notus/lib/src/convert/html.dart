@@ -124,11 +124,11 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
 
   @override
   String convert(Delta input) {
-    final iterator = new DeltaIterator(input);
-    final buffer = new StringBuffer();
-    final lineBuffer = new StringBuffer();
+    final iterator = DeltaIterator(input);
+    final buffer = StringBuffer();
+    final lineBuffer = StringBuffer();
     NotusAttribute<String> currentBlockStyle;
-    NotusStyle currentInlineStyle = new NotusStyle();
+    NotusStyle currentInlineStyle = NotusStyle();
     List<String> currentBlockLines = [];
 
     void _handleBlock(NotusAttribute<String> blockStyle) {
@@ -222,7 +222,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
   }
 
   String _writeLine(String text, NotusStyle style) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuffer buffer = StringBuffer();
     if (style.contains(NotusAttribute.heading)) {
       _writeAttribute(buffer, style.get(NotusAttribute.heading));
     }
@@ -284,7 +284,7 @@ class _NotusHTMLEncoder extends Converter<Delta, String> {
     } else if (attribute.key == NotusAttribute.embed.key) {
       _writeEmbedTag(buffer, attribute, close: close);
     } else {
-      throw new ArgumentError('Cannot handle $attribute');
+      throw ArgumentError('Cannot handle $attribute');
     }
   }
 
