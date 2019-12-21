@@ -171,6 +171,11 @@ class InputConnectionController implements TextInputClient {
     // TODO: implement showAutocorrectionPromptRect
   }
 
+  @override
+  // TODO: implement currentTextEditingValue
+  TextEditingValue get currentTextEditingValue =>
+      _lastKnownRemoteTextEditingValue;
+
   //
   // Private members
   //
