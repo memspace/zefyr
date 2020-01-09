@@ -38,6 +38,7 @@ abstract class NotusAttributeKey<T> {
 abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
   const NotusAttributeBuilder._(this.key, this.scope);
 
+  @override
   final String key;
   final NotusAttributeScope scope;
   NotusAttribute<T> get unset => NotusAttribute<T>._(key, scope, null);
@@ -138,9 +139,11 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   const NotusAttribute._(this.key, this.scope, this.value);
 
   /// Unique key of this attribute.
+  @override
   final String key;
 
   /// Scope of this attribute.
+  @override
   final NotusAttributeScope scope;
 
   /// Value of this attribute.
@@ -159,6 +162,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   ///
   /// When composed into a rich text document, unset attributes remove
   /// associated style.
+  @override
   NotusAttribute<T> get unset => NotusAttribute<T>._(key, scope, null);
 
   /// Returns `true` if this attribute is an unset attribute.
@@ -167,6 +171,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Returns `true` if this is an inline-scoped attribute.
   bool get isInline => scope == NotusAttributeScope.inline;
 
+  @override
   NotusAttribute<T> withValue(T value) =>
       NotusAttribute<T>._(key, scope, value);
 
@@ -205,7 +210,7 @@ class NotusStyle {
     return NotusStyle._(result);
   }
 
-  NotusStyle() : _data = Map<String, NotusAttribute>();
+  NotusStyle() : _data = <String, NotusAttribute>{};
 
   /// Returns `true` if this attribute set is empty.
   bool get isEmpty => _data.isEmpty;
@@ -398,6 +403,7 @@ class EmbedAttributeBuilder
   @override
   NotusAttribute<Map<String, dynamic>> get unset => EmbedAttribute._(null);
 
+  @override
   NotusAttribute<Map<String, dynamic>> withValue(Map<String, dynamic> value) =>
       EmbedAttribute._(value);
 }

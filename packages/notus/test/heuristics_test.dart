@@ -7,7 +7,7 @@ import 'package:quill_delta/quill_delta.dart';
 import 'package:test/test.dart';
 
 NotusDocument dartconfDoc() {
-  Delta delta = Delta()..insert('DartConf\nLos Angeles\n');
+  final delta = Delta()..insert('DartConf\nLos Angeles\n');
   return NotusDocument.fromDelta(delta);
 }
 

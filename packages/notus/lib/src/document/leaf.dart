@@ -54,7 +54,7 @@ abstract class LeafNode extends Node
     if (index == length && isLast) return null;
     if (index == length && !isLast) return next as LeafNode;
 
-    String text = _value;
+    final text = _value;
     _value = text.substring(0, index);
     final split = LeafNode(text.substring(index));
     split.applyStyle(style);
@@ -69,7 +69,7 @@ abstract class LeafNode extends Node
   /// method may return `null`.
   LeafNode cutAt(int index) {
     assert(index >= 0 && index <= length);
-    LeafNode cut = splitAt(index);
+    final cut = splitAt(index);
     cut?.unlink();
     return cut;
   }
@@ -88,7 +88,7 @@ abstract class LeafNode extends Node
         'Actual node length: ${this.length}.');
     // Since `index < this.length` (guarded by assert) below line
     // always returns a new node.
-    LeafNode target = splitAt(index);
+    final target = splitAt(index);
     target.splitAt(length);
     return target;
   }
@@ -104,7 +104,7 @@ abstract class LeafNode extends Node
   @override
   void applyStyle(NotusStyle value) {
     assert(value != null && (value.isInline || value.isEmpty),
-        "Style cannot be applied to this leaf node: $value");
+        'Style cannot be applied to this leaf node: $value');
     assert(() {
       if (value.contains(NotusAttribute.embed)) {
         if (value.get(NotusAttribute.embed) == NotusAttribute.embed.unset) {
@@ -157,7 +157,7 @@ abstract class LeafNode extends Node
     final local = math.min(this.length - index, length);
     final node = isolate(index, local);
 
-    int remaining = length - local;
+    final remaining = length - local;
     if (remaining > 0) {
       assert(node.next != null);
       node.next.retain(0, remaining, style);
@@ -177,7 +177,7 @@ abstract class LeafNode extends Node
     final actualNext = target.next;
     target.unlink();
 
-    int remaining = length - local;
+    final remaining = length - local;
     if (remaining > 0) {
       assert(actualNext != null);
       actualNext.delete(0, remaining);
@@ -189,15 +189,15 @@ abstract class LeafNode extends Node
   @override
   String toString() {
     final keys = style.keys.toList(growable: false)..sort();
-    String styleKeys = keys.join();
-    return "⟨$value⟩$styleKeys";
+    final styleKeys = keys.join();
+    return '⟨$value⟩$styleKeys';
   }
 
   /// Optimizes this text node by merging it with adjacent nodes if they share
   /// the same style.
   @override
   void optimize() {
-    LeafNode node = this;
+    var node = this;
     if (!node.isFirst) {
       LeafNode mergeWith = node.previous;
       if (mergeWith.style == node.style) {

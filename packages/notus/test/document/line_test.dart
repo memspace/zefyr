@@ -1,9 +1,9 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'package:test/test.dart';
-import 'package:quill_delta/quill_delta.dart';
 import 'package:notus/notus.dart';
+import 'package:quill_delta/quill_delta.dart';
+import 'package:test/test.dart';
 
 final boldStyle = NotusStyle().merge(NotusAttribute.bold);
 final h1Style = NotusStyle().merge(NotusAttribute.h1);
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('empty', () {
-      LineNode node = LineNode();
+      final node = LineNode();
       expect(node, isEmpty);
       expect(node.length, 1);
       expect(node.style, NotusStyle());
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('hasEmbed', () {
-      LineNode node = LineNode();
+      final node = LineNode();
       expect(node.hasEmbed, isFalse);
       node.add(EmbedNode());
       expect(node.hasEmbed, isTrue);
@@ -50,7 +50,7 @@ void main() {
     });
 
     test('toString', () {
-      LineNode node = LineNode();
+      final node = LineNode();
       node.insert(0, 'London "Grammar" - Hey Now', null);
       node.retain(0, 16, boldStyle);
       node.applyAttribute(NotusAttribute.h1);
@@ -68,14 +68,14 @@ void main() {
     });
 
     test('insert into empty line', () {
-      LineNode node = LineNode();
+      final node = LineNode();
       node.insert(0, 'London "Grammar" - Hey Now', null);
       expect(node, hasLength(27));
       expect(node.toDelta(), Delta()..insert('London "Grammar" - Hey Now\n'));
     });
 
     test('insert into empty line with styles', () {
-      LineNode node = LineNode();
+      final node = LineNode();
       node.insert(0, 'London "Grammar" - Hey Now', null);
       node.retain(0, 16, boldStyle);
       node.applyAttribute(NotusAttribute.h1);
@@ -90,7 +90,7 @@ void main() {
     });
 
     test('insert into non-empty line', () {
-      LineNode node = LineNode();
+      final node = LineNode();
       node.insert(0, 'Hello world', null);
       node.insert(11, '!!!', null);
       expect(node, hasLength(15));
@@ -119,7 +119,7 @@ void main() {
 
       LineNode line = root.first;
       expect(line, hasLength(15));
-      Delta delta = Delta()
+      final delta = Delta()
         ..insert('Hello ')
         ..insert('world', boldStyle.toJson())
         ..insert('!!!\n');
@@ -133,7 +133,7 @@ void main() {
       LineNode line = root.first;
       expect(line, hasLength(12));
 
-      Delta delta = Delta()
+      final delta = Delta()
         ..insert('Hello world')
         ..insert('\n', NotusAttribute.h1.toJson());
       expect(line.toDelta(), delta);
@@ -187,7 +187,7 @@ void main() {
       LineNode line = root.first;
       expect(line, hasLength(8));
       expect(line.childCount, 1);
-      Delta lineDelta = Delta()..insert('Hellord\n');
+      final lineDelta = Delta()..insert('Hellord\n');
       expect(line.toDelta(), lineDelta);
     });
 
@@ -198,7 +198,7 @@ void main() {
       expect(root.childCount, 1);
       LineNode line = root.first;
       expect(line, hasLength(18));
-      Delta lineDelta = Delta()
+      final lineDelta = Delta()
         ..insert('Hello ')
         ..insert('worl', boldStyle.toJson())
         ..insert(' cd ef!\n');
@@ -266,7 +266,7 @@ void main() {
 
     test('collectStyle with embed nodes', () {
       root.insert(0, 'Hello world\n\nMore text.\n', null);
-      NotusStyle style = NotusStyle();
+      var style = NotusStyle();
       style = style.put(NotusAttribute.embed.horizontalRule);
       root.insert(12, EmbedNode.kPlainTextPlaceholder, style);
 

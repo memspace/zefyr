@@ -1,3 +1,10 @@
+## 0.9.0
+
+* Feature: toggle inline styles (works for bold and italic)
+* Updated to support Flutter 1.12.0
+* Upgraded dependencies
+* Fixed analyzer issues
+
 ## 0.8.0
 
 * Updated to support Flutter 1.9.0 (#154)

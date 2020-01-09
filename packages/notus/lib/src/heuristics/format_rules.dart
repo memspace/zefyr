@@ -2,8 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:quill_delta/quill_delta.dart';
 import 'package:notus/notus.dart';
+import 'package:quill_delta/quill_delta.dart';
 
 /// A heuristic rule for format (retain) operations.
 abstract class FormatRule {
@@ -24,13 +24,13 @@ class ResolveLineFormatRule extends FormatRule {
   Delta apply(Delta document, int index, int length, NotusAttribute attribute) {
     if (attribute.scope != NotusAttributeScope.line) return null;
 
-    Delta result = Delta()..retain(index);
+    var result = Delta()..retain(index);
     final iter = DeltaIterator(document);
     iter.skip(index);
 
     // Apply line styles to all line-break characters within range of this
     // retain operation.
-    int current = 0;
+    var current = 0;
     while (current < length && iter.hasNext) {
       final op = iter.next(length - current);
       if (op.data.contains('\n')) {
@@ -44,7 +44,7 @@ class ResolveLineFormatRule extends FormatRule {
     // And include extra line-break after retain
     while (iter.hasNext) {
       final op = iter.next();
-      int lf = op.data.indexOf('\n');
+      final lf = op.data.indexOf('\n');
       if (lf == -1) {
         result..retain(op.length);
         continue;
@@ -57,8 +57,8 @@ class ResolveLineFormatRule extends FormatRule {
 
   Delta _applyAttribute(String text, NotusAttribute attribute) {
     final result = Delta();
-    int offset = 0;
-    int lf = text.indexOf('\n');
+    var offset = 0;
+    var lf = text.indexOf('\n');
     while (lf >= 0) {
       result..retain(lf - offset)..retain(1, attribute.toJson());
       offset = lf + 1;
@@ -79,18 +79,18 @@ class ResolveInlineFormatRule extends FormatRule {
   Delta apply(Delta document, int index, int length, NotusAttribute attribute) {
     if (attribute.scope != NotusAttributeScope.inline) return null;
 
-    Delta result = Delta()..retain(index);
+    final result = Delta()..retain(index);
     final iter = DeltaIterator(document);
     iter.skip(index);
 
     // Apply inline styles to all non-line-break characters within range of this
     // retain operation.
-    int current = 0;
+    var current = 0;
     while (current < length && iter.hasNext) {
       final op = iter.next(length - current);
-      int lf = op.data.indexOf('\n');
+      var lf = op.data.indexOf('\n');
       if (lf != -1) {
-        int pos = 0;
+        var pos = 0;
         while (lf != -1) {
           result..retain(lf - pos, attribute.toJson())..retain(1);
           pos = lf + 1;
@@ -122,12 +122,12 @@ class FormatLinkAtCaretPositionRule extends FormatRule {
     // edge cases.
     if (length != 0) return null;
 
-    Delta result = Delta();
+    final result = Delta();
     final iter = DeltaIterator(document);
     final before = iter.skip(index);
     final after = iter.next();
-    int startIndex = index;
-    int retain = 0;
+    var startIndex = index;
+    var retain = 0;
     if (before != null && before.hasAttribute(attribute.key)) {
       startIndex -= before.length;
       retain = before.length;
@@ -171,7 +171,7 @@ class FormatEmbedsRule extends FormatRule {
 
   Delta _insertEmbed(
       Delta document, int index, int length, EmbedAttribute embed) {
-    Delta result = Delta()..retain(index);
+    final result = Delta()..retain(index);
     final iter = DeltaIterator(document);
     final previous = iter.skip(index);
     iter.skip(length); // ignore deleted part.
@@ -207,7 +207,7 @@ class FormatEmbedsRule extends FormatRule {
     Map<String, dynamic> attributes;
     while (iterator.hasNext) {
       final op = iterator.next();
-      int lf = op.data.indexOf('\n');
+      final lf = op.data.indexOf('\n');
       if (lf >= 0) {
         attributes = op.attributes;
         break;

@@ -2,8 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:quill_delta/quill_delta.dart';
 import 'package:notus/notus.dart';
+import 'package:quill_delta/quill_delta.dart';
 
 /// A heuristic rule for delete operations.
 abstract class DeleteRule {
@@ -39,19 +39,19 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
 
   @override
   Delta apply(Delta document, int index, int length) {
-    DeltaIterator iter = DeltaIterator(document);
+    final iter = DeltaIterator(document);
     iter.skip(index);
     final target = iter.next(1);
     if (target.data != '\n') return null;
     iter.skip(length - 1);
-    final Delta result = Delta()
+    final result = Delta()
       ..retain(index)
       ..delete(length);
 
     // Look for next line-break to apply the attributes
     while (iter.hasNext) {
       final op = iter.next();
-      int lf = op.data.indexOf('\n');
+      final lf = op.data.indexOf('\n');
       if (lf == -1) {
         result..retain(op.length);
         continue;
@@ -80,18 +80,18 @@ class EnsureEmbedLineRule extends DeleteRule {
 
   @override
   Delta apply(Delta document, int index, int length) {
-    DeltaIterator iter = DeltaIterator(document);
+    final iter = DeltaIterator(document);
 
     // First, check if line-break deleted after an embed.
-    Operation op = iter.skip(index);
-    int indexDelta = 0;
-    int lengthDelta = 0;
-    int remaining = length;
-    bool foundEmbed = false;
-    bool hasLineBreakBefore = false;
+    var op = iter.skip(index);
+    var indexDelta = 0;
+    var lengthDelta = 0;
+    var remaining = length;
+    var foundEmbed = false;
+    var hasLineBreakBefore = false;
     if (op != null && op.data.endsWith(kZeroWidthSpace)) {
       foundEmbed = true;
-      Operation candidate = iter.next(1);
+      var candidate = iter.next(1);
       remaining--;
       if (candidate.data == '\n') {
         indexDelta += 1;
