@@ -124,7 +124,8 @@ class ZefyrController extends ChangeNotifier {
       // some style, then we apply it to our document.
       if (delta != null &&
           toggledStyles.isNotEmpty &&
-          delta.length <=2 &&
+          delta.isNotEmpty &&
+          delta.length <= 2 &&
           delta.last.isInsert) {
         // Apply it.
         Delta retainDelta = Delta()

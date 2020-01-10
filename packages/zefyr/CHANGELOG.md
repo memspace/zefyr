@@ -1,3 +1,7 @@
+## 0.9.1
+
+* Fixed: Preserve inline style when replacing formatted text from the first character (#201)
+
 ## 0.9.0
 
 * Feature: toggle inline styles (works for bold and italic)

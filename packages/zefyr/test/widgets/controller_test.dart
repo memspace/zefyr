@@ -170,7 +170,9 @@ void main() {
       var result = controller.getSelectionStyle();
       expect(result.values, [NotusAttribute.bold]);
     });
-    test('formatText with toggled style for first charater', () {
+
+    test('preserve inline format when replacing text from the first character',
+        () {
       bool notified = false;
       controller.addListener(() {
         notified = true;
