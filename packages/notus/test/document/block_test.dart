@@ -2,8 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:notus/notus.dart';
-import 'package:test/test.dart';
 import 'package:quill_delta/quill_delta.dart';
+import 'package:test/test.dart';
 
 final ulAttrs = NotusStyle().merge(NotusAttribute.ul);
 final olAttrs = NotusStyle().merge(NotusAttribute.ol);
@@ -17,16 +17,16 @@ void main() {
     });
 
     test('empty', () {
-      BlockNode node = BlockNode();
+      final node = BlockNode();
       expect(node, isEmpty);
       expect(node.length, 0);
       expect(node.style, NotusStyle());
     });
 
     test('toString', () {
-      LineNode line = LineNode();
+      final line = LineNode();
       line.add(TextNode('London "Grammar"'));
-      BlockNode block = BlockNode();
+      final block = BlockNode();
       block.applyAttribute(NotusAttribute.ul);
       block.add(line);
       final expected = '§ {ul}\n  └ ¶ ⟨London "Grammar"⟩ ⏎';
@@ -59,7 +59,7 @@ void main() {
       expect(block.first, const TypeMatcher<LineNode>());
 
       LineNode line = block.first;
-      Delta delta = Delta()
+      final delta = Delta()
         ..insert('Hello world')
         ..insert('\n', ulAttrs.toJson());
       expect(line.toDelta(), delta);

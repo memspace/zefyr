@@ -42,8 +42,8 @@ abstract class Node extends LinkedListEntry<Node> {
   /// To get offset of this node in the document see [documentOffset].
   int get offset {
     if (isFirst) return 0;
-    int offset = 0;
-    Node node = this;
+    var offset = 0;
+    var node = this;
     do {
       node = node.previous;
       offset += node.length;
@@ -53,14 +53,14 @@ abstract class Node extends LinkedListEntry<Node> {
 
   /// Offset in characters of this node in the document.
   int get documentOffset {
-    int parentOffset = (_parent is! RootNode) ? _parent.documentOffset : 0;
-    return parentOffset + this.offset;
+    final parentOffset = (_parent is! RootNode) ? _parent.documentOffset : 0;
+    return parentOffset + offset;
   }
 
   /// Returns `true` if this node contains character at specified [offset] in
   /// the document.
   bool containsOffset(int offset) {
-    int o = documentOffset;
+    final o = documentOffset;
     return o <= offset && offset < o + length;
   }
 
@@ -208,10 +208,10 @@ abstract class ContainerNode<T extends Node> extends Node {
   /// which points at the same character position in the document as the
   /// original [offset].
   LookupResult lookup(int offset, {bool inclusive = false}) {
-    assert(offset >= 0 && offset <= this.length);
+    assert(offset >= 0 && offset <= length);
 
-    for (Node node in children) {
-      final int length = node.length;
+    for (final node in children) {
+      final length = node.length;
       if (offset < length || (inclusive && offset == length && (node.isLast))) {
         return LookupResult(node, offset);
       }
@@ -238,11 +238,11 @@ abstract class ContainerNode<T extends Node> extends Node {
 
     if (isEmpty) {
       assert(index == 0);
-      T node = defaultChild;
+      final node = defaultChild;
       add(node);
       node.insert(index, value, style);
     } else {
-      LookupResult result = lookup(index);
+      final result = lookup(index);
       result.node.insert(result.offset, value, style);
     }
   }

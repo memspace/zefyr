@@ -3,10 +3,10 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'dart:convert';
 
-import 'package:test/test.dart';
-import 'package:quill_delta/quill_delta.dart';
-import 'package:notus/notus.dart';
 import 'package:notus/convert.dart';
+import 'package:notus/notus.dart';
+import 'package:quill_delta/quill_delta.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('$NotusMarkdownCodec.encode', () {
@@ -25,7 +25,7 @@ void main() {
     });
 
     test('bold italic', () {
-      runFor(NotusAttribute<bool> attribute, String expected) {
+      void runFor(NotusAttribute<bool> attribute, String expected) {
         final delta = Delta()
           ..insert('This ')
           ..insert('house', attribute.toJson())
@@ -87,7 +87,8 @@ void main() {
     });
 
     test('heading styles', () {
-      runFor(NotusAttribute<int> attribute, String source, String expected) {
+      void runFor(
+          NotusAttribute<int> attribute, String source, String expected) {
         final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusMarkdown.encode(delta);
         expect(result, expected);
@@ -99,7 +100,8 @@ void main() {
     });
 
     test('block styles', () {
-      runFor(NotusAttribute<String> attribute, String source, String expected) {
+      void runFor(
+          NotusAttribute<String> attribute, String source, String expected) {
         final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusMarkdown.encode(delta);
         expect(result, expected);
@@ -112,7 +114,8 @@ void main() {
     });
 
     test('multiline blocks', () {
-      runFor(NotusAttribute<String> attribute, String source, String expected) {
+      void runFor(
+          NotusAttribute<String> attribute, String source, String expected) {
         final delta = Delta()
           ..insert(source)
           ..insert('\n', attribute.toJson())

@@ -136,12 +136,11 @@ class NotusDocument {
   Delta replace(int index, int length, String text) {
     assert(index >= 0 && (text.isNotEmpty || length > 0),
         'With index $index, length $length and text "$text"');
-    Delta delta = Delta();
+    var delta = Delta();
     // We have to compose before applying delete rules
     // Otherwise delete would be operating on stale document snapshot.
     if (text.isNotEmpty) {
-      delta = insert(index, text);
-      index = delta.transformPosition(index);
+      delta = insert(index + length, text);
     }
 
     if (length > 0) {
@@ -162,7 +161,7 @@ class NotusDocument {
   Delta format(int index, int length, NotusAttribute attribute) {
     assert(index >= 0 && length >= 0 && attribute != null);
 
-    Delta change = Delta();
+    var change = Delta();
 
     if (attribute is EmbedAttribute && length > 0) {
       // Must delete selected length of text before applying embed attribute
@@ -222,9 +221,9 @@ class NotusDocument {
     change.trim();
     assert(change.isNotEmpty);
 
-    int offset = 0;
+    var offset = 0;
     final before = toDelta();
-    for (final Operation op in change.toList()) {
+    for (final op in change.toList()) {
       final attributes =
           op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
       if (op.isInsert) {
@@ -272,21 +271,21 @@ class NotusDocument {
   void _loadDocument(Delta doc) {
     assert(doc.last.data.endsWith('\n'),
         'Invalid document delta. Document delta must always end with a line-break.');
-    int offset = 0;
-    for (final Operation op in doc.toList()) {
+    var offset = 0;
+    for (final op in doc.toList()) {
       final style =
           op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
       if (op.isInsert) {
         _root.insert(offset, op.data, style);
       } else {
         throw ArgumentError.value(doc,
-            "Document Delta can only contain insert operations but ${op.key} found.");
+            'Document Delta can only contain insert operations but ${op.key} found.');
       }
       offset += op.length;
     }
     // Must remove last line if it's empty and with no styles.
     // TODO: find a way for DocumentRoot to not create extra line when composing initial delta.
-    Node node = _root.last;
+    final node = _root.last;
     if (node is LineNode &&
         node.parent is! BlockNode &&
         node.style.isEmpty &&

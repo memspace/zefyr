@@ -33,14 +33,14 @@ class BlockNode extends ContainerNode<LineNode>
       insertAfter(line);
     } else {
       /// need to split this block into two as [line] is in the middle.
-      BlockNode before = clone();
+      final before = clone();
       insertBefore(before);
 
-      LineNode child = this.first;
+      LineNode child = first;
       while (child != line) {
         child.unlink();
         before.add(child);
-        child = this.first as LineNode;
+        child = first as LineNode;
       }
       line.unlink();
       insertBefore(line);
@@ -74,7 +74,7 @@ class BlockNode extends ContainerNode<LineNode>
   @override
   void optimize() {
     if (isEmpty) {
-      Node sibling = this.previous;
+      final sibling = previous;
       unlink();
       if (sibling != null) sibling.optimize();
       return;

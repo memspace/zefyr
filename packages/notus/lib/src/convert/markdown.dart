@@ -4,8 +4,8 @@
 
 import 'dart:convert';
 
-import 'package:quill_delta/quill_delta.dart';
 import 'package:notus/notus.dart';
+import 'package:quill_delta/quill_delta.dart';
 
 class NotusMarkdownCodec extends Codec<Delta, String> {
   const NotusMarkdownCodec();
@@ -33,8 +33,8 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
     final buffer = StringBuffer();
     final lineBuffer = StringBuffer();
     NotusAttribute<String> currentBlockStyle;
-    NotusStyle currentInlineStyle = NotusStyle();
-    List<String> currentBlockLines = [];
+    var currentInlineStyle = NotusStyle();
+    var currentBlockLines = [];
 
     void _handleBlock(NotusAttribute<String> blockStyle) {
       if (currentBlockLines.isEmpty) {
@@ -86,7 +86,7 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
       if (lf == -1) {
         _handleSpan(op.data, op.attributes);
       } else {
-        StringBuffer span = StringBuffer();
+        var span = StringBuffer();
         for (var i = 0; i < op.data.length; i++) {
           if (op.data.codeUnitAt(i) == 0x0A) {
             if (span.isNotEmpty) {
@@ -112,7 +112,7 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
   }
 
   String _writeLine(String text, NotusStyle style) {
-    StringBuffer buffer = StringBuffer();
+    var buffer = StringBuffer();
     if (style.contains(NotusAttribute.heading)) {
       _writeAttribute(buffer, style.get<int>(NotusAttribute.heading));
     }
@@ -123,7 +123,7 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
   }
 
   String _trimRight(StringBuffer buffer) {
-    String text = buffer.toString();
+    var text = buffer.toString();
     if (!text.endsWith(' ')) return '';
     final result = text.trimRight();
     buffer.clear();

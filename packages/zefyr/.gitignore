@@ -10,6 +10,7 @@ pubspec.lock
 coverage/
 ios/Flutter/Generated.xcconfig
 .flutter-plugins
+.flutter-plugins-dependencies
 example/ios/.symlinks
 example/ios/Flutter/Generated.xcconfig
 doc/api/

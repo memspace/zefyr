@@ -106,7 +106,7 @@ void main() {
 
       expect(
         controller.document.toDelta(),
-        new Delta()
+        Delta()
           ..insert('Won')
           ..insert('B', NotusAttribute.bold.toJson())
           ..insert('rds')
@@ -129,7 +129,7 @@ void main() {
       expect(notified, isTrue);
       expect(
         controller.document.toDelta(),
-        new Delta()
+        Delta()
           ..insert('W')
           ..insert('B', NotusAttribute.bold.toJson())
           ..insert('uords')
@@ -163,12 +163,28 @@ void main() {
     });
 
     test('getSelectionStyle with toggled style', () {
-      var selection = new TextSelection.collapsed(offset: 3);
+      var selection = TextSelection.collapsed(offset: 3);
       controller.replaceText(0, 0, 'Words', selection: selection);
       controller.formatText(3, 0, NotusAttribute.bold);
 
       var result = controller.getSelectionStyle();
       expect(result.values, [NotusAttribute.bold]);
+    });
+
+    test('preserve inline format when replacing text from the first character',
+        () {
+      bool notified = false;
+      controller.addListener(() {
+        notified = true;
+      });
+      controller.formatText(0, 0, NotusAttribute.bold);
+      controller.replaceText(0, 0, 'Word');
+      expect(notified, isTrue);
+      expect(
+        controller.document.toDelta(),
+        Delta()..insert('Word', NotusAttribute.bold.toJson())..insert('\n'),
+      );
+      expect(controller.lastChangeSource, ChangeSource.local);
     });
   });
 }
