@@ -170,5 +170,19 @@ void main() {
       var result = controller.getSelectionStyle();
       expect(result.values, [NotusAttribute.bold]);
     });
+    test('formatText with toggled style for first charater', () {
+      bool notified = false;
+      controller.addListener(() {
+        notified = true;
+      });
+      controller.formatText(0, 0, NotusAttribute.bold);
+      controller.replaceText(0, 0, 'Word');
+      expect(notified, isTrue);
+      expect(
+        controller.document.toDelta(),
+        Delta()..insert('Word', NotusAttribute.bold.toJson())..insert('\n'),
+      );
+      expect(controller.lastChangeSource, ChangeSource.local);
+    });
   });
 }
