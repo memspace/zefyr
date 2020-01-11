@@ -46,5 +46,33 @@ void main() {
       ZefyrEditor widget = tester.widget(find.byType(ZefyrEditor));
       expect(widget.mode, ZefyrMode.view);
     });
+
+    testWidgets('toggle toolbar between two editors', (tester) async {
+      final sandbox = MultiEditorSandbox(tester: tester);
+      await sandbox.pump();
+      await sandbox.tapFirstEditor();
+      expect(sandbox.firstFocusNode.hasFocus, isTrue);
+      expect(sandbox.secondFocusNode.hasFocus, isFalse);
+      expect(find.byIcon(Icons.format_list_bulleted), findsOneWidget);
+
+      await sandbox.tapButtonWithIcon(Icons.format_list_bulleted);
+      ZefyrEditor widget = sandbox.findFirstEditor();
+      Node line = widget.controller.document.root.children.first;
+      expect(line, isInstanceOf<BlockNode>());
+      BlockNode block = line;
+      expect(block.style.contains(NotusAttribute.block.bulletList), isTrue);
+
+      await sandbox.tapSecondEditor();
+      expect(sandbox.firstFocusNode.hasFocus, isFalse);
+      expect(sandbox.secondFocusNode.hasFocus, isTrue);
+      expect(find.byIcon(Icons.format_list_bulleted), findsOneWidget);
+
+      await sandbox.tapButtonWithIcon(Icons.format_list_bulleted);
+      widget = sandbox.findSecondEditor();
+      line = widget.controller.document.root.children.first;
+      expect(line, isInstanceOf<BlockNode>());
+      block = line;
+      expect(block.style.contains(NotusAttribute.block.bulletList), isTrue);
+    });
   });
 }

@@ -27,8 +27,8 @@ class ZefyrScaffoldState extends State<ZefyrScaffold> {
     });
   }
 
-  void hideToolbar() {
-    if (_toolbarBuilder != null) {
+  void hideToolbar(WidgetBuilder builder) {
+    if (_toolbarBuilder == builder) {
       setState(() {
         _toolbarBuilder = null;
       });
