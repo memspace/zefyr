@@ -1,6 +1,7 @@
 ## 0.9.1
 
 * Fixed: Preserve inline style when replacing formatted text from the first character (#201)
+* Fixed: Toggling toolbar between two editors (#229)
 
 ## 0.9.0
 
