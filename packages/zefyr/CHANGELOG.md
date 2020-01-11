@@ -1,5 +1,6 @@
 ## 0.9.1
 
+* Added: Support for iOS keyboard appearance. See `ZefyrEditor.keyboardAppearance` and `ZefyrField.keyboardAppearance`
 * Fixed: Preserve inline style when replacing formatted text from the first character (#201)
 * Fixed: Toggling toolbar between two editors (#229)
 
