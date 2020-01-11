@@ -58,4 +58,9 @@ class ZefyrMode {
 
   @override
   int get hashCode => hash3(canEdit, canSelect, canFormat);
+
+  @override
+  String toString() {
+    return 'ZefyrMode(canEdit: $canEdit, canSelect: $canSelect, canFormat: $canFormat)';
+  }
 }
