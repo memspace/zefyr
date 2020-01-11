@@ -40,9 +40,11 @@ class ZefyrEditableText extends StatefulWidget {
     this.mode = ZefyrMode.edit,
     this.padding = const EdgeInsets.symmetric(horizontal: 16.0),
     this.physics,
+    this.keyboardAppearance = Brightness.light,
   })  : assert(mode != null),
         assert(controller != null),
         assert(focusNode != null),
+        assert(keyboardAppearance != null),
         super(key: key);
 
   /// Controls the document being edited.
@@ -75,6 +77,13 @@ class ZefyrEditableText extends StatefulWidget {
   /// Padding around editable area.
   final EdgeInsets padding;
 
+  /// The appearance of the keyboard.
+  ///
+  /// This setting is only honored on iOS devices.
+  ///
+  /// If unset, defaults to the brightness of [Brightness.light].
+  final Brightness keyboardAppearance;
+
   @override
   _ZefyrEditableTextState createState() => _ZefyrEditableTextState();
 }
@@ -103,7 +112,8 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   /// keyboard become visible.
   void requestKeyboard() {
     if (_focusNode.hasFocus) {
-      _input.openConnection(widget.controller.plainTextEditingValue);
+      _input.openConnection(
+          widget.controller.plainTextEditingValue, widget.keyboardAppearance);
     } else {
       FocusScope.of(context).requestFocus(_focusNode);
     }
@@ -293,8 +303,8 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   }
 
   void _handleFocusChange() {
-    _input.openOrCloseConnection(
-        _focusNode, widget.controller.plainTextEditingValue);
+    _input.openOrCloseConnection(_focusNode,
+        widget.controller.plainTextEditingValue, widget.keyboardAppearance);
     _cursorTimer.startOrStop(_focusNode, selection);
     updateKeepAlive();
   }
