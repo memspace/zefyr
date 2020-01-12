@@ -119,9 +119,9 @@ class EditorSandBox {
 class _ZefyrSandbox extends StatefulWidget {
   const _ZefyrSandbox({
     Key key,
-    this.controller,
-    this.focusNode,
-    this.autofocus,
+    @required this.controller,
+    @required this.focusNode,
+    this.autofocus = false,
     this.imageDelegate,
   }) : super(key: key);
   final ZefyrController controller;
@@ -151,5 +151,96 @@ class _ZefyrSandboxState extends State<_ZefyrSandbox> {
     setState(() {
       _enabled = false;
     });
+  }
+}
+
+class MultiEditorSandbox {
+  final WidgetTester tester;
+  final Key firstEditorKey;
+  final Key secondEditorKey;
+  final FocusNode firstFocusNode;
+  final FocusNode secondFocusNode;
+  final Widget widget;
+
+  factory MultiEditorSandbox({@required WidgetTester tester}) {
+    final firstEditorKey = UniqueKey();
+    final secondEditorKey = UniqueKey();
+    final firstFocusNode = FocusNode();
+    final secondFocusNode = FocusNode();
+    Widget first = _ZefyrSandbox(
+      key: firstEditorKey,
+      controller: ZefyrController(NotusDocument.fromDelta(delta)),
+      focusNode: firstFocusNode,
+    );
+    Widget second = _ZefyrSandbox(
+      key: secondEditorKey,
+      controller: ZefyrController(NotusDocument.fromDelta(delta)),
+      focusNode: secondFocusNode,
+    );
+
+    Widget widget = MaterialApp(
+      home: Scaffold(
+        body: ZefyrScaffold(
+          child: Column(
+            children: <Widget>[
+              SizedBox(height: 100, child: first),
+              SizedBox(height: 10),
+              SizedBox(height: 100, child: second),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    return MultiEditorSandbox._(
+      tester: tester,
+      widget: widget,
+      firstEditorKey: firstEditorKey,
+      secondEditorKey: secondEditorKey,
+      firstFocusNode: firstFocusNode,
+      secondFocusNode: secondFocusNode,
+    );
+  }
+
+  MultiEditorSandbox._({
+    @required this.tester,
+    @required this.widget,
+    @required this.firstEditorKey,
+    @required this.secondEditorKey,
+    @required this.firstFocusNode,
+    @required this.secondFocusNode,
+  });
+
+  Future<void> pump() async {
+    await tester.pumpWidget(widget);
+  }
+
+  Future<void> tapFirstEditor() async {
+    await tester.tap(find.byKey(firstEditorKey).first);
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> tapSecondEditor() async {
+    await tester.tap(find.byKey(secondEditorKey).first);
+    await tester.pumpAndSettle();
+  }
+
+  ZefyrEditor findFirstEditor() {
+    return tester.widget(find.descendant(
+      of: find.byKey(firstEditorKey),
+      matching: find.byType(ZefyrEditor),
+    ));
+  }
+
+  ZefyrEditor findSecondEditor() {
+    return tester.widget(find.descendant(
+      of: find.byKey(secondEditorKey),
+      matching: find.byType(ZefyrEditor),
+    ));
+  }
+
+  Future<void> tapButtonWithIcon(IconData icon) async {
+    await tester.tap(find.widgetWithIcon(ZefyrButton, icon));
+    await tester.pumpAndSettle();
   }
 }
