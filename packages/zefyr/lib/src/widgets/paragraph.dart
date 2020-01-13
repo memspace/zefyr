@@ -22,7 +22,7 @@ class ZefyrParagraph extends StatelessWidget {
     if (blockStyle != null) {
       style = style.merge(blockStyle);
     }
-    return RawZefyrLine(
+    return ZefyrLine(
       node: node,
       style: style,
       padding: theme.paragraphTheme.padding,
@@ -46,7 +46,7 @@ class ZefyrHeading extends StatelessWidget {
     if (blockStyle != null) {
       style = style.merge(blockStyle);
     }
-    return RawZefyrLine(
+    return ZefyrLine(
       node: node,
       style: style,
       padding: theme.padding,

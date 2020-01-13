@@ -64,16 +64,6 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ZefyrThemeData(
-      cursorColor: Colors.blue,
-      toolbarTheme: ZefyrToolbarTheme.fallback(context).copyWith(
-        color: Colors.grey.shade800,
-        toggleColor: Colors.grey.shade900,
-        iconColor: Colors.white,
-        disabledIconColor: Colors.grey.shade500,
-      ),
-    );
-
     final done = _editing
         ? [FlatButton(onPressed: _stopEditing, child: Text('DONE'))]
         : [FlatButton(onPressed: _startEditing, child: Text('EDIT'))];
@@ -87,15 +77,12 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
         actions: done,
       ),
       body: ZefyrScaffold(
-        child: ZefyrTheme(
-          data: theme,
-          child: ZefyrEditor(
-            controller: _controller,
-            focusNode: _focusNode,
-            mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
-            imageDelegate: CustomImageDelegate(),
-            keyboardAppearance: Brightness.dark,
-          ),
+        child: ZefyrEditor(
+          controller: _controller,
+          focusNode: _focusNode,
+          mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
+          imageDelegate: CustomImageDelegate(),
+          keyboardAppearance: Brightness.dark,
         ),
       ),
     );

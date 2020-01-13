@@ -12,17 +12,11 @@ import 'rich_text.dart';
 import 'scope.dart';
 import 'theme.dart';
 
-/// Raw widget representing a single line of rich text document in Zefyr editor.
-///
-/// See [ZefyrParagraph] and [ZefyrHeading] which wrap this widget and
-/// integrate it with current [ZefyrTheme].
-class RawZefyrLine extends StatefulWidget {
-  const RawZefyrLine({
-    Key key,
-    @required this.node,
-    this.style,
-    this.padding,
-  }) : super(key: key);
+/// Represents single line of rich text document in Zefyr editor.
+class ZefyrLine extends StatefulWidget {
+  const ZefyrLine({Key key, @required this.node, this.style, this.padding})
+      : assert(node != null),
+        super(key: key);
 
   /// Line in the document represented by this widget.
   final LineNode node;
@@ -35,10 +29,10 @@ class RawZefyrLine extends StatefulWidget {
   final EdgeInsets padding;
 
   @override
-  _RawZefyrLineState createState() => _RawZefyrLineState();
+  _ZefyrLineState createState() => _ZefyrLineState();
 }
 
-class _RawZefyrLineState extends State<RawZefyrLine> {
+class _ZefyrLineState extends State<ZefyrLine> {
   final LayerLink _link = LayerLink();
 
   @override

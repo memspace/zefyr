@@ -153,6 +153,13 @@ class RenderEditableProxyBox extends RenderBox
   /// Returns `true` if current selection is collapsed and located
   /// within this paragraph.
   bool get containsCaret {
+    if (!node.mounted) {
+      // It is possible that a document node gets unmounted before widget tree
+      // is updated, in which case this function fails when triggered by
+      // _showCursor notification calling markNeedsCursorPaint.
+      // TODO: react to document node's mounted state.
+      return false;
+    }
     if (!_selection.isCollapsed) return false;
 
     final int start = node.documentOffset;

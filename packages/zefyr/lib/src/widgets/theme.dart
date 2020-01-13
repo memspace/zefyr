@@ -71,25 +71,23 @@ class ZefyrThemeData {
     final defaultStyle = DefaultTextStyle.of(context);
     final paragraphStyle = defaultStyle.style.copyWith(
       fontSize: 16.0,
-      height: 1.25,
-      fontWeight: FontWeight.normal,
-      color: Colors.grey.shade800,
+      height: 1.3,
     );
-    final padding = const EdgeInsets.only(bottom: 16.0);
+    const padding = EdgeInsets.symmetric(vertical: 8.0);
     final boldStyle = TextStyle(fontWeight: FontWeight.bold);
     final italicStyle = TextStyle(fontStyle: FontStyle.italic);
-    final linkStyle =
-        TextStyle(color: Colors.blue, decoration: TextDecoration.underline);
+    final linkStyle = TextStyle(
+        color: themeData.accentColor, decoration: TextDecoration.underline);
 
     return ZefyrThemeData(
       boldStyle: boldStyle,
       italicStyle: italicStyle,
       linkStyle: linkStyle,
       paragraphTheme: StyleTheme(textStyle: paragraphStyle, padding: padding),
-      headingTheme: HeadingTheme.fallback(),
-      blockTheme: BlockTheme.fallback(themeData),
-      selectionColor: Colors.lightBlueAccent.shade100,
-      cursorColor: Colors.black,
+      headingTheme: HeadingTheme.fallback(context),
+      blockTheme: BlockTheme.fallback(context),
+      selectionColor: themeData.textSelectionColor,
+      cursorColor: themeData.cursorColor,
       indentSize: 16.0,
       toolbarTheme: ZefyrToolbarTheme.fallback(context),
     );
@@ -169,34 +167,35 @@ class HeadingTheme {
   });
 
   /// Creates fallback theme for headings.
-  factory HeadingTheme.fallback() {
+  factory HeadingTheme.fallback(BuildContext context) {
+    final defaultStyle = DefaultTextStyle.of(context);
     return HeadingTheme(
       level1: StyleTheme(
-        textStyle: TextStyle(
-          fontSize: 30.0,
-          color: Colors.grey.shade800,
-          height: 1.25,
-          fontWeight: FontWeight.w600,
+        textStyle: defaultStyle.style.copyWith(
+          fontSize: 34.0,
+          color: defaultStyle.style.color.withOpacity(0.70),
+          height: 1.15,
+          fontWeight: FontWeight.w300,
         ),
-        padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
+        padding: EdgeInsets.only(top: 16.0, bottom: 0.0),
       ),
       level2: StyleTheme(
         textStyle: TextStyle(
           fontSize: 24.0,
-          color: Colors.grey.shade800,
-          height: 1.25,
-          fontWeight: FontWeight.w600,
+          color: defaultStyle.style.color.withOpacity(0.70),
+          height: 1.15,
+          fontWeight: FontWeight.normal,
         ),
-        padding: EdgeInsets.only(bottom: 8.0, top: 8.0),
+        padding: EdgeInsets.only(bottom: 0.0, top: 8.0),
       ),
       level3: StyleTheme(
         textStyle: TextStyle(
           fontSize: 20.0,
-          color: Colors.grey.shade800,
+          color: defaultStyle.style.color.withOpacity(0.70),
           height: 1.25,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
         ),
-        padding: EdgeInsets.only(bottom: 8.0, top: 8.0),
+        padding: EdgeInsets.only(bottom: 0.0, top: 8.0),
       ),
     );
   }
@@ -224,8 +223,10 @@ class BlockTheme {
   });
 
   /// Creates fallback theme for blocks.
-  factory BlockTheme.fallback(ThemeData themeData) {
-    final padding = const EdgeInsets.only(bottom: 8.0);
+  factory BlockTheme.fallback(BuildContext context) {
+    final themeData = Theme.of(context);
+    final defaultTextStyle = DefaultTextStyle.of(context);
+    final padding = const EdgeInsets.symmetric(vertical: 8.0);
     String fontFamily;
     switch (themeData.platform) {
       case TargetPlatform.iOS:
@@ -241,12 +242,14 @@ class BlockTheme {
       bulletList: StyleTheme(padding: padding),
       numberList: StyleTheme(padding: padding),
       quote: StyleTheme(
-        textStyle: TextStyle(color: Colors.grey.shade700),
+        textStyle: TextStyle(
+          color: defaultTextStyle.style.color.withOpacity(0.6),
+        ),
         padding: padding,
       ),
       code: StyleTheme(
         textStyle: TextStyle(
-          color: Colors.blueGrey.shade800,
+          color: defaultTextStyle.style.color.withOpacity(0.8),
           fontFamily: fontFamily,
           fontSize: 14.0,
           height: 1.25,

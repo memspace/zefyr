@@ -69,7 +69,7 @@ class ZefyrListItem extends StatelessWidget {
       content = ZefyrHeading(node: node);
     } else {
       textStyle = theme.paragraphTheme.textStyle;
-      content = RawZefyrLine(node: node, style: textStyle);
+      content = ZefyrLine(node: node, style: textStyle);
     }
 
     Widget bullet =
