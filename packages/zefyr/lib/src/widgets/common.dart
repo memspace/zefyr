@@ -1,6 +1,7 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -56,6 +57,18 @@ class _ZefyrLineState extends State<ZefyrLine> {
     }
 
     if (scope.isEditable) {
+      Color cursorColor;
+      switch (theme.platform) {
+        case TargetPlatform.iOS:
+          cursorColor ??= CupertinoTheme.of(context).primaryColor;
+          break;
+
+        case TargetPlatform.android:
+        case TargetPlatform.fuchsia:
+          cursorColor = theme.cursorColor;
+          break;
+      }
+
       content = EditableBox(
         child: content,
         node: widget.node,
@@ -64,7 +77,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
         showCursor: scope.showCursor,
         selection: scope.selection,
         selectionColor: theme.textSelectionColor,
-        cursorColor: theme.cursorColor,
+        cursorColor: cursorColor,
       );
       content = CompositedTransformTarget(link: _link, child: content);
     }

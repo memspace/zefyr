@@ -47,6 +47,7 @@ class ZefyrField extends StatefulWidget {
 }
 
 class _ZefyrFieldState extends State<ZefyrField> {
+  ZefyrMode get _effectiveMode => widget.mode ?? ZefyrMode.edit;
   @override
   Widget build(BuildContext context) {
     Widget child = ZefyrEditor(
@@ -54,7 +55,7 @@ class _ZefyrFieldState extends State<ZefyrField> {
       controller: widget.controller,
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
-      mode: widget.mode ?? ZefyrMode.edit,
+      mode: _effectiveMode,
       toolbarDelegate: widget.toolbarDelegate,
       imageDelegate: widget.imageDelegate,
       physics: widget.physics,
@@ -88,7 +89,7 @@ class _ZefyrFieldState extends State<ZefyrField> {
         (widget.decoration ?? const InputDecoration())
             .applyDefaults(Theme.of(context).inputDecorationTheme)
             .copyWith(
-              enabled: widget.mode == ZefyrMode.edit,
+              enabled: _effectiveMode == ZefyrMode.edit,
             );
 
     return effectiveDecoration;
