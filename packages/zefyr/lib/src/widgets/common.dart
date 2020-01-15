@@ -1,6 +1,7 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
@@ -41,7 +42,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
     if (scope.isEditable) {
       ensureVisible(context, scope);
     }
-    final theme = ZefyrTheme.of(context);
+    final theme = Theme.of(context);
 
     Widget content;
     if (widget.node.hasEmbed) {
@@ -62,7 +63,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
         renderContext: scope.renderContext,
         showCursor: scope.showCursor,
         selection: scope.selection,
-        selectionColor: theme.selectionColor,
+        selectionColor: theme.textSelectionColor,
         cursorColor: theme.cursorColor,
       );
       content = CompositedTransformTarget(link: _link, child: content);
@@ -123,13 +124,13 @@ class _ZefyrLineState extends State<ZefyrLine> {
   TextStyle _getTextStyle(NotusStyle style, ZefyrThemeData theme) {
     TextStyle result = TextStyle();
     if (style.containsSame(NotusAttribute.bold)) {
-      result = result.merge(theme.boldStyle);
+      result = result.merge(theme.attributeTheme.bold);
     }
     if (style.containsSame(NotusAttribute.italic)) {
-      result = result.merge(theme.italicStyle);
+      result = result.merge(theme.attributeTheme.italic);
     }
     if (style.contains(NotusAttribute.link)) {
-      result = result.merge(theme.linkStyle);
+      result = result.merge(theme.attributeTheme.link);
     }
     return result;
   }

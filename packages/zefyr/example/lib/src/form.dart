@@ -8,6 +8,8 @@ import 'package:zefyr/zefyr.dart';
 import 'full_page.dart';
 import 'images.dart';
 
+enum _Options { darkTheme }
+
 class FormEmbeddedScreen extends StatefulWidget {
   @override
   _FormEmbeddedScreenState createState() => _FormEmbeddedScreenState();
@@ -16,6 +18,8 @@ class FormEmbeddedScreen extends StatefulWidget {
 class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
   final ZefyrController _controller = ZefyrController(NotusDocument());
   final FocusNode _focusNode = FocusNode();
+
+  bool _darkTheme = false;
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +31,16 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
       ],
     );
 
-    return Scaffold(
+    final result = Scaffold(
       resizeToAvoidBottomPadding: true,
       appBar: AppBar(
-        elevation: 1.0,
-        backgroundColor: Colors.grey.shade200,
-        brightness: Brightness.light,
         title: ZefyrLogo(),
+        actions: [
+          PopupMenuButton<_Options>(
+            itemBuilder: buildPopupMenu,
+            onSelected: handlePopupItemSelected,
+          )
+        ],
       ),
       body: ZefyrScaffold(
         child: Padding(
@@ -42,29 +49,41 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
         ),
       ),
     );
+
+    if (_darkTheme) {
+      return Theme(data: ThemeData.dark(), child: result);
+    }
+    return Theme(data: ThemeData(primarySwatch: Colors.cyan), child: result);
   }
 
   Widget buildEditor() {
-    final theme = ZefyrThemeData(
-      toolbarTheme: ZefyrToolbarTheme.fallback(context).copyWith(
-        color: Colors.grey.shade800,
-        toggleColor: Colors.grey.shade900,
-        iconColor: Colors.white,
-        disabledIconColor: Colors.grey.shade500,
-      ),
+    return ZefyrField(
+      height: 200.0,
+      decoration: InputDecoration(labelText: 'Description'),
+      controller: _controller,
+      focusNode: _focusNode,
+      autofocus: true,
+      imageDelegate: CustomImageDelegate(),
+      physics: ClampingScrollPhysics(),
     );
+  }
 
-    return ZefyrTheme(
-      data: theme,
-      child: ZefyrField(
-        height: 200.0,
-        decoration: InputDecoration(labelText: 'Description'),
-        controller: _controller,
-        focusNode: _focusNode,
-        autofocus: true,
-        imageDelegate: CustomImageDelegate(),
-        physics: ClampingScrollPhysics(),
+  void handlePopupItemSelected(value) {
+    if (!mounted) return;
+    setState(() {
+      if (value == _Options.darkTheme) {
+        _darkTheme = !_darkTheme;
+      }
+    });
+  }
+
+  List<PopupMenuEntry<_Options>> buildPopupMenu(BuildContext context) {
+    return [
+      CheckedPopupMenuItem(
+        value: _Options.darkTheme,
+        child: Text("Dark theme"),
+        checked: _darkTheme,
       ),
-    );
+    ];
   }
 }

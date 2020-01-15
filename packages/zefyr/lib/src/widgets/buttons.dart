@@ -93,7 +93,7 @@ class ZefyrButton extends StatelessWidget {
     }
   }
 
-  Color _getColor(ZefyrScope editor, ZefyrToolbarTheme theme) {
+  Color _getColor(ZefyrScope editor, ToolbarTheme theme) {
     if (isAttributeAction) {
       final attribute = kZefyrToolbarAttributeActions[action];
       final isToggled = (attribute is NotusAttribute)
