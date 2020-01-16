@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Applies a Zefyr editor theme to descendant widgets.
 ///
-/// Describes colors and typographic styles for an editor.
+/// Describes colors and typographic styles.
 ///
 /// Descendant widgets obtain the current theme's [ZefyrThemeData] object using
 /// [ZefyrTheme.of].
@@ -41,19 +41,40 @@ class ZefyrTheme extends InheritedWidget {
   }
 }
 
+/// Holds colors and typography values for a Zefyr design theme.
+///
+/// To obtain the current theme, use [ZefyrTheme.of].
+@immutable
 class ZefyrThemeData {
+  /// Default theme used for document lines in Zefyr editor.
+  ///
+  /// Defines text style and spacing for regular paragraphs of text with
+  /// no style attributes applied.
   final LineTheme defaultLineTheme;
+
+  /// The text styles, padding and decorations used to render text with
+  /// different style attributes.
   final AttributeTheme attributeTheme;
+
+  /// The width of indentation used for blocks (lists, quotes, code).
   final double indentWidth;
+
+  /// The colors used to render editor toolbar.
   final ToolbarTheme toolbarTheme;
 
-  ZefyrThemeData({
-    this.defaultLineTheme,
-    this.attributeTheme,
-    this.indentWidth,
-    this.toolbarTheme,
-  });
+  /// Creates a [ZefyrThemeData] given a set of exact values. All values
+  /// must be specified and must be not null.
+  const ZefyrThemeData({
+    @required this.defaultLineTheme,
+    @required this.attributeTheme,
+    @required this.indentWidth,
+    @required this.toolbarTheme,
+  })  : assert(defaultLineTheme != null),
+        assert(attributeTheme != null),
+        assert(indentWidth != null),
+        assert(toolbarTheme != null);
 
+  /// The default color theme.
   factory ZefyrThemeData.fallback(BuildContext context) {
     final defaultStyle = DefaultTextStyle.of(context);
     final defaultLineTheme = LineTheme(
@@ -71,11 +92,14 @@ class ZefyrThemeData {
     );
   }
 
-  ZefyrThemeData copyWith(
-      {LineTheme defaultLineTheme,
-      AttributeTheme attributeTheme,
-      double indentWidth,
-      ToolbarTheme toolbarTheme}) {
+  /// Creates a copy of this theme but with the given fields replaced with
+  /// the new values.
+  ZefyrThemeData copyWith({
+    LineTheme defaultLineTheme,
+    AttributeTheme attributeTheme,
+    double indentWidth,
+    ToolbarTheme toolbarTheme,
+  }) {
     return ZefyrThemeData(
       defaultLineTheme: defaultLineTheme ?? this.defaultLineTheme,
       attributeTheme: attributeTheme ?? this.attributeTheme,
@@ -84,6 +108,8 @@ class ZefyrThemeData {
     );
   }
 
+  /// Creates a new [ZefyrThemeData] where each property from this object has
+  /// been merged with the matching text style from the `other` object.
   ZefyrThemeData merge(ZefyrThemeData other) {
     if (other == null) return this;
     return copyWith(
@@ -303,11 +329,11 @@ class AttributeTheme {
       ),
       bulletList: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
-        linePadding: EdgeInsets.zero,
+        linePadding: EdgeInsets.symmetric(vertical: 2.0),
       ),
       numberList: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
-        linePadding: EdgeInsets.zero,
+        linePadding: EdgeInsets.symmetric(vertical: 2.0),
       ),
       quote: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
