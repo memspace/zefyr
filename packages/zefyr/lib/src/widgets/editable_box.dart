@@ -72,7 +72,7 @@ class RenderEditableProxyBox extends RenderBox
     @required TextSelection selection,
     @required Color selectionColor,
     @required Color cursorColor,
-  })  : _node = node,
+  })  : node = node,
         _layerLink = layerLink,
         _renderContext = renderContext,
         _showCursor = showCursor,
@@ -94,11 +94,7 @@ class RenderEditableProxyBox extends RenderBox
 
   bool _isDirty = true;
 
-  ContainerNode get node => _node;
-  ContainerNode _node;
-  set node(ContainerNode value) {
-    _node = value;
-  }
+  ContainerNode node;
 
   LayerLink get layerLink => _layerLink;
   LayerLink _layerLink;

@@ -50,7 +50,7 @@ class RenderZefyrParagraph extends RenderParagraph
     TextOverflow overflow = TextOverflow.clip,
     double textScaleFactor = 1.0,
     int maxLines,
-  })  : _node = node,
+  })  : node = node,
         _prototypePainter = TextPainter(
           text: TextSpan(text: '.', style: text.style),
           textAlign: textAlign,
@@ -67,11 +67,7 @@ class RenderZefyrParagraph extends RenderParagraph
           maxLines: maxLines,
         );
 
-  LineNode get node => _node;
-  LineNode _node;
-  set node(LineNode value) {
-    _node = value;
-  }
+  LineNode node;
 
   @override
   double get preferredLineHeight => _prototypePainter.height;
@@ -95,7 +91,7 @@ class RenderZefyrParagraph extends RenderParagraph
   TextPosition getPositionForOffset(Offset offset) {
     final position = super.getPositionForOffset(offset);
     return TextPosition(
-      offset: _node.documentOffset + position.offset,
+      offset: node.documentOffset + position.offset,
       affinity: position.affinity,
     );
   }
@@ -103,20 +99,20 @@ class RenderZefyrParagraph extends RenderParagraph
   @override
   TextRange getWordBoundary(TextPosition position) {
     final localPosition = TextPosition(
-      offset: position.offset - _node.documentOffset,
+      offset: position.offset - node.documentOffset,
       affinity: position.affinity,
     );
     final localRange = super.getWordBoundary(localPosition);
     return TextRange(
-      start: _node.documentOffset + localRange.start,
-      end: _node.documentOffset + localRange.end,
+      start: node.documentOffset + localRange.start,
+      end: node.documentOffset + localRange.end,
     );
   }
 
   @override
   Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
     final localPosition = TextPosition(
-      offset: position.offset - _node.documentOffset,
+      offset: position.offset - node.documentOffset,
       affinity: position.affinity,
     );
     return super.getOffsetForCaret(localPosition, caretPrototype);
@@ -169,7 +165,7 @@ class RenderZefyrParagraph extends RenderParagraph
     }
     if (isExtentShifted) {
       final box = result.last;
-      result.removeLast;
+      result.removeLast();
       result.add(ui.TextBox.fromLTRBD(
           box.left, box.top, box.left, box.bottom, box.direction));
     }

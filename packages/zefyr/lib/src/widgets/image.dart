@@ -96,16 +96,12 @@ class RenderEditableImage extends RenderBox
   RenderEditableImage({
     RenderImage child,
     @required EmbedNode node,
-  }) : _node = node {
+  }) : node = node {
     this.child = child;
   }
 
   @override
-  EmbedNode get node => _node;
-  EmbedNode _node;
-  set node(EmbedNode value) {
-    _node = value;
-  }
+  EmbedNode node;
 
   // TODO: Customize caret height offset instead of adjusting here by 2px.
   @override
@@ -147,7 +143,7 @@ class RenderEditableImage extends RenderBox
 
   @override
   TextPosition getPositionForOffset(Offset offset) {
-    int position = _node.documentOffset;
+    int position = node.documentOffset;
 
     if (offset.dx > size.width / 2) {
       position++;
@@ -157,7 +153,7 @@ class RenderEditableImage extends RenderBox
 
   @override
   TextRange getWordBoundary(TextPosition position) {
-    final start = _node.documentOffset;
+    final start = node.documentOffset;
     return TextRange(start: start, end: start + 1);
   }
 
