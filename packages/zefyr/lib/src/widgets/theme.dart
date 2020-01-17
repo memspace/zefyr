@@ -65,14 +65,11 @@ class ZefyrThemeData {
   /// Creates a [ZefyrThemeData] given a set of exact values. All values
   /// must be specified and must be not null.
   const ZefyrThemeData({
-    @required this.defaultLineTheme,
-    @required this.attributeTheme,
-    @required this.indentWidth,
-    @required this.toolbarTheme,
-  })  : assert(defaultLineTheme != null),
-        assert(attributeTheme != null),
-        assert(indentWidth != null),
-        assert(toolbarTheme != null);
+    this.defaultLineTheme,
+    this.attributeTheme,
+    this.indentWidth,
+    this.toolbarTheme,
+  });
 
   /// The default color theme.
   factory ZefyrThemeData.fallback(BuildContext context) {
