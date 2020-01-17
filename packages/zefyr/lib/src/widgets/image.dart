@@ -9,6 +9,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/zefyr.dart';
 
 import 'editable_box.dart';
 
@@ -58,9 +59,13 @@ class _ZefyrImageState extends State<ZefyrImage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ZefyrTheme.of(context);
     final image = widget.delegate.buildImage(context, imageSource);
     return _EditableImage(
-      child: image,
+      child: Padding(
+        padding: theme.defaultLineTheme.padding,
+        child: image,
+      ),
       node: widget.node,
     );
   }
@@ -88,25 +93,19 @@ class _EditableImage extends SingleChildRenderObjectWidget {
 class RenderEditableImage extends RenderBox
     with RenderObjectWithChildMixin<RenderBox>, RenderProxyBoxMixin<RenderBox>
     implements RenderEditableBox {
-  static const kPaddingBottom = 24.0;
-
   RenderEditableImage({
     RenderImage child,
     @required EmbedNode node,
-  }) : _node = node {
+  }) : node = node {
     this.child = child;
   }
 
   @override
-  EmbedNode get node => _node;
-  EmbedNode _node;
-  set node(EmbedNode value) {
-    _node = value;
-  }
+  EmbedNode node;
 
   // TODO: Customize caret height offset instead of adjusting here by 2px.
   @override
-  double get preferredLineHeight => size.height - kPaddingBottom + 2.0;
+  double get preferredLineHeight => size.height + 2.0;
 
   @override
   SelectionOrder get selectionOrder => SelectionOrder.foreground;
@@ -129,8 +128,7 @@ class RenderEditableImage extends RenderBox
     if (local.isCollapsed) {
       final dx = local.extentOffset == 0 ? _childOffset.dx : size.width;
       return [
-        ui.TextBox.fromLTRBD(
-            dx, 0.0, dx, size.height - kPaddingBottom, TextDirection.ltr),
+        ui.TextBox.fromLTRBD(dx, 0.0, dx, size.height, TextDirection.ltr),
       ];
     }
 
@@ -145,7 +143,7 @@ class RenderEditableImage extends RenderBox
 
   @override
   TextPosition getPositionForOffset(Offset offset) {
-    int position = _node.documentOffset;
+    int position = node.documentOffset;
 
     if (offset.dx > size.width / 2) {
       position++;
@@ -155,7 +153,7 @@ class RenderEditableImage extends RenderBox
 
   @override
   TextRange getWordBoundary(TextPosition position) {
-    final start = _node.documentOffset;
+    final start = node.documentOffset;
     return TextRange(start: start, end: start + 1);
   }
 
@@ -203,7 +201,7 @@ class RenderEditableImage extends RenderBox
 
   Offset get _childOffset {
     final dx = (size.width - _lastChildSize.width) / 2 + kHorizontalPadding;
-    final dy = (size.height - _lastChildSize.height - kPaddingBottom) / 2;
+    final dy = (size.height - _lastChildSize.height) / 2;
     return Offset(dx, dy);
   }
 
@@ -226,7 +224,7 @@ class RenderEditableImage extends RenderBox
       );
       child.layout(childConstraints, parentUsesSize: true);
       _lastChildSize = child.size;
-      size = Size(constraints.maxWidth, _lastChildSize.height + kPaddingBottom);
+      size = Size(constraints.maxWidth, _lastChildSize.height);
     } else {
       performResize();
     }

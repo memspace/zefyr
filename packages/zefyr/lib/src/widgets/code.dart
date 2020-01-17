@@ -16,19 +16,23 @@ class ZefyrCode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ZefyrTheme.of(context);
+    final theme = Theme.of(context);
+    final zefyrTheme = ZefyrTheme.of(context);
 
     List<Widget> items = [];
     for (var line in node.children) {
-      items.add(_buildLine(line, theme.blockTheme.code.textStyle));
+      items.add(_buildLine(line, zefyrTheme.attributeTheme.code.textStyle));
     }
 
+    // TODO: move background color and decoration to BlockTheme
+    final color = theme.primaryColorBrightness == Brightness.light
+        ? Colors.grey.shade200
+        : Colors.grey.shade800;
     return Padding(
-      padding: theme.blockTheme.code.padding,
+      padding: zefyrTheme.attributeTheme.code.padding,
       child: Container(
-        // TODO: make decorations configurable
         decoration: BoxDecoration(
-          color: Colors.blueGrey.shade50,
+          color: color,
           borderRadius: BorderRadius.circular(3.0),
         ),
         padding: const EdgeInsets.all(16.0),
@@ -42,6 +46,6 @@ class ZefyrCode extends StatelessWidget {
 
   Widget _buildLine(Node node, TextStyle style) {
     LineNode line = node;
-    return RawZefyrLine(node: line, style: style);
+    return ZefyrLine(node: line, style: style);
   }
 }
