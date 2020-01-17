@@ -62,8 +62,7 @@ class ZefyrThemeData {
   /// The colors used to render editor toolbar.
   final ToolbarTheme toolbarTheme;
 
-  /// Creates a [ZefyrThemeData] given a set of exact values. All values
-  /// must be specified and must be not null.
+  /// Creates a [ZefyrThemeData] given a set of exact values.
   const ZefyrThemeData({
     this.defaultLineTheme,
     this.attributeTheme,
@@ -71,7 +70,7 @@ class ZefyrThemeData {
     this.toolbarTheme,
   });
 
-  /// The default color theme.
+  /// The default editor theme.
   factory ZefyrThemeData.fallback(BuildContext context) {
     final defaultStyle = DefaultTextStyle.of(context);
     final defaultLineTheme = LineTheme(
@@ -141,14 +140,25 @@ class ZefyrThemeData {
   }
 }
 
+/// Holds typography values for a document line in Zefyr editor.
+///
+/// Applicable for regular paragraphs, headings and lines within blocks
+/// (lists, quotes). Blocks may override some of these values using [BlockTheme].
+@immutable
 class LineTheme {
+  /// Default text style for a document line.
   final TextStyle textStyle;
+
+  /// Additional space around a document line.
   final EdgeInsets padding;
 
+  /// Creates a [LineTheme] given a set of exact values.
   LineTheme({this.textStyle, this.padding})
       : assert(textStyle != null),
         assert(padding != null);
 
+  /// Creates a copy of this theme but with the given fields replaced with
+  /// the new values.
   LineTheme copyWith({TextStyle textStyle, EdgeInsets padding}) {
     return LineTheme(
       textStyle: textStyle ?? this.textStyle,
@@ -156,6 +166,14 @@ class LineTheme {
     );
   }
 
+  /// Creates a new [LineTheme] where each property from this object has
+  /// been merged with the matching property from the `other` object.
+  ///
+  /// Text style is merged using [TextStyle.merge] when this and other
+  /// theme have this value set.
+  ///
+  /// If padding property is set in other then it replaces value of this
+  /// theme.
   LineTheme merge(LineTheme other) {
     if (other == null) return this;
     return copyWith(
@@ -176,8 +194,10 @@ class LineTheme {
   int get hashCode => hashValues(textStyle, padding);
 }
 
+/// Holds typography values for a block of lines in Zefyr editor.
+@immutable
 class BlockTheme {
-  /// Text style for all text within a block, can be null.
+  /// Default text style for all text within a block, can be null.
   ///
   /// Takes precedence over line-level text style set by [LineTheme] if
   /// [inheritLineTextStyle] is set to `false`. Otherwise this text style
@@ -202,13 +222,16 @@ class BlockTheme {
   /// Takes precedence over line padding set in [LineTheme].
   final EdgeInsets linePadding;
 
-  BlockTheme({
+  /// Creates a [BlockTheme] given a set of exact values.
+  const BlockTheme({
     this.textStyle,
     this.inheritLineTextStyle = true,
-    @required this.padding,
+    this.padding,
     this.linePadding,
-  }) : assert(padding != null);
+  });
 
+  /// Creates a copy of this theme but with the given fields replaced with
+  /// the new values.
   BlockTheme copyWith({
     TextStyle textStyle,
     EdgeInsets padding,
@@ -223,6 +246,14 @@ class BlockTheme {
     );
   }
 
+  /// Creates a new [BlockTheme] where each property from this object has
+  /// been merged with the matching property from the `other` object.
+  ///
+  /// Text style is merged using [TextStyle.merge] when this and other
+  /// theme have this field set.
+  ///
+  /// If padding property is set in other then it replaces value of this
+  /// theme. [linePadding] follows the same logic.
   BlockTheme merge(BlockTheme other) {
     if (other == null) return this;
     return copyWith(
@@ -248,18 +279,40 @@ class BlockTheme {
       hashValues(textStyle, inheritLineTextStyle, padding, linePadding);
 }
 
+/// Holds style information for all format attributes supported by Zefyr editor.
+@immutable
 class AttributeTheme {
+  /// Style used to render "bold" text.
   final TextStyle bold;
+
+  /// Style used to render "italic" text.
   final TextStyle italic;
+
+  /// Style used to render text containing links.
   final TextStyle link;
+
+  /// Style theme used to render largest headings.
   final LineTheme heading1;
+
+  /// Style theme used to render medium headings.
   final LineTheme heading2;
+
+  /// Style theme used to render smaller headings.
   final LineTheme heading3;
+
+  /// Style theme used to render bullet lists.
   final BlockTheme bulletList;
+
+  /// Style theme used to render number lists.
   final BlockTheme numberList;
+
+  /// Style theme used to render quote blocks.
   final BlockTheme quote;
+
+  /// Style theme used to render code blocks.
   final BlockTheme code;
 
+  /// Creates a [AttributeTheme] given a set of exact values.
   AttributeTheme({
     this.bold,
     this.italic,
@@ -273,6 +326,7 @@ class AttributeTheme {
     this.code,
   });
 
+  /// The default attribute theme.
   factory AttributeTheme.fallback(
       BuildContext context, LineTheme defaultLineTheme) {
     final theme = Theme.of(context);
@@ -353,6 +407,8 @@ class AttributeTheme {
     );
   }
 
+  /// Creates a new [AttributeTheme] where each property from this object has
+  /// been merged with the matching property from the `other` object.
   AttributeTheme copyWith({
     TextStyle bold,
     TextStyle italic,
@@ -379,6 +435,8 @@ class AttributeTheme {
     );
   }
 
+  /// Creates a new [AttributeTheme] where each property from this object has
+  /// been merged with the matching property from the `other` object.
   AttributeTheme merge(AttributeTheme other) {
     if (other == null) return this;
     return copyWith(
@@ -428,9 +486,9 @@ class AttributeTheme {
   }
 }
 
-/// Defines styles and colors for [ZefyrToolbar].
+/// Defines styles and colors for Zefyr editor toolbar.
 class ToolbarTheme {
-  /// The background color of toolbar.
+  /// The background color of the toolbar.
   final Color color;
 
   /// Color of buttons in toggled state.
@@ -442,7 +500,7 @@ class ToolbarTheme {
   /// Color of button icons in disabled state.
   final Color disabledIconColor;
 
-  /// Creates fallback theme for editor toolbars.
+  /// Creates default theme for editor toolbar.
   factory ToolbarTheme.fallback(BuildContext context) {
     final theme = Theme.of(context);
     return ToolbarTheme._(
@@ -464,6 +522,8 @@ class ToolbarTheme {
     @required this.disabledIconColor,
   });
 
+  /// Creates a new [ToolbarTheme] where each property from this object has
+  /// been merged with the matching property from the `other` object.
   ToolbarTheme copyWith({
     Color color,
     Color toggleColor,
@@ -478,6 +538,8 @@ class ToolbarTheme {
     );
   }
 
+  /// Creates a new [ToolbarTheme] where each property from this object has
+  /// been merged with the matching property from the `other` object.
   ToolbarTheme merge(ToolbarTheme other) {
     if (other == null) return this;
     return copyWith(
