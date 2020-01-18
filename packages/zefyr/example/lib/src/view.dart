@@ -32,43 +32,27 @@ class _ViewScreen extends State<ViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ZefyrThemeData(
-      toolbarTheme: ZefyrToolbarTheme.fallback(context).copyWith(
-        color: Colors.grey.shade800,
-        toggleColor: Colors.grey.shade900,
-        iconColor: Colors.white,
-        disabledIconColor: Colors.grey.shade500,
-      ),
-    );
     return Scaffold(
       resizeToAvoidBottomPadding: true,
-      appBar: AppBar(
-        elevation: 1.0,
-        backgroundColor: Colors.grey.shade200,
-        brightness: Brightness.light,
-        title: ZefyrLogo(),
-      ),
-      body: ZefyrTheme(
-        data: theme,
-        child: ListView(
-          children: <Widget>[
-            SizedBox(height: 16.0),
-            ListTile(
-              leading: Icon(Icons.info),
-              title: Text('ZefyrView inside ListView'),
-              subtitle: Text(
-                  'Allows embedding Notus documents in custom scrollables'),
-              trailing: Icon(Icons.keyboard_arrow_down),
+      appBar: AppBar(title: ZefyrLogo()),
+      body: ListView(
+        children: <Widget>[
+          SizedBox(height: 16.0),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: Text('ZefyrView inside ListView'),
+            subtitle:
+                Text('Allows embedding Notus documents in custom scrollables'),
+            trailing: Icon(Icons.keyboard_arrow_down),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ZefyrView(
+              document: doc,
+              imageDelegate: CustomImageDelegate(),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ZefyrView(
-                document: doc,
-                imageDelegate: CustomImageDelegate(),
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }

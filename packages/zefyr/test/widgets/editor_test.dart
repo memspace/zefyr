@@ -11,7 +11,7 @@ import '../testing.dart';
 
 void main() {
   group('$ZefyrEditor', () {
-    testWidgets('allows merging theme data', (tester) async {
+    testWidgets('allows merging attribute theme data', (tester) async {
       var delta = Delta()
         ..insert(
           'Website',
@@ -19,7 +19,8 @@ void main() {
         )
         ..insert('\n');
       var doc = NotusDocument.fromDelta(delta);
-      var theme = ZefyrThemeData(linkStyle: TextStyle(color: Colors.red));
+      var attributeTheme = AttributeTheme(link: TextStyle(color: Colors.red));
+      var theme = ZefyrThemeData(attributeTheme: attributeTheme);
       var editor = EditorSandBox(tester: tester, document: doc, theme: theme);
       await editor.pumpAndTap();
       // TODO: figure out why this extra pump is needed here

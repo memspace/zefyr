@@ -381,7 +381,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
       // TODO: For some reason sometimes we get updates when render boxes
       //      are in process of rebuilding so we don't have access to them here.
       //      As a workaround we just return empty container. There is usually
-      //      another rebuild right after which "fixes" the view.
+      //      another rebuild right after this one which "fixes" the view.
       //      Example: when toolbar button is toggled changing style of current
       //      selection.
       return Container();

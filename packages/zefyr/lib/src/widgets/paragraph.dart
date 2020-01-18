@@ -18,14 +18,14 @@ class ZefyrParagraph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context);
-    TextStyle style = theme.paragraphTheme.textStyle;
+    TextStyle style = theme.defaultLineTheme.textStyle;
     if (blockStyle != null) {
       style = style.merge(blockStyle);
     }
-    return RawZefyrLine(
+    return ZefyrLine(
       node: node,
       style: style,
-      padding: theme.paragraphTheme.padding,
+      padding: theme.defaultLineTheme.padding,
     );
   }
 }
@@ -46,22 +46,22 @@ class ZefyrHeading extends StatelessWidget {
     if (blockStyle != null) {
       style = style.merge(blockStyle);
     }
-    return RawZefyrLine(
+    return ZefyrLine(
       node: node,
       style: style,
       padding: theme.padding,
     );
   }
 
-  static StyleTheme themeOf(LineNode node, BuildContext context) {
+  static LineTheme themeOf(LineNode node, BuildContext context) {
     final theme = ZefyrTheme.of(context);
     final style = node.style.get(NotusAttribute.heading);
     if (style == NotusAttribute.heading.level1) {
-      return theme.headingTheme.level1;
+      return theme.attributeTheme.heading1;
     } else if (style == NotusAttribute.heading.level2) {
-      return theme.headingTheme.level2;
+      return theme.attributeTheme.heading2;
     } else if (style == NotusAttribute.heading.level3) {
-      return theme.headingTheme.level3;
+      return theme.attributeTheme.heading3;
     }
     throw UnimplementedError('Unsupported heading style $style');
   }

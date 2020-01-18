@@ -1,3 +1,23 @@
+## 0.10.0
+
+This release contains breaking changes.
+The entire theming layer of ZefyrEditor has been rewritten. Most notable changes include:
+
+* Removed `selectionColor` and `cursorColor` from `ZefyrThemeData`. Relying on the Flutter 
+  `ThemeData.textSelectionColor` and `ThemeData.cursorColor` instead.
+* All attribute styles moved to the new `AttributeTheme` class.
+* `indentSize` renamed to `indentWidth`
+* Purpose of `BlockTheme` changed to specify styles for particular block type (list, quote, code)
+* Removed `HeadingTheme` and `StyleTheme`
+* Added new `LineTheme` to describe styles of headings and paragraphs
+
+Other changes in this release include:
+
+* Added: Support for Dark Mode
+* Changed: Minor tweaks to default theme
+* Fixed: ZefyrField decoration when focused appeared as disabled
+* Fixed: Caret color for iOS
+
 ## 0.9.1
 
 * Added: Support for iOS keyboard appearance. See `ZefyrEditor.keyboardAppearance` and `ZefyrField.keyboardAppearance`

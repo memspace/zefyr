@@ -16,14 +16,14 @@ class ZefyrQuote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context);
-    final style = theme.blockTheme.quote.textStyle;
+    final style = theme.attributeTheme.quote.textStyle;
     List<Widget> items = [];
     for (var line in node.children) {
-      items.add(_buildLine(line, style, theme.indentSize));
+      items.add(_buildLine(line, style, theme.indentWidth));
     }
 
     return Padding(
-      padding: theme.blockTheme.quote.padding,
+      padding: theme.attributeTheme.quote.padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: items,
