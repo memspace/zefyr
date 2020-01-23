@@ -10,7 +10,7 @@ environment:
 dependencies:
   collection: ^1.14.6
   meta: ^1.1.0
-  quill_delta: ^1.0.0
+  quill_delta: ^1.0.2
   quiver_hashcode: ^2.0.0
 
 dev_dependencies:

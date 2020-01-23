@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   collection: ^1.14.6
   url_launcher: ^5.0.0
-  quill_delta: ^1.0.0
+  quill_delta: ^1.0.2
   notus: ^0.1.0
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
