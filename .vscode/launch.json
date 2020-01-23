@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Zefyr Example (debug)",
+      "program": "packages/zefyr/example/lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+    },
+    {
+      "name": "Zefyr Example (profile)",
+      "program": "packages/zefyr/example/lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "Zefyr Example (release)",
+      "program": "packages/zefyr/example/lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    }
+  ]
+}
