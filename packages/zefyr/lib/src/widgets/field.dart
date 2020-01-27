@@ -20,6 +20,7 @@ class ZefyrField extends StatefulWidget {
   final ZefyrToolbarDelegate toolbarDelegate;
   final ZefyrImageDelegate imageDelegate;
   final ScrollPhysics physics;
+  final bool expands;
 
   /// The appearance of the keyboard.
   ///
@@ -40,6 +41,7 @@ class ZefyrField extends StatefulWidget {
     this.imageDelegate,
     this.physics,
     this.keyboardAppearance,
+    this.expands = false,
   }) : super(key: key);
 
   @override
@@ -55,6 +57,7 @@ class _ZefyrFieldState extends State<ZefyrField> {
       controller: widget.controller,
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
+      expands: widget.expands,
       mode: _effectiveMode,
       toolbarDelegate: widget.toolbarDelegate,
       imageDelegate: widget.imageDelegate,
