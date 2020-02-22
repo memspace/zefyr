@@ -27,5 +27,5 @@ dependencies:
 
 And run `flutter packages get`.
 
-Continue to [https://github.com/memspace/zefyr/blob/master/doc/concepts/quick_start.md](documentation) to
+Continue to [https://github.com/memspace/zefyr/blob/master/doc/quick-start.md](documentation) to
 learn more about Zefyr and how to use it in your projects.
