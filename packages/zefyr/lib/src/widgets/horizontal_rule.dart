@@ -81,7 +81,17 @@ class RenderHorizontalRule extends RenderEditableBox {
   void paint(PaintingContext context, Offset offset) {
     final rect = Rect.fromLTWH(0.0, 0.0, size.width, _kThickness);
     final paint = ui.Paint()..color = _theme.dividerColor;
-    context.canvas.drawRect(rect.shift(offset), paint);
+    var max = 3;
+    var dashWidth = 5;
+    var dashSpace = 5;
+    double startY = 0;
+    while (max >= 0) {
+      context.canvas.drawLine(Offset(0, startY), Offset(0, startY + dashWidth), paint);
+      final space = (dashSpace + dashWidth);
+      startY += space;
+      max -= space;
+    }
+    // context.canvas.drawRect(rect.shift(offset), paint);
   }
 
   @override
