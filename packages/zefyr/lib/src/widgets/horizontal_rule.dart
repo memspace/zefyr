@@ -83,7 +83,7 @@ class RenderHorizontalRule extends RenderEditableBox {
     double dims = 4;
     double spacer = 14;
 
-    final double startY = size.width / 2 - (3 * (spacer));
+    final double startY = size.width / 2 - (2 * (spacer));
     double offsetY = 0;
 
     for (var i = 0; i < 3; i++) {
