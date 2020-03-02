@@ -28,8 +28,8 @@ class ZefyrHorizontalRule extends LeafRenderObjectWidget {
 }
 
 class RenderHorizontalRule extends RenderEditableBox {
-  static const _kPaddingTop = 18.0;
-  static const _kPaddingBottom = 18.0;
+  static const _kPaddingTop = 22.0;
+  static const _kPaddingBottom = 22.0;
   static const _kHeight = _kPaddingTop + _kPaddingBottom;
 
   RenderHorizontalRule({
