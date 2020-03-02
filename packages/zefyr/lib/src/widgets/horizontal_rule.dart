@@ -79,6 +79,7 @@ class RenderHorizontalRule extends RenderEditableBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    print('dividerColor ${_theme.dividerColor}');
     var paint = Paint()..color = _theme.dividerColor;
 
     double dims = 10;
@@ -90,7 +91,11 @@ class RenderHorizontalRule extends RenderEditableBox {
     for (var i = 0; i < 3; i++) {
       offsetY += (spacer + dims);
 
-      context.canvas.drawCircle(Offset(startY + offsetY, 0), dims / 2, paint);
+      context.canvas.drawCircle(
+        Offset(startY + offsetY, _kPaddingTop),
+        dims / 2,
+        paint,
+      );
     }
 
     // final rect = Rect.fromLTWH(0.0, 0.0, size.width, _kThickness);
