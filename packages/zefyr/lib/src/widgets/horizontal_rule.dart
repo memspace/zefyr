@@ -21,16 +21,16 @@ class ZefyrHorizontalRule extends LeafRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, RenderHorizontalRule renderObject) {
+  void updateRenderObject(BuildContext context, RenderHorizontalRule renderObject) {
     renderObject..node = node;
   }
 }
 
 class RenderHorizontalRule extends RenderEditableBox {
-  static const _kPaddingBottom = 24.0;
-  static const _kThickness = 3.0;
-  static const _kHeight = _kThickness + _kPaddingBottom;
+  static const _kPaddingTop = 12.0;
+  static const _kPaddingBottom = 12.0;
+  static const _kThickness = 1.0;
+  static const _kHeight = _kThickness + _kPaddingTop + _kPaddingBottom;
 
   RenderHorizontalRule({
     @required EmbedNode node,
@@ -63,8 +63,7 @@ class RenderHorizontalRule extends RenderEditableBox {
 
     return [
       ui.TextBox.fromLTRBD(0.0, 0.0, 0.0, size.height, TextDirection.ltr),
-      ui.TextBox.fromLTRBD(
-          size.width, 0.0, size.width, size.height, TextDirection.ltr),
+      ui.TextBox.fromLTRBD(size.width, 0.0, size.width, size.height, TextDirection.ltr),
     ];
   }
 
@@ -98,8 +97,7 @@ class RenderHorizontalRule extends RenderEditableBox {
   }
 
   @override
-  void paintSelection(PaintingContext context, Offset offset,
-      TextSelection selection, Color selectionColor) {
+  void paintSelection(PaintingContext context, Offset offset, TextSelection selection, Color selectionColor) {
     final localSelection = getLocalSelection(selection);
     assert(localSelection != null);
     if (!localSelection.isCollapsed) {
