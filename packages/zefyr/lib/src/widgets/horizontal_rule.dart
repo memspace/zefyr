@@ -7,17 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
-
+import 'theme.dart';
 import 'editable_box.dart';
 
 class ZefyrHorizontalRule extends LeafRenderObjectWidget {
-  ZefyrHorizontalRule({@required this.node}) : assert(node != null);
+  ZefyrHorizontalRule({@required this.node, @required this.theme}) : assert(node != null);
 
   final EmbedNode node;
+  final ZefyrThemeData theme;
 
   @override
   RenderHorizontalRule createRenderObject(BuildContext context) {
-    return RenderHorizontalRule(node: node);
+    return RenderHorizontalRule(node: node, theme: theme);
   }
 
   @override
@@ -27,18 +28,21 @@ class ZefyrHorizontalRule extends LeafRenderObjectWidget {
 }
 
 class RenderHorizontalRule extends RenderEditableBox {
-  static const _kPaddingTop = 12.0;
-  static const _kPaddingBottom = 12.0;
+  static const _kPaddingTop = 8.0;
+  static const _kPaddingBottom = 8.0;
   static const _kThickness = 1.0;
   static const _kHeight = _kThickness + _kPaddingTop + _kPaddingBottom;
 
   RenderHorizontalRule({
     @required EmbedNode node,
-  }) : _node = node;
+    @required ZefyrThemeData theme,
+  })  : _node = node,
+        _theme = theme;
 
   @override
   EmbedNode get node => _node;
   EmbedNode _node;
+  ZefyrThemeData _theme;
   set node(EmbedNode value) {
     if (_node == value) return;
     _node = value;
@@ -76,7 +80,7 @@ class RenderHorizontalRule extends RenderEditableBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     final rect = Rect.fromLTWH(0.0, 0.0, size.width, _kThickness);
-    final paint = ui.Paint()..color = Colors.grey.shade200;
+    final paint = ui.Paint()..color = _theme.dividerColor;
     context.canvas.drawRect(rect.shift(offset), paint);
   }
 

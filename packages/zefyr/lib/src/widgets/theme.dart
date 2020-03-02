@@ -32,11 +32,9 @@ class ZefyrTheme extends InheritedWidget {
   /// and [nullOk] is set to `true`. If [nullOk] is set to `false` (default)
   /// then this method asserts.
   static ZefyrThemeData of(BuildContext context, {bool nullOk = false}) {
-    final ZefyrTheme widget =
-        context.dependOnInheritedWidgetOfExactType<ZefyrTheme>();
+    final ZefyrTheme widget = context.dependOnInheritedWidgetOfExactType<ZefyrTheme>();
     if (widget == null && nullOk) return null;
-    assert(widget != null,
-        '$ZefyrTheme.of() called with a context that does not contain a ZefyrEditor.');
+    assert(widget != null, '$ZefyrTheme.of() called with a context that does not contain a ZefyrEditor.');
     return widget.data;
   }
 }
@@ -62,11 +60,15 @@ class ZefyrThemeData {
   /// The colors used to render editor toolbar.
   final ToolbarTheme toolbarTheme;
 
+  /// The Divider Color.
+  final Color dividerColor;
+
   /// Creates a [ZefyrThemeData] given a set of exact values.
   const ZefyrThemeData({
     this.defaultLineTheme,
     this.attributeTheme,
     this.indentWidth,
+    this.dividerColor,
     this.toolbarTheme,
   });
 
@@ -84,6 +86,7 @@ class ZefyrThemeData {
       defaultLineTheme: defaultLineTheme,
       attributeTheme: AttributeTheme.fallback(context, defaultLineTheme),
       indentWidth: 16.0,
+      dividerColor: Colors.grey.shade200,
       toolbarTheme: ToolbarTheme.fallback(context),
     );
   }
@@ -94,12 +97,14 @@ class ZefyrThemeData {
     LineTheme defaultLineTheme,
     AttributeTheme attributeTheme,
     double indentWidth,
+    Color dividerColor,
     ToolbarTheme toolbarTheme,
   }) {
     return ZefyrThemeData(
       defaultLineTheme: defaultLineTheme ?? this.defaultLineTheme,
       attributeTheme: attributeTheme ?? this.attributeTheme,
       indentWidth: indentWidth ?? this.indentWidth,
+      dividerColor: dividerColor ?? this.dividerColor,
       toolbarTheme: toolbarTheme ?? this.toolbarTheme,
     );
   }
@@ -109,13 +114,11 @@ class ZefyrThemeData {
   ZefyrThemeData merge(ZefyrThemeData other) {
     if (other == null) return this;
     return copyWith(
-      defaultLineTheme: defaultLineTheme?.merge(other.defaultLineTheme) ??
-          other.defaultLineTheme,
-      attributeTheme:
-          attributeTheme?.merge(other.attributeTheme) ?? other.attributeTheme,
+      defaultLineTheme: defaultLineTheme?.merge(other.defaultLineTheme) ?? other.defaultLineTheme,
+      attributeTheme: attributeTheme?.merge(other.attributeTheme) ?? other.attributeTheme,
       indentWidth: other.indentWidth ?? indentWidth,
-      toolbarTheme:
-          toolbarTheme?.merge(other.toolbarTheme) ?? other.toolbarTheme,
+      dividerColor: other.dividerColor ?? dividerColor,
+      toolbarTheme: toolbarTheme?.merge(other.toolbarTheme) ?? other.toolbarTheme,
     );
   }
 
@@ -126,6 +129,7 @@ class ZefyrThemeData {
     return (otherData.defaultLineTheme == defaultLineTheme) &&
         (otherData.attributeTheme == attributeTheme) &&
         (otherData.indentWidth == indentWidth) &&
+        (otherData.dividerColor == dividerColor) &&
         (otherData.toolbarTheme == toolbarTheme);
   }
 
@@ -135,6 +139,7 @@ class ZefyrThemeData {
       defaultLineTheme,
       attributeTheme,
       indentWidth,
+      dividerColor,
       toolbarTheme,
     ]);
   }
@@ -186,8 +191,7 @@ class LineTheme {
   bool operator ==(other) {
     if (other.runtimeType != runtimeType) return false;
     final LineTheme otherTheme = other;
-    return (otherTheme.textStyle == textStyle) &&
-        (otherTheme.padding == padding);
+    return (otherTheme.textStyle == textStyle) && (otherTheme.padding == padding);
   }
 
   @override
@@ -275,8 +279,7 @@ class BlockTheme {
   }
 
   @override
-  int get hashCode =>
-      hashValues(textStyle, inheritLineTextStyle, padding, linePadding);
+  int get hashCode => hashValues(textStyle, inheritLineTextStyle, padding, linePadding);
 }
 
 /// Holds style information for all format attributes supported by Zefyr editor.
@@ -327,8 +330,7 @@ class AttributeTheme {
   });
 
   /// The default attribute theme.
-  factory AttributeTheme.fallback(
-      BuildContext context, LineTheme defaultLineTheme) {
+  factory AttributeTheme.fallback(BuildContext context, LineTheme defaultLineTheme) {
     final theme = Theme.of(context);
 
     String monospaceFontFamily;
@@ -504,12 +506,8 @@ class ToolbarTheme {
   factory ToolbarTheme.fallback(BuildContext context) {
     final theme = Theme.of(context);
     return ToolbarTheme._(
-      color: theme.primaryColorBrightness == Brightness.light
-          ? Colors.grey.shade300
-          : Colors.grey.shade800,
-      toggleColor: theme.primaryColorBrightness == Brightness.light
-          ? Colors.grey.shade400
-          : Colors.grey.shade900,
+      color: theme.primaryColorBrightness == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800,
+      toggleColor: theme.primaryColorBrightness == Brightness.light ? Colors.grey.shade400 : Colors.grey.shade900,
       iconColor: theme.primaryIconTheme.color,
       disabledIconColor: theme.disabledColor,
     );
@@ -561,6 +559,5 @@ class ToolbarTheme {
   }
 
   @override
-  int get hashCode =>
-      hashValues(color, toggleColor, iconColor, disabledIconColor);
+  int get hashCode => hashValues(color, toggleColor, iconColor, disabledIconColor);
 }
