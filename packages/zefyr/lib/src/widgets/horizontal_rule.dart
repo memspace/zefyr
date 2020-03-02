@@ -80,10 +80,10 @@ class RenderHorizontalRule extends RenderEditableBox {
   void paint(PaintingContext context, Offset offset) {
     var paint = Paint()..color = _theme.dividerColor;
 
-    double dims = 6;
+    double dims = 4;
     double spacer = 10;
 
-    final double startY = size.width / 2 - (3 * 8);
+    final double startY = size.width / 2 - (3 * 6);
     double offsetY = 0;
 
     for (var i = 0; i < 3; i++) {
