@@ -1,6 +1,8 @@
 # Zefyr [![Build Status](https://travis-ci.com/memspace/zefyr.svg?branch=master)](https://travis-ci.com/memspace/zefyr) [![codecov](https://codecov.io/gh/memspace/zefyr/branch/master/graph/badge.svg)](https://codecov.io/gh/memspace/zefyr)
 
-*Soft and gentle rich text editing for Flutter applications.*
+_Soft and gentle rich text editing for Flutter applications._
+
+Fokred!
 
 Zefyr is currently in **early preview**. If you have a feature
 request or found a bug, please file it at the [issue tracker][].
@@ -16,7 +18,6 @@ For documentation see [https://github.com/memspace/zefyr](https://github.com/mem
 Official releases of Zefyr can be installed from Dart's Pub package repository.
 
 > Note that versions from Pub track stable channel of Flutter.
-
 
 To install Zefyr from Pub add `zefyr` package as a dependency to your `pubspec.yaml`:
 
