@@ -89,8 +89,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
   }
 
   void ensureVisible(BuildContext context, ZefyrScope scope) {
-    if (scope.selection.isCollapsed &&
-        widget.node.containsOffset(scope.selection.extentOffset)) {
+    if (scope.selection.isCollapsed && widget.node.containsOffset(scope.selection.extentOffset)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         bringIntoView(context);
       });
@@ -118,9 +117,8 @@ class _ZefyrLineState extends State<ZefyrLine> {
 
   TextSpan buildText(BuildContext context) {
     final theme = ZefyrTheme.of(context);
-    final List<TextSpan> children = widget.node.children
-        .map((node) => _segmentToTextSpan(node, theme))
-        .toList(growable: false);
+    final List<TextSpan> children =
+        widget.node.children.map((node) => _segmentToTextSpan(node, theme)).toList(growable: false);
     return TextSpan(style: widget.style, children: children);
   }
 
@@ -152,8 +150,13 @@ class _ZefyrLineState extends State<ZefyrLine> {
     EmbedNode node = widget.node.children.single;
     EmbedAttribute embed = node.style.get(NotusAttribute.embed);
 
+    final theme = ZefyrTheme.of(context);
+
     if (embed.type == EmbedType.horizontalRule) {
-      return ZefyrHorizontalRule(node: node);
+      return Container(
+        margin: theme.defaultLineTheme.padding,
+        child: ZefyrHorizontalRule(node: node),
+      );
     } else if (embed.type == EmbedType.image) {
       return ZefyrImage(node: node, delegate: scope.imageDelegate);
     } else {
