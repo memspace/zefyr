@@ -41,8 +41,7 @@ abstract class ZefyrImageDelegate<S> {
 }
 
 class ZefyrImage extends StatefulWidget {
-  const ZefyrImage({Key key, @required this.node, @required this.delegate})
-      : super(key: key);
+  const ZefyrImage({Key key, @required this.node, @required this.delegate}) : super(key: key);
 
   final EmbedNode node;
   final ZefyrImageDelegate delegate;
@@ -84,8 +83,7 @@ class _EditableImage extends SingleChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, RenderEditableImage renderObject) {
+  void updateRenderObject(BuildContext context, RenderEditableImage renderObject) {
     renderObject..node = node;
   }
 }
@@ -117,8 +115,7 @@ class RenderEditableImage extends RenderBox
     int nodeBase = node.documentOffset;
     int nodeExtent = nodeBase + node.length;
     int base = math.max(0, documentSelection.baseOffset - nodeBase);
-    int extent =
-        math.min(documentSelection.extentOffset, nodeExtent) - nodeBase;
+    int extent = math.min(documentSelection.extentOffset, nodeExtent) - nodeBase;
     return documentSelection.copyWith(baseOffset: base, extentOffset: extent);
   }
 
@@ -134,10 +131,8 @@ class RenderEditableImage extends RenderBox
 
     final rect = _childRect;
     return [
-      ui.TextBox.fromLTRBD(
-          rect.left, rect.top, rect.left, rect.bottom, TextDirection.ltr),
-      ui.TextBox.fromLTRBD(
-          rect.right, rect.top, rect.right, rect.bottom, TextDirection.ltr),
+      ui.TextBox.fromLTRBD(rect.left, rect.top, rect.left, rect.bottom, TextDirection.ltr),
+      ui.TextBox.fromLTRBD(rect.right, rect.top, rect.right, rect.bottom, TextDirection.ltr),
     ];
   }
 
@@ -169,15 +164,13 @@ class RenderEditableImage extends RenderBox
     final pos = position.offset - node.documentOffset;
     Offset caretOffset = _childOffset - Offset(kHorizontalPadding, 0.0);
     if (pos == 1) {
-      caretOffset =
-          caretOffset + Offset(_lastChildSize.width + kHorizontalPadding, 0.0);
+      caretOffset = caretOffset + Offset(_lastChildSize.width + kHorizontalPadding, 0.0);
     }
     return caretOffset;
   }
 
   @override
-  void paintSelection(PaintingContext context, Offset offset,
-      TextSelection selection, Color selectionColor) {
+  void paintSelection(PaintingContext context, Offset offset, TextSelection selection, Color selectionColor) {
     final localSelection = getLocalSelection(selection);
     assert(localSelection != null);
     if (!localSelection.isCollapsed) {
@@ -185,8 +178,7 @@ class RenderEditableImage extends RenderBox
         ..color = selectionColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3.0;
-      final rect =
-          Rect.fromLTWH(0.0, 0.0, _lastChildSize.width, _lastChildSize.height);
+      final rect = Rect.fromLTWH(0.0, 0.0, _lastChildSize.width, _lastChildSize.height);
       context.canvas.drawRect(rect.shift(offset + _childOffset), paint);
     }
   }
@@ -206,8 +198,7 @@ class RenderEditableImage extends RenderBox
   }
 
   Rect get _childRect {
-    return Rect.fromLTWH(_childOffset.dx, _childOffset.dy, _lastChildSize.width,
-        _lastChildSize.height);
+    return Rect.fromLTWH(_childOffset.dx, _childOffset.dy, _lastChildSize.width, _lastChildSize.height);
   }
 
   @override
@@ -217,11 +208,11 @@ class RenderEditableImage extends RenderBox
       // Make constraints use 16:9 aspect ratio.
       final width = constraints.maxWidth - kHorizontalPadding * 2;
       final childConstraints = constraints.copyWith(
-        minWidth: 0.0,
-        maxWidth: width,
-        minHeight: 0.0,
-        maxHeight: (width * 9 / 16).floorToDouble(),
-      );
+          // minWidth: 0.0,
+          // maxWidth: width,
+          // minHeight: 0.0,
+          // maxHeight: (width * 9 / 16).floorToDouble(),
+          );
       child.layout(childConstraints, parentUsesSize: true);
       _lastChildSize = child.size;
       size = Size(constraints.maxWidth, _lastChildSize.height);
