@@ -28,8 +28,8 @@ class ZefyrHorizontalRule extends LeafRenderObjectWidget {
 }
 
 class RenderHorizontalRule extends RenderEditableBox {
-  static const _kPaddingTop = 8.0;
-  static const _kPaddingBottom = 8.0;
+  static const _kPaddingTop = 10.0;
+  static const _kPaddingBottom = 10.0;
   static const _kThickness = 1.0;
   static const _kHeight = _kThickness + _kPaddingTop + _kPaddingBottom;
 
@@ -82,7 +82,7 @@ class RenderHorizontalRule extends RenderEditableBox {
     print('dividerColor ${_theme.dividerColor}');
     var paint = Paint()..color = _theme.dividerColor;
 
-    double dims = 10;
+    double dims = 8;
     double spacer = 8;
 
     final double startY = size.width / 2 - (3 * 12);
