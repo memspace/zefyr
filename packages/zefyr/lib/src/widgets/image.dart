@@ -187,7 +187,8 @@ class RenderEditableImage extends RenderBox
     super.paint(context, offset + _childOffset);
   }
 
-  static const double kHorizontalPadding = 1.0;
+  // not sure what this does
+  static const double kHorizontalPadding = 0.0;
 
   Size _lastChildSize;
 

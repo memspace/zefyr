@@ -44,8 +44,7 @@ Delta getDelta() {
 enum _Options { darkTheme }
 
 class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
-  final ZefyrController _controller =
-      ZefyrController(NotusDocument.fromDelta(getDelta()));
+  final ZefyrController _controller = ZefyrController(NotusDocument.fromDelta(getDelta()));
   final FocusNode _focusNode = FocusNode();
   bool _editing = false;
   StreamSubscription<NotusChange> _sub;
@@ -82,13 +81,27 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
           )
         ],
       ),
-      body: ZefyrScaffold(
-        child: ZefyrEditor(
-          controller: _controller,
-          focusNode: _focusNode,
-          mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
-          imageDelegate: CustomImageDelegate(),
-          keyboardAppearance: _darkTheme ? Brightness.dark : Brightness.light,
+      body: ZefyrTheme(
+        data: ZefyrThemeData(
+          defaultLineTheme: LineTheme(
+            padding: EdgeInsets.only(top: 4.0, bottom: 8.0, right: 20.0, left: 20.0),
+            textStyle: TextStyle(
+              color: Colors.blueGrey,
+              fontWeight: FontWeight.w600,
+              fontSize: 19.0,
+              height: 1.6,
+            ),
+          ),
+        ),
+        child: ZefyrScaffold(
+          child: ZefyrEditor(
+            controller: _controller,
+            focusNode: _focusNode,
+            mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
+            imageDelegate: CustomImageDelegate(),
+            keyboardAppearance: _darkTheme ? Brightness.dark : Brightness.light,
+            padding: EdgeInsets.all(0),
+          ),
         ),
       ),
     );
