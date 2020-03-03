@@ -264,33 +264,33 @@ class _ImageButtonState extends State<ImageButton> {
     final buttons = Row(
       children: <Widget>[
         SizedBox(width: 8.0),
-        toolbar.buildButton(context, ZefyrToolbarAction.cameraImage, onPressed: _pickFromCamera),
-        toolbar.buildButton(context, ZefyrToolbarAction.galleryImage, onPressed: _pickFromGallery),
-        toolbar.buildButton(context, ZefyrToolbarAction.unsplashImage, onPressed: _pickFromUnsplash),
+        toolbar.buildButton(context, ZefyrToolbarAction.cameraImage, onPressed: () => _pickFromCamera(context)),
+        toolbar.buildButton(context, ZefyrToolbarAction.galleryImage, onPressed: () => _pickFromGallery(context)),
+        toolbar.buildButton(context, ZefyrToolbarAction.unsplashImage, onPressed: () => _pickFromUnsplash(context)),
       ],
     );
     return ZefyrToolbarScaffold(body: buttons);
   }
 
-  void _pickFromCamera() async {
+  void _pickFromCamera(BuildContext context) async {
     final editor = ZefyrToolbar.of(context).editor;
-    final image = await editor.imageDelegate.pickImage(editor.imageDelegate.cameraSource);
+    final image = await editor.imageDelegate.pickImage(context, editor.imageDelegate.cameraSource);
     if (image != null) {
       editor.formatSelection(NotusAttribute.embed.image(image));
     }
   }
 
-  void _pickFromGallery() async {
+  void _pickFromGallery(BuildContext context) async {
     final editor = ZefyrToolbar.of(context).editor;
-    final image = await editor.imageDelegate.pickImage(editor.imageDelegate.gallerySource);
+    final image = await editor.imageDelegate.pickImage(context, editor.imageDelegate.gallerySource);
     if (image != null) {
       editor.formatSelection(NotusAttribute.embed.image(image));
     }
   }
 
-  void _pickFromUnsplash() async {
+  void _pickFromUnsplash(BuildContext context) async {
     final editor = ZefyrToolbar.of(context).editor;
-    final image = await editor.imageDelegate.pickImage(editor.imageDelegate.unsplashSource);
+    final image = await editor.imageDelegate.pickImage(context, editor.imageDelegate.unsplashSource);
     if (image != null) {
       editor.formatSelection(NotusAttribute.embed.image(image));
     }
