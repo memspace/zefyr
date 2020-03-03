@@ -215,7 +215,8 @@ class ZefyrToolbarState extends State<ZefyrToolbar> with SingleTickerProviderSta
     final toolbar = ZefyrToolbarScaffold(
       key: _toolbarKey,
       body: ZefyrButtonList(buttons: _buildButtons(context)),
-      trailing: buildButton(context, ZefyrToolbarAction.hideKeyboard),
+      // trailing: buildButton(context, ZefyrToolbarAction.hideKeyboard),
+      trailing: Container(),
     );
 
     layers.add(toolbar);
@@ -243,16 +244,16 @@ class ZefyrToolbarState extends State<ZefyrToolbar> with SingleTickerProviderSta
 
   List<Widget> _buildButtons(BuildContext context) {
     final buttons = <Widget>[
+      if (editor.imageDelegate != null) ImageButton(),
+      HeadingButton(),
       buildButton(context, ZefyrToolbarAction.bold),
       buildButton(context, ZefyrToolbarAction.italic),
-      LinkButton(),
-      HeadingButton(),
       buildButton(context, ZefyrToolbarAction.bulletList),
       buildButton(context, ZefyrToolbarAction.numberList),
+      LinkButton(),
       buildButton(context, ZefyrToolbarAction.quote),
-      buildButton(context, ZefyrToolbarAction.code),
+      // buildButton(context, ZefyrToolbarAction.code),
       buildButton(context, ZefyrToolbarAction.horizontalRule),
-      if (editor.imageDelegate != null) ImageButton(),
     ];
     return buttons;
   }
@@ -330,7 +331,7 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.openInBrowser: Icons.open_in_new,
     ZefyrToolbarAction.heading: Icons.format_size,
     ZefyrToolbarAction.bulletList: Icons.format_list_bulleted,
-    ZefyrToolbarAction.numberList: Icons.format_list_numbered,
+    ZefyrToolbarAction.numberList: Icons.format_list_numbered_rtl,
     ZefyrToolbarAction.code: Icons.code,
     ZefyrToolbarAction.quote: Icons.format_quote,
     ZefyrToolbarAction.horizontalRule: Icons.remove,
@@ -344,6 +345,8 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
   };
 
   static const kSpecialIconSizes = {
+    ZefyrToolbarAction.image: 24.0,
+    ZefyrToolbarAction.quote: 28.0,
     ZefyrToolbarAction.unlink: 20.0,
     ZefyrToolbarAction.clipboardCopy: 20.0,
     ZefyrToolbarAction.openInBrowser: 20.0,

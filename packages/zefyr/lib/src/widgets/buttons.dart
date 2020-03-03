@@ -527,6 +527,8 @@ class _LinkInputState extends State<_LinkInput> {
       focusNode: _focusNode,
       controller: widget.controller,
       autofocus: true,
+      textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
       decoration: InputDecoration(
         hintText: 'https://',
         filled: true,
@@ -559,7 +561,7 @@ class _LinkView extends StatelessWidget {
               value,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.subhead.copyWith(color: toolbarTheme.disabledIconColor),
+              style: theme.textTheme.subhead.copyWith(color: toolbarTheme.disabledIconColor, height: 1),
             ),
           )
         ],

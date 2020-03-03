@@ -93,14 +93,16 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
             ),
           ),
         ),
-        child: ZefyrScaffold(
-          child: ZefyrEditor(
-            controller: _controller,
-            focusNode: _focusNode,
-            mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
-            imageDelegate: CustomImageDelegate(),
-            keyboardAppearance: _darkTheme ? Brightness.dark : Brightness.light,
-            padding: EdgeInsets.all(0),
+        child: SafeArea(
+          child: ZefyrScaffold(
+            child: ZefyrEditor(
+              controller: _controller,
+              focusNode: _focusNode,
+              mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
+              imageDelegate: CustomImageDelegate(),
+              keyboardAppearance: _darkTheme ? Brightness.dark : Brightness.light,
+              padding: EdgeInsets.all(0),
+            ),
           ),
         ),
       ),
