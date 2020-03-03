@@ -266,7 +266,7 @@ class _ImageButtonState extends State<ImageButton> {
         SizedBox(width: 8.0),
         toolbar.buildButton(context, ZefyrToolbarAction.cameraImage, onPressed: _pickFromCamera),
         toolbar.buildButton(context, ZefyrToolbarAction.galleryImage, onPressed: _pickFromGallery),
-        toolbar.buildButton(context, ZefyrToolbarAction.unsplashImage, onPressed: _pickFromGallery),
+        toolbar.buildButton(context, ZefyrToolbarAction.unsplashImage, onPressed: _pickFromUnsplash),
       ],
     );
     return ZefyrToolbarScaffold(body: buttons);
