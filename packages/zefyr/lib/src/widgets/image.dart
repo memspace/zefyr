@@ -23,6 +23,9 @@ abstract class ZefyrImageDelegate<S> {
   /// Unique key to identify gallery source.
   S get gallerySource;
 
+  /// Unique key to identify unsplash source.
+  S get unsplashSource;
+
   /// Builds image widget for specified image [key].
   ///
   /// The [key] argument contains value which was previously returned from

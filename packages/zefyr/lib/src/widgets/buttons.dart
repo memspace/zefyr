@@ -68,9 +68,7 @@ class ZefyrButton extends StatelessWidget {
     final editor = toolbar.editor;
     final toolbarTheme = ZefyrTheme.of(context).toolbarTheme;
     final pressedHandler = _getPressedHandler(editor, toolbar);
-    final iconColor = (pressedHandler == null)
-        ? toolbarTheme.disabledIconColor
-        : toolbarTheme.iconColor;
+    final iconColor = (pressedHandler == null) ? toolbarTheme.disabledIconColor : toolbarTheme.iconColor;
     if (_icon != null) {
       return RawZefyrButton.icon(
         action: action,
@@ -104,8 +102,7 @@ class ZefyrButton extends StatelessWidget {
     return null;
   }
 
-  VoidCallback _getPressedHandler(
-      ZefyrScope editor, ZefyrToolbarState toolbar) {
+  VoidCallback _getPressedHandler(ZefyrScope editor, ZefyrToolbarState toolbar) {
     if (onPressed != null) {
       return onPressed;
     } else if (isAttributeAction) {
@@ -177,8 +174,8 @@ class RawZefyrButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final width = theme.buttonTheme.constraints.minHeight + 4.0;
-    final constraints = theme.buttonTheme.constraints.copyWith(
-        minWidth: width, maxHeight: theme.buttonTheme.constraints.minHeight);
+    final constraints =
+        theme.buttonTheme.constraints.copyWith(minWidth: width, maxHeight: theme.buttonTheme.constraints.minHeight);
     final radius = BorderRadius.all(Radius.circular(3.0));
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 1.0, vertical: 6.0),
@@ -267,10 +264,9 @@ class _ImageButtonState extends State<ImageButton> {
     final buttons = Row(
       children: <Widget>[
         SizedBox(width: 8.0),
-        toolbar.buildButton(context, ZefyrToolbarAction.cameraImage,
-            onPressed: _pickFromCamera),
-        toolbar.buildButton(context, ZefyrToolbarAction.galleryImage,
-            onPressed: _pickFromGallery),
+        toolbar.buildButton(context, ZefyrToolbarAction.cameraImage, onPressed: _pickFromCamera),
+        toolbar.buildButton(context, ZefyrToolbarAction.galleryImage, onPressed: _pickFromGallery),
+        toolbar.buildButton(context, ZefyrToolbarAction.unsplashImage, onPressed: _pickFromGallery),
       ],
     );
     return ZefyrToolbarScaffold(body: buttons);
@@ -278,8 +274,7 @@ class _ImageButtonState extends State<ImageButton> {
 
   void _pickFromCamera() async {
     final editor = ZefyrToolbar.of(context).editor;
-    final image =
-        await editor.imageDelegate.pickImage(editor.imageDelegate.cameraSource);
+    final image = await editor.imageDelegate.pickImage(editor.imageDelegate.cameraSource);
     if (image != null) {
       editor.formatSelection(NotusAttribute.embed.image(image));
     }
@@ -287,8 +282,15 @@ class _ImageButtonState extends State<ImageButton> {
 
   void _pickFromGallery() async {
     final editor = ZefyrToolbar.of(context).editor;
-    final image = await editor.imageDelegate
-        .pickImage(editor.imageDelegate.gallerySource);
+    final image = await editor.imageDelegate.pickImage(editor.imageDelegate.gallerySource);
+    if (image != null) {
+      editor.formatSelection(NotusAttribute.embed.image(image));
+    }
+  }
+
+  void _pickFromUnsplash() async {
+    final editor = ZefyrToolbar.of(context).editor;
+    final image = await editor.imageDelegate.pickImage(editor.imageDelegate.unsplashSource);
     if (image != null) {
       editor.formatSelection(NotusAttribute.embed.image(image));
     }
@@ -313,8 +315,7 @@ class _LinkButtonState extends State<LinkButton> {
   Widget build(BuildContext context) {
     final toolbar = ZefyrToolbar.of(context);
     final editor = toolbar.editor;
-    final enabled =
-        hasLink(editor.selectionStyle) || !editor.selection.isCollapsed;
+    final enabled = hasLink(editor.selectionStyle) || !editor.selection.isCollapsed;
 
     return toolbar.buildButton(
       context,
@@ -361,10 +362,8 @@ class _LinkButtonState extends State<LinkButton> {
       if (_inputController.text.isNotEmpty) {
         try {
           var uri = Uri.parse(_inputController.text);
-          if ((uri.isScheme('https') || uri.isScheme('http')) &&
-              uri.host.isNotEmpty) {
-            toolbar.editor.formatSelection(
-                NotusAttribute.link.fromString(_inputController.text));
+          if ((uri.isScheme('https') || uri.isScheme('http')) && uri.host.isNotEmpty) {
+            toolbar.editor.formatSelection(NotusAttribute.link.fromString(_inputController.text));
           } else {
             error = true;
           }
@@ -449,10 +448,8 @@ class _LinkButtonState extends State<LinkButton> {
       final copyHandler = clipboardEnabled ? copyToClipboard : null;
       final openHandler = hasLink(style) ? openInBrowser : null;
       final buttons = <Widget>[
-        toolbar.buildButton(context, ZefyrToolbarAction.unlink,
-            onPressed: unlinkHandler),
-        toolbar.buildButton(context, ZefyrToolbarAction.clipboardCopy,
-            onPressed: copyHandler),
+        toolbar.buildButton(context, ZefyrToolbarAction.unlink, onPressed: unlinkHandler),
+        toolbar.buildButton(context, ZefyrToolbarAction.clipboardCopy, onPressed: copyHandler),
         toolbar.buildButton(
           context,
           ZefyrToolbarAction.openInBrowser,
@@ -462,8 +459,7 @@ class _LinkButtonState extends State<LinkButton> {
       items.addAll(buttons);
     }
     final trailingPressed = isEditing ? doneEdit : closeOverlay;
-    final trailingAction =
-        isEditing ? ZefyrToolbarAction.confirm : ZefyrToolbarAction.close;
+    final trailingAction = isEditing ? ZefyrToolbarAction.confirm : ZefyrToolbarAction.close;
 
     return ZefyrToolbarScaffold(
       body: Row(children: items),
@@ -480,9 +476,7 @@ class _LinkInput extends StatefulWidget {
   final TextEditingController controller;
   final bool formatError;
 
-  const _LinkInput(
-      {Key key, @required this.controller, this.formatError = false})
-      : super(key: key);
+  const _LinkInput({Key key, @required this.controller, this.formatError = false}) : super(key: key);
 
   @override
   _LinkInputState createState() {
@@ -525,8 +519,7 @@ class _LinkInputState extends State<_LinkInput> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final toolbarTheme = ZefyrTheme.of(context).toolbarTheme;
-    final color =
-        widget.formatError ? Colors.redAccent : toolbarTheme.iconColor;
+    final color = widget.formatError ? Colors.redAccent : toolbarTheme.iconColor;
     final style = theme.textTheme.subhead.copyWith(color: color);
     return TextField(
       style: style,
@@ -546,8 +539,7 @@ class _LinkInputState extends State<_LinkInput> {
 }
 
 class _LinkView extends StatelessWidget {
-  const _LinkView({Key key, @required this.value, this.onTap})
-      : super(key: key);
+  const _LinkView({Key key, @required this.value, this.onTap}) : super(key: key);
   final String value;
   final VoidCallback onTap;
 
@@ -567,8 +559,7 @@ class _LinkView extends StatelessWidget {
               value,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.subhead
-                  .copyWith(color: toolbarTheme.disabledIconColor),
+              style: theme.textTheme.subhead.copyWith(color: toolbarTheme.disabledIconColor),
             ),
           )
         ],

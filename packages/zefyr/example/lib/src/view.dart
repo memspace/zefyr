@@ -41,8 +41,7 @@ class _ViewScreen extends State<ViewScreen> {
           ListTile(
             leading: Icon(Icons.info),
             title: Text('ZefyrView inside ListView'),
-            subtitle:
-                Text('Allows embedding Notus documents in custom scrollables'),
+            subtitle: Text('Allows embedding Notus documents in custom scrollables'),
             trailing: Icon(Icons.keyboard_arrow_down),
           ),
           Padding(
