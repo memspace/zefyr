@@ -90,7 +90,7 @@ class RenderHorizontalRule extends RenderEditableBox {
       offsetY += (spacer + dims);
 
       context.canvas.drawCircle(
-        Offset(startY + offsetY, _kPaddingTop),
+        Offset(startY + offsetY, _kPaddingTop + offset.dy),
         dims / 2,
         paint,
       );

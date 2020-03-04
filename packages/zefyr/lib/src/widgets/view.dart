@@ -20,8 +20,7 @@ class ZefyrView extends StatefulWidget {
   final NotusDocument document;
   final ZefyrImageDelegate imageDelegate;
 
-  const ZefyrView({Key key, @required this.document, this.imageDelegate})
-      : super(key: key);
+  const ZefyrView({Key key, @required this.document, this.imageDelegate}) : super(key: key);
 
   @override
   ZefyrViewState createState() => ZefyrViewState();
@@ -50,9 +49,7 @@ class ZefyrViewState extends State<ZefyrView> {
     super.didChangeDependencies();
     final parentTheme = ZefyrTheme.of(context, nullOk: true);
     final fallbackTheme = ZefyrThemeData.fallback(context);
-    _themeData = (parentTheme != null)
-        ? fallbackTheme.merge(parentTheme)
-        : fallbackTheme;
+    _themeData = (parentTheme != null) ? fallbackTheme.merge(parentTheme) : fallbackTheme;
   }
 
   @override
@@ -68,7 +65,7 @@ class ZefyrViewState extends State<ZefyrView> {
       child: ZefyrScopeAccess(
         scope: _scope,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: _buildChildren(context),
         ),
       ),
