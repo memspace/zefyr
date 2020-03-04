@@ -31,20 +31,18 @@ class ZefyrRichText extends LeafRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, RenderZefyrParagraph renderObject) {
+  void updateRenderObject(BuildContext context, RenderZefyrParagraph renderObject) {
     renderObject
       ..text = text
       ..node = node;
   }
 }
 
-class RenderZefyrParagraph extends RenderParagraph
-    implements RenderEditableBox {
+class RenderZefyrParagraph extends RenderParagraph implements RenderEditableBox {
   RenderZefyrParagraph(
     TextSpan text, {
     @required LineNode node,
-    TextAlign textAlign = TextAlign.start,
+    TextAlign textAlign = TextAlign.justify,
     @required TextDirection textDirection,
     bool softWrap = true,
     TextOverflow overflow = TextOverflow.clip,
@@ -82,8 +80,7 @@ class RenderZefyrParagraph extends RenderParagraph
     int nodeBase = node.documentOffset;
     int nodeExtent = nodeBase + node.length;
     int base = math.max(0, documentSelection.baseOffset - nodeBase);
-    int extent =
-        math.min(documentSelection.extentOffset, nodeExtent) - nodeBase;
+    int extent = math.min(documentSelection.extentOffset, nodeExtent) - nodeBase;
     return documentSelection.copyWith(baseOffset: base, extentOffset: extent);
   }
 
@@ -160,14 +157,12 @@ class RenderZefyrParagraph extends RenderParagraph
       final box = result.first;
       final dx = isBaseShifted == -1 ? box.right : box.left;
       result.removeAt(0);
-      result.insert(
-          0, ui.TextBox.fromLTRBD(dx, box.top, dx, box.bottom, box.direction));
+      result.insert(0, ui.TextBox.fromLTRBD(dx, box.top, dx, box.bottom, box.direction));
     }
     if (isExtentShifted) {
       final box = result.last;
       result.removeLast();
-      result.add(ui.TextBox.fromLTRBD(
-          box.left, box.top, box.left, box.bottom, box.direction));
+      result.add(ui.TextBox.fromLTRBD(box.left, box.top, box.left, box.bottom, box.direction));
     }
     return result;
   }
@@ -186,8 +181,7 @@ class RenderZefyrParagraph extends RenderParagraph
   @override
   void performLayout() {
     super.performLayout();
-    _prototypePainter.layout(
-        minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
+    _prototypePainter.layout(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
   }
 
   @override
@@ -208,8 +202,7 @@ class RenderZefyrParagraph extends RenderParagraph
 
   TextSelection _lastPaintedSelection;
   @override
-  void paintSelection(PaintingContext context, Offset offset,
-      TextSelection selection, Color selectionColor) {
+  void paintSelection(PaintingContext context, Offset offset, TextSelection selection, Color selectionColor) {
     if (_lastPaintedSelection != selection) {
       _selectionRects = null;
     }
