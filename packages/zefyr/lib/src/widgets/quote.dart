@@ -22,8 +22,9 @@ class ZefyrQuote extends StatelessWidget {
       items.add(_buildLine(line, style, theme.indentWidth));
     }
 
-    return Padding(
+    return Container(
       padding: theme.attributeTheme.quote.padding,
+      decoration: theme.attributeTheme.quote.decoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: items,
@@ -43,12 +44,12 @@ class ZefyrQuote extends StatelessWidget {
 
     final row = Row(children: <Widget>[Expanded(child: content)]);
     return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(width: 4.0, color: Colors.grey.shade300),
-        ),
-      ),
-      padding: EdgeInsets.only(left: indentSize),
+      // decoration: BoxDecoration(
+      //   border: Border(
+      //     left: BorderSide(width: 4.0, color: Colors.grey.shade300),
+      //   ),
+      // ),
+      // padding: EdgeInsets.only(left: indentSize),
       child: row,
     );
   }

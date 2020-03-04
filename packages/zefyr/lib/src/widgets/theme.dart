@@ -221,6 +221,9 @@ class BlockTheme {
   /// Space around the block.
   final EdgeInsets padding;
 
+  /// Box Decoration.
+  final BoxDecoration decoration;
+
   /// Space around each individual line within a block, can be null.
   ///
   /// Takes precedence over line padding set in [LineTheme].
@@ -232,6 +235,7 @@ class BlockTheme {
     this.inheritLineTextStyle = true,
     this.padding,
     this.linePadding,
+    this.decoration,
   });
 
   /// Creates a copy of this theme but with the given fields replaced with
@@ -241,12 +245,14 @@ class BlockTheme {
     EdgeInsets padding,
     bool inheritLineTextStyle,
     EdgeInsets linePadding,
+    BoxDecoration decoration,
   }) {
     return BlockTheme(
       textStyle: textStyle ?? this.textStyle,
       inheritLineTextStyle: inheritLineTextStyle ?? this.inheritLineTextStyle,
       padding: padding ?? this.padding,
       linePadding: linePadding ?? this.linePadding,
+      decoration: decoration ?? this.decoration,
     );
   }
 
@@ -265,6 +271,7 @@ class BlockTheme {
       inheritLineTextStyle: other.inheritLineTextStyle ?? inheritLineTextStyle,
       padding: other.padding ?? padding,
       linePadding: other.linePadding ?? linePadding,
+      decoration: other.decoration ?? decoration,
     );
   }
 
@@ -275,11 +282,12 @@ class BlockTheme {
     return (otherTheme.textStyle == textStyle) &&
         (otherTheme.inheritLineTextStyle == inheritLineTextStyle) &&
         (otherTheme.padding == padding) &&
-        (otherTheme.linePadding == linePadding);
+        (otherTheme.linePadding == linePadding) &&
+        (otherTheme.decoration == decoration);
   }
 
   @override
-  int get hashCode => hashValues(textStyle, inheritLineTextStyle, padding, linePadding);
+  int get hashCode => hashValues(textStyle, inheritLineTextStyle, padding, linePadding, decoration);
 }
 
 /// Holds style information for all format attributes supported by Zefyr editor.
@@ -383,10 +391,12 @@ class AttributeTheme {
       bulletList: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
         linePadding: EdgeInsets.symmetric(vertical: 2.0),
+        decoration: null,
       ),
       numberList: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
         linePadding: EdgeInsets.symmetric(vertical: 2.0),
+        decoration: null,
       ),
       quote: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -394,6 +404,7 @@ class AttributeTheme {
           color: defaultLineTheme.textStyle.color.withOpacity(0.6),
         ),
         inheritLineTextStyle: true,
+        decoration: null,
       ),
       code: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -405,6 +416,7 @@ class AttributeTheme {
         ),
         inheritLineTextStyle: false,
         linePadding: EdgeInsets.zero,
+        decoration: null,
       ),
     );
   }
