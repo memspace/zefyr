@@ -17,14 +17,16 @@ class ZefyrQuote extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context);
     final style = theme.attributeTheme.quote.textStyle;
+    final decoration = theme.attributeTheme.quote.decoration;
+    final innerPadding = theme.attributeTheme.quote.innerPadding;
+
     List<Widget> items = [];
     for (var line in node.children) {
-      items.add(_buildLine(line, style, theme.indentWidth));
+      items.add(_buildLine(line, style, theme.indentWidth, decoration, innerPadding));
     }
 
-    return Container(
+    return Padding(
       padding: theme.attributeTheme.quote.padding,
-      decoration: theme.attributeTheme.quote.decoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: items,
@@ -32,7 +34,13 @@ class ZefyrQuote extends StatelessWidget {
     );
   }
 
-  Widget _buildLine(Node node, TextStyle blockStyle, double indentSize) {
+  Widget _buildLine(
+    Node node,
+    TextStyle blockStyle,
+    double indentSize,
+    BoxDecoration decoration,
+    EdgeInsets innerPadding,
+  ) {
     LineNode line = node;
 
     Widget content;
@@ -44,12 +52,8 @@ class ZefyrQuote extends StatelessWidget {
 
     final row = Row(children: <Widget>[Expanded(child: content)]);
     return Container(
-      // decoration: BoxDecoration(
-      //   border: Border(
-      //     left: BorderSide(width: 4.0, color: Colors.grey.shade300),
-      //   ),
-      // ),
-      // padding: EdgeInsets.only(left: indentSize),
+      decoration: decoration,
+      padding: innerPadding,
       child: row,
     );
   }

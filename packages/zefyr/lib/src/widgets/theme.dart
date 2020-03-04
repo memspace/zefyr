@@ -221,6 +221,9 @@ class BlockTheme {
   /// Space around the block.
   final EdgeInsets padding;
 
+  /// Space around the block content.
+  final EdgeInsets innerPadding;
+
   /// Box Decoration.
   final BoxDecoration decoration;
 
@@ -234,6 +237,7 @@ class BlockTheme {
     this.textStyle,
     this.inheritLineTextStyle = true,
     this.padding,
+    this.innerPadding,
     this.linePadding,
     this.decoration,
   });
@@ -243,6 +247,7 @@ class BlockTheme {
   BlockTheme copyWith({
     TextStyle textStyle,
     EdgeInsets padding,
+    EdgeInsets innerPadding,
     bool inheritLineTextStyle,
     EdgeInsets linePadding,
     BoxDecoration decoration,
@@ -251,6 +256,7 @@ class BlockTheme {
       textStyle: textStyle ?? this.textStyle,
       inheritLineTextStyle: inheritLineTextStyle ?? this.inheritLineTextStyle,
       padding: padding ?? this.padding,
+      innerPadding: innerPadding ?? this.innerPadding,
       linePadding: linePadding ?? this.linePadding,
       decoration: decoration ?? this.decoration,
     );
@@ -270,6 +276,7 @@ class BlockTheme {
       textStyle: textStyle?.merge(other.textStyle) ?? other.textStyle,
       inheritLineTextStyle: other.inheritLineTextStyle ?? inheritLineTextStyle,
       padding: other.padding ?? padding,
+      innerPadding: other.innerPadding ?? innerPadding,
       linePadding: other.linePadding ?? linePadding,
       decoration: other.decoration ?? decoration,
     );
@@ -282,12 +289,13 @@ class BlockTheme {
     return (otherTheme.textStyle == textStyle) &&
         (otherTheme.inheritLineTextStyle == inheritLineTextStyle) &&
         (otherTheme.padding == padding) &&
+        (otherTheme.innerPadding == innerPadding) &&
         (otherTheme.linePadding == linePadding) &&
         (otherTheme.decoration == decoration);
   }
 
   @override
-  int get hashCode => hashValues(textStyle, inheritLineTextStyle, padding, linePadding, decoration);
+  int get hashCode => hashValues(textStyle, inheritLineTextStyle, padding, innerPadding, linePadding, decoration);
 }
 
 /// Holds style information for all format attributes supported by Zefyr editor.
@@ -390,16 +398,19 @@ class AttributeTheme {
       ),
       bulletList: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
+        innerPadding: EdgeInsets.symmetric(vertical: 8.0),
         linePadding: EdgeInsets.symmetric(vertical: 2.0),
         decoration: null,
       ),
       numberList: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
+        innerPadding: EdgeInsets.symmetric(vertical: 8.0),
         linePadding: EdgeInsets.symmetric(vertical: 2.0),
         decoration: null,
       ),
       quote: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
+        innerPadding: EdgeInsets.symmetric(vertical: 8.0),
         textStyle: TextStyle(
           color: defaultLineTheme.textStyle.color.withOpacity(0.6),
         ),
@@ -408,6 +419,7 @@ class AttributeTheme {
       ),
       code: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
+        innerPadding: EdgeInsets.symmetric(vertical: 8.0),
         textStyle: TextStyle(
           fontFamily: monospaceFontFamily,
           fontSize: 14.0,
