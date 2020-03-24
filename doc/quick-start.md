@@ -338,3 +338,6 @@ This is because reading a tiny file from disk is too fast. For the above
 recording we added an artificial delay of 1 second in order to demonstrate
 loading. If you'd like to replicate this, we'll leave implementation of this
 task to you as an exercise.
+
+### 04. Customize the toolbar menu
+see this https://github.com/memspace/zefyr/issues/265
