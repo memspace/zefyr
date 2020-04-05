@@ -89,7 +89,7 @@ class _ZefyrFieldState extends State<ZefyrField> {
         (widget.decoration ?? const InputDecoration())
             .applyDefaults(Theme.of(context).inputDecorationTheme)
             .copyWith(
-              enabled: _effectiveMode == ZefyrMode.edit,
+              enabled: ((_effectiveMode == ZefyrMode.edit) | (_effectiveMode == ZefyrMode.select)),
             );
 
     return effectiveDecoration;

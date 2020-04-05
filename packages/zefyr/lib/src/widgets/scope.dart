@@ -106,7 +106,7 @@ class ZefyrScope extends ChangeNotifier {
   ZefyrController _controller;
   ZefyrController get controller => _controller;
   set controller(ZefyrController value) {
-    assert((mode == ZefyrMode.edit) && value != null);
+    assert(((mode == ZefyrMode.edit) | (mode == ZefyrMode.select)) && value != null);
     if (_controller != value) {
       _controller.removeListener(_handleControllerChange);
       _controller = value;
@@ -120,7 +120,7 @@ class ZefyrScope extends ChangeNotifier {
   FocusNode _focusNode;
   FocusNode get focusNode => _focusNode;
   set focusNode(FocusNode value) {
-    assert((mode == ZefyrMode.edit) && value != null);
+    assert(((mode == ZefyrMode.edit) | (mode == ZefyrMode.select)) && value != null);
     if (_focusNode != value) {
       _focusNode.removeListener(_handleFocusChange);
       _focusNode = value;
@@ -132,7 +132,7 @@ class ZefyrScope extends ChangeNotifier {
   FocusScopeNode _focusScope;
   FocusScopeNode get focusScope => _focusScope;
   set focusScope(FocusScopeNode value) {
-    assert((mode == ZefyrMode.edit) && value != null);
+    assert(((mode == ZefyrMode.edit) | (mode == ZefyrMode.select)) && value != null);
     if (_focusScope != value) {
       _focusScope = value;
     }
@@ -165,7 +165,7 @@ class ZefyrScope extends ChangeNotifier {
   /// objects which are not dependent on editing flow, e.g. [imageDelegate].
 
   set toolbarFocusNode(FocusNode node) {
-    assert((mode == ZefyrMode.edit));
+    assert(((mode == ZefyrMode.edit) | (mode == ZefyrMode.select)));
     assert(!_disposed || node == null);
     if (_toolbarFocusNode != node) {
       _toolbarFocusNode?.removeListener(_handleFocusChange);
@@ -177,7 +177,7 @@ class ZefyrScope extends ChangeNotifier {
   }
 
   FocusOwner get focusOwner {
-    assert((mode == ZefyrMode.edit));
+    assert(((mode == ZefyrMode.edit) | (mode == ZefyrMode.select)));
     assert(!_disposed);
     if (_focusNode.hasFocus) {
       return FocusOwner.editor;
@@ -190,25 +190,25 @@ class ZefyrScope extends ChangeNotifier {
 
   void updateSelection(TextSelection value,
       {ChangeSource source = ChangeSource.remote}) {
-    assert((mode == ZefyrMode.edit));
+    assert(((mode == ZefyrMode.edit) | (mode == ZefyrMode.select)));
     assert(!_disposed);
     _controller.updateSelection(value, source: source);
   }
 
   void formatSelection(NotusAttribute value) {
-    assert((mode == ZefyrMode.edit));
+    assert(((mode == ZefyrMode.edit) | (mode == ZefyrMode.select)));
     assert(!_disposed);
     _controller.formatSelection(value);
   }
 
   void focus() {
-    assert((mode == ZefyrMode.edit));
+    assert(((mode == ZefyrMode.edit) | (mode == ZefyrMode.select)));
     assert(!_disposed);
     _focusScope.requestFocus(_focusNode);
   }
 
   void hideKeyboard() {
-    assert((mode == ZefyrMode.edit));
+    assert(((mode == ZefyrMode.edit) | (mode == ZefyrMode.select)));
     assert(!_disposed);
     _focusNode.unfocus();
   }
