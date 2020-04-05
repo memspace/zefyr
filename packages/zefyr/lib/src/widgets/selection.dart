@@ -247,7 +247,9 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     if (box == null) {
       box = _scope.renderContext.closestBoxForGlobalPoint(globalPoint);
     }
-    if (box == null) return null;
+    if (box == null) {
+      return null;
+    }
 
     final localPoint = box.globalToLocal(globalPoint);
     final position = box.getPositionForOffset(localPoint);

@@ -26,8 +26,7 @@ class ZefyrScope extends ChangeNotifier {
   ///
   /// Normally used in [ZefyrView].
   ZefyrScope.view({ZefyrImageDelegate imageDelegate})
-      : isEditable = false,
-        _mode = ZefyrMode.view,
+      : _mode = ZefyrMode.view,
         _imageDelegate = imageDelegate;
 
   /// Creates editable scope.
@@ -43,7 +42,29 @@ class ZefyrScope extends ChangeNotifier {
         assert(controller != null),
         assert(focusNode != null),
         assert(focusScope != null),
-        isEditable = true,
+        _mode = mode,
+        _controller = controller,
+        _imageDelegate = imageDelegate,
+        _focusNode = focusNode,
+        _focusScope = focusScope,
+        _cursorTimer = CursorTimer(),
+        _renderContext = ZefyrRenderContext() {
+    _selectionStyle = _controller.getSelectionStyle();
+    _selection = _controller.selection;
+    _controller.addListener(_handleControllerChange);
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  ZefyrScope.selectable({
+    @required ZefyrMode mode,
+    @required ZefyrController controller,
+    @required FocusNode focusNode,
+    @required FocusScopeNode focusScope,
+    ZefyrImageDelegate imageDelegate,
+  })  : assert(mode != null),
+        assert(controller != null),
+        assert(focusNode != null),
+        assert(focusScope != null),
         _mode = mode,
         _controller = controller,
         _imageDelegate = imageDelegate,
@@ -85,7 +106,7 @@ class ZefyrScope extends ChangeNotifier {
   ZefyrController _controller;
   ZefyrController get controller => _controller;
   set controller(ZefyrController value) {
-    assert(isEditable && value != null);
+    assert((mode == ZefyrMode.edit) && value != null);
     if (_controller != value) {
       _controller.removeListener(_handleControllerChange);
       _controller = value;
@@ -99,7 +120,7 @@ class ZefyrScope extends ChangeNotifier {
   FocusNode _focusNode;
   FocusNode get focusNode => _focusNode;
   set focusNode(FocusNode value) {
-    assert(isEditable && value != null);
+    assert((mode == ZefyrMode.edit) && value != null);
     if (_focusNode != value) {
       _focusNode.removeListener(_handleFocusChange);
       _focusNode = value;
@@ -111,7 +132,7 @@ class ZefyrScope extends ChangeNotifier {
   FocusScopeNode _focusScope;
   FocusScopeNode get focusScope => _focusScope;
   set focusScope(FocusScopeNode value) {
-    assert(isEditable && value != null);
+    assert((mode == ZefyrMode.edit) && value != null);
     if (_focusScope != value) {
       _focusScope = value;
     }
@@ -142,10 +163,9 @@ class ZefyrScope extends ChangeNotifier {
   /// [focusScope], [showCursor], [renderContext] and other shared objects. For
   /// non-editable scopes these are set to `null`. You can still access
   /// objects which are not dependent on editing flow, e.g. [imageDelegate].
-  final bool isEditable;
 
   set toolbarFocusNode(FocusNode node) {
-    assert(isEditable);
+    assert((mode == ZefyrMode.edit));
     assert(!_disposed || node == null);
     if (_toolbarFocusNode != node) {
       _toolbarFocusNode?.removeListener(_handleFocusChange);
@@ -157,7 +177,7 @@ class ZefyrScope extends ChangeNotifier {
   }
 
   FocusOwner get focusOwner {
-    assert(isEditable);
+    assert((mode == ZefyrMode.edit));
     assert(!_disposed);
     if (_focusNode.hasFocus) {
       return FocusOwner.editor;
@@ -170,25 +190,25 @@ class ZefyrScope extends ChangeNotifier {
 
   void updateSelection(TextSelection value,
       {ChangeSource source = ChangeSource.remote}) {
-    assert(isEditable);
+    assert((mode == ZefyrMode.edit));
     assert(!_disposed);
     _controller.updateSelection(value, source: source);
   }
 
   void formatSelection(NotusAttribute value) {
-    assert(isEditable);
+    assert((mode == ZefyrMode.edit));
     assert(!_disposed);
     _controller.formatSelection(value);
   }
 
   void focus() {
-    assert(isEditable);
+    assert((mode == ZefyrMode.edit));
     assert(!_disposed);
     _focusScope.requestFocus(_focusNode);
   }
 
   void hideKeyboard() {
-    assert(isEditable);
+    assert((mode == ZefyrMode.edit));
     assert(!_disposed);
     _focusNode.unfocus();
   }

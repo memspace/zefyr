@@ -7,9 +7,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
+import '../../zefyr.dart';
 import 'editable_box.dart';
 import 'horizontal_rule.dart';
 import 'image.dart';
+import 'mode.dart';
 import 'rich_text.dart';
 import 'scope.dart';
 import 'theme.dart';
@@ -40,7 +42,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
   @override
   Widget build(BuildContext context) {
     final scope = ZefyrScope.of(context);
-    if (scope.isEditable) {
+    if (((scope.mode == ZefyrMode.edit) | (scope.mode == ZefyrMode.select))) {
       ensureVisible(context, scope);
     }
     final theme = Theme.of(context);
@@ -56,7 +58,35 @@ class _ZefyrLineState extends State<ZefyrLine> {
       );
     }
 
-    if (scope.isEditable) {
+    if (scope.mode == ZefyrMode.select) {
+      Color cursorColor;
+      switch (theme.platform) {
+        case TargetPlatform.iOS:
+          cursorColor ??= CupertinoTheme.of(context).primaryColor;
+          break;
+
+        case TargetPlatform.android:
+        case TargetPlatform.fuchsia:
+          cursorColor = theme.cursorColor;
+          break;
+      }
+
+      if (!(content is ZefyrImage)) {
+        content = EditableBox(
+          child: content,
+          node: widget.node,
+          layerLink: _link,
+          renderContext: scope.renderContext,
+          showCursor: scope.showCursor,
+          selection: scope.selection,
+          selectionColor: theme.textSelectionColor,
+          cursorColor: cursorColor,
+        );
+        content = CompositedTransformTarget(link: _link, child: content);
+      }
+    }
+
+    if (scope.mode == ZefyrMode.edit) {
       Color cursorColor;
       switch (theme.platform) {
         case TargetPlatform.iOS:
