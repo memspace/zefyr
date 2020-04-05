@@ -15,6 +15,8 @@ export 'src/widgets/common.dart';
 export 'src/widgets/controller.dart';
 export 'src/widgets/editable_text.dart';
 export 'src/widgets/editor.dart';
+export 'src/widgets/expanding_editable_text.dart';
+export 'src/widgets/expanding_editor.dart';
 export 'src/widgets/field.dart';
 export 'src/widgets/horizontal_rule.dart';
 export 'src/widgets/image.dart';
