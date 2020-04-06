@@ -14,14 +14,6 @@ import 'controller.dart';
 import 'editable_box.dart';
 import 'scope.dart';
 
-RenderEditableBox _getEditableBox(HitTestResult result) {
-  for (var entry in result.path) {
-    if (entry.target is RenderEditableBox) {
-      return entry.target as RenderEditableBox;
-    }
-  }
-  return null;
-}
 
 /// Selection overlay controls selection handles and other gestures.
 class ZefyrSelectionOverlay extends StatefulWidget {
@@ -66,6 +58,15 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     }
     return isSelectionCollapsed;
   }
+
+  RenderEditableBox _getEditableBox(HitTestResult result) {
+  for (var entry in result.path) {
+    if (entry.target is RenderEditableBox) {
+      return entry.target as RenderEditableBox;
+    }
+  }
+  return null;
+}
 
   void showToolbar() {
     final toolbarOpacity = _toolbarController.view;
@@ -243,7 +244,10 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     HitTestResult result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
 
-    RenderEditableProxyBox box = _getEditableBox(result);
+    // RenderEditableProxyBox box = _getEditableBox(result);
+
+    RenderEditableBox box = _getEditableBox(result);
+
     if (box == null) {
       box = _scope.renderContext.closestBoxForGlobalPoint(globalPoint);
     }

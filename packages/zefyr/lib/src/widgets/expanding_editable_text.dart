@@ -147,23 +147,38 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
     _focusAttachment.reparent();
     super.build(context); // See AutomaticKeepAliveState.
 
-    Widget body = ListBody(children: _buildChildren(context));
-    if (widget.padding != null) {
-      body = Padding(padding: widget.padding, child: body);
+    List<Widget> layers = [];
+
+    if (widget.mode == ZefyrMode.select) {
+      Widget body = ListBody(children: _buildSelectableChildren(context));
+      if (widget.padding != null) {
+        body = Padding(padding: widget.padding, child: body);
+        layers = <Widget>[body];
+      }
+
+      return body;
     }
 
-    body = SingleChildScrollView(
-      physics: widget.physics,
-      controller: _scrollController,
-      child: body,
-    );
+    if (widget.mode == ZefyrMode.edit) {
+      Widget body = ListBody(children: _buildEditableChildren(context));
+      if (widget.padding != null) {
+        body = Padding(padding: widget.padding, child: body);
+      }
 
-    final layers = <Widget>[body];
-    layers.add(ZefyrSelectionOverlay(
-      controls: widget.selectionControls ?? defaultSelectionControls(context),
-    ));
+      layers = <Widget>[body];
 
-    return Stack(fit: StackFit.expand, children: layers);
+      layers.add(Positioned.fill(
+        left: 0,
+        right: 0,
+        bottom: 0,
+        top: 0,
+        child: ZefyrSelectionOverlay(
+          controls:
+              widget.selectionControls ?? defaultSelectionControls(context),
+      )));
+
+      return Stack(fit: StackFit.passthrough, children: layers);
+    }
   }
 
   @override
@@ -228,9 +243,65 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
   InputConnectionController _input;
   bool _didAutoFocus = false;
 
-  List<Widget> _buildChildren(BuildContext context) {
+  List<Widget> _buildSelectableChildren(BuildContext context) {
+    final result = <Widget>[];
+    List<Widget> currentStack = [];
+    for (Node node in document.root.children) {
+      print("currentStack: ${currentStack.length}");
+      if (node is LineNode) {
+        if (node.hasEmbed) {
+          EmbedNode embededNode = node.children.single;
+          EmbedAttribute embed = embededNode.style.get(NotusAttribute.embed);
+
+          if (embed.type == EmbedType.image) {
+            Widget selection = Positioned.fill(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              top: 0,
+              child: ZefyrSelectionOverlay(
+                controls:
+                    widget.selectionControls ?? defaultSelectionControls(context),
+              ));
+            List<Widget> layered = [ListBody(children: currentStack)];
+            layered.add(selection);
+            result.add(Stack(fit: StackFit.passthrough, children: layered));
+            result.add(_defaultChildBuilder(context, node));
+            currentStack = [];
+          }
+          else {
+            currentStack.add(_defaultChildBuilder(context, node));
+          }
+        }
+        else {
+          currentStack.add(_defaultChildBuilder(context, node));
+        }
+      }
+      else {
+        currentStack.add(_defaultChildBuilder(context, node));
+      }
+    }
+    Widget selection = Positioned.fill(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      top: 0,
+      child: ZefyrSelectionOverlay(
+        controls:
+            widget.selectionControls ?? defaultSelectionControls(context),
+      ));
+    List<Widget> layered = [ListBody(children: currentStack)];
+    layered.add(selection);
+    result.add(Stack(fit: StackFit.passthrough, children: layered));
+
+    print("result: ${result.length}");
+    return result;
+  }
+
+  List<Widget> _buildEditableChildren(BuildContext context) {
     final result = <Widget>[];
     for (var node in document.root.children) {
+      print(result.length);
       result.add(_defaultChildBuilder(context, node));
     }
     return result;
