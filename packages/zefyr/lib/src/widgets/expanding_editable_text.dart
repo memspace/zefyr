@@ -247,7 +247,6 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
     final result = <Widget>[];
     List<Widget> currentStack = [];
     for (Node node in document.root.children) {
-      print("currentStack: ${currentStack.length}");
       if (node is LineNode) {
         if (node.hasEmbed) {
           EmbedNode embededNode = node.children.single;
@@ -294,14 +293,12 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
     layered.add(selection);
     result.add(Stack(fit: StackFit.passthrough, children: layered));
 
-    print("result: ${result.length}");
     return result;
   }
 
   List<Widget> _buildEditableChildren(BuildContext context) {
     final result = <Widget>[];
     for (var node in document.root.children) {
-      print(result.length);
       result.add(_defaultChildBuilder(context, node));
     }
     return result;
