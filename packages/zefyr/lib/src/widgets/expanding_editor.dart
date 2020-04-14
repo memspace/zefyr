@@ -13,6 +13,7 @@ import 'scaffold.dart';
 import 'scope.dart';
 import 'theme.dart';
 import 'toolbar.dart';
+import 'attr_delegate.dart';
 
 /// Widget for editing Zefyr documents.
 class ZefyrExpandingEditor extends StatefulWidget {
@@ -25,6 +26,7 @@ class ZefyrExpandingEditor extends StatefulWidget {
     this.padding,
     this.toolbarDelegate,
     this.imageDelegate,
+    this.attrDelegate,
     this.selectionControls,
     this.physics,
     this.keyboardAppearance,
@@ -53,6 +55,8 @@ class ZefyrExpandingEditor extends StatefulWidget {
 
   /// Optional delegate for customizing this editor's toolbar.
   final ZefyrToolbarDelegate toolbarDelegate;
+
+  final ZefyrAttrDelegate attrDelegate;
 
   /// Delegate for resolving embedded images.
   ///
@@ -83,6 +87,7 @@ class ZefyrExpandingEditor extends StatefulWidget {
 
 class _ZefyrExpandingEditorState extends State<ZefyrExpandingEditor> {
   ZefyrImageDelegate _imageDelegate;
+  ZefyrAttrDelegate _attrDelegate;
   ZefyrScope _scope;
   ZefyrThemeData _themeData;
   GlobalKey<ZefyrToolbarState> _toolbarKey;
@@ -130,6 +135,7 @@ class _ZefyrExpandingEditorState extends State<ZefyrExpandingEditor> {
   void initState() {
     super.initState();
     _imageDelegate = widget.imageDelegate;
+    _attrDelegate = widget.attrDelegate;
   }
 
   @override
@@ -142,6 +148,10 @@ class _ZefyrExpandingEditorState extends State<ZefyrExpandingEditor> {
       _imageDelegate = widget.imageDelegate;
       _scope.imageDelegate = _imageDelegate;
     }
+    if (widget.attrDelegate != oldWidget.attrDelegate) {
+       _attrDelegate = widget.attrDelegate;
+       _scope.attrDelegate = _attrDelegate;
+     }
   }
 
   @override
@@ -157,6 +167,7 @@ class _ZefyrExpandingEditorState extends State<ZefyrExpandingEditor> {
       _scope = ZefyrScope.editable(
         mode: widget.mode,
         imageDelegate: _imageDelegate,
+        attrDelegate: _attrDelegate,
         controller: widget.controller,
         focusNode: widget.focusNode,
         focusScope: FocusScope.of(context),

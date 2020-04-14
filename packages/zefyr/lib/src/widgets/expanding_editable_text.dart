@@ -243,9 +243,11 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
   InputConnectionController _input;
   bool _didAutoFocus = false;
 
+
   List<Widget> _buildSelectableChildren(BuildContext context) {
     final result = <Widget>[];
     List<Widget> currentStack = [];
+
     for (Node node in document.root.children) {
       if (node is LineNode) {
         if (node.hasEmbed) {
@@ -253,7 +255,7 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
           EmbedAttribute embed = embededNode.style.get(NotusAttribute.embed);
 
           if (embed.type == EmbedType.image) {
-            Widget selection = Positioned.fill(
+            Widget selectionOverlay = Positioned.fill(
               left: 0,
               right: 0,
               bottom: 0,
@@ -263,7 +265,7 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
                     widget.selectionControls ?? defaultSelectionControls(context),
               ));
             List<Widget> layered = [ListBody(children: currentStack)];
-            layered.add(selection);
+            layered.add(selectionOverlay);
             result.add(Stack(fit: StackFit.passthrough, children: layered));
             result.add(_defaultChildBuilder(context, node));
             currentStack = [];
@@ -273,6 +275,7 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
           }
         }
         else {
+
           currentStack.add(_defaultChildBuilder(context, node));
         }
       }
@@ -280,7 +283,7 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
         currentStack.add(_defaultChildBuilder(context, node));
       }
     }
-    Widget selection = Positioned.fill(
+    Widget selectionOverlay = Positioned.fill(
       left: 0,
       right: 0,
       bottom: 0,
@@ -290,7 +293,7 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
             widget.selectionControls ?? defaultSelectionControls(context),
       ));
     List<Widget> layered = [ListBody(children: currentStack)];
-    layered.add(selection);
+    layered.add(selectionOverlay);
     result.add(Stack(fit: StackFit.passthrough, children: layered));
 
     return result;
@@ -309,9 +312,9 @@ class _ZefyrExpandingEditableTextState extends State<ZefyrExpandingEditableText>
       if (node.hasEmbed) {
         return ZefyrLine(node: node);
       } else if (node.style.contains(NotusAttribute.heading)) {
-        return ZefyrHeading(node: node);
+        return ZefyrHeading(node: node, rich: false,);
       }
-      return ZefyrParagraph(node: node);
+      return ZefyrParagraph(node: node, rich: false,);
     }
 
     final BlockNode block = node;

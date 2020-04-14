@@ -3,11 +3,11 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
-import '../../zefyr.dart';
 import 'editable_box.dart';
 import 'horizontal_rule.dart';
 import 'image.dart';
@@ -18,7 +18,7 @@ import 'theme.dart';
 
 /// Represents single line of rich text document in Zefyr editor.
 class ZefyrLine extends StatefulWidget {
-  const ZefyrLine({Key key, @required this.node, this.style, this.padding})
+  const ZefyrLine({Key key, @required this.node, this.style, this.padding, this.rich})
       : assert(node != null),
         super(key: key);
 
@@ -31,6 +31,7 @@ class ZefyrLine extends StatefulWidget {
 
   /// Padding to add around this paragraph.
   final EdgeInsets padding;
+  final bool rich;
 
   @override
   _ZefyrLineState createState() => _ZefyrLineState();
@@ -51,10 +52,14 @@ class _ZefyrLineState extends State<ZefyrLine> {
     if (widget.node.hasEmbed) {
       content = buildEmbed(context, scope);
     } else {
+      // Try this
+      if (widget.rich == true) {
+        return SelectableText.rich(buildText(context, scope));
+      }
       assert(widget.style != null);
       content = ZefyrRichText(
         node: widget.node,
-        text: buildText(context),
+        text: buildText(context, scope),
       );
     }
 
@@ -146,20 +151,32 @@ class _ZefyrLineState extends State<ZefyrLine> {
     }
   }
 
-  TextSpan buildText(BuildContext context) {
+  TextSpan buildText(BuildContext context, ZefyrScope scope) {
     final theme = ZefyrTheme.of(context);
     final List<TextSpan> children = widget.node.children
-        .map((node) => _segmentToTextSpan(node, theme))
+        .map((node) => _segmentToTextSpan(node, theme, scope))
         .toList(growable: false);
     return TextSpan(style: widget.style, children: children);
   }
 
-  TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme) {
+  TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme, ZefyrScope scope) {
     final TextNode segment = node;
     final attrs = segment.style;
 
+    GestureRecognizer recognizer;
+
+    if (attrs.contains(NotusAttribute.link)) {
+      if (scope.attrDelegate == null) {
+        recognizer = TapGestureRecognizer();
+      }
+      else {
+        recognizer = scope.attrDelegate.provideLinkGesture(attrs.get(NotusAttribute.link).value);
+      }
+    }
+
     return TextSpan(
       text: segment.value,
+      recognizer: recognizer,
       style: _getTextStyle(attrs, theme),
     );
   }

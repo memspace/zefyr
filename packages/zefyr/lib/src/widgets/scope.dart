@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
+import 'attr_delegate.dart';
 import 'controller.dart';
 import 'cursor_timer.dart';
 import 'editor.dart';
@@ -25,9 +26,12 @@ class ZefyrScope extends ChangeNotifier {
   /// Creates a view-only scope.
   ///
   /// Normally used in [ZefyrView].
-  ZefyrScope.view({ZefyrImageDelegate imageDelegate})
-      : _mode = ZefyrMode.view,
-        _imageDelegate = imageDelegate;
+  ZefyrScope.view({
+    ZefyrImageDelegate imageDelegate,
+    ZefyrAttrDelegate attrDelegate,
+  })  : _mode = ZefyrMode.view,
+        _imageDelegate = imageDelegate,
+        _attrDelegate = attrDelegate;
 
   /// Creates editable scope.
   ///
@@ -38,6 +42,7 @@ class ZefyrScope extends ChangeNotifier {
     @required FocusNode focusNode,
     @required FocusScopeNode focusScope,
     ZefyrImageDelegate imageDelegate,
+    ZefyrAttrDelegate attrDelegate,
   })  : assert(mode != null),
         assert(controller != null),
         assert(focusNode != null),
@@ -45,6 +50,7 @@ class ZefyrScope extends ChangeNotifier {
         _mode = mode,
         _controller = controller,
         _imageDelegate = imageDelegate,
+        _attrDelegate = attrDelegate,
         _focusNode = focusNode,
         _focusScope = focusScope,
         _cursorTimer = CursorTimer(),
@@ -61,6 +67,7 @@ class ZefyrScope extends ChangeNotifier {
     @required FocusNode focusNode,
     @required FocusScopeNode focusScope,
     ZefyrImageDelegate imageDelegate,
+    ZefyrAttrDelegate attrDelegate,
   })  : assert(mode != null),
         assert(controller != null),
         assert(focusNode != null),
@@ -68,6 +75,7 @@ class ZefyrScope extends ChangeNotifier {
         _mode = mode,
         _controller = controller,
         _imageDelegate = imageDelegate,
+        _attrDelegate = attrDelegate,
         _focusNode = focusNode,
         _focusScope = focusScope,
         _cursorTimer = CursorTimer(),
@@ -92,6 +100,15 @@ class ZefyrScope extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  ZefyrAttrDelegate _attrDelegate;
+   ZefyrAttrDelegate get attrDelegate => _attrDelegate;
+   set attrDelegate(ZefyrAttrDelegate value) {
+     if (_attrDelegate != value) {
+       _attrDelegate = value;
+       notifyListeners();
+     }
+   }
 
   ZefyrMode _mode;
   ZefyrMode get mode => _mode;
