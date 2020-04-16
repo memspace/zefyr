@@ -10,11 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  collection: ^1.14.6
-  url_launcher: ^5.0.0
-  quill_delta: ^1.0.0
-  notus: ^0.1.0
-  meta: ^1.1.0
+  collection: ^1.14.12
+  url_launcher: ^5.4.2
+  quill_delta: ^1.0.1
+  notus: ^0.1.5
+  meta: ^1.1.8
   quiver_hashcode: ^2.0.0
 
 dev_dependencies:

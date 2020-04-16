@@ -1,9 +1,5 @@
-.DS_Store
-.dart_tool/
+.*
+!.gitignore
 
-.packages
-.pub/
-
+lib/generated_plugin_registrant.dart
 build/
-
-.flutter-plugins
