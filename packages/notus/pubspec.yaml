@@ -8,9 +8,9 @@ environment:
   sdk: '>=2.2.0 <3.0.0'
 
 dependencies:
-  collection: ^1.14.6
-  meta: ^1.1.0
-  quill_delta: ^1.0.0
+  collection: ^1.14.12
+  meta: ^1.1.8
+  quill_delta: ^1.0.1
   quiver_hashcode: ^2.0.0
 
 dev_dependencies:
