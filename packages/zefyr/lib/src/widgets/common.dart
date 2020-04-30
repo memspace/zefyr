@@ -149,8 +149,22 @@ class _ZefyrLineState extends State<ZefyrLine> {
     final TextNode segment = node;
     final attrs = segment.style;
 
+    GestureRecognizer recognizer;
+
+    if (attrs.contains(NotusAttribute.link)) {
+      final tapGestureRecognizer = TapGestureRecognizer();
+      tapGestureRecognizer.onTap = () {
+        print("delegate: ${scope.attrDelegate}");
+        if (scope.attrDelegate?.onLinkTap != null) {
+          scope.attrDelegate.onLinkTap(attrs.get(NotusAttribute.link).value);
+        }
+      };
+      recognizer = tapGestureRecognizer;
+    }
+
     return TextSpan(
       text: segment.value,
+      recognizer: recognizer,
       style: _getTextStyle(attrs, theme),
     );
   }
