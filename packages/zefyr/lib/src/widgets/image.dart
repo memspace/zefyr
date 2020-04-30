@@ -2,15 +2,15 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'dart:async';
-import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
-import 'package:zefyr/zefyr.dart';
 
+import 'selection_utils.dart';
+import 'theme.dart';
 import 'editable_box.dart';
 
 /// Provides interface for embedding images into Zefyr editor.
@@ -114,12 +114,9 @@ class RenderEditableImage extends RenderBox
   TextSelection getLocalSelection(TextSelection documentSelection) {
     if (!intersectsWithSelection(documentSelection)) return null;
 
-    int nodeBase = node.documentOffset;
-    int nodeExtent = nodeBase + node.length;
-    int base = math.max(0, documentSelection.baseOffset - nodeBase);
-    int extent =
-        math.min(documentSelection.extentOffset, nodeExtent) - nodeBase;
-    return documentSelection.copyWith(baseOffset: base, extentOffset: extent);
+    final nodeBase = node.documentOffset;
+    final nodeExtent = nodeBase + node.length;
+    return selectionRestrict(nodeBase, nodeExtent, documentSelection);
   }
 
   @override
@@ -159,9 +156,9 @@ class RenderEditableImage extends RenderBox
 
   @override
   bool intersectsWithSelection(TextSelection selection) {
-    final int base = node.documentOffset;
-    final int extent = base + node.length;
-    return base <= selection.extentOffset && selection.baseOffset <= extent;
+    final base = node.documentOffset;
+    final extent = base + node.length;
+    return selectionIntersectsWith(base, extent, selection);
   }
 
   @override
