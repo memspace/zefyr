@@ -86,7 +86,7 @@ class ZefyrScope extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   ZefyrMode _mode;
   ZefyrMode get mode => _mode;
   set mode(ZefyrMode value) {
