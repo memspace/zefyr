@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/widgets/attr_delegate.dart';
 
 import 'controller.dart';
 import 'cursor_timer.dart';
@@ -25,10 +26,13 @@ class ZefyrScope extends ChangeNotifier {
   /// Creates a view-only scope.
   ///
   /// Normally used in [ZefyrView].
-  ZefyrScope.view({ZefyrImageDelegate imageDelegate})
-      : isEditable = false,
+  ZefyrScope.view({
+    ZefyrImageDelegate imageDelegate,
+    ZefyrAttrDelegate attrDelegate,
+  })  : isEditable = false,
         _mode = ZefyrMode.view,
-        _imageDelegate = imageDelegate;
+        _imageDelegate = imageDelegate,
+        _attrDelegate = attrDelegate;
 
   /// Creates editable scope.
   ///
@@ -39,6 +43,7 @@ class ZefyrScope extends ChangeNotifier {
     @required FocusNode focusNode,
     @required FocusScopeNode focusScope,
     ZefyrImageDelegate imageDelegate,
+    ZefyrAttrDelegate attrDelegate,
   })  : assert(mode != null),
         assert(controller != null),
         assert(focusNode != null),
@@ -47,6 +52,7 @@ class ZefyrScope extends ChangeNotifier {
         _mode = mode,
         _controller = controller,
         _imageDelegate = imageDelegate,
+        _attrDelegate = attrDelegate,
         _focusNode = focusNode,
         _focusScope = focusScope,
         _cursorTimer = CursorTimer(),
@@ -58,8 +64,7 @@ class ZefyrScope extends ChangeNotifier {
   }
 
   static ZefyrScope of(BuildContext context) {
-    final ZefyrScopeAccess widget =
-        context.dependOnInheritedWidgetOfExactType<ZefyrScopeAccess>();
+    final ZefyrScopeAccess widget = context.dependOnInheritedWidgetOfExactType<ZefyrScopeAccess>();
     return widget.scope;
   }
 
@@ -68,6 +73,15 @@ class ZefyrScope extends ChangeNotifier {
   set imageDelegate(ZefyrImageDelegate value) {
     if (_imageDelegate != value) {
       _imageDelegate = value;
+      notifyListeners();
+    }
+  }
+
+  ZefyrAttrDelegate _attrDelegate;
+  ZefyrAttrDelegate get attrDelegate => _attrDelegate;
+  set attrDelegate(ZefyrAttrDelegate value) {
+    if (_attrDelegate != value) {
+      _attrDelegate = value;
       notifyListeners();
     }
   }
@@ -168,8 +182,7 @@ class ZefyrScope extends ChangeNotifier {
     }
   }
 
-  void updateSelection(TextSelection value,
-      {ChangeSource source = ChangeSource.remote}) {
+  void updateSelection(TextSelection value, {ChangeSource source = ChangeSource.remote}) {
     assert(isEditable);
     assert(!_disposed);
     _controller.updateSelection(value, source: source);
@@ -234,8 +247,7 @@ class ZefyrScope extends ChangeNotifier {
 class ZefyrScopeAccess extends InheritedWidget {
   final ZefyrScope scope;
 
-  ZefyrScopeAccess({Key key, @required this.scope, @required Widget child})
-      : super(key: key, child: child);
+  ZefyrScopeAccess({Key key, @required this.scope, @required Widget child}) : super(key: key, child: child);
 
   @override
   bool updateShouldNotify(ZefyrScopeAccess oldWidget) {

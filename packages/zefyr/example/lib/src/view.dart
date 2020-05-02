@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 
+import 'attrs.dart';
 import 'full_page.dart';
 import 'images.dart';
 
@@ -48,6 +49,7 @@ class _ViewScreen extends State<ViewScreen> {
             padding: const EdgeInsets.all(16.0),
             child: ZefyrView(
               document: doc,
+              attrDelegate: CustomAttrDelegate(),
               imageDelegate: CustomImageDelegate(),
             ),
           )

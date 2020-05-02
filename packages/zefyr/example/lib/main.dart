@@ -3,12 +3,15 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'src/form.dart';
 import 'src/full_page.dart';
 import 'src/view.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  RendererBinding.instance.initPersistentFrameCallback();
   runApp(ZefyrApp());
 }
 
