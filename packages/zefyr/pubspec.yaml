@@ -11,18 +11,18 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.14.12
-  url_launcher: ^5.4.2
-  quill_delta: ^1.0.1
+  url_launcher: ^5.4.5
+  quill_delta: ^1.0.2
   #notus: ^0.1.5
   notus:
-    git:
-      url: git://github.com/zeusbaba/zefyr.git
-      path: packages/notus/
-      commit: d618372
+    path: ../notus/
+    #git:
+    #  url: git://github.com/zeusbaba/zefyr.git
+    #  path: packages/notus/
   meta: ^1.1.8
   quiver_hashcode: ^2.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  pedantic: ^1.0.0
+  pedantic: ^1.9.0
