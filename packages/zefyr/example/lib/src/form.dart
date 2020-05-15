@@ -25,7 +25,10 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
   Widget build(BuildContext context) {
     final form = ListView(
       children: <Widget>[
-        TextField(decoration: InputDecoration(labelText: 'Name')),
+        TextField(
+          decoration: InputDecoration(labelText: 'Name'),
+          maxLines: 5,
+        ),
         buildEditor(),
         TextField(decoration: InputDecoration(labelText: 'Email')),
       ],
