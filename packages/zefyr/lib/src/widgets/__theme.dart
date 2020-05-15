@@ -234,6 +234,9 @@ class BlockTheme {
         break;
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
+      case TargetPlatform.windows:
+      case TargetPlatform.macOS:
+      case TargetPlatform.linux:
         fontFamily = 'Roboto Mono';
         break;
     }
