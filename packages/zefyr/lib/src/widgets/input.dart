@@ -159,27 +159,22 @@ class InputConnectionController implements TextInputClient {
   }
 
   @override
-  void showAutocorrectionPromptRect(int start, int end) {
-    // TODO: implement showAutocorrectionPromptRect
-  }
-
-  @override
-  // TODO: implement currentTextEditingValue
   TextEditingValue get currentTextEditingValue =>
       _lastKnownRemoteTextEditingValue;
-
-  //
-  // Private members
-  //
-
-  final List<TextEditingValue> _sentRemoteValues = [];
-  TextInputConnection _textInputConnection;
-  TextEditingValue _lastKnownRemoteTextEditingValue;
 
   @override
   void updateFloatingCursor(RawFloatingCursorPoint point) {
     // TODO: implement updateFloatingCursor
   }
+
+  @override
+  void showAutocorrectionPromptRect(int start, int end) {
+    // TODO: implement showAutocorrectionPromptRect
+  }
+
+  @override
+  // TODO: implement currentAutofillScope
+  AutofillScope get currentAutofillScope => null;
 
   @override
   void connectionClosed() {
@@ -191,7 +186,11 @@ class InputConnectionController implements TextInputClient {
     }
   }
 
-  @override
-  // TODO: implement currentAutofillScope
-  AutofillScope get currentAutofillScope => null;
+  //
+  // Private members
+  //
+
+  final List<TextEditingValue> _sentRemoteValues = [];
+  TextInputConnection _textInputConnection;
+  TextEditingValue _lastKnownRemoteTextEditingValue;
 }
