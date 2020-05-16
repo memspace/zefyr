@@ -527,7 +527,7 @@ class _LinkInputState extends State<_LinkInput> {
     final toolbarTheme = ZefyrTheme.of(context).toolbarTheme;
     final color =
         widget.formatError ? Colors.redAccent : toolbarTheme.iconColor;
-    final style = theme.textTheme.subhead.copyWith(color: color);
+    final style = theme.textTheme.subtitle1.copyWith(color: color);
     return TextField(
       style: style,
       keyboardType: TextInputType.url,
@@ -567,7 +567,7 @@ class _LinkView extends StatelessWidget {
               value,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.subhead
+              style: theme.textTheme.subtitle1
                   .copyWith(color: toolbarTheme.disabledIconColor),
             ),
           )

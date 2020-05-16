@@ -65,6 +65,9 @@ class _ZefyrLineState extends State<ZefyrLine> {
 
         case TargetPlatform.android:
         case TargetPlatform.fuchsia:
+        case TargetPlatform.windows:
+        case TargetPlatform.macOS:
+        case TargetPlatform.linux:
           cursorColor = theme.cursorColor;
           break;
       }
