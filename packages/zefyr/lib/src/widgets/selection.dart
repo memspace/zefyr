@@ -549,15 +549,16 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
     // capture horizontal component of movement
     if (paragraph == null) {
       paragraph = _dragCurrentParagraph;
-      Offset effectiveglobalPoint = paragraph.localToGlobal(Offset.zero);
+      Offset effectiveGlobalPoint = paragraph.localToGlobal(Offset.zero);
       if (_dragPosition.dy > paragraph.localToGlobal(Offset.zero).dy) {
-        effectiveglobalPoint = Offset(
-            _dragPosition.dx, effectiveglobalPoint.dy + paragraph.size.height);
+        effectiveGlobalPoint = Offset(
+            _dragPosition.dx, effectiveGlobalPoint.dy + paragraph.size.height);
       }
       if (_dragPosition.dy < paragraph.localToGlobal(Offset.zero).dy) {
-        effectiveglobalPoint = Offset(_dragPosition.dx, effectiveglobalPoint.dy);
+        effectiveGlobalPoint =
+            Offset(_dragPosition.dx, effectiveGlobalPoint.dy);
       }
-      return paragraph.globalToLocal(effectiveglobalPoint);
+      return paragraph.globalToLocal(effectiveGlobalPoint);
     }
     _dragCurrentParagraph = paragraph;
     return paragraph.globalToLocal(_dragPosition);
