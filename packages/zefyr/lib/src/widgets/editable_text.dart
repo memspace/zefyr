@@ -331,7 +331,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     double maxOffset = _scrollController.position.maxScrollExtent;
 
     if (scrollDirection == ScrollDirection.idle && controller.selection.isCollapsed) {
-      if (_scrollOffset >= maxOffset) { // isAtEnd() ?
+      if (controller.document.length - 1 == controller.selection.end) {
         _scrollController.jumpTo(maxOffset);
       } else {
         _scrollController.jumpTo(_scrollOffset);
