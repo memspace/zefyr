@@ -172,6 +172,8 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     super.initState();
     _focusAttachment = _focusNode.attach(context);
     _input = InputConnectionController(_handleRemoteValueChange);
+    _scrollOffset = _scrollController.offset;
+    _scrollController.addListener(_handleScroll);
     _updateSubscriptions();
   }
 
@@ -223,6 +225,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   //
 
   final ScrollController _scrollController = ScrollController();
+  double _scrollOffset;
   ZefyrRenderContext _renderContext;
   CursorTimer _cursorTimer;
   InputConnectionController _input;
@@ -284,6 +287,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     _renderContext.removeListener(_handleRenderContextChange);
     widget.controller.removeListener(_handleLocalValueChange);
     _focusNode.removeListener(_handleFocusChange);
+    _scrollController.removeListener(_handleScroll);
     _input.closeConnection();
     _cursorTimer.stop();
   }
@@ -319,5 +323,21 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     setState(() {
       // nothing to update internally.
     });
+  }
+
+  void _handleScroll() {
+    ScrollDirection scrollDirection = _scrollController.position.userScrollDirection;
+    double currentOffset = _scrollController.offset;
+    double maxOffset = _scrollController.position.maxScrollExtent;
+
+    if (scrollDirection == ScrollDirection.idle && controller.selection.isCollapsed) {
+      if (_scrollOffset >= maxOffset) { // isAtEnd() ?
+        _scrollController.jumpTo(maxOffset);
+      } else {
+        _scrollController.jumpTo(_scrollOffset);
+      }
+    } else {
+      _scrollOffset = currentOffset;
+    }
   }
 }
