@@ -4,6 +4,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
 
 import 'code.dart';
@@ -330,8 +331,8 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     double currentOffset = _scrollController.offset;
     double maxOffset = _scrollController.position.maxScrollExtent;
 
-    if (scrollDirection == ScrollDirection.idle && controller.selection.isCollapsed) {
-      if (controller.document.length - 1 == controller.selection.end) {
+    if (scrollDirection == ScrollDirection.idle && widget.controller.selection.isCollapsed) {
+      if (widget.controller.document.length - 1 == widget.controller.selection.end) {
         _scrollController.jumpTo(maxOffset);
       } else {
         _scrollController.jumpTo(_scrollOffset);
