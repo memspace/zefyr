@@ -173,7 +173,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     super.initState();
     _focusAttachment = _focusNode.attach(context);
     _input = InputConnectionController(_handleRemoteValueChange);
-    _scrollOffset = _scrollController.offset;
+    _scrollOffset = 0;//_scrollController.offset;
     _scrollController.addListener(_handleScroll);
     _updateSubscriptions();
   }
@@ -327,6 +327,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   }
 
   void _handleScroll() {
+    if (_scrollController == null) return;
     ScrollDirection scrollDirection = _scrollController.position.userScrollDirection;
     double currentOffset = _scrollController.offset;
     double maxOffset = _scrollController.position.maxScrollExtent;
