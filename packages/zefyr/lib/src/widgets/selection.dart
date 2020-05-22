@@ -394,7 +394,15 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
     Offset point;
     TextSelectionHandleType type;
 
-    switch (widget.position) {
+    // we invert base / extend if the selection is from bottom to top
+    var pos = widget.position;
+    if (selection.baseOffset > selection.extentOffset) {
+      pos = pos == _SelectionHandlePosition.base
+          ? _SelectionHandlePosition.extent
+          : _SelectionHandlePosition.base;
+    }
+
+    switch (pos) {
       case _SelectionHandlePosition.base:
         point = endpoints[0].point;
         type = _chooseType(endpoints[0], TextSelectionHandleType.left,
