@@ -15,7 +15,7 @@ void main() {
 
 // Create a Focus Intent that does nothing
 class FakeFocusIntent extends Intent {
-  const FakeFocusIntent();
+  FakeFocusIntent(LocalKey key) : super(key);
 }
 
 class ZefyrApp extends StatelessWidget {
@@ -26,10 +26,10 @@ class ZefyrApp extends StatelessWidget {
       // otherwise it makes the keyboard flicker when we move with arrows)
       shortcuts: Map<LogicalKeySet, Intent>.from(WidgetsApp.defaultShortcuts)
         ..addAll(<LogicalKeySet, Intent>{
-          LogicalKeySet(LogicalKeyboardKey.arrowLeft): const FakeFocusIntent(),
-          LogicalKeySet(LogicalKeyboardKey.arrowRight): const FakeFocusIntent(),
-          LogicalKeySet(LogicalKeyboardKey.arrowDown): const FakeFocusIntent(),
-          LogicalKeySet(LogicalKeyboardKey.arrowUp): const FakeFocusIntent(),
+          LogicalKeySet(LogicalKeyboardKey.arrowLeft):  FakeFocusIntent(UniqueKey()),
+          LogicalKeySet(LogicalKeyboardKey.arrowRight):  FakeFocusIntent(UniqueKey()),
+          LogicalKeySet(LogicalKeyboardKey.arrowDown):  FakeFocusIntent(UniqueKey()),
+          LogicalKeySet(LogicalKeyboardKey.arrowUp):  FakeFocusIntent(UniqueKey()),
         }),
       debugShowCheckedModeBanner: false,
       title: 'Zefyr Editor',
