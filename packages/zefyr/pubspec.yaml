@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.14.12
-  url_launcher: ^5.4.5
+  url_launcher: ^5.4.10
   quill_delta: ^1.0.2
   #notus: ^0.1.5
   notus:
