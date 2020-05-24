@@ -97,6 +97,9 @@ class InputConnectionController implements TextInputClient {
   @override
   void performAction(TextInputAction action) {
     // no-op
+    final val = _lastKnownRemoteTextEditingValue;
+    onValueChanged(val.selection.start, '', '\n',
+        TextSelection.collapsed(offset: val.selection.start + 1));
   }
 
   @override
@@ -182,5 +185,6 @@ class InputConnectionController implements TextInputClient {
   }
 
   @override
-  TextEditingValue get currentTextEditingValue => _lastKnownRemoteTextEditingValue;
+  TextEditingValue get currentTextEditingValue =>
+      _lastKnownRemoteTextEditingValue;
 }
