@@ -82,7 +82,9 @@ void main() {
       EmbedNode embed = line.children.single;
       expect(editor.selection.baseOffset, embed.documentOffset);
       expect(editor.selection.extentOffset, embed.documentOffset + 1);
-      expect(find.text('PASTE'), findsOneWidget);
+      final state = tester.state(find.byType(ZefyrSelectionOverlay))
+          as ZefyrSelectionOverlayState;
+      expect(state.isToolbarVisible, isTrue);
     });
   });
 }

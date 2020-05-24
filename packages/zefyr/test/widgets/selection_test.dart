@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zefyr/src/widgets/rich_text.dart';
 import 'package:zefyr/zefyr.dart';
@@ -13,16 +14,17 @@ void main() {
     testWidgets('double tap caret shows toolbar', (tester) async {
       final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
-
       RenderZefyrParagraph renderObject =
           tester.firstRenderObject(find.byType(ZefyrRichText));
       var offset = renderObject.localToGlobal(Offset.zero);
-      offset += Offset(5.0, 5.0);
+      offset += Offset(10.0, 5.0);
       await tester.tapAt(offset);
       await tester.pumpAndSettle();
       await tester.tapAt(offset);
       await tester.pumpAndSettle();
-      expect(find.text('PASTE'), findsOneWidget);
+      final state = tester.state(find.byType(ZefyrSelectionOverlay))
+          as ZefyrSelectionOverlayState;
+      expect(state.isToolbarVisible, isTrue);
     });
 
     testWidgets('hides when editor lost focus', (tester) async {
