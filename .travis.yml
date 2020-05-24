@@ -21,7 +21,7 @@ cache:
     - $HOME/.pub-cache
 
 env:
-  - FLUTTER_VERSION=stable
+  - FLUTTER_VERSION=master
 
 before_script:
   - pwd
