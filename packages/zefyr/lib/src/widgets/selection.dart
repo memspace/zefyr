@@ -1,6 +1,7 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -38,6 +39,7 @@ class ZefyrSelectionOverlay extends StatefulWidget {
 class ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     implements TextSelectionDelegate {
   TextSelectionControls _controls;
+
   TextSelectionControls get controls => _controls;
 
   final ClipboardStatusNotifier _clipboardStatus =
@@ -54,6 +56,7 @@ class ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   AnimationController _toolbarController;
 
   ZefyrScope _scope;
+
   ZefyrScope get scope => _scope;
   TextSelection _selection;
   FocusOwner _focusOwner;
@@ -87,6 +90,7 @@ class ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   bool get isToolbarVisible => _toolbar != null;
+
   bool get isToolbarHidden => _toolbar == null;
 
   @override
@@ -513,6 +517,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
   }
 
   Offset _dragPosition;
+  RenderEditableBox _dragCurrentParagraph;
 
   void _handleScopeChange() {
     if (_selection != _scope.selection) {
@@ -523,23 +528,27 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
   }
 
   void _handleDragStart(DragStartDetails details) {
-    _dragPosition = details.globalPosition;
+    _dragCurrentParagraph =
+        _scope.renderContext.boxForTextOffset(documentOffset);
+    _dragPosition = Platform.isAndroid
+        ? details.globalPosition -
+            Offset(
+                0,
+                widget.selectionOverlay.controls
+                    .getHandleSize(_dragCurrentParagraph.preferredLineHeight)
+                    .height)
+        : details.globalPosition;
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
-    _dragPosition += details.delta;
-    final globalPoint = _dragPosition;
-    final paragraph = _scope.renderContext.boxForGlobalPoint(globalPoint);
-    if (paragraph == null) {
-      return;
-    }
-
-    final localPoint = paragraph.globalToLocal(globalPoint);
-    final position = paragraph.getPositionForOffset(localPoint);
-    final newSelection = selection.copyWith(
+    final Offset localPoint = _getLocalPointFromDragDetails(details);
+    final TextPosition position =
+        _dragCurrentParagraph.getPositionForOffset(localPoint);
+    final TextSelection newSelection = selection.copyWith(
       baseOffset: isBaseHandle ? position.offset : selection.baseOffset,
       extentOffset: isBaseHandle ? selection.extentOffset : position.offset,
     );
+
     if (newSelection.baseOffset >= newSelection.extentOffset) {
       // Don't allow reversed or collapsed selection.
       return;
@@ -548,6 +557,30 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
     if (newSelection != _selection) {
       _scope.updateSelection(newSelection, source: ChangeSource.local);
     }
+  }
+
+  Offset _getLocalPointFromDragDetails(DragUpdateDetails details) {
+    // Keep track of the handle size adjusted position (Android only)
+    _dragPosition += details.delta;
+    RenderEditableBox paragraph =
+        _scope.renderContext.boxForGlobalPoint(_dragPosition);
+    // When dragging outside a paragraph, user expects dragging to
+    // capture horizontal component of movement
+    if (paragraph == null) {
+      paragraph = _dragCurrentParagraph;
+      Offset effectiveGlobalPoint = paragraph.localToGlobal(Offset.zero);
+      if (_dragPosition.dy > paragraph.localToGlobal(Offset.zero).dy) {
+        effectiveGlobalPoint = Offset(
+            _dragPosition.dx, effectiveGlobalPoint.dy + paragraph.size.height);
+      }
+      if (_dragPosition.dy < paragraph.localToGlobal(Offset.zero).dy) {
+        effectiveGlobalPoint =
+            Offset(_dragPosition.dx, effectiveGlobalPoint.dy);
+      }
+      return paragraph.globalToLocal(effectiveGlobalPoint);
+    }
+    _dragCurrentParagraph = paragraph;
+    return paragraph.globalToLocal(_dragPosition);
   }
 }
 
@@ -567,7 +600,9 @@ class _SelectionToolbar extends StatefulWidget {
 
 class _SelectionToolbarState extends State<_SelectionToolbar> {
   TextSelectionControls get controls => widget.selectionOverlay.controls;
+
   ZefyrScope get scope => widget.selectionOverlay.scope;
+
   TextSelection get selection =>
       widget.selectionOverlay.textEditingValue.selection;
 
