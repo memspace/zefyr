@@ -334,10 +334,13 @@ class AttributeTheme {
     String monospaceFontFamily;
     switch (theme.platform) {
       case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
         monospaceFontFamily = 'Menlo';
         break;
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
         monospaceFontFamily = 'Roboto Mono';
         break;
       default:

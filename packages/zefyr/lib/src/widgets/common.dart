@@ -60,11 +60,14 @@ class _ZefyrLineState extends State<ZefyrLine> {
       Color cursorColor;
       switch (theme.platform) {
         case TargetPlatform.iOS:
+        case TargetPlatform.macOS:
           cursorColor ??= CupertinoTheme.of(context).primaryColor;
           break;
 
         case TargetPlatform.android:
         case TargetPlatform.fuchsia:
+        case TargetPlatform.linux:
+        case TargetPlatform.windows:
           cursorColor = theme.cursorColor;
           break;
       }
