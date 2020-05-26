@@ -20,11 +20,7 @@ class ZefyrList extends StatelessWidget {
     List<Widget> items = [];
     int index = 1;
     for (var line in node.children) {
-      if (theme.centerAll) {
-        items.add(Center(child: _buildItem(line, index)));
-      } else {
-        items.add(_buildItem(line, index));
-      }
+      items.add(_buildItem(line, index));
       index++;
     }
 
@@ -81,10 +77,11 @@ class ZefyrListItem extends StatelessWidget {
     if (padding != null) {
       bullet = Padding(padding: padding, child: bullet);
     }
-
+  
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[bullet, Expanded(child: content)],
-    );
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: theme.centerAll ? MainAxisAlignment.center : MainAxisAlignment.start,
+        children: <Widget>[bullet, theme.centerAll ? content : Expanded(child: content)],
+      );
   }
 }

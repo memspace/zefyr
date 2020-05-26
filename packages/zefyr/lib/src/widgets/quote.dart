@@ -19,23 +19,37 @@ class ZefyrQuote extends StatelessWidget {
     final style = theme.blockTheme.quote.textStyle;
     List<Widget> items = [];
     for (var line in node.children) {
-      if (theme.centerAll) {
-        items.add(Center(child: _buildLine(line, style, theme.indentSize)));
-      } else {
-        items.add(_buildLine(line, style, theme.indentSize));
-      }
+      items.add(_buildLine(line, style, theme.indentSize, theme.centerAll));
     }
 
-    return Padding(
-      padding: theme.blockTheme.quote.padding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: items,
-      ),
-    );
+    if (theme.centerAll) {
+      return Padding(
+        padding: theme.blockTheme.quote.padding,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(width: 4.0, color: Colors.grey.shade300),
+            ),
+          ),
+          padding: EdgeInsets.only(left: theme.indentSize),
+          child: Column(
+            children: items,
+          ),
+        ),
+      );
+    } else {
+      return Padding(
+        padding: theme.blockTheme.quote.padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: items,
+        ),
+      );
+    }
   }
 
-  Widget _buildLine(Node node, TextStyle blockStyle, double indentSize) {
+  Widget _buildLine(
+      Node node, TextStyle blockStyle, double indentSize, bool centerAll) {
     LineNode line = node;
 
     Widget content;
@@ -45,15 +59,19 @@ class ZefyrQuote extends StatelessWidget {
       content = ZefyrParagraph(node: line, blockStyle: blockStyle);
     }
 
-    final row = Row(children: <Widget>[Expanded(child: content)]);
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(width: 4.0, color: Colors.grey.shade300),
+    if (centerAll) {
+      return content;
+    } else {
+      final row = Row(children: <Widget>[Expanded(child: content)]);
+      return Container(
+        decoration: BoxDecoration(
+          border: Border(
+            left: BorderSide(width: 4.0, color: Colors.grey.shade300),
+          ),
         ),
-      ),
-      padding: EdgeInsets.only(left: indentSize),
-      child: row,
-    );
+        padding: EdgeInsets.only(left: indentSize),
+        child: row,
+      );
+    }
   }
 }
