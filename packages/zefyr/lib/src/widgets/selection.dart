@@ -1,6 +1,7 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -230,6 +231,8 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     });
   }
 
+  Timer _doubleTapTimer;
+
   void _handleTapDown(TapDownDetails details) {
     _lastTapDownPosition = details.globalPosition;
   }
@@ -244,16 +247,29 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     assert(_lastTapDownPosition != null);
     final globalPoint = _lastTapDownPosition;
     _lastTapDownPosition = null;
+    if (_doubleTapTimer != null) {
+      _doubleTapTimer.cancel();
+      _doubleTapTimer = null;
+      _handleWordSelectionAction(globalPoint);
+      return;
+    }
+    _doubleTapTimer = Timer(kDoubleTapTimeout, () {
+      _handleSingleTap(globalPoint);
+      _doubleTapTimer = null;
+    });
+  }
+
+  void _handleSingleTap(Offset targetPoint) {
     HitTestResult result = HitTestResult();
-    WidgetsBinding.instance.hitTest(result, globalPoint);
+    WidgetsBinding.instance.hitTest(result, targetPoint);
 
     RenderEditableProxyBox box = _getEditableBox(result);
     if (box == null) {
-      box = _scope.renderContext.closestBoxForGlobalPoint(globalPoint);
+      box = _scope.renderContext.closestBoxForGlobalPoint(targetPoint);
     }
     if (box == null) return null;
 
-    final localPoint = box.globalToLocal(globalPoint);
+    final localPoint = box.globalToLocal(targetPoint);
     final position = box.getPositionForOffset(localPoint);
     final selection = TextSelection.collapsed(
       offset: position.offset,
@@ -273,15 +289,18 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   void _handleLongPress() {
-    final Offset globalPoint = _longPressPosition;
+    _handleWordSelectionAction(_longPressPosition);
     _longPressPosition = null;
+  }
+
+  void _handleWordSelectionAction(Offset targetPosition) {
     HitTestResult result = HitTestResult();
-    WidgetsBinding.instance.hitTest(result, globalPoint);
+    WidgetsBinding.instance.hitTest(result, targetPosition);
     final box = _getEditableBox(result);
     if (box == null) {
       return;
     }
-    final localPoint = box.globalToLocal(globalPoint);
+    final localPoint = box.globalToLocal(targetPosition);
     final position = box.getPositionForOffset(localPoint);
     final word = box.getWordBoundary(position);
     final selection = TextSelection(
