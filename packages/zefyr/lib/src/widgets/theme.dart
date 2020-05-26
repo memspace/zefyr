@@ -66,6 +66,9 @@ class ZefyrThemeData {
   final double indentSize;
   final ZefyrToolbarTheme toolbarTheme;
 
+  // Should everything in the editor be centered.
+  final bool centerAll;
+
   factory ZefyrThemeData.fallback(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     final defaultStyle = DefaultTextStyle.of(context);
@@ -92,6 +95,7 @@ class ZefyrThemeData {
       cursorColor: Colors.black,
       indentSize: 16.0,
       toolbarTheme: ZefyrToolbarTheme.fallback(context),
+      centerAll: false,
     );
   }
 
@@ -106,6 +110,7 @@ class ZefyrThemeData {
     this.cursorColor,
     this.indentSize,
     this.toolbarTheme,
+    this.centerAll,
   });
 
   ZefyrThemeData copyWith({
@@ -120,6 +125,7 @@ class ZefyrThemeData {
     Color cursorColor,
     double indentSize,
     ZefyrToolbarTheme toolbarTheme,
+    bool centerAll,
   }) {
     return ZefyrThemeData(
       boldStyle: boldStyle ?? this.boldStyle,
@@ -132,6 +138,7 @@ class ZefyrThemeData {
       cursorColor: cursorColor ?? this.cursorColor,
       indentSize: indentSize ?? this.indentSize,
       toolbarTheme: toolbarTheme ?? this.toolbarTheme,
+      centerAll: centerAll ?? this.centerAll,
     );
   }
 
@@ -147,6 +154,7 @@ class ZefyrThemeData {
       cursorColor: other.cursorColor,
       indentSize: other.indentSize,
       toolbarTheme: other.toolbarTheme,
+      centerAll: other.centerAll,
     );
   }
 }

@@ -220,8 +220,13 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
   List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
+    final theme = ZefyrTheme.of(context);
     for (var node in document.root.children) {
-      result.add(_defaultChildBuilder(context, node));
+      if (theme.centerAll != null && theme.centerAll) {
+        result.add(Center(child: _defaultChildBuilder(context, node)));
+      } else {
+        result.add(_defaultChildBuilder(context, node));
+      }
     }
     return result;
   }
