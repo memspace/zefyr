@@ -19,7 +19,11 @@ class ZefyrQuote extends StatelessWidget {
     final style = theme.blockTheme.quote.textStyle;
     List<Widget> items = [];
     for (var line in node.children) {
-      items.add(_buildLine(line, style, theme.indentSize));
+      if (theme.centerAll) {
+        items.add(Center(child: _buildLine(line, style, theme.indentSize)));
+      } else {
+        items.add(_buildLine(line, style, theme.indentSize));
+      }
     }
 
     return Padding(

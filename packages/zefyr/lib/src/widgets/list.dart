@@ -20,7 +20,11 @@ class ZefyrList extends StatelessWidget {
     List<Widget> items = [];
     int index = 1;
     for (var line in node.children) {
-      items.add(_buildItem(line, index));
+      if (theme.centerAll) {
+        items.add(Center(child: _buildItem(line, index)));
+      } else {
+        items.add(_buildItem(line, index));
+      }
       index++;
     }
 

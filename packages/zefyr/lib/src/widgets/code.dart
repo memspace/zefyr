@@ -20,7 +20,11 @@ class ZefyrCode extends StatelessWidget {
 
     List<Widget> items = [];
     for (var line in node.children) {
-      items.add(_buildLine(line, theme.blockTheme.code.textStyle));
+      if (theme.centerAll) {
+        items.add(Center(child: _buildLine(line, theme.blockTheme.code.textStyle)));
+      } else {
+        items.add(_buildLine(line, theme.blockTheme.code.textStyle));
+      }
     }
 
     return Padding(
