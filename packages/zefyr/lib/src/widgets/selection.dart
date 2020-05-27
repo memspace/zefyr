@@ -243,7 +243,7 @@ class ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   void _handleTap(TapUpDetails details) {
-    final globalPoint = details.globalPosition;
+    final Offset globalPoint = details.globalPosition;
     HitTestResult result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
 
@@ -281,7 +281,7 @@ class ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   void _wordSelectionFromPosition(Offset globalPoint) {
-    final result = HitTestResult();
+    HitTestResult result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
     final box = _getEditableBox(result);
     if (box == null) {
