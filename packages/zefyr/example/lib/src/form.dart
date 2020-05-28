@@ -26,6 +26,11 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
     final form = ListView(
       children: <Widget>[
         TextField(decoration: InputDecoration(labelText: 'Name')),
+        TextField(
+          maxLines: 3,
+          textDirection: TextDirection.rtl,
+          decoration: InputDecoration(labelText: 'Info'),
+        ),
         buildEditor(),
         TextField(decoration: InputDecoration(labelText: 'Email')),
       ],
@@ -44,7 +49,7 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
       ),
       body: ZefyrScaffold(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(0.0),
           child: form,
         ),
       ),
