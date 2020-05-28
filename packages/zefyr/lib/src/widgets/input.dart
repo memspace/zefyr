@@ -157,10 +157,10 @@ class InputConnectionController implements TextInputClient {
   @override
   TextEditingValue get currentTextEditingValue => _lastKnownRemoteTextEditingValue;
 
-  @override
-  AutofillScope get currentAutofillScope => null; //AutofillGroup.of(context);
-  @override
-  void showAutocorrectionPromptRect(int start, int end) {}
+  // @override
+  // AutofillScope get currentAutofillScope => null;
+  // @override
+  // void showAutocorrectionPromptRect(int start, int end) {}
 
   //
   // Private members

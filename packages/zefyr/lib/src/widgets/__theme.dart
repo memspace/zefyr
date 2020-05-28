@@ -42,11 +42,9 @@ class ZefyrTheme extends InheritedWidget {
   /// and [nullOk] is set to `true`. If [nullOk] is set to `false` (default)
   /// then this method asserts.
   static ZefyrThemeData of(BuildContext context, {bool nullOk = false}) {
-    final ZefyrTheme widget =
-        context.dependOnInheritedWidgetOfExactType<ZefyrTheme>();
+    final ZefyrTheme widget = context.dependOnInheritedWidgetOfExactType<ZefyrTheme>();
     if (widget == null && nullOk) return null;
-    assert(widget != null,
-        '$ZefyrTheme.of() called with a context that does not contain a ZefyrEditor.');
+    assert(widget != null, '$ZefyrTheme.of() called with a context that does not contain a ZefyrEditor.');
     return widget.data;
   }
 }
@@ -76,8 +74,7 @@ class ZefyrThemeData {
     const padding = EdgeInsets.symmetric(vertical: 8.0);
     final boldStyle = TextStyle(fontWeight: FontWeight.bold);
     final italicStyle = TextStyle(fontStyle: FontStyle.italic);
-    final linkStyle = TextStyle(
-        color: themeData.accentColor, decoration: TextDecoration.underline);
+    final linkStyle = TextStyle(color: themeData.accentColor, decoration: TextDecoration.underline);
 
     return ZefyrThemeData(
       boldStyle: boldStyle,
@@ -230,10 +227,13 @@ class BlockTheme {
     String fontFamily;
     switch (themeData.platform) {
       case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
         fontFamily = 'Menlo';
         break;
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
         fontFamily = 'Roboto Mono';
         break;
     }
@@ -296,12 +296,8 @@ class ZefyrToolbarTheme {
   factory ZefyrToolbarTheme.fallback(BuildContext context) {
     final theme = Theme.of(context);
     return ZefyrToolbarTheme._(
-      color: theme.primaryColorBrightness == Brightness.light
-          ? Colors.grey.shade300
-          : Colors.grey.shade800,
-      toggleColor: theme.primaryColorBrightness == Brightness.light
-          ? Colors.grey.shade400
-          : Colors.grey.shade900,
+      color: theme.primaryColorBrightness == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800,
+      toggleColor: theme.primaryColorBrightness == Brightness.light ? Colors.grey.shade400 : Colors.grey.shade900,
       iconColor: theme.primaryIconTheme.color,
       disabledIconColor: theme.disabledColor,
     );
