@@ -24,15 +24,16 @@ class InputConnectionController implements TextInputClient {
 
   /// Opens or closes input connection based on the current state of
   /// [focusNode] and [value].
-  void openOrCloseConnection(FocusNode focusNode, TextEditingValue value) {
+  void openOrCloseConnection(FocusNode focusNode, TextEditingValue value,
+      Brightness keyboardAppearance) {
     if (focusNode.hasFocus && focusNode.consumeKeyboardToken()) {
-      openConnection(value);
+      openConnection(value, keyboardAppearance);
     } else if (!focusNode.hasFocus) {
       closeConnection();
     }
   }
 
-  void openConnection(TextEditingValue value) {
+  void openConnection(TextEditingValue value, Brightness keyboardAppearance) {
     if (!hasConnection) {
       _lastKnownRemoteTextEditingValue = value;
       _textInputConnection = TextInput.attach(
@@ -42,6 +43,7 @@ class InputConnectionController implements TextInputClient {
           obscureText: false,
           autocorrect: true,
           inputAction: TextInputAction.newline,
+          keyboardAppearance: keyboardAppearance,
           textCapitalization: TextCapitalization.sentences,
         ),
       )..setEditingState(value);
@@ -156,13 +158,9 @@ class InputConnectionController implements TextInputClient {
     }
   }
 
-  //
-  // Private members
-  //
-
-  final List<TextEditingValue> _sentRemoteValues = [];
-  TextInputConnection _textInputConnection;
-  TextEditingValue _lastKnownRemoteTextEditingValue;
+  @override
+  TextEditingValue get currentTextEditingValue =>
+      _lastKnownRemoteTextEditingValue;
 
   @override
   void updateFloatingCursor(RawFloatingCursorPoint point) {
@@ -179,7 +177,20 @@ class InputConnectionController implements TextInputClient {
     }
   }
 
+  //
+  // Private members
+  //
+
+  final List<TextEditingValue> _sentRemoteValues = [];
+  TextInputConnection _textInputConnection;
+  TextEditingValue _lastKnownRemoteTextEditingValue;
+
+  // TODO: figure out if we need to support autofill
   @override
-  // TODO: implement currentTextEditingValue
-  TextEditingValue get currentTextEditingValue => throw UnimplementedError();
+  AutofillScope get currentAutofillScope => null;
+
+  @override
+  void showAutocorrectionPromptRect(int start, int end) {
+    // TODO: implement showAutocorrectionPromptRect
+  }
 }

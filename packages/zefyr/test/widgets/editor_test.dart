@@ -11,7 +11,7 @@ import '../testing.dart';
 
 void main() {
   group('$ZefyrEditor', () {
-    testWidgets('allows merging theme data', (tester) async {
+    testWidgets('allows merging attribute theme data', (tester) async {
       var delta = Delta()
         ..insert(
           'Website',
@@ -19,7 +19,8 @@ void main() {
         )
         ..insert('\n');
       var doc = NotusDocument.fromDelta(delta);
-      var theme = ZefyrThemeData(linkStyle: TextStyle(color: Colors.red));
+      var attributeTheme = AttributeTheme(link: TextStyle(color: Colors.red));
+      var theme = ZefyrThemeData(attributeTheme: attributeTheme);
       var editor = EditorSandBox(tester: tester, document: doc, theme: theme);
       await editor.pumpAndTap();
       // TODO: figure out why this extra pump is needed here
@@ -45,6 +46,34 @@ void main() {
       await editor.disable();
       ZefyrEditor widget = tester.widget(find.byType(ZefyrEditor));
       expect(widget.mode, ZefyrMode.view);
+    });
+
+    testWidgets('toggle toolbar between two editors', (tester) async {
+      final sandbox = MultiEditorSandbox(tester: tester);
+      await sandbox.pump();
+      await sandbox.tapFirstEditor();
+      expect(sandbox.firstFocusNode.hasFocus, isTrue);
+      expect(sandbox.secondFocusNode.hasFocus, isFalse);
+      expect(find.byIcon(Icons.format_list_bulleted), findsOneWidget);
+
+      await sandbox.tapButtonWithIcon(Icons.format_list_bulleted);
+      ZefyrEditor widget = sandbox.findFirstEditor();
+      Node line = widget.controller.document.root.children.first;
+      expect(line, isInstanceOf<BlockNode>());
+      BlockNode block = line;
+      expect(block.style.contains(NotusAttribute.block.bulletList), isTrue);
+
+      await sandbox.tapSecondEditor();
+      expect(sandbox.firstFocusNode.hasFocus, isFalse);
+      expect(sandbox.secondFocusNode.hasFocus, isTrue);
+      expect(find.byIcon(Icons.format_list_bulleted), findsOneWidget);
+
+      await sandbox.tapButtonWithIcon(Icons.format_list_bulleted);
+      widget = sandbox.findSecondEditor();
+      line = widget.controller.document.root.children.first;
+      expect(line, isInstanceOf<BlockNode>());
+      block = line;
+      expect(block.style.contains(NotusAttribute.block.bulletList), isTrue);
     });
   });
 }

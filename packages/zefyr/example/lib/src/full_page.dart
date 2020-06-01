@@ -41,12 +41,15 @@ Delta getDelta() {
   return Delta.fromJson(json.decode(doc) as List);
 }
 
+enum _Options { darkTheme }
+
 class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
   final ZefyrController _controller =
       ZefyrController(NotusDocument.fromDelta(getDelta()));
   final FocusNode _focusNode = FocusNode();
   bool _editing = false;
   StreamSubscription<NotusChange> _sub;
+  bool _darkTheme = false;
 
   @override
   void initState() {
@@ -64,40 +67,54 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ZefyrThemeData(
-      cursorColor: Colors.blue,
-      toolbarTheme: ZefyrToolbarTheme.fallback(context).copyWith(
-        color: Colors.grey.shade800,
-        toggleColor: Colors.grey.shade900,
-        iconColor: Colors.white,
-        disabledIconColor: Colors.grey.shade500,
-      ),
-    );
-
     final done = _editing
-        ? [FlatButton(onPressed: _stopEditing, child: Text('DONE'))]
-        : [FlatButton(onPressed: _startEditing, child: Text('EDIT'))];
-    return Scaffold(
+        ? IconButton(onPressed: _stopEditing, icon: Icon(Icons.save))
+        : IconButton(onPressed: _startEditing, icon: Icon(Icons.edit));
+    final result = Scaffold(
       resizeToAvoidBottomPadding: true,
       appBar: AppBar(
-        elevation: 1.0,
-        backgroundColor: Colors.grey.shade200,
-        brightness: Brightness.light,
         title: ZefyrLogo(),
-        actions: done,
+        actions: [
+          done,
+          PopupMenuButton<_Options>(
+            itemBuilder: buildPopupMenu,
+            onSelected: handlePopupItemSelected,
+          )
+        ],
       ),
       body: ZefyrScaffold(
-        child: ZefyrTheme(
-          data: theme,
-          child: ZefyrEditor(
-            controller: _controller,
-            focusNode: _focusNode,
-            mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
-            imageDelegate: CustomImageDelegate(),
-          ),
+        child: ZefyrEditor(
+          controller: _controller,
+          focusNode: _focusNode,
+          mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
+          imageDelegate: CustomImageDelegate(),
+          keyboardAppearance: _darkTheme ? Brightness.dark : Brightness.light,
         ),
       ),
     );
+    if (_darkTheme) {
+      return Theme(data: ThemeData.dark(), child: result);
+    }
+    return Theme(data: ThemeData(primarySwatch: Colors.cyan), child: result);
+  }
+
+  void handlePopupItemSelected(value) {
+    if (!mounted) return;
+    setState(() {
+      if (value == _Options.darkTheme) {
+        _darkTheme = !_darkTheme;
+      }
+    });
+  }
+
+  List<PopupMenuEntry<_Options>> buildPopupMenu(BuildContext context) {
+    return [
+      CheckedPopupMenuItem(
+        value: _Options.darkTheme,
+        child: Text("Dark theme"),
+        checked: _darkTheme,
+      ),
+    ];
   }
 
   void _startEditing() {

@@ -27,6 +27,7 @@ class ZefyrEditor extends StatefulWidget {
     this.imageDelegate,
     this.selectionControls,
     this.physics,
+    this.keyboardAppearance,
   })  : assert(mode != null),
         assert(controller != null),
         assert(focusNode != null),
@@ -69,6 +70,13 @@ class ZefyrEditor extends StatefulWidget {
   /// Padding around editable area.
   final EdgeInsets padding;
 
+  /// The appearance of the keyboard.
+  ///
+  /// This setting is only honored on iOS devices.
+  ///
+  /// If unset, defaults to the brightness of [ThemeData.primaryColorBrightness].
+  final Brightness keyboardAppearance;
+
   @override
   _ZefyrEditorState createState() => _ZefyrEditorState();
 }
@@ -90,7 +98,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
 
   void hideToolbar() {
     if (_toolbarKey == null) return;
-    _scaffold.hideToolbar();
+    _scaffold.hideToolbar(buildToolbar);
     _toolbarKey = null;
   }
 
@@ -178,6 +186,10 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData themeData = Theme.of(context);
+    final Brightness keyboardAppearance =
+        widget.keyboardAppearance ?? themeData.primaryColorBrightness;
+
     Widget editable = ZefyrEditableText(
       controller: _scope.controller,
       focusNode: _scope.focusNode,
@@ -187,6 +199,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       mode: widget.mode,
       padding: widget.padding,
       physics: widget.physics,
+      keyboardAppearance: keyboardAppearance,
     );
 
     return ZefyrTheme(

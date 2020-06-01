@@ -72,7 +72,7 @@ class RenderEditableProxyBox extends RenderBox
     @required TextSelection selection,
     @required Color selectionColor,
     @required Color cursorColor,
-  })  : _node = node,
+  })  : node = node,
         _layerLink = layerLink,
         _renderContext = renderContext,
         _showCursor = showCursor,
@@ -94,11 +94,7 @@ class RenderEditableProxyBox extends RenderBox
 
   bool _isDirty = true;
 
-  ContainerNode get node => _node;
-  ContainerNode _node;
-  set node(ContainerNode value) {
-    _node = value;
-  }
+  ContainerNode node;
 
   LayerLink get layerLink => _layerLink;
   LayerLink _layerLink;
@@ -153,6 +149,13 @@ class RenderEditableProxyBox extends RenderBox
   /// Returns `true` if current selection is collapsed and located
   /// within this paragraph.
   bool get containsCaret {
+    if (!node.mounted) {
+      // It is possible that a document node gets unmounted before widget tree
+      // is updated, in which case this function fails when triggered by
+      // _showCursor notification calling markNeedsCursorPaint.
+      // TODO: react to document node's mounted state.
+      return false;
+    }
     if (!_selection.isCollapsed) return false;
 
     final int start = node.documentOffset;

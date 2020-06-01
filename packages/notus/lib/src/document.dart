@@ -140,8 +140,7 @@ class NotusDocument {
     // We have to compose before applying delete rules
     // Otherwise delete would be operating on stale document snapshot.
     if (text.isNotEmpty) {
-      delta = insert(index, text);
-      index = delta.transformPosition(index);
+      delta = insert(index + length, text);
     }
 
     if (length > 0) {

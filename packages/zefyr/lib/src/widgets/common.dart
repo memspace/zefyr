@@ -1,6 +1,8 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
@@ -12,17 +14,11 @@ import 'rich_text.dart';
 import 'scope.dart';
 import 'theme.dart';
 
-/// Raw widget representing a single line of rich text document in Zefyr editor.
-///
-/// See [ZefyrParagraph] and [ZefyrHeading] which wrap this widget and
-/// integrate it with current [ZefyrTheme].
-class RawZefyrLine extends StatefulWidget {
-  const RawZefyrLine({
-    Key key,
-    @required this.node,
-    this.style,
-    this.padding,
-  }) : super(key: key);
+/// Represents single line of rich text document in Zefyr editor.
+class ZefyrLine extends StatefulWidget {
+  const ZefyrLine({Key key, @required this.node, this.style, this.padding})
+      : assert(node != null),
+        super(key: key);
 
   /// Line in the document represented by this widget.
   final LineNode node;
@@ -35,10 +31,10 @@ class RawZefyrLine extends StatefulWidget {
   final EdgeInsets padding;
 
   @override
-  _RawZefyrLineState createState() => _RawZefyrLineState();
+  _ZefyrLineState createState() => _ZefyrLineState();
 }
 
-class _RawZefyrLineState extends State<RawZefyrLine> {
+class _ZefyrLineState extends State<ZefyrLine> {
   final LayerLink _link = LayerLink();
 
   @override
@@ -47,7 +43,7 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     if (scope.isEditable) {
       ensureVisible(context, scope);
     }
-    final theme = ZefyrTheme.of(context);
+    final theme = Theme.of(context);
 
     Widget content;
     if (widget.node.hasEmbed) {
@@ -61,6 +57,22 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
     }
 
     if (scope.isEditable) {
+      Color cursorColor;
+      switch (theme.platform) {
+        case TargetPlatform.iOS:
+        case TargetPlatform.macOS:
+          cursorColor ??= CupertinoTheme.of(context).primaryColor;
+          break;
+
+        case TargetPlatform.android:
+        case TargetPlatform.fuchsia:
+        case TargetPlatform.windows:
+        case TargetPlatform.macOS:
+        case TargetPlatform.linux:
+          cursorColor = theme.cursorColor;
+          break;
+      }
+
       content = EditableBox(
         child: content,
         node: widget.node,
@@ -68,8 +80,8 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
         renderContext: scope.renderContext,
         showCursor: scope.showCursor,
         selection: scope.selection,
-        selectionColor: theme.selectionColor,
-        cursorColor: theme.cursorColor,
+        selectionColor: theme.textSelectionColor,
+        cursorColor: cursorColor,
       );
       content = CompositedTransformTarget(link: _link, child: content);
     }
@@ -129,13 +141,13 @@ class _RawZefyrLineState extends State<RawZefyrLine> {
   TextStyle _getTextStyle(NotusStyle style, ZefyrThemeData theme) {
     TextStyle result = TextStyle();
     if (style.containsSame(NotusAttribute.bold)) {
-      result = result.merge(theme.boldStyle);
+      result = result.merge(theme.attributeTheme.bold);
     }
     if (style.containsSame(NotusAttribute.italic)) {
-      result = result.merge(theme.italicStyle);
+      result = result.merge(theme.attributeTheme.italic);
     }
     if (style.contains(NotusAttribute.link)) {
-      result = result.merge(theme.linkStyle);
+      result = result.merge(theme.attributeTheme.link);
     }
     return result;
   }
