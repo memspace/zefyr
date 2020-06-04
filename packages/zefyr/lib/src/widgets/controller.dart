@@ -29,11 +29,10 @@ enum FocusOwner {
 class ZefyrController extends ChangeNotifier {
   ZefyrController(NotusDocument document)
       : assert(document != null),
-        _document = document;
+        document = document;
 
   /// Zefyr document managed by this controller.
-  NotusDocument get document => _document;
-  NotusDocument _document;
+  final NotusDocument document;
 
   /// Currently selected text within the [document].
   TextSelection get selection => _selection;
@@ -70,7 +69,7 @@ class ZefyrController extends ChangeNotifier {
 
   @override
   void dispose() {
-    _document.close();
+    document.close();
     super.dispose();
   }
 
@@ -84,7 +83,7 @@ class ZefyrController extends ChangeNotifier {
   void compose(Delta change,
       {TextSelection selection, ChangeSource source = ChangeSource.remote}) {
     if (change.isNotEmpty) {
-      _document.compose(change, source);
+      document.compose(change, source);
     }
     if (selection != null) {
       _updateSelectionSilent(selection, source: source);
@@ -128,7 +127,7 @@ class ZefyrController extends ChangeNotifier {
           delta.length <= 2 &&
           delta.last.isInsert) {
         // Apply it.
-        Delta retainDelta = Delta()
+        final retainDelta = Delta()
           ..retain(index)
           ..retain(text.length, toggledStyles.toJson());
         document.compose(retainDelta, ChangeSource.local);
@@ -144,11 +143,11 @@ class ZefyrController extends ChangeNotifier {
       } else {
         // need to transform selection position in case actual delta
         // is different from user's version (in deletes and inserts).
-        Delta user = Delta()
+        final user = Delta()
           ..retain(index)
           ..insert(text)
           ..delete(length);
-        int positionDelta = getPositionDelta(user, delta);
+        var positionDelta = getPositionDelta(user, delta);
         _updateSelectionSilent(
           selection.copyWith(
             baseOffset: selection.baseOffset + positionDelta,
@@ -188,8 +187,8 @@ class ZefyrController extends ChangeNotifier {
 
   /// Formats current selection with [attribute].
   void formatSelection(NotusAttribute attribute) {
-    int index = _selection.start;
-    int length = _selection.end - index;
+    final index = _selection.start;
+    final length = _selection.end - index;
     formatText(index, length, attribute);
   }
 
@@ -198,9 +197,9 @@ class ZefyrController extends ChangeNotifier {
   /// If nothing is selected but we've toggled an attribute,
   ///  we also merge those in our style before returning.
   NotusStyle getSelectionStyle() {
-    int start = _selection.start;
-    int length = _selection.end - start;
-    var lineStyle = _document.collectStyle(start, length);
+    final start = _selection.start;
+    final length = _selection.end - start;
+    var lineStyle = document.collectStyle(start, length);
 
     lineStyle = lineStyle.mergeAll(toggledStyles);
 
@@ -216,7 +215,7 @@ class ZefyrController extends ChangeNotifier {
   }
 
   void _ensureSelectionBeforeLastBreak() {
-    final end = _document.length - 1;
+    final end = document.length - 1;
     final base = math.min(_selection.baseOffset, end);
     final extent = math.min(_selection.extentOffset, end);
     _selection = _selection.copyWith(baseOffset: base, extentOffset: extent);

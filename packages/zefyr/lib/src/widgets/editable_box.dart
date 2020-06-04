@@ -7,9 +7,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
-import 'selection_utils.dart';
 import 'caret.dart';
 import 'render_context.dart';
+import 'selection_utils.dart';
 
 class EditableBox extends SingleChildRenderObjectWidget {
   EditableBox({
@@ -94,6 +94,7 @@ class RenderEditableProxyBox extends RenderBox
 
   bool _isDirty = true;
 
+  @override
   ContainerNode node;
 
   LayerLink get layerLink => _layerLink;
@@ -158,9 +159,9 @@ class RenderEditableProxyBox extends RenderBox
     }
     if (!_selection.isCollapsed) return false;
 
-    final int start = node.documentOffset;
-    final int end = start + node.length;
-    final int caretOffset = _selection.extentOffset;
+    final start = node.documentOffset;
+    final end = start + node.length;
+    final caretOffset = _selection.extentOffset;
     return caretOffset >= start && caretOffset < end;
   }
 
@@ -230,7 +231,7 @@ class RenderEditableProxyBox extends RenderBox
   }
 
   void _paintCursor(PaintingContext context, Offset offset) {
-    Offset caretOffset =
+    final caretOffset =
         getOffsetForCaret(_selection.extent, _cursorPainter.prototype);
     _cursorPainter.paint(context.canvas, caretOffset + offset);
   }
@@ -270,6 +271,7 @@ class RenderEditableProxyBox extends RenderBox
   TextSelection getLocalSelection(TextSelection documentSelection) =>
       child.getLocalSelection(documentSelection);
 
+  @override
   bool intersectsWithSelection(TextSelection selection) =>
       child.intersectsWithSelection(selection);
 

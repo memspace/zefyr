@@ -14,8 +14,8 @@ void main() {
     testWidgets('double tap caret shows toolbar', (tester) async {
       final editor = EditorSandBox(tester: tester);
       await editor.pumpAndTap();
-      RenderZefyrParagraph renderObject =
-          tester.firstRenderObject(find.byType(ZefyrRichText));
+      final renderObject = tester.firstRenderObject(find.byType(ZefyrRichText))
+          as RenderZefyrParagraph;
       var offset = renderObject.localToGlobal(Offset.zero);
       offset += Offset(10.0, 5.0);
       await tester.tapAt(offset);
@@ -43,8 +43,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(editor.controller.selection.extentOffset, 10);
 
-      RenderZefyrParagraph renderObject =
-          tester.firstRenderObject(find.byType(ZefyrRichText));
+      final renderObject = tester.firstRenderObject(find.byType(ZefyrRichText))
+          as RenderZefyrParagraph;
       var offset = renderObject.localToGlobal(Offset.zero);
       offset += Offset(-5.0, 5.0);
       await tester.tapAt(offset);
@@ -63,8 +63,8 @@ void main() {
           'This House\nIs A Circus\n');
       expect(editor.controller.selection.extentOffset, 0);
 
-      RenderBox renderObject =
-          tester.firstRenderObject(find.byType(ZefyrEditableText));
+      final renderObject =
+          tester.firstRenderObject(find.byType(ZefyrEditableText)) as RenderBox;
       var offset = renderObject.localToGlobal(Offset.zero);
       offset += Offset(50.0, renderObject.size.height - 500.0);
       await tester.tapAt(offset);

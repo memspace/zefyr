@@ -9,9 +9,9 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
 
+import 'editable_box.dart';
 import 'selection_utils.dart';
 import 'theme.dart';
-import 'editable_box.dart';
 
 /// Provides interface for embedding images into Zefyr editor.
 // TODO: allow configuring image sources and related toolbar buttons.
@@ -121,7 +121,7 @@ class RenderEditableImage extends RenderBox
 
   @override
   List<ui.TextBox> getEndpointsForSelection(TextSelection selection) {
-    TextSelection local = getLocalSelection(selection);
+    final local = getLocalSelection(selection);
     if (local.isCollapsed) {
       final dx = local.extentOffset == 0 ? _childOffset.dx : size.width;
       return [
@@ -140,7 +140,7 @@ class RenderEditableImage extends RenderBox
 
   @override
   TextPosition getPositionForOffset(Offset offset) {
-    int position = node.documentOffset;
+    var position = node.documentOffset;
 
     if (offset.dx > size.width / 2) {
       position++;
@@ -164,7 +164,7 @@ class RenderEditableImage extends RenderBox
   @override
   Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
     final pos = position.offset - node.documentOffset;
-    Offset caretOffset = _childOffset - Offset(kHorizontalPadding, 0.0);
+    var caretOffset = _childOffset - Offset(kHorizontalPadding, 0.0);
     if (pos == 1) {
       caretOffset =
           caretOffset + Offset(_lastChildSize.width + kHorizontalPadding, 0.0);
@@ -178,7 +178,7 @@ class RenderEditableImage extends RenderBox
     final localSelection = getLocalSelection(selection);
     assert(localSelection != null);
     if (!localSelection.isCollapsed) {
-      final Paint paint = Paint()
+      final paint = Paint()
         ..color = selectionColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3.0;
@@ -188,6 +188,7 @@ class RenderEditableImage extends RenderBox
     }
   }
 
+  @override
   void paint(PaintingContext context, Offset offset) {
     super.paint(context, offset + _childOffset);
   }

@@ -7,9 +7,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
-import 'selection_utils.dart';
 import 'caret.dart';
 import 'editable_box.dart';
+import 'selection_utils.dart';
 
 /// Represents single paragraph of Zefyr rich-text.
 class ZefyrRichText extends LeafRenderObjectWidget {
@@ -67,6 +67,7 @@ class RenderZefyrParagraph extends RenderParagraph
           maxLines: maxLines,
         );
 
+  @override
   LineNode node;
 
   @override
@@ -196,8 +197,8 @@ class RenderZefyrParagraph extends RenderParagraph
     var localSel = getLocalSelection(selection);
 
     _selectionRects ??= getBoxesForSelection(_trimSelection(localSel));
-    final Paint paint = Paint()..color = selectionColor;
-    for (ui.TextBox box in _selectionRects) {
+    final paint = Paint()..color = selectionColor;
+    for (var box in _selectionRects) {
       context.canvas.drawRect(box.toRect().shift(offset), paint);
     }
     _lastPaintedSelection = selection;
