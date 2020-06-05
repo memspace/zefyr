@@ -22,7 +22,7 @@ void main() {
     });
 
     test('it notifies on image delegate update', () {
-      bool notified = false;
+      var notified = false;
       scope.addListener(() {
         notified = true;
       });
@@ -35,7 +35,7 @@ void main() {
     });
 
     test('it notifies on controller update', () {
-      bool notified = false;
+      var notified = false;
       scope.addListener(() {
         notified = true;
       });
@@ -48,7 +48,7 @@ void main() {
     });
 
     test('it notifies on focus node update', () {
-      bool notified = false;
+      var notified = false;
       scope.addListener(() {
         notified = true;
       });
@@ -61,7 +61,7 @@ void main() {
     });
 
     test('it notifies on selection changes but not text changes', () {
-      bool notified = false;
+      var notified = false;
       scope.addListener(() {
         notified = true;
       });

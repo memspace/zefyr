@@ -85,12 +85,11 @@ class _ZefyrFieldState extends State<ZefyrField> {
   }
 
   InputDecoration _getEffectiveDecoration() {
-    final InputDecoration effectiveDecoration =
-        (widget.decoration ?? const InputDecoration())
-            .applyDefaults(Theme.of(context).inputDecorationTheme)
-            .copyWith(
-              enabled: _effectiveMode == ZefyrMode.edit,
-            );
+    final effectiveDecoration = (widget.decoration ?? const InputDecoration())
+        .applyDefaults(Theme.of(context).inputDecorationTheme)
+        .copyWith(
+          enabled: _effectiveMode == ZefyrMode.edit,
+        );
 
     return effectiveDecoration;
   }

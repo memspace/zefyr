@@ -35,8 +35,8 @@ import 'editable_box.dart';
 /// When a box is detached from rendering pipeline it unregisters
 /// itself by calling [removeBox].
 class ZefyrRenderContext extends ChangeNotifier {
-  final Set<RenderEditableProxyBox> _dirtyBoxes = Set();
-  final Set<RenderEditableProxyBox> _activeBoxes = Set();
+  final Set<RenderEditableProxyBox> _dirtyBoxes = {};
+  final Set<RenderEditableProxyBox> _activeBoxes = {};
 
   Set<RenderEditableProxyBox> get dirty => _dirtyBoxes;
   Set<RenderEditableProxyBox> get active => _activeBoxes;
@@ -104,7 +104,7 @@ class ZefyrRenderContext extends ChangeNotifier {
   RenderEditableProxyBox closestBoxForGlobalPoint(Offset point) {
     assert(!_disposed);
     if (_activeBoxes.isEmpty) return null;
-    RenderEditableProxyBox box = boxForGlobalPoint(point);
+    var box = boxForGlobalPoint(point);
     if (box != null) return box;
 
     box = _activeBoxes.firstWhere((p) {

@@ -190,13 +190,13 @@ class _TestImageDelegate implements ZefyrImageDelegate<String> {
   }
 
   @override
-  String get cameraSource => "camera";
+  String get cameraSource => 'camera';
 
   @override
-  String get gallerySource => "gallery";
+  String get gallerySource => 'gallery';
 
   @override
   Future<String> pickImage(String source) {
-    return Future.value("file:///tmp/test.jpg");
+    return Future.value('file:///tmp/test.jpg');
   }
 }
