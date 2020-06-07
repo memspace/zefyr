@@ -50,6 +50,9 @@ class _NotusQuillEncoder extends Converter<Delta, Delta> {
               attributes[key] = value;
             }
             break;
+          case 'a':
+            attributes['link'] = value;
+            break;
           default:
             attributes[key] = value;
         }
@@ -88,6 +91,9 @@ class _NotusQuillDecoder extends Converter<Delta, Delta> {
             } else {
               attributes[key] = value;
             }
+            break;
+          case 'link':
+            attributes['a'] = value;
             break;
           case 'code-block':
             if (value == true) {
