@@ -38,13 +38,13 @@ class _NotusQuillEncoder extends Converter<Delta, Delta> {
             attributes['header'] = value;
             break;
           case 'block':
-            if (value == NotusAttribute.block.bulletList.value) {
+            if (value == 'ul') {
               attributes['list'] = 'bullet';
-            } else if (value == NotusAttribute.block.numberList.value) {
+            } else if (value == 'ol') {
               attributes['list'] = 'ordered';
-            } else if (value == NotusAttribute.block.code.value) {
+            } else if (value == 'code') {
               attributes['code-block'] = true;
-            } else if (value == NotusAttribute.block.quote.value) {
+            } else if (value == 'quote') {
               attributes['blockquote'] = true;
             } else {
               attributes[key] = value;
@@ -72,31 +72,31 @@ class _NotusQuillDecoder extends Converter<Delta, Delta> {
       op.attributes?.forEach((String key, dynamic value) {
         switch (key) {
           case 'bold':
-            attributes[NotusAttribute.bold.key] = value;
+            attributes['b'] = value;
             break;
           case 'italic':
-            attributes[NotusAttribute.italic.key] = value;
+            attributes['i'] = value;
             break;
           case 'header':
-            attributes[NotusAttribute.heading.key] = value;
+            attributes['heading'] = value;
             break;
           case 'list':
             if (value == 'bullet') {
-              attributes[NotusAttribute.block.key] = NotusAttribute.block.bulletList.value;
+              attributes['block'] = 'ul';
             } else if (value == 'ordered') {
-              attributes[NotusAttribute.block.key] = NotusAttribute.block.numberList.value;
+              attributes['block'] = 'ol';
             } else {
               attributes[key] = value;
             }
             break;
           case 'code-block':
             if (value == true) {
-              attributes[NotusAttribute.block.key] = NotusAttribute.block.code.value;
+              attributes['block'] = 'code';
             }
             break;
           case 'blockquote':
             if (value == true) {
-              attributes[NotusAttribute.block.key] = NotusAttribute.block.quote.value;
+              attributes['block'] = 'quote';
             }
             break;
           default:
