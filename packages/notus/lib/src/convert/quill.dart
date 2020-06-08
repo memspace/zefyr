@@ -4,7 +4,6 @@
 
 import 'dart:convert';
 
-import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 class NotusQuillCodec extends Codec<Delta, Delta> {
