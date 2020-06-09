@@ -23,7 +23,6 @@ void main() {
       expect(jsonEncode(result.toJson()), notus_string);
     });
   });
-
 }
 
 final notus_string =
