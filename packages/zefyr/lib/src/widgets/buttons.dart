@@ -348,7 +348,7 @@ class _LinkButtonState extends State<LinkButton> {
     final toolbar = ZefyrToolbar.of(context);
     setState(() {
       _inputKey = UniqueKey();
-      _inputController.text = getLink('https://');
+      _inputController.text = getLink("");
       _inputController.addListener(_handleInputChange);
       toolbar.markNeedsRebuild();
     });
@@ -359,16 +359,7 @@ class _LinkButtonState extends State<LinkButton> {
     setState(() {
       var error = false;
       if (_inputController.text.isNotEmpty) {
-        try {
-          var uri = Uri.parse(_inputController.text);
-          if ((uri.isScheme('https') || uri.isScheme('http')) &&
-              uri.host.isNotEmpty) {
-            toolbar.editor.formatSelection(
-                NotusAttribute.link.fromString(_inputController.text));
-          } else {
-            error = true;
-          }
-        } on FormatException {
+        try {} on FormatException {
           error = true;
         }
       }
@@ -567,8 +558,7 @@ class _LinkView extends StatelessWidget {
               value,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.subtitle1
-                  .copyWith(color: toolbarTheme.disabledIconColor),
+              style: theme.textTheme.subtitle1.copyWith(color: Colors.white),
             ),
           )
         ],
