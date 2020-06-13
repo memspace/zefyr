@@ -359,7 +359,15 @@ class _LinkButtonState extends State<LinkButton> {
     setState(() {
       var error = false;
       if (_inputController.text.isNotEmpty) {
-        try {} on FormatException {
+        try {
+          var uri = Uri.parse(_inputController.text);
+          if (uri.host.isNotEmpty) {
+            toolbar.editor.formatSelection(
+                NotusAttribute.link.fromString(_inputController.text));
+          } else {
+            error = true;
+          }
+        } on FormatException {
           error = true;
         }
       }
