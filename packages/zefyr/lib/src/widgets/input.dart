@@ -184,4 +184,11 @@ class InputConnectionController implements TextInputClient {
       _sentRemoteValues.clear();
     }
   }
+
+  //to keep the compiler happy
+  @override
+  AutofillScope get currentAutofillScope => null;
+  //to keep the compiler happy
+  @override
+  void showAutocorrectionPromptRect(int start, int end) {}
 }

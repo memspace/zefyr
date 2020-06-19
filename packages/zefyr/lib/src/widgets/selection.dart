@@ -4,6 +4,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -25,8 +26,7 @@ RenderEditableBox _getEditableBox(HitTestResult result) {
 
 /// Selection overlay controls selection handles and other gestures.
 class ZefyrSelectionOverlay extends StatefulWidget {
-  const ZefyrSelectionOverlay({Key key, @required this.controls})
-      : super(key: key);
+  const ZefyrSelectionOverlay({Key key, @required this.controls}) : super(key: key);
 
   final TextSelectionControls controls;
 
@@ -34,10 +34,11 @@ class ZefyrSelectionOverlay extends StatefulWidget {
   _ZefyrSelectionOverlayState createState() => _ZefyrSelectionOverlayState();
 }
 
-class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
-    implements TextSelectionDelegate {
+class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay> implements TextSelectionDelegate {
   TextSelectionControls _controls;
   TextSelectionControls get controls => _controls;
+
+  final ClipboardStatusNotifier _clipboardStatus = kIsWeb ? null : ClipboardStatusNotifier();
 
   /// Global position of last TapDown event.
   Offset _lastTapDownPosition;
@@ -72,7 +73,10 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     _toolbar = OverlayEntry(
       builder: (context) => FadeTransition(
         opacity: toolbarOpacity,
-        child: _SelectionToolbar(selectionOverlay: this),
+        child: _SelectionToolbar(
+          selectionOverlay: this,
+          clipboardStatus: _clipboardStatus,
+        ),
       ),
     );
     _overlay.insert(_toolbar);
@@ -83,17 +87,14 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   bool get isToolbarHidden => _toolbar == null;
 
   @override
-  TextEditingValue get textEditingValue =>
-      _scope.controller.plainTextEditingValue;
+  TextEditingValue get textEditingValue => _scope.controller.plainTextEditingValue;
 
   set textEditingValue(TextEditingValue value) {
     final cursorPosition = value.selection.extentOffset;
     final oldText = _scope.controller.document.toPlainText();
     final newText = value.text;
     final diff = fastDiff(oldText, newText, cursorPosition);
-    _scope.controller.replaceText(
-        diff.start, diff.deleted.length, diff.inserted,
-        selection: value.selection);
+    _scope.controller.replaceText(diff.start, diff.deleted.length, diff.inserted, selection: value.selection);
   }
 
   @override
@@ -115,12 +116,16 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   void initState() {
     super.initState();
     _controls = widget.controls;
+    _clipboardStatus?.addListener(_onChangedClipboardStatus);
   }
 
   @override
   void didUpdateWidget(ZefyrSelectionOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
     _controls = widget.controls;
+    if (pasteEnabled && _controls?.canPaste(this) == true) {
+      _clipboardStatus?.update();
+    }
   }
 
   @override
@@ -158,6 +163,8 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     hideToolbar();
     _toolbarController.dispose();
     _toolbarController = null;
+    _clipboardStatus?.removeListener(_onChangedClipboardStatus);
+    _clipboardStatus?.dispose();
     super.dispose();
   }
 
@@ -189,6 +196,12 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   //
   // Private members
   //
+
+  void _onChangedClipboardStatus() {
+    setState(() {
+      // Inform the widget that the value of clipboardStatus has changed.
+    });
+  }
 
   void _handleChange() {
     if (_selection != _scope.selection || _focusOwner != _scope.focusOwner) {
@@ -317,8 +330,7 @@ class SelectionHandleDriver extends StatefulWidget {
   _SelectionHandleDriverState createState() => _SelectionHandleDriverState();
 }
 
-class _SelectionHandleDriverState extends State<SelectionHandleDriver>
-    with SingleTickerProviderStateMixin {
+class _SelectionHandleDriverState extends State<SelectionHandleDriver> with SingleTickerProviderStateMixin {
   ZefyrScope _scope;
 
   /// Current document selection.
@@ -332,16 +344,14 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
   ///
   /// For base handle this equals to [TextSelection.baseOffset] and for
   /// extent handle - [TextSelection.extentOffset].
-  int get documentOffset =>
-      isBaseHandle ? selection.baseOffset : selection.extentOffset;
+  int get documentOffset => isBaseHandle ? selection.baseOffset : selection.extentOffset;
 
   List<TextSelectionPoint> getEndpointsForSelection(RenderEditableBox block) {
     if (block == null) return null;
 
     final Offset paintOffset = Offset.zero;
     final List<ui.TextBox> boxes = block.getEndpointsForSelection(selection);
-    final Offset start =
-        Offset(boxes.first.start, boxes.first.bottom) + paintOffset;
+    final Offset start = Offset(boxes.first.start, boxes.first.bottom) + paintOffset;
     final Offset end = Offset(boxes.last.end, boxes.last.bottom) + paintOffset;
     return <TextSelectionPoint>[
       TextSelectionPoint(start, boxes.first.direction),
@@ -394,16 +404,14 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
     switch (widget.position) {
       case _SelectionHandlePosition.base:
         point = endpoints[0].point;
-        type = _chooseType(endpoints[0], TextSelectionHandleType.left,
-            TextSelectionHandleType.right);
+        type = _chooseType(endpoints[0], TextSelectionHandleType.left, TextSelectionHandleType.right);
         break;
       case _SelectionHandlePosition.extent:
         // [endpoints] will only contain 1 point for collapsed selections, in
         // which case we shouldn't be building the [end] handle.
         assert(endpoints.length == 2);
         point = endpoints[1].point;
-        type = _chooseType(endpoints[1], TextSelectionHandleType.right,
-            TextSelectionHandleType.left);
+        type = _chooseType(endpoints[1], TextSelectionHandleType.right, TextSelectionHandleType.left);
         break;
     }
 
@@ -413,8 +421,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
       point.dy.clamp(0.0, viewport.height),
     );
 
-    final Offset handleAnchor =
-        widget.selectionOverlay.controls.getHandleAnchor(
+    final Offset handleAnchor = widget.selectionOverlay.controls.getHandleAnchor(
       type,
       block.preferredLineHeight,
     );
@@ -431,8 +438,7 @@ class _SelectionHandleDriverState extends State<SelectionHandleDriver>
 
     // Make sure the GestureDetector is big enough to be easily interactive.
     final Rect interactiveRect = handleRect.expandToInclude(
-      Rect.fromCircle(
-          center: handleRect.center, radius: kMinInteractiveDimension / 2),
+      Rect.fromCircle(center: handleRect.center, radius: kMinInteractiveDimension / 2),
     );
     final RelativeRect padding = RelativeRect.fromLTRB(
       math.max((interactiveRect.width - handleRect.width) / 2, 0),
@@ -536,9 +542,11 @@ class _SelectionToolbar extends StatefulWidget {
   const _SelectionToolbar({
     Key key,
     @required this.selectionOverlay,
+    @required this.clipboardStatus,
   }) : super(key: key);
 
   final _ZefyrSelectionOverlayState selectionOverlay;
+  final ClipboardStatusNotifier clipboardStatus;
 
   @override
   _SelectionToolbarState createState() => _SelectionToolbarState();
@@ -547,8 +555,7 @@ class _SelectionToolbar extends StatefulWidget {
 class _SelectionToolbarState extends State<_SelectionToolbar> {
   TextSelectionControls get controls => widget.selectionOverlay.controls;
   ZefyrScope get scope => widget.selectionOverlay.scope;
-  TextSelection get selection =>
-      widget.selectionOverlay.textEditingValue.selection;
+  TextSelection get selection => widget.selectionOverlay.textEditingValue.selection;
 
   @override
   Widget build(BuildContext context) {
@@ -564,20 +571,16 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
     final boxes = block.getEndpointsForSelection(selection);
     // Find the horizontal midpoint, just above the selected text.
     Offset midpoint = Offset(
-      (boxes.length == 1)
-          ? (boxes[0].start + boxes[0].end) / 2.0
-          : (boxes[0].start + boxes[1].start) / 2.0,
+      (boxes.length == 1) ? (boxes[0].start + boxes[0].end) / 2.0 : (boxes[0].start + boxes[1].start) / 2.0,
       boxes[0].bottom - block.preferredLineHeight,
     );
     List<TextSelectionPoint> endpoints;
     if (boxes.length == 1) {
-      midpoint = Offset((boxes[0].start + boxes[0].end) / 2.0,
-          boxes[0].bottom - block.preferredLineHeight);
+      midpoint = Offset((boxes[0].start + boxes[0].end) / 2.0, boxes[0].bottom - block.preferredLineHeight);
       final Offset start = Offset(boxes[0].start, block.preferredLineHeight);
       endpoints = <TextSelectionPoint>[TextSelectionPoint(start, null)];
     } else {
-      midpoint = Offset((boxes[0].start + boxes[1].start) / 2.0,
-          boxes[0].bottom - block.preferredLineHeight);
+      midpoint = Offset((boxes[0].start + boxes[1].start) / 2.0, boxes[0].bottom - block.preferredLineHeight);
       final Offset start = Offset(boxes.first.start, boxes.first.bottom);
       final Offset end = Offset(boxes.last.end, boxes.last.bottom);
       endpoints = <TextSelectionPoint>[
@@ -592,12 +595,14 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
     );
 
     final toolbar = controls.buildToolbar(
-        context,
-        editingRegion,
-        block.preferredLineHeight,
-        midpoint,
-        endpoints,
-        widget.selectionOverlay);
+      context,
+      editingRegion,
+      block.preferredLineHeight,
+      midpoint,
+      endpoints,
+      widget.selectionOverlay,
+      widget.clipboardStatus,
+    );
     return CompositedTransformFollower(
       link: block.layerLink,
       showWhenUnlinked: false,
