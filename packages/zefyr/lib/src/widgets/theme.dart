@@ -361,6 +361,7 @@ class AttributeTheme {
     String monospaceFontFamily;
     switch (theme.platform) {
       case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
         monospaceFontFamily = 'Menlo';
         break;
       case TargetPlatform.android:
@@ -368,7 +369,7 @@ class AttributeTheme {
         monospaceFontFamily = 'Roboto Mono';
         break;
       default:
-        throw UnimplementedError("Platform ${theme.platform} not implemented.");
+        throw UnimplementedError('Platform ${theme.platform} not implemented.');
     }
 
     return AttributeTheme(
