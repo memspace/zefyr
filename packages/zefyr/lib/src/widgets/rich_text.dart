@@ -16,7 +16,7 @@ class ZefyrRichText extends LeafRenderObjectWidget {
   ZefyrRichText({
     @required this.node,
     @required this.text,
-    this.textAlign,
+    @required this.textAlign,
   }) : assert(node != null && text != null);
 
   final LineNode node;
@@ -47,7 +47,7 @@ class RenderZefyrParagraph extends RenderParagraph
   RenderZefyrParagraph(
     TextSpan text, {
     @required LineNode node,
-    TextAlign textAlign = TextAlign.start,
+    @required TextAlign textAlign,
     @required TextDirection textDirection,
     bool softWrap = true,
     TextOverflow overflow = TextOverflow.clip,
