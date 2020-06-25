@@ -254,6 +254,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     final buttons = <Widget>[
       buildButton(context, ZefyrToolbarAction.bold),
       buildButton(context, ZefyrToolbarAction.italic),
+      buildButton(context, ZefyrToolbarAction.underline),
       if (editor.imageDelegate != null) ImageButton(),
       LinkButton(),
       HeadingButton(),
