@@ -30,12 +30,10 @@ class ZefyrAlign extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context);
     List<Widget> items = [];
-    final style = theme.attributeTheme.quote.textStyle;
-
     for (var line in node.children) {
       items.add(_buildLine(
         line,
-        style,
+        null,
         theme.indentWidth,
       ));
     }

@@ -313,7 +313,10 @@ class AttributeTheme {
   final BlockTheme quote;
 
   /// Style theme used to render align block.
-  final BlockTheme align;
+  final BlockTheme alignLeft;
+  final BlockTheme alignRight;
+  final BlockTheme alignCenter;
+  final BlockTheme alignJustify;
 
   /// Style theme used to render code blocks.
   final BlockTheme code;
@@ -331,7 +334,10 @@ class AttributeTheme {
     this.numberList,
     this.quote,
     this.code,
-    this.align,
+    this.alignLeft,
+    this.alignCenter,
+    this.alignJustify,
+    this.alignRight,
   });
 
   /// The default attribute theme.
@@ -402,11 +408,10 @@ class AttributeTheme {
         ),
         inheritLineTextStyle: true,
       ),
-      align: BlockTheme(
-        padding: EdgeInsets.symmetric(
-          vertical: 8.0,
-        ),
-      ),
+      alignLeft: BlockTheme(),
+      alignRight: BlockTheme(),
+      alignCenter: BlockTheme(),
+      alignJustify: BlockTheme(),
       code: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
         textStyle: TextStyle(
@@ -434,6 +439,10 @@ class AttributeTheme {
     BlockTheme bulletList,
     BlockTheme numberList,
     BlockTheme quote,
+    BlockTheme alignLeft,
+    BlockTheme alignRight,
+    BlockTheme alignJustify,
+    BlockTheme alignCenter,
     BlockTheme code,
   }) {
     return AttributeTheme(
@@ -447,6 +456,10 @@ class AttributeTheme {
       bulletList: bulletList ?? this.bulletList,
       numberList: numberList ?? this.numberList,
       quote: quote ?? this.quote,
+      alignLeft: alignLeft ?? this.alignLeft,
+      alignRight: alignRight ?? this.alignRight,
+      alignJustify: alignJustify ?? this.alignJustify,
+      alignCenter: alignCenter ?? this.alignCenter,
       code: code ?? this.code,
     );
   }
@@ -466,6 +479,11 @@ class AttributeTheme {
       bulletList: bulletList?.merge(other.bulletList) ?? other.bulletList,
       numberList: numberList?.merge(other.numberList) ?? other.numberList,
       quote: quote?.merge(other.quote) ?? other.quote,
+      alignCenter: alignCenter?.merge(other.alignCenter) ?? other.alignCenter,
+      alignJustify:
+          alignJustify?.merge(other.alignJustify) ?? other.alignJustify,
+      alignRight: alignRight?.merge(other.alignRight) ?? other.alignRight,
+      alignLeft: alignLeft?.merge(other.alignLeft) ?? other.alignLeft,
       code: code?.merge(other.code) ?? other.code,
     );
   }
@@ -484,6 +502,10 @@ class AttributeTheme {
         (otherTheme.bulletList == bulletList) &&
         (otherTheme.numberList == numberList) &&
         (otherTheme.quote == quote) &&
+        (otherTheme.alignLeft == alignLeft) &&
+        (otherTheme.alignRight == alignRight) &&
+        (otherTheme.alignCenter == alignCenter) &&
+        (otherTheme.alignJustify == alignJustify) &&
         (otherTheme.code == code);
   }
 

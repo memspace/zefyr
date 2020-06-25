@@ -13,6 +13,7 @@ import 'paragraph.dart';
 import 'quote.dart';
 import 'scope.dart';
 import 'theme.dart';
+import 'align.dart';
 
 /// Non-scrollable read-only view of Notus rich text documents.
 @experimental
@@ -103,6 +104,14 @@ class ZefyrViewState extends State<ZefyrView> {
       return ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.quote) {
       return ZefyrQuote(node: block);
+    } else if (blockStyle == NotusAttribute.block.alignLeft) {
+      return ZefyrAlign(node: block);
+    } else if (blockStyle == NotusAttribute.block.alignRight) {
+      return ZefyrAlign(node: block);
+    } else if (blockStyle == NotusAttribute.block.alignCenter) {
+      return ZefyrAlign(node: block);
+    } else if (blockStyle == NotusAttribute.block.alignJustify) {
+      return ZefyrAlign(node: block);
     }
 
     throw UnimplementedError('Block format $blockStyle.');
