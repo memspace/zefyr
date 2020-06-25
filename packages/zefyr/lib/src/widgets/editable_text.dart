@@ -242,8 +242,6 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
         return ZefyrLine(node: node);
       } else if (node.style.contains(NotusAttribute.heading)) {
         return ZefyrHeading(node: node);
-      } else if (node.style.contains(NotusAttribute.align)) {
-        return ZefyrAlign(node: node);
       }
       return ZefyrParagraph(node: node);
     }
