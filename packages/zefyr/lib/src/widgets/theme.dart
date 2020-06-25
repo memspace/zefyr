@@ -142,7 +142,7 @@ class ZefyrThemeData {
 
 /// Holds typography values for a document line in Zefyr editor.
 ///
-/// Applicable for regular paragraphs, headings and lines within blocks
+/// Applicable for regular paragraphs, headings, align and lines within blocks
 /// (lists, quotes). Blocks may override some of these values using [BlockTheme].
 @immutable
 class LineTheme {

@@ -235,10 +235,49 @@ class _HeadingButtonState extends State<HeadingButton> {
   }
 }
 
-/// Controls image attribute.
+/// Controls align styles.
 ///
-/// When pressed, this button displays overlay toolbar with three
-/// buttons for each heading level.
+/// When pressed, this button displays overlay toolbar with four
+/// buttons for each align style.
+class AlignButton extends StatefulWidget {
+  const AlignButton({Key key}) : super(key: key);
+
+  @override
+  _AlignButtonState createState() => _AlignButtonState();
+}
+
+class _AlignButtonState extends State<AlignButton> {
+  @override
+  Widget build(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    return toolbar.buildButton(
+      context,
+      ZefyrToolbarAction.align,
+      onPressed: showOverlay,
+    );
+  }
+
+  void showOverlay() {
+    final toolbar = ZefyrToolbar.of(context);
+    toolbar.showOverlay(buildOverlay);
+  }
+
+  Widget buildOverlay(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    final buttons = Row(
+      children: <Widget>[
+        SizedBox(width: 8.0),
+        toolbar.buildButton(context, ZefyrToolbarAction.alignLeft),
+        toolbar.buildButton(context, ZefyrToolbarAction.alignRight),
+        toolbar.buildButton(context, ZefyrToolbarAction.alignCenter),
+        toolbar.buildButton(context, ZefyrToolbarAction.alignJustify),
+      ],
+    );
+    return ZefyrToolbarScaffold(body: buttons);
+  }
+}
+
+/// Controls image attribute.
 class ImageButton extends StatefulWidget {
   const ImageButton({Key key}) : super(key: key);
 

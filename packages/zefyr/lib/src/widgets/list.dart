@@ -70,6 +70,10 @@ class ZefyrListItem extends StatelessWidget {
       textStyle = headingTheme.textStyle;
       padding = headingTheme.padding;
       content = ZefyrHeading(node: node);
+    } else if (node.style.contains(NotusAttribute.align)) {
+      textStyle = theme.defaultLineTheme.textStyle;
+      padding = blockTheme.linePadding;
+      content = ZefyrAlign(node: node);
     } else {
       textStyle = theme.defaultLineTheme.textStyle;
       content = ZefyrLine(

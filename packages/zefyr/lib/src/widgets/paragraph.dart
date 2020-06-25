@@ -66,3 +66,43 @@ class ZefyrHeading extends StatelessWidget {
     throw UnimplementedError('Unsupported heading style $style');
   }
 }
+
+/// Represents heading-styled line in [ZefyrEditor].
+class ZefyrAlign extends StatelessWidget {
+  ZefyrAlign({Key key, @required this.node, this.blockStyle})
+      : assert(node.style.contains(NotusAttribute.align)),
+        super(key: key);
+
+  final LineNode node;
+  final TextStyle blockStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ZefyrTheme.of(context).defaultLineTheme;
+    final textAlign = themeOf(node, context);
+    TextStyle style = theme.textStyle;
+    if (blockStyle != null) {
+      style = style.merge(blockStyle);
+    }
+    return ZefyrLine(
+      node: node,
+      style: style,
+      padding: theme.padding,
+      textAlign: textAlign,
+    );
+  }
+
+  static TextAlign themeOf(LineNode node, BuildContext context) {
+    final style = node.style.get(NotusAttribute.align);
+    if (style == NotusAttribute.align.left) {
+      return TextAlign.left;
+    } else if (style == NotusAttribute.align.right) {
+      return TextAlign.right;
+    } else if (style == NotusAttribute.align.center) {
+      return TextAlign.center;
+    } else if (style == NotusAttribute.align.justify) {
+      return TextAlign.justify;
+    }
+    throw UnimplementedError('Unsupported align style $style');
+  }
+}

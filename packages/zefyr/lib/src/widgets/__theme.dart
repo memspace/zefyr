@@ -59,6 +59,7 @@ class ZefyrThemeData {
   final TextStyle linkStyle;
   final StyleTheme paragraphTheme;
   final HeadingTheme headingTheme;
+  final AlignTheme alignTheme;
   final BlockTheme blockTheme;
   final Color selectionColor;
   final Color cursorColor;
@@ -88,6 +89,7 @@ class ZefyrThemeData {
       linkStyle: linkStyle,
       paragraphTheme: StyleTheme(textStyle: paragraphStyle, padding: padding),
       headingTheme: HeadingTheme.fallback(context),
+      alignTheme: AlignTheme.fallback(context),
       blockTheme: BlockTheme.fallback(context),
       selectionColor: themeData.textSelectionColor,
       cursorColor: themeData.cursorColor,
@@ -103,6 +105,7 @@ class ZefyrThemeData {
     this.linkStyle,
     this.paragraphTheme,
     this.headingTheme,
+    this.alignTheme,
     this.blockTheme,
     this.selectionColor,
     this.cursorColor,
@@ -118,6 +121,7 @@ class ZefyrThemeData {
     TextStyle linkStyle,
     StyleTheme paragraphTheme,
     HeadingTheme headingTheme,
+    AlignTheme alignTheme,
     BlockTheme blockTheme,
     Color selectionColor,
     Color cursorColor,
@@ -131,6 +135,7 @@ class ZefyrThemeData {
       linkStyle: linkStyle ?? this.linkStyle,
       paragraphTheme: paragraphTheme ?? this.paragraphTheme,
       headingTheme: headingTheme ?? this.headingTheme,
+      alignTheme: alignTheme ?? this.alignTheme,
       blockTheme: blockTheme ?? this.blockTheme,
       selectionColor: selectionColor ?? this.selectionColor,
       cursorColor: cursorColor ?? this.cursorColor,
@@ -147,6 +152,7 @@ class ZefyrThemeData {
       linkStyle: other.linkStyle,
       paragraphTheme: other.paragraphTheme,
       headingTheme: other.headingTheme,
+      alignTheme: other.alignTheme,
       blockTheme: other.blockTheme,
       selectionColor: other.selectionColor,
       cursorColor: other.cursorColor,
@@ -203,6 +209,47 @@ class HeadingTheme {
           fontWeight: FontWeight.w500,
         ),
         padding: EdgeInsets.only(bottom: 0.0, top: 8.0),
+      ),
+    );
+  }
+}
+
+/// Theme for align-styled lines of text.
+class AlignTheme {
+  /// Style theme for left align.
+  final StyleTheme left;
+
+  /// Style theme for right align.
+  final StyleTheme right;
+
+  /// Style theme for center align.
+  final StyleTheme center;
+
+  /// Style theme for justify.
+  final StyleTheme justify;
+
+  AlignTheme({
+    @required this.left,
+    @required this.right,
+    @required this.center,
+    @required this.justify,
+  });
+
+  /// Creates fallback theme for align.
+  factory AlignTheme.fallback(BuildContext context) {
+    final padding = const EdgeInsets.symmetric(vertical: 8.0);
+    return AlignTheme(
+      left: StyleTheme(
+        padding: padding,
+      ),
+      right: StyleTheme(
+        padding: padding,
+      ),
+      center: StyleTheme(
+        padding: padding,
+      ),
+      justify: StyleTheme(
+        padding: padding,
       ),
     );
   }
@@ -272,7 +319,7 @@ class BlockTheme {
 
 /// Theme for a specific attribute style.
 ///
-/// Used in [HeadingTheme] and [BlockTheme], as well as in
+/// Used in [HeadingTheme], [AlignTheme] and [BlockTheme], as well as in
 /// [ZefyrThemeData.paragraphTheme].
 class StyleTheme {
   /// Text style of this theme.

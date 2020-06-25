@@ -37,6 +37,11 @@ class ZefyrQuote extends StatelessWidget {
     Widget content;
     if (line.style.contains(NotusAttribute.heading)) {
       content = ZefyrHeading(node: line, blockStyle: blockStyle);
+    } else if (line.style.contains(NotusAttribute.align)) {
+      content = ZefyrAlign(
+        node: line,
+        blockStyle: blockStyle,
+      );
     } else {
       content = ZefyrParagraph(node: line, blockStyle: blockStyle);
     }

@@ -16,10 +16,12 @@ class ZefyrRichText extends LeafRenderObjectWidget {
   ZefyrRichText({
     @required this.node,
     @required this.text,
+    this.textAlign,
   }) : assert(node != null && text != null);
 
   final LineNode node;
   final TextSpan text;
+  final TextAlign textAlign;
 
   @override
   RenderObject createRenderObject(BuildContext context) {
@@ -27,6 +29,7 @@ class ZefyrRichText extends LeafRenderObjectWidget {
       text,
       node: node,
       textDirection: Directionality.of(context),
+      textAlign: textAlign,
     );
   }
 
