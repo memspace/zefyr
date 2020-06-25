@@ -291,6 +291,9 @@ class AttributeTheme {
   /// Style used to render text containing links.
   final TextStyle link;
 
+  // Style theme used to render underline blocks
+  final TextStyle underline;
+
   /// Style theme used to render largest headings.
   final LineTheme heading1;
 
@@ -316,6 +319,7 @@ class AttributeTheme {
   AttributeTheme({
     this.bold,
     this.italic,
+    this.underline,
     this.link,
     this.heading1,
     this.heading2,
@@ -347,6 +351,7 @@ class AttributeTheme {
     return AttributeTheme(
       bold: TextStyle(fontWeight: FontWeight.bold),
       italic: TextStyle(fontStyle: FontStyle.italic),
+      underline: TextStyle(decoration: TextDecoration.underline),
       link: TextStyle(
         decoration: TextDecoration.underline,
         color: theme.accentColor,
@@ -412,6 +417,7 @@ class AttributeTheme {
   AttributeTheme copyWith({
     TextStyle bold,
     TextStyle italic,
+    TextStyle underline,
     TextStyle link,
     LineTheme heading1,
     LineTheme heading2,
@@ -424,6 +430,7 @@ class AttributeTheme {
     return AttributeTheme(
       bold: bold ?? this.bold,
       italic: italic ?? this.italic,
+      underline: underline ?? this.underline,
       link: link ?? this.link,
       heading1: heading1 ?? this.heading1,
       heading2: heading2 ?? this.heading2,
@@ -442,6 +449,7 @@ class AttributeTheme {
     return copyWith(
       bold: bold?.merge(other.bold) ?? other.bold,
       italic: italic?.merge(other.italic) ?? other.italic,
+      underline: underline?.merge(other.underline) ?? other.underline,
       link: link?.merge(other.link) ?? other.link,
       heading1: heading1?.merge(other.heading1) ?? other.heading1,
       heading2: heading2?.merge(other.heading2) ?? other.heading2,
@@ -459,6 +467,7 @@ class AttributeTheme {
     final AttributeTheme otherTheme = other;
     return (otherTheme.bold == bold) &&
         (otherTheme.italic == italic) &&
+        (otherTheme.underline == underline) &&
         (otherTheme.link == link) &&
         (otherTheme.heading1 == heading1) &&
         (otherTheme.heading2 == heading2) &&
@@ -474,6 +483,7 @@ class AttributeTheme {
     return hashList([
       bold,
       italic,
+      underline,
       link,
       heading1,
       heading2,

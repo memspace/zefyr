@@ -5,7 +5,7 @@ import 'package:quiver_hashcode/hashcode.dart';
 ///
 // TODO: consider extending with following:
 //       - linkTapBehavior: none|launch
-//       - allowedStyles: ['bold', 'italic', 'image', ... ]
+//       - allowedStyles: ['bold', 'italic', 'image', 'underline', ... ]
 class ZefyrMode {
   /// Editing mode provides full access to all editing features: keyboard,
   /// editor toolbar with formatting tools, selection controls and selection

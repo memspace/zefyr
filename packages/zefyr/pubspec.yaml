@@ -5,7 +5,7 @@ author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 homepage: https://github.com/memspace/zefyr
 
 environment:
-  sdk: '>=2.2.2 <3.0.0'
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
@@ -13,7 +13,11 @@ dependencies:
   collection: ^1.14.6
   url_launcher: ^5.0.0
   quill_delta: ^1.0.0
-  notus: ^0.1.0
+  notus:
+    git:
+      url: https://github.com/devakrishna33/zefyr.git
+      path: packages/notus
+      ref: master
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
 

@@ -56,6 +56,8 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 ///       document.format(0, 5, NotusAttribute.bold);
 ///       // Similarly for italic
 ///       document.format(0, 5, NotusAttribute.italic);
+///       // Similarly for underline
+///       document.format(0, 5, NotusAttribute.underline)
 ///       // Format first line as a heading (h1)
 ///       // Note that there is no need to specify character range of the whole
 ///       // line. Simply set index position to anywhere within the line and
@@ -67,6 +69,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 ///
 ///   * [NotusAttribute.bold]
 ///   * [NotusAttribute.italic]
+///   * [NotusAttribute.underline]
 ///   * [NotusAttribute.link]
 ///   * [NotusAttribute.heading]
 ///   * [NotusAttribute.block]
@@ -74,6 +77,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static final Map<String, NotusAttributeBuilder> _registry = {
     NotusAttribute.bold.key: NotusAttribute.bold,
     NotusAttribute.italic.key: NotusAttribute.italic,
+    NotusAttribute.underline.key: NotusAttribute.underline,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
@@ -87,6 +91,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Italic style attribute.
   static const italic = _ItalicAttribute();
+
+  /// Underline style attribure.
+  static const underline = _UnderlineAttribute();
 
   /// Link style attribute.
   // ignore: const_eval_throws_exception
@@ -330,6 +337,11 @@ class _BoldAttribute extends NotusAttribute<bool> {
 /// Applies italic style to a text segment.
 class _ItalicAttribute extends NotusAttribute<bool> {
   const _ItalicAttribute() : super._('i', NotusAttributeScope.inline, true);
+}
+
+/// Applies underline style to a text segment.
+class _UnderlineAttribute extends NotusAttribute<bool> {
+  const _UnderlineAttribute() : super._('u', NotusAttributeScope.inline, true);
 }
 
 /// Builder for link attribute values.

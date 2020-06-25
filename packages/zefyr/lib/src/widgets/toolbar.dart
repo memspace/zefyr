@@ -15,6 +15,7 @@ import 'theme.dart';
 enum ZefyrToolbarAction {
   bold,
   italic,
+  underline,
   link,
   unlink,
   clipboardCopy,
