@@ -10,7 +10,7 @@ import 'node.dart';
 /// A block represents a group of adjacent [LineNode]s with the same block
 /// style.
 ///
-/// Block examples: lists, quotes, code snippets.
+/// Block examples: lists, quotes, code snippets, alignment.
 class BlockNode extends ContainerNode<LineNode>
     with StyledNodeMixin
     implements StyledNode {
