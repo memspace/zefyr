@@ -35,6 +35,7 @@ abstract class NotusAttributeKey<T> {
 ///   * [LinkAttributeBuilder]
 ///   * [BlockAttributeBuilder]
 ///   * [HeadingAttributeBuilder]
+///   * [AlignAttributeBuilder]
 abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
   const NotusAttributeBuilder._(this.key, this.scope);
 
@@ -63,6 +64,11 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 ///       // line. Simply set index position to anywhere within the line and
 ///       // length to 0.
 ///       document.format(0, 0, NotusAttribute.h1);
+///       // Format first line as align (left)
+///       // Note that there is no need to specify character range of the whole
+///       // line. Simply set index position to anywhere within the line and
+///       // length to 0.
+///       document.format(0, 0, NotusAttribute.left);
 ///     }
 ///
 /// List of supported attributes:
@@ -72,6 +78,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 ///   * [NotusAttribute.underline]
 ///   * [NotusAttribute.link]
 ///   * [NotusAttribute.heading]
+///   * [NotusAttribute.align]
 ///   * [NotusAttribute.block]
 class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static final Map<String, NotusAttributeBuilder> _registry = {
@@ -80,6 +87,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.underline.key: NotusAttribute.underline,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
+    NotusAttribute.align.key: NotusAttribute.align,
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.embed.key: NotusAttribute.embed,
   };
@@ -113,6 +121,22 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.heading.level3].
   static NotusAttribute<int> get h3 => heading.level3;
+
+  // Align style attribute
+  // ignore: const_eval_throws_excepation
+  static const align = AlignAttributeBuilder._();
+
+  /// Alias for [NotusAttribute.align.left]
+  static NotusAttribute<String> get left => align.left;
+
+  /// Alias for [NotusAttribute.align.right]
+  static NotusAttribute<String> get right => align.right;
+
+  /// Alias for [NotusAttribute.align.left]
+  static NotusAttribute<String> get center => align.center;
+
+  /// Alias for [NotusAttribute.align.left]
+  static NotusAttribute<String> get justify => align.justify;
 
   /// Block attribute
   // ignore: const_eval_throws_exception
@@ -374,6 +398,32 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
 
   /// Level 3 heading, equivalent of `H3` in HTML.
   NotusAttribute<int> get level3 => NotusAttribute<int>._(key, scope, 3);
+}
+
+/// Builder for align attribute styles.
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.alignemnt] instead.
+class AlignAttributeBuilder extends NotusAttributeBuilder<String> {
+  static const _kAlignemnt = 'align';
+  const AlignAttributeBuilder._()
+      : super._(_kAlignemnt, NotusAttributeScope.line);
+
+  /// Left alignemnt
+  NotusAttribute<String> get left =>
+      NotusAttribute<String>._(key, scope, 'left');
+
+  /// Right align
+  NotusAttribute<String> get right =>
+      NotusAttribute<String>._(key, scope, 'right');
+
+  /// Center align
+  NotusAttribute<String> get center =>
+      NotusAttribute<String>._(key, scope, 'center');
+
+  /// Justify align
+  NotusAttribute<String> get justify =>
+      NotusAttribute<String>._(key, scope, 'justify');
 }
 
 /// Builder for block attribute styles (number/bullet lists, code and quote).
