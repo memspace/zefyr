@@ -1,40 +1,51 @@
+// Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
 import 'paragraph.dart';
 import 'theme.dart';
 
-/// Represents a align block in a Zefyr editor.
+/// Represents number lists and bullet lists in a Zefyr editor.
 class ZefyrAlign extends StatelessWidget {
-  const ZefyrAlign({
-    Key key,
-    @required this.node,
-    @required this.textAlign,
-  }) : super(key: key);
+  const ZefyrAlign({Key key, @required this.node}) : super(key: key);
 
   final BlockNode node;
-  final TextAlign textAlign;
+
+  TextAlign _getTextAlign() {
+    final blockStyle = node.style.get(NotusAttribute.block);
+    if (blockStyle == NotusAttribute.block.alignLeft) {
+      return TextAlign.left;
+    } else if (blockStyle == NotusAttribute.block.alignRight) {
+      return TextAlign.right;
+    } else if (blockStyle == NotusAttribute.block.alignCenter) {
+      return TextAlign.center;
+    } else if (blockStyle == NotusAttribute.block.alignJustify) {
+      return TextAlign.justify;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context);
-    final style = theme.attributeTheme.align.textStyle;
-    final items = [];
+    List<Widget> items = [];
+    final style = theme.attributeTheme.quote.textStyle;
+
     for (var line in node.children) {
-      items.add(_buildLine(line, style, theme.indentWidth));
+      items.add(_buildLine(
+        line,
+        style,
+        theme.indentWidth,
+      ));
     }
 
-    return Padding(
-      padding: theme.attributeTheme.quote.padding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: items,
-      ),
-    );
+    return Column(children: items);
   }
 
   Widget _buildLine(Node node, TextStyle blockStyle, double indentSize) {
     LineNode line = node;
+    final textAlign = _getTextAlign();
 
     Widget content;
     if (line.style.contains(NotusAttribute.heading)) {
@@ -51,10 +62,6 @@ class ZefyrAlign extends StatelessWidget {
       );
     }
 
-    final row = Row(children: <Widget>[Expanded(child: content)]);
-    return Container(
-      padding: EdgeInsets.only(left: indentSize),
-      child: row,
-    );
+    return Row(children: <Widget>[Expanded(child: content)]);
   }
 }

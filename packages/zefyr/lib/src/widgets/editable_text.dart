@@ -260,13 +260,13 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     } else if (blockStyle == NotusAttribute.block.quote) {
       return ZefyrQuote(node: block);
     } else if (blockStyle == NotusAttribute.block.alignLeft) {
-      return ZefyrAlign(node: block, textAlign: TextAlign.left);
+      return ZefyrAlign(node: block);
     } else if (blockStyle == NotusAttribute.block.alignRight) {
-      return ZefyrAlign(node: block, textAlign: TextAlign.right);
+      return ZefyrAlign(node: block);
     } else if (blockStyle == NotusAttribute.block.alignCenter) {
-      return ZefyrAlign(node: block, textAlign: TextAlign.center);
+      return ZefyrAlign(node: block);
     } else if (blockStyle == NotusAttribute.block.alignJustify) {
-      return ZefyrAlign(node: block, textAlign: TextAlign.justify);
+      return ZefyrAlign(node: block);
     }
     throw UnimplementedError('Block format $blockStyle.');
   }
