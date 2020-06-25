@@ -21,6 +21,7 @@ import 'render_context.dart';
 import 'scope.dart';
 import 'selection.dart';
 import 'theme.dart';
+import 'align.dart';
 
 /// Core widget responsible for editing Zefyr documents.
 ///
@@ -239,7 +240,9 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   Widget _defaultChildBuilder(BuildContext context, Node node) {
     if (node is LineNode) {
       if (node.hasEmbed) {
-        return ZefyrLine(node: node);
+        return ZefyrLine(
+          node: node,
+        );
       } else if (node.style.contains(NotusAttribute.heading)) {
         return ZefyrHeading(node: node);
       }
@@ -256,8 +259,15 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       return ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.quote) {
       return ZefyrQuote(node: block);
+    } else if (blockStyle == NotusAttribute.block.alignLeft) {
+      return ZefyrAlign(node: block, textAlign: TextAlign.left);
+    } else if (blockStyle == NotusAttribute.block.alignRight) {
+      return ZefyrAlign(node: block, textAlign: TextAlign.right);
+    } else if (blockStyle == NotusAttribute.block.alignCenter) {
+      return ZefyrAlign(node: block, textAlign: TextAlign.center);
+    } else if (blockStyle == NotusAttribute.block.alignJustify) {
+      return ZefyrAlign(node: block, textAlign: TextAlign.justify);
     }
-
     throw UnimplementedError('Block format $blockStyle.');
   }
 

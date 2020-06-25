@@ -70,6 +70,7 @@ class RenderZefyrParagraph extends RenderParagraph
           maxLines: maxLines,
         );
 
+  @override
   LineNode node;
 
   @override

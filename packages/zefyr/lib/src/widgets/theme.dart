@@ -312,6 +312,9 @@ class AttributeTheme {
   /// Style theme used to render quote blocks.
   final BlockTheme quote;
 
+  /// Style theme used to render align block.
+  final BlockTheme align;
+
   /// Style theme used to render code blocks.
   final BlockTheme code;
 
@@ -328,6 +331,7 @@ class AttributeTheme {
     this.numberList,
     this.quote,
     this.code,
+    this.align,
   });
 
   /// The default attribute theme.
@@ -397,6 +401,11 @@ class AttributeTheme {
           color: defaultLineTheme.textStyle.color.withOpacity(0.6),
         ),
         inheritLineTextStyle: true,
+      ),
+      align: BlockTheme(
+        padding: EdgeInsets.symmetric(
+          vertical: 8.0,
+        ),
       ),
       code: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),

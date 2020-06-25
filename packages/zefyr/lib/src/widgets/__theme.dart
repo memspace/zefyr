@@ -269,11 +269,27 @@ class BlockTheme {
   /// Style theme for quotes.
   final StyleTheme quote;
 
+  /// Style theme for align left
+  final StyleTheme alignLeft;
+
+  /// Style theme for align right
+  final StyleTheme alignRight;
+
+  /// Style theme for align center
+  final StyleTheme alignCenter;
+
+  /// Style theme for align justify
+  final StyleTheme alignJustify;
+
   BlockTheme({
     @required this.bulletList,
     @required this.numberList,
     @required this.quote,
     @required this.code,
+    @required this.alignLeft,
+    @required this.alignRight,
+    @required this.alignCenter,
+    @required this.alignJustify,
   });
 
   /// Creates fallback theme for blocks.
@@ -298,6 +314,10 @@ class BlockTheme {
     return BlockTheme(
       bulletList: StyleTheme(padding: padding),
       numberList: StyleTheme(padding: padding),
+      alignLeft: StyleTheme(padding: padding),
+      alignRight: StyleTheme(padding: padding),
+      alignJustify: StyleTheme(padding: padding),
+      alignCenter: StyleTheme(padding: padding),
       quote: StyleTheme(
         textStyle: TextStyle(
           color: defaultTextStyle.style.color.withOpacity(0.6),

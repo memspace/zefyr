@@ -16,8 +16,13 @@ import 'theme.dart';
 
 /// Represents single line of rich text document in Zefyr editor.
 class ZefyrLine extends StatefulWidget {
-  const ZefyrLine({Key key, @required this.node, this.style, this.padding})
-      : assert(node != null),
+  const ZefyrLine({
+    Key key,
+    @required this.node,
+    this.style,
+    this.padding,
+    this.textAlign,
+  })  : assert(node != null),
         super(key: key);
 
   /// Line in the document represented by this widget.
@@ -30,26 +35,15 @@ class ZefyrLine extends StatefulWidget {
   /// Padding to add around this paragraph.
   final EdgeInsets padding;
 
+  /// TextAlign to add around the block of lines
+  final TextAlign textAlign;
+
   @override
   _ZefyrLineState createState() => _ZefyrLineState();
 }
 
 class _ZefyrLineState extends State<ZefyrLine> {
   final LayerLink _link = LayerLink();
-
-  TextAlign getTextAlign(LineNode node) {
-    final style = node.style.get(NotusAttribute.align);
-    if (style == NotusAttribute.align.left) {
-      return TextAlign.left;
-    } else if (style == NotusAttribute.align.right) {
-      return TextAlign.right;
-    } else if (style == NotusAttribute.align.center) {
-      return TextAlign.center;
-    } else if (style == NotusAttribute.align.justify) {
-      return TextAlign.justify;
-    }
-    return TextAlign.start;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +61,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
       content = ZefyrRichText(
         node: widget.node,
         text: buildText(context),
-        textAlign: getTextAlign(widget.node),
+        textAlign: widget.textAlign ?? TextAlign.start,
       );
     }
 
@@ -116,14 +110,14 @@ class _ZefyrLineState extends State<ZefyrLine> {
   }
 
   void bringIntoView(BuildContext context) {
-    ScrollableState scrollable = Scrollable.of(context);
+    final scrollable = Scrollable.of(context);
     final object = context.findRenderObject();
     assert(object.attached);
-    final RenderAbstractViewport viewport = RenderAbstractViewport.of(object);
+    final viewport = RenderAbstractViewport.of(object);
     assert(viewport != null);
 
-    final double offset = scrollable.position.pixels;
-    double target = viewport.getOffsetToReveal(object, 0.0).offset;
+    final offset = scrollable.position.pixels;
+    var target = viewport.getOffsetToReveal(object, 0.0).offset;
     if (target - offset < 0.0) {
       scrollable.position.jumpTo(target);
       return;
@@ -136,7 +130,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
 
   TextSpan buildText(BuildContext context) {
     final theme = ZefyrTheme.of(context);
-    final List<TextSpan> children = widget.node.children
+    final children = widget.node.children
         .map((node) => _segmentToTextSpan(node, theme))
         .toList(growable: false);
     return TextSpan(style: widget.style, children: children);
@@ -153,7 +147,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
   }
 
   TextStyle _getTextStyle(NotusStyle style, ZefyrThemeData theme) {
-    TextStyle result = TextStyle();
+    var result = TextStyle();
     if (style.containsSame(NotusAttribute.bold)) {
       result = result.merge(theme.attributeTheme.bold);
     }

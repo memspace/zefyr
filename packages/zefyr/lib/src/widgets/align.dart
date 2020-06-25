@@ -1,22 +1,24 @@
-// Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
 import 'paragraph.dart';
 import 'theme.dart';
 
-/// Represents a quote block in a Zefyr editor.
-class ZefyrQuote extends StatelessWidget {
-  const ZefyrQuote({Key key, @required this.node}) : super(key: key);
+/// Represents a align block in a Zefyr editor.
+class ZefyrAlign extends StatelessWidget {
+  const ZefyrAlign({
+    Key key,
+    @required this.node,
+    @required this.textAlign,
+  }) : super(key: key);
 
   final BlockNode node;
+  final TextAlign textAlign;
 
   @override
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context);
-    final style = theme.attributeTheme.quote.textStyle;
+    final style = theme.attributeTheme.align.textStyle;
     final items = [];
     for (var line in node.children) {
       items.add(_buildLine(line, style, theme.indentWidth));
@@ -36,18 +38,21 @@ class ZefyrQuote extends StatelessWidget {
 
     Widget content;
     if (line.style.contains(NotusAttribute.heading)) {
-      content = ZefyrHeading(node: line, blockStyle: blockStyle);
+      content = ZefyrHeading(
+        node: line,
+        blockStyle: blockStyle,
+        textAlign: textAlign,
+      );
     } else {
-      content = ZefyrParagraph(node: line, blockStyle: blockStyle);
+      content = ZefyrParagraph(
+        node: line,
+        blockStyle: blockStyle,
+        textAlign: textAlign,
+      );
     }
 
     final row = Row(children: <Widget>[Expanded(child: content)]);
     return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(width: 4.0, color: Colors.grey.shade300),
-        ),
-      ),
       padding: EdgeInsets.only(left: indentSize),
       child: row,
     );
