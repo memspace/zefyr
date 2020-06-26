@@ -24,7 +24,7 @@ class ZefyrAlign extends StatelessWidget {
     } else if (blockStyle == NotusAttribute.block.alignJustify) {
       return TextAlign.justify;
     }
-    return null;
+    return TextAlign.start;
   }
 
   @override
@@ -61,7 +61,7 @@ class ZefyrAlign extends StatelessWidget {
       );
     }
     return Row(
-      key: Key(textAlign.toString()),
+      key: UniqueKey(),
       children: <Widget>[Expanded(child: content)],
     );
   }
