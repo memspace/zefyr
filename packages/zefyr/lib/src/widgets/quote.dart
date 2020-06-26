@@ -17,7 +17,7 @@ class ZefyrQuote extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context);
     final style = theme.attributeTheme.quote.textStyle;
-    final items = [];
+    final List<Widget> items = [];
     for (var line in node.children) {
       items.add(_buildLine(line, style, theme.indentWidth));
     }

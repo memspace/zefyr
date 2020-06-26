@@ -24,6 +24,7 @@ class ZefyrAlign extends StatelessWidget {
     } else if (blockStyle == NotusAttribute.block.alignJustify) {
       return TextAlign.justify;
     }
+    return null;
   }
 
   @override
@@ -44,8 +45,8 @@ class ZefyrAlign extends StatelessWidget {
   Widget _buildLine(Node node, TextStyle blockStyle, double indentSize) {
     LineNode line = node;
     final textAlign = _getTextAlign();
-
     Widget content;
+
     if (line.style.contains(NotusAttribute.heading)) {
       content = ZefyrHeading(
         node: line,
@@ -59,7 +60,9 @@ class ZefyrAlign extends StatelessWidget {
         textAlign: textAlign,
       );
     }
-
-    return Row(children: <Widget>[Expanded(child: content)]);
+    return Row(
+      key: Key(textAlign.toString()),
+      children: <Widget>[Expanded(child: content)],
+    );
   }
 }

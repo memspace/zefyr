@@ -110,6 +110,7 @@ class ZefyrButton extends StatelessWidget {
       return onPressed;
     } else if (isAttributeAction) {
       final attribute = kZefyrToolbarAttributeActions[action];
+
       if (attribute is NotusAttribute) {
         return () => _toggleAttribute(attribute, editor);
       }
@@ -124,6 +125,7 @@ class ZefyrButton extends StatelessWidget {
 
   void _toggleAttribute(NotusAttribute attribute, ZefyrScope editor) {
     final isToggled = editor.selectionStyle.containsSame(attribute);
+
     if (isToggled) {
       editor.formatSelection(attribute.unset);
     } else {

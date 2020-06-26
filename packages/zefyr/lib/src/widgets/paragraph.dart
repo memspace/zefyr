@@ -24,6 +24,7 @@ class ZefyrParagraph extends StatelessWidget {
     if (blockStyle != null) {
       style = style.merge(blockStyle);
     }
+
     return ZefyrLine(
       node: node,
       style: style,
@@ -50,6 +51,7 @@ class ZefyrHeading extends StatelessWidget {
     if (blockStyle != null) {
       style = style.merge(blockStyle);
     }
+
     return ZefyrLine(
       node: node,
       style: style,

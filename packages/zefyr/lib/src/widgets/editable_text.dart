@@ -251,6 +251,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
 
     final BlockNode block = node;
     final blockStyle = block.style.get(NotusAttribute.block);
+
     if (blockStyle == NotusAttribute.block.code) {
       return ZefyrCode(node: block);
     } else if (blockStyle == NotusAttribute.block.bulletList) {
