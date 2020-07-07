@@ -29,7 +29,7 @@ enum FocusOwner {
 class ZefyrController extends ChangeNotifier {
   ZefyrController(NotusDocument document)
       : assert(document != null),
-        document = document;
+       document = document;
 
   /// Zefyr document managed by this controller.
   final NotusDocument document;
@@ -167,7 +167,7 @@ class ZefyrController extends ChangeNotifier {
 
     if (length == 0 &&
         (attribute.key == NotusAttribute.bold.key ||
-            attribute.key == NotusAttribute.italic.key)) {
+            attribute.key == NotusAttribute.italic.key|| attribute.key == NotusAttribute.color.key)) {
       // Add the attribute to our toggledStyle. It will be used later upon insertion.
       _toggledStyles = toggledStyles.put(attribute);
     }
