@@ -12,8 +12,8 @@ import 'toolbar.dart';
 
 /// A button used in [ZefyrToolbar].
 ///
-/// Create an instance of this widget with [ZefyrButton.icon] or
-/// [ZefyrButton.text] constructors.
+/// Create an instance of this widget with [ZefyrButton.icon],
+/// [ZefyrButton.text], or [ZefyrButton.widget] constructors.
 ///
 /// Toolbar buttons are normally created by a [ZefyrToolbarDelegate].
 class ZefyrButton extends StatelessWidget {
@@ -25,11 +25,29 @@ class ZefyrButton extends StatelessWidget {
     this.onPressed,
   })  : assert(action != null),
         assert(icon != null),
+        _circleWidget = null,
         _icon = icon,
         _iconSize = iconSize,
         _text = null,
         _textStyle = null,
         super();
+
+  //create toolbar button with widget, size 20
+  ZefyrButton.widget({
+    @required this.action,
+    @required Widget circle,
+    double iconSize,
+    this.onPressed,
+  })  : assert(action != null),
+        assert(circle != null),
+        _icon = null,
+        _circleWidget = circle,
+        _iconSize = iconSize,
+        _text = null,
+        _textStyle = null,
+        super();
+
+
 
   /// Creates a toolbar button containing text.
   ///
@@ -43,6 +61,7 @@ class ZefyrButton extends StatelessWidget {
   })  : assert(action != null),
         assert(text != null),
         _icon = null,
+        _circleWidget = null,
         _iconSize = null,
         _text = text,
         _textStyle = style,
@@ -53,6 +72,7 @@ class ZefyrButton extends StatelessWidget {
   final IconData _icon;
   final double _iconSize;
   final String _text;
+  final Container _circleWidget;
   final TextStyle _textStyle;
 
   /// Callback to trigger when this button is tapped.
@@ -80,8 +100,7 @@ class ZefyrButton extends StatelessWidget {
         color: _getColor(editor, toolbarTheme),
         onPressed: _getPressedHandler(editor, toolbar),
       );
-    } else {
-      assert(_text != null);
+    } else if (_text != null){
       var style = _textStyle ?? TextStyle();
       style = style.copyWith(color: iconColor);
       return RawZefyrButton(
@@ -90,6 +109,15 @@ class ZefyrButton extends StatelessWidget {
         color: _getColor(editor, toolbarTheme),
         onPressed: _getPressedHandler(editor, toolbar),
       );
+    }else{
+      assert(_circleWidget != null);
+      return RawZefyrButton(
+        action: action,
+        child: _circleWidget,
+        color: _getColor(editor, toolbarTheme),
+        onPressed: _getPressedHandler(editor, toolbar),
+      );
+
     }
   }
 
@@ -232,6 +260,106 @@ class _HeadingButtonState extends State<HeadingButton> {
       ],
     );
     return ZefyrToolbarScaffold(body: buttons);
+  }
+}
+
+// Controls color styles.
+///
+/// When pressed, this button displays overlay toolbar with
+/// buttons for each color.
+class ColorButton extends StatefulWidget {
+  const ColorButton({Key key}) : super(key: key);
+
+  @override
+  _ColorButtonState createState() => _ColorButtonState();
+}
+
+class _ColorButtonState extends State<ColorButton> {
+  @override
+  Widget build(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    return toolbar.buildButton(
+      context,
+      ZefyrToolbarAction.color,
+      onPressed: showOverlay,
+    );
+  }
+
+  void showOverlay() {
+    final toolbar = ZefyrToolbar.of(context);
+    toolbar.showOverlay(buildOverlay);
+  }
+
+  Widget buildOverlay(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    final buttons = Row(
+      children: <Widget>[
+        SizedBox(width: 8.0),
+        ModeColorButton(1),
+        ModeColorButton(0),
+      ],
+    );
+    return ZefyrToolbarScaffold(body: buttons);
+  }
+}
+
+//Light mode and dark mode colors
+//
+//Shows colors for light mode and dark mode depending on what is passed in:
+//0 - Dark Mode; 1 - Light Mode
+class ModeColorButton extends StatefulWidget {
+  final int modeChosen;
+  ModeColorButton(this.modeChosen);
+  @override
+  _ModeColorButtonState createState() => _ModeColorButtonState();
+}
+
+class _ModeColorButtonState extends State<ModeColorButton> {
+
+  @override
+  Widget build(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    return toolbar.buildButton(
+      context,
+      (widget.modeChosen == 1) ? ZefyrToolbarAction.lightMode : ZefyrToolbarAction.darkMode,
+      onPressed: showOverlay,
+    );
+  }
+
+  void showOverlay() {
+    final toolbar = ZefyrToolbar.of(context);
+    toolbar.showOverlay(buildOverlay);
+  }
+
+  Widget buildOverlay(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    List<Widget> darkModeColors = [
+      SizedBox(width: 8.0),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorPink),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorCherryRed),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorCoralRed),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorOrange),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorYellow),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorAppleGreen),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorTeaGreen),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorLightBlue),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorOceanBlue),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorLilBlue),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorPlum),
+    ];
+
+    List<Widget> lightModeColors = [
+      SizedBox(width: 8.0),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorMaroonRed),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorCherryRed),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorMahogany),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorForestGreen),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorTealGreen),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorNavyBlue),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorSuedePurple),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorOrchidPurple),
+    ];
+    return ZefyrToolbarScaffold(body: ZefyrButtonList(buttons: (widget.modeChosen == 1) ? lightModeColors : darkModeColors,));
   }
 }
 
