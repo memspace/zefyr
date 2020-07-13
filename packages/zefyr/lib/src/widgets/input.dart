@@ -81,7 +81,7 @@ class InputConnectionController implements TextInputClient {
 
     if (actualValue == _lastKnownRemoteTextEditingValue) return;
 
-    bool shouldRemember = value.text != _lastKnownRemoteTextEditingValue.text;
+    final shouldRemember = value.text != _lastKnownRemoteTextEditingValue.text;
     _lastKnownRemoteTextEditingValue = actualValue;
     _textInputConnection.setEditingState(actualValue);
     if (shouldRemember) {

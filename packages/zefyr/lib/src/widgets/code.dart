@@ -19,7 +19,7 @@ class ZefyrCode extends StatelessWidget {
     final theme = Theme.of(context);
     final zefyrTheme = ZefyrTheme.of(context);
 
-    List<Widget> items = [];
+    final items = <Widget>[];
     for (var line in node.children) {
       items.add(_buildLine(line, zefyrTheme.attributeTheme.code.textStyle));
     }

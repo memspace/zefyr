@@ -17,7 +17,7 @@ DiffResult fastDiff(String oldText, String newText, int cursorPosition) {
   while (start < startLimit && oldText[start] == newText[start]) {
     start += 1;
   }
-  final String deleted = (start < end) ? oldText.substring(start, end) : '';
+  final deleted = (start < end) ? oldText.substring(start, end) : '';
   final inserted = newText.substring(start, end + delta);
   return DiffResult(start, deleted, inserted);
 }
