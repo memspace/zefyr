@@ -145,6 +145,9 @@ class _ZefyrLineState extends State<ZefyrLine> {
     if (style.containsSame(NotusAttribute.italic)) {
       result = result.merge(theme.attributeTheme.italic);
     }
+    if (style.containsSame(NotusAttribute.underline)) {
+      result = result.merge(theme.attributeTheme.underline);
+    }
     if (style.contains(NotusAttribute.link)) {
       result = result.merge(theme.attributeTheme.link);
     }
