@@ -76,6 +76,7 @@ class ZefyrThemeData {
     const padding = EdgeInsets.symmetric(vertical: 8.0);
     final boldStyle = TextStyle(fontWeight: FontWeight.bold);
     final italicStyle = TextStyle(fontStyle: FontStyle.italic);
+    final underlineStyle = TextStyle(decoration: TextDecoration.underline);
     final linkStyle = TextStyle(
         color: themeData.accentColor, decoration: TextDecoration.underline);
 
@@ -97,6 +98,7 @@ class ZefyrThemeData {
   const ZefyrThemeData({
     this.boldStyle,
     this.italicStyle,
+    this.underlineStyle,
     this.linkStyle,
     this.paragraphTheme,
     this.headingTheme,
