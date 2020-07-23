@@ -215,7 +215,7 @@ class NotusStyle {
   /// Returns `true` if this attribute set is empty.
   bool get isEmpty => _data.isEmpty;
 
-  /// Returns `true` if this attribute set is note empty.
+  /// Returns `true` if this attribute set is not empty.
   bool get isNotEmpty => _data.isNotEmpty;
 
   /// Returns `true` if this style is not empty and contains only inline-scoped
