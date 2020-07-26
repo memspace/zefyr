@@ -374,7 +374,6 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
   @override
   Widget buildButton(BuildContext context, ZefyrToolbarAction action, {VoidCallback onPressed}) {
     final theme = Theme.of(context);
-    print('buildButton action: $action');
     if (kDefaultButtonIcons.containsKey(action)) {
       final icon = kDefaultButtonIcons[action];
       final size = kSpecialIconSizes[action];
