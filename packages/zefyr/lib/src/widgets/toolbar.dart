@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:notus/notus.dart';
 
 import 'buttons.dart';
@@ -32,6 +33,9 @@ enum ZefyrToolbarAction {
   cameraImage,
   unsplashImage,
   galleryImage,
+  embed,
+  video,
+  tweet,
   hideKeyboard,
   close,
   confirm,
@@ -244,13 +248,14 @@ class ZefyrToolbarState extends State<ZefyrToolbar> with SingleTickerProviderSta
 
   List<Widget> _buildButtons(BuildContext context) {
     final buttons = <Widget>[
-      if (editor.imageDelegate != null) ImageButton(),
       HeadingButton(),
       buildButton(context, ZefyrToolbarAction.bold),
       buildButton(context, ZefyrToolbarAction.italic),
+      if (editor.imageDelegate != null) ImageButton(),
+      if (editor.imageDelegate != null) EmbedButton(),
+      LinkButton(),
       buildButton(context, ZefyrToolbarAction.bulletList),
       buildButton(context, ZefyrToolbarAction.numberList),
-      LinkButton(),
       buildButton(context, ZefyrToolbarAction.quote),
       // buildButton(context, ZefyrToolbarAction.code),
       buildButton(context, ZefyrToolbarAction.horizontalRule),
@@ -333,25 +338,31 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.bulletList: Icons.format_list_bulleted,
     ZefyrToolbarAction.numberList: Icons.format_list_numbered_rtl,
     ZefyrToolbarAction.code: Icons.code,
-    ZefyrToolbarAction.quote: Icons.format_quote,
-    ZefyrToolbarAction.horizontalRule: Icons.remove,
-    ZefyrToolbarAction.image: Icons.photo,
+    ZefyrToolbarAction.quote: MdiIcons.cardTextOutline,
+    ZefyrToolbarAction.horizontalRule: MdiIcons.dotsHorizontal,
+    ZefyrToolbarAction.image: MdiIcons.imageOutline,
     ZefyrToolbarAction.cameraImage: Icons.photo_camera,
     ZefyrToolbarAction.galleryImage: Icons.photo_library,
-    ZefyrToolbarAction.unsplashImage: Icons.search,
+    ZefyrToolbarAction.unsplashImage: MdiIcons.imageSearch,
     ZefyrToolbarAction.hideKeyboard: Icons.keyboard_hide,
+    ZefyrToolbarAction.embed: MdiIcons.paperclip,
+    ZefyrToolbarAction.video: MdiIcons.youtube,
+    ZefyrToolbarAction.tweet: MdiIcons.twitter,
     ZefyrToolbarAction.close: Icons.close,
     ZefyrToolbarAction.confirm: Icons.check,
   };
 
   static const kSpecialIconSizes = {
-    ZefyrToolbarAction.image: 24.0,
-    ZefyrToolbarAction.quote: 28.0,
+    ZefyrToolbarAction.image: 23.5,
+    ZefyrToolbarAction.bold: 23.5,
+    ZefyrToolbarAction.italic: 23.5,
+    ZefyrToolbarAction.quote: 22.0,
     ZefyrToolbarAction.unlink: 20.0,
     ZefyrToolbarAction.clipboardCopy: 20.0,
     ZefyrToolbarAction.openInBrowser: 20.0,
     ZefyrToolbarAction.close: 20.0,
     ZefyrToolbarAction.confirm: 20.0,
+    ZefyrToolbarAction.embed: 21.0,
   };
 
   static const kDefaultButtonTexts = {
@@ -363,6 +374,7 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
   @override
   Widget buildButton(BuildContext context, ZefyrToolbarAction action, {VoidCallback onPressed}) {
     final theme = Theme.of(context);
+    print('buildButton action: $action');
     if (kDefaultButtonIcons.containsKey(action)) {
       final icon = kDefaultButtonIcons[action];
       final size = kSpecialIconSizes[action];

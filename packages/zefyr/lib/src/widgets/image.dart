@@ -41,6 +41,10 @@ abstract class ZefyrImageDelegate<S> {
   /// an image file on user's device, an HTTP link, or an identifier generated
   /// by a file hosting service like AWS S3 or Google Drive.
   Future<String> pickImage(BuildContext context, S source);
+
+  Future<String> pickVideo(BuildContext context);
+
+  Future<String> pickTweet(BuildContext context);
 }
 
 class ZefyrImage extends StatefulWidget {

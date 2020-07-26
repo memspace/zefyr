@@ -176,12 +176,16 @@ class RawZefyrButton extends StatelessWidget {
     final width = theme.buttonTheme.constraints.minHeight + 4.0;
     final constraints =
         theme.buttonTheme.constraints.copyWith(minWidth: width, maxHeight: theme.buttonTheme.constraints.minHeight);
-    final radius = BorderRadius.all(Radius.circular(3.0));
+    final radius = BorderRadius.all(Radius.circular(5.0));
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 1.0, vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: RawMaterialButton(
         shape: RoundedRectangleBorder(borderRadius: radius),
         elevation: 0.0,
+        disabledElevation: 0.0,
+        hoverElevation: 0.0,
+        focusElevation: 0.0,
+        highlightElevation: 0.0,
         fillColor: color,
         constraints: constraints,
         onPressed: onPressed,
@@ -293,6 +297,62 @@ class _ImageButtonState extends State<ImageButton> {
     final image = await editor.imageDelegate.pickImage(context, editor.imageDelegate.unsplashSource);
     if (image != null) {
       editor.formatSelection(NotusAttribute.embed.image(image));
+    }
+  }
+}
+
+/// Controls image attribute.
+///
+/// When pressed, this button displays overlay toolbar with three
+/// buttons for each heading level.
+class EmbedButton extends StatefulWidget {
+  const EmbedButton({Key key}) : super(key: key);
+
+  @override
+  _EmbedButtonState createState() => _EmbedButtonState();
+}
+
+class _EmbedButtonState extends State<EmbedButton> {
+  @override
+  Widget build(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    return toolbar.buildButton(
+      context,
+      ZefyrToolbarAction.embed,
+      onPressed: showOverlay,
+    );
+  }
+
+  void showOverlay() {
+    final toolbar = ZefyrToolbar.of(context);
+    toolbar.showOverlay(buildOverlay);
+  }
+
+  Widget buildOverlay(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    final buttons = Row(
+      children: <Widget>[
+        SizedBox(width: 8.0),
+        toolbar.buildButton(context, ZefyrToolbarAction.video, onPressed: () => _addVideo(context)),
+        toolbar.buildButton(context, ZefyrToolbarAction.tweet, onPressed: () => _addTweet(context)),
+      ],
+    );
+    return ZefyrToolbarScaffold(body: buttons);
+  }
+
+  void _addVideo(BuildContext context) async {
+    final editor = ZefyrToolbar.of(context).editor;
+    final video = await editor.imageDelegate.pickVideo(context);
+    if (video != null) {
+      editor.formatSelection(NotusAttribute.embed.image(video));
+    }
+  }
+
+  void _addTweet(BuildContext context) async {
+    final editor = ZefyrToolbar.of(context).editor;
+    final tweet = await editor.imageDelegate.pickTweet(context);
+    if (tweet != null) {
+      editor.formatSelection(NotusAttribute.embed.image(tweet));
     }
   }
 }
@@ -449,12 +509,12 @@ class _LinkButtonState extends State<LinkButton> {
       final openHandler = hasLink(style) ? openInBrowser : null;
       final buttons = <Widget>[
         toolbar.buildButton(context, ZefyrToolbarAction.unlink, onPressed: unlinkHandler),
-        toolbar.buildButton(context, ZefyrToolbarAction.clipboardCopy, onPressed: copyHandler),
-        toolbar.buildButton(
-          context,
-          ZefyrToolbarAction.openInBrowser,
-          onPressed: openHandler,
-        ),
+        // toolbar.buildButton(context, ZefyrToolbarAction.clipboardCopy, onPressed: copyHandler),
+        // toolbar.buildButton(
+        //   context,
+        //   ZefyrToolbarAction.openInBrowser,
+        //   onPressed: openHandler,
+        // ),
       ];
       items.addAll(buttons);
     }

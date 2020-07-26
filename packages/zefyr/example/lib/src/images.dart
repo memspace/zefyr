@@ -40,4 +40,16 @@ class CustomImageDelegate implements ZefyrImageDelegate<ImageSource> {
       return Image(image: image);
     }
   }
+
+  @override
+  Future<String> pickTweet(BuildContext context) {
+    // TODO: implement pickTweet
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> pickVideo(BuildContext context) {
+    // TODO: implement pickVideo
+    throw UnimplementedError();
+  }
 }

@@ -11,7 +11,7 @@ import 'src/view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // RendererBinding.instance.initPersistentFrameCallback();
+  RendererBinding.instance.initPersistentFrameCallback();
   runApp(ZefyrApp());
 }
 

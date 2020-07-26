@@ -16,6 +16,7 @@ dependencies:
   notus: ^0.1.0
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
+  material_design_icons_flutter: ^4.0.5345
 
 dev_dependencies:
   flutter_test:
