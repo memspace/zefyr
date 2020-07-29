@@ -19,6 +19,7 @@ coverage/
 ios/Flutter/Generated.xcconfig
 example/ios/.symlinks
 example/ios/Flutter/Generated.xcconfig
+example/ios/Flutter/flutter_export_environment.sh
 doc/api/
 build/
 

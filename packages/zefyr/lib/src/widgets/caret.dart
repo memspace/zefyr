@@ -35,8 +35,8 @@ class CursorPainter {
   }
 
   void paint(Canvas canvas, Offset offset) {
-    final Paint paint = Paint()..color = _color;
-    final Rect caretRect = _prototype.shift(offset);
+    final paint = Paint()..color = _color;
+    final caretRect = _prototype.shift(offset);
     canvas.drawRect(caretRect, paint);
   }
 }

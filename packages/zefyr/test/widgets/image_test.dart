@@ -82,7 +82,9 @@ void main() {
       EmbedNode embed = line.children.single;
       expect(editor.selection.baseOffset, embed.documentOffset);
       expect(editor.selection.extentOffset, embed.documentOffset + 1);
-      expect(find.text('PASTE'), findsOneWidget);
+      final state = tester.state(find.byType(ZefyrSelectionOverlay))
+          as ZefyrSelectionOverlayState;
+      expect(state.isToolbarVisible, isTrue);
     });
   });
 }
@@ -94,13 +96,13 @@ class _TestImageDelegate implements ZefyrImageDelegate<String> {
   }
 
   @override
-  String get cameraSource => "camera";
+  String get cameraSource => 'camera';
 
   @override
-  String get gallerySource => "gallery";
+  String get gallerySource => 'gallery';
 
   @override
   Future<String> pickImage(String source) {
-    return Future.value("file:///tmp/test.jpg");
+    return Future.value('file:///tmp/test.jpg');
   }
 }
