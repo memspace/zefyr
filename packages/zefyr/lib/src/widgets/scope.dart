@@ -181,6 +181,18 @@ class ZefyrScope extends ChangeNotifier {
     _controller.formatSelection(value);
   }
 
+  void undo() {
+    assert(isEditable);
+    assert(!_disposed);
+    _controller.undo();
+  }
+
+  void redo() {
+    assert(isEditable);
+    assert(!_disposed);
+    _controller.redo();
+  }
+
   void focus() {
     assert(isEditable);
     assert(!_disposed);

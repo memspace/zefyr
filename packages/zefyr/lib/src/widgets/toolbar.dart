@@ -40,6 +40,8 @@ enum ZefyrToolbarAction {
   hideKeyboard,
   close,
   confirm,
+  undo,
+  redo,
 }
 
 final kZefyrToolbarAttributeActions = <ZefyrToolbarAction, NotusAttributeKey>{
@@ -273,6 +275,8 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
       buildButton(context, ZefyrToolbarAction.quote),
       buildButton(context, ZefyrToolbarAction.code),
       buildButton(context, ZefyrToolbarAction.horizontalRule),
+      buildButton(context, ZefyrToolbarAction.undo),
+      buildButton(context, ZefyrToolbarAction.redo),
     ];
     return buttons;
   }
@@ -372,6 +376,8 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.hideKeyboard: Icons.keyboard_hide,
     ZefyrToolbarAction.close: Icons.close,
     ZefyrToolbarAction.confirm: Icons.check,
+    ZefyrToolbarAction.undo: Icons.undo,
+    ZefyrToolbarAction.redo: Icons.redo,
   };
 
   static const kSpecialIconSizes = {
@@ -380,6 +386,8 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.openInBrowser: 20.0,
     ZefyrToolbarAction.close: 20.0,
     ZefyrToolbarAction.confirm: 20.0,
+    ZefyrToolbarAction.undo: 20.0,
+    ZefyrToolbarAction.redo: 20.0,
   };
 
   static const kDefaultButtonTexts = {

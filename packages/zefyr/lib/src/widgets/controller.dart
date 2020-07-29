@@ -194,6 +194,16 @@ class ZefyrController extends ChangeNotifier {
     formatText(index, length, attribute);
   }
 
+  void undo() {
+    document.undo();
+    updateSelection(TextSelection.collapsed(offset: document.length));
+  }
+
+  void redo() {
+    document.redo();
+    updateSelection(TextSelection.collapsed(offset: document.length));
+  }
+
   /// Returns style of specified text range.
   ///
   /// If nothing is selected but we've toggled an attribute,

@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:quill_delta/quill_delta.dart';
+import 'package:notus/notus.dart';
 
 import 'document/attributes.dart';
 import 'document/block.dart';
@@ -40,12 +41,14 @@ class NotusDocument {
   /// Creates new empty Notus document.
   NotusDocument()
       : _heuristics = NotusHeuristics.fallback,
+        _history = NotusHistory(),
         _delta = Delta()..insert('\n') {
     _loadDocument(_delta);
   }
 
   NotusDocument.fromJson(List data)
       : _heuristics = NotusHeuristics.fallback,
+        _history = NotusHistory(),
         _delta = Delta.fromJson(data) {
     _loadDocument(_delta);
   }
@@ -53,11 +56,21 @@ class NotusDocument {
   NotusDocument.fromDelta(Delta delta)
       : assert(delta != null),
         _heuristics = NotusHeuristics.fallback,
+        _history = NotusHistory(),
         _delta = delta {
     _loadDocument(_delta);
   }
 
   final NotusHeuristics _heuristics;
+
+  NotusHistory _history;
+
+  set history(NotusHistory value) {
+    _history?.clear();
+    _history = value;
+  }
+
+  NotusHistory get history => _history;
 
   /// The root node of this document tree.
   RootNode get root => _root;
@@ -92,6 +105,7 @@ class NotusDocument {
   /// Closes [changes] stream.
   void close() {
     _controller.close();
+    _history.clear();
   }
 
   /// Inserts [text] in this document at specified [index].
@@ -216,7 +230,7 @@ class NotusDocument {
   /// of this document.
   ///
   /// In case the [change] is invalid, behavior of this method is unspecified.
-  void compose(Delta change, ChangeSource source) {
+  void compose(Delta change, ChangeSource source, {bool history}) {
     _checkMutable();
     change.trim();
     assert(change.isNotEmpty);
@@ -241,7 +255,9 @@ class NotusDocument {
       throw StateError('Compose produced inconsistent results. '
           'This is likely due to a bug in the library. Tried to compose change $change from $source.');
     }
-    _controller.add(NotusChange(before, change, source));
+    final notusChange = NotusChange(before, change, source);
+    _controller.add(notusChange);
+    if (history != true) _history?.handleDocChange(notusChange);
   }
 
   //
@@ -292,5 +308,13 @@ class NotusDocument {
         _root.childCount > 1) {
       _root.remove(node);
     }
+  }
+
+  void undo() {
+    _history?.undo(this);
+  }
+
+  void redo() {
+    _history?.redo(this);
   }
 }
