@@ -369,18 +369,20 @@ class AttributeTheme {
       heading1: LineTheme(
         textStyle: defaultLineTheme.textStyle.copyWith(
           fontSize: 24.0,
-          color: defaultLineTheme.textStyle.color,
+          color: Colors.black,
           height: 1.15,
           fontWeight: FontWeight.bold,
         ),
+        padding: EdgeInsets.only(top: 5.0),
       ),
       heading2: LineTheme(
         textStyle: defaultLineTheme.textStyle.copyWith(
           fontSize: 20.0,
-          color: defaultLineTheme.textStyle.color,
+          color: Colors.black,
           height: 1.15,
           fontWeight: FontWeight.bold,
         ),
+        padding: EdgeInsets.only(top: 5.0),
       ),
       heading3: LineTheme(
         textStyle: defaultLineTheme.textStyle.copyWith(
