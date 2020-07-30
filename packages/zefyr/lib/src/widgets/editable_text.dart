@@ -37,6 +37,7 @@ class ZefyrEditableText extends StatefulWidget {
     @required this.focusNode,
     @required this.imageDelegate,
     this.selectionControls,
+    @required this.scrollable,
     this.autofocus = true,
     this.mode = ZefyrMode.edit,
     this.padding = const EdgeInsets.symmetric(horizontal: 16.0),
@@ -46,6 +47,7 @@ class ZefyrEditableText extends StatefulWidget {
         assert(controller != null),
         assert(focusNode != null),
         assert(keyboardAppearance != null),
+        assert(scrollable != null),
         super(key: key);
 
   /// Controls the document being edited.
@@ -63,6 +65,8 @@ class ZefyrEditableText extends StatefulWidget {
   ///
   /// Defaults to true. Cannot be null.
   final bool autofocus;
+
+  final bool scrollable;
 
   /// Editing mode of this text field.
   final ZefyrMode mode;
@@ -153,16 +157,29 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       body = Padding(padding: widget.padding, child: body);
     }
 
-    body = SingleChildScrollView(
-      physics: widget.physics,
-      controller: _scrollController,
-      child: body,
-    );
+    if (widget.scrollable)
+      body = SingleChildScrollView(
+        physics: widget.physics,
+        controller: _scrollController,
+        child: body,
+      );
 
     final layers = <Widget>[body];
-    layers.add(ZefyrSelectionOverlay(
-      controls: widget.selectionControls ?? defaultSelectionControls(context),
-    ));
+    if (widget.scrollable) {
+      layers.add(ZefyrSelectionOverlay(
+        controls: widget.selectionControls ?? defaultSelectionControls(context),
+      ));
+    } else {
+      layers.add(Positioned.fill(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          top: 0,
+          child: ZefyrSelectionOverlay(
+            controls:
+                widget.selectionControls ?? defaultSelectionControls(context),
+          )));
+    }
 
     return Stack(fit: StackFit.expand, children: layers);
   }
