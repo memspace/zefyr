@@ -181,7 +181,9 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
           )));
     }
 
-    return Stack(fit: StackFit.expand, children: layers);
+    return Stack(
+        fit: widget.scrollable ? StackFit.expand : StackFit.passthrough,
+        children: layers);
   }
 
   @override
