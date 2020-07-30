@@ -21,7 +21,6 @@ class ZefyrEditor extends StatefulWidget {
     @required this.controller,
     @required this.focusNode,
     this.autofocus = true,
-    this.scrollable = true,
     this.mode = ZefyrMode.edit,
     this.padding = const EdgeInsets.symmetric(horizontal: 16.0),
     this.toolbarDelegate,
@@ -77,9 +76,6 @@ class ZefyrEditor extends StatefulWidget {
   ///
   /// If unset, defaults to the brightness of [ThemeData.primaryColorBrightness].
   final Brightness keyboardAppearance;
-
-  //Variable to know whether the editor can be scrollable or not, this is used for viewing only functionality
-  final bool scrollable;
 
   @override
   _ZefyrEditorState createState() => _ZefyrEditorState();
@@ -204,7 +200,6 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
       padding: widget.padding,
       physics: widget.physics,
       keyboardAppearance: keyboardAppearance,
-      scrollable: widget.scrollable,
     );
 
     return ZefyrTheme(
