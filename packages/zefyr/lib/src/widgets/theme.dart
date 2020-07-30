@@ -368,21 +368,19 @@ class AttributeTheme {
       ),
       heading1: LineTheme(
         textStyle: defaultLineTheme.textStyle.copyWith(
-          fontSize: 28.0,
-          color: defaultLineTheme.textStyle.color.withOpacity(0.7),
+          fontSize: 24.0,
+          color: defaultLineTheme.textStyle.color,
           height: 1.15,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.bold,
         ),
-        padding: EdgeInsets.only(top: 16.0),
       ),
       heading2: LineTheme(
         textStyle: defaultLineTheme.textStyle.copyWith(
-          fontSize: 24.0,
-          color: defaultLineTheme.textStyle.color.withOpacity(0.7),
+          fontSize: 20.0,
+          color: defaultLineTheme.textStyle.color,
           height: 1.15,
-          fontWeight: FontWeight.normal,
+          fontWeight: FontWeight.bold,
         ),
-        padding: EdgeInsets.only(top: 8.0),
       ),
       heading3: LineTheme(
         textStyle: defaultLineTheme.textStyle.copyWith(
