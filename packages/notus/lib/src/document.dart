@@ -171,6 +171,7 @@ class NotusDocument {
       length = 0;
     }
 
+    // todo 识别部分
     final formatChange =
         _heuristics.applyFormatRules(this, index, length, attribute);
     if (formatChange.isNotEmpty) {

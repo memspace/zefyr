@@ -41,7 +41,9 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
   @override
   final String key;
   final NotusAttributeScope scope;
+
   NotusAttribute<T> get unset => NotusAttribute<T>._(key, scope, null);
+
   NotusAttribute<T> withValue(T value) =>
       NotusAttribute<T>._(key, scope, value);
 }
@@ -73,6 +75,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static final Map<String, NotusAttributeBuilder> _registry = {
     NotusAttribute.bold.key: NotusAttribute.bold,
+    NotusAttribute.newTextColor.key: NotusAttribute.newTextColor,
     NotusAttribute.italic.key: NotusAttribute.italic,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
@@ -84,6 +87,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Bold style attribute.
   static const bold = _BoldAttribute();
+
+  /// 新字体颜色
+  static const newTextColor = _NewTextColorAttribute();
 
   /// Italic style attribute.
   static const italic = _ItalicAttribute();
@@ -327,6 +333,11 @@ class _BoldAttribute extends NotusAttribute<bool> {
   const _BoldAttribute() : super._('b', NotusAttributeScope.inline, true);
 }
 
+/// Applies bold style to a text segment.
+class _NewTextColorAttribute extends NotusAttribute<String> {
+  const _NewTextColorAttribute() : super._('textColor', NotusAttributeScope.inline, 'blue');
+}
+
 /// Applies italic style to a text segment.
 class _ItalicAttribute extends NotusAttribute<bool> {
   const _ItalicAttribute() : super._('i', NotusAttributeScope.inline, true);
@@ -338,6 +349,7 @@ class _ItalicAttribute extends NotusAttribute<bool> {
 /// [NotusAttribute.link] instead.
 class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kLink = 'a';
+
   const LinkAttributeBuilder._() : super._(_kLink, NotusAttributeScope.inline);
 
   /// Creates a link attribute with specified link [value].
@@ -351,6 +363,7 @@ class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
 /// [NotusAttribute.heading] instead.
 class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
   static const _kHeading = 'heading';
+
   const HeadingAttributeBuilder._()
       : super._(_kHeading, NotusAttributeScope.line);
 
@@ -364,12 +377,24 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
   NotusAttribute<int> get level3 => NotusAttribute<int>._(key, scope, 3);
 }
 
+/// 新增加的
+class TestStyleAttributeBuilder extends NotusAttributeBuilder<String> {
+  static const _kHeading = 'color';
+
+  const TestStyleAttributeBuilder._()
+      : super._(_kHeading, NotusAttributeScope.line);
+
+  /// 红色颜色
+  NotusAttribute<String> get red => NotusAttribute<String>._(key, scope, 'red');
+}
+
 /// Builder for block attribute styles (number/bullet lists, code and quote).
 ///
 /// There is no need to use this class directly, consider using
 /// [NotusAttribute.block] instead.
 class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kBlock = 'block';
+
   const BlockAttributeBuilder._() : super._(_kBlock, NotusAttributeScope.line);
 
   /// Formats a block of lines as a bullet list.

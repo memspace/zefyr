@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 
+// todo markDown放弃
 class NotusMarkdownCodec extends Codec<Delta, String> {
   const NotusMarkdownCodec();
 

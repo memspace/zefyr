@@ -236,6 +236,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     return result;
   }
 
+  // todo 构建显示视图
   Widget _defaultChildBuilder(BuildContext context, Node node) {
     if (node is LineNode) {
       if (node.hasEmbed) {

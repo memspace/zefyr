@@ -88,7 +88,6 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
           focusNode: _focusNode,
           mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
           imageDelegate: CustomImageDelegate(),
-          keyboardAppearance: _darkTheme ? Brightness.dark : Brightness.light,
         ),
       ),
     );

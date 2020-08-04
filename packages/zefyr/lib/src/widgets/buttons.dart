@@ -124,6 +124,8 @@ class ZefyrButton extends StatelessWidget {
 
   void _toggleAttribute(NotusAttribute attribute, ZefyrScope editor) {
     final isToggled = editor.selectionStyle.containsSame(attribute);
+    print(
+        '是否点击::${attribute.key}，，，attribute.unset::${attribute.unset.toJson()}');
     if (isToggled) {
       editor.formatSelection(attribute.unset);
     } else {
@@ -226,6 +228,7 @@ class _HeadingButtonState extends State<HeadingButton> {
     final buttons = Row(
       children: <Widget>[
         SizedBox(width: 8.0),
+        Text('字体大小'),
         toolbar.buildButton(context, ZefyrToolbarAction.headingLevel1),
         toolbar.buildButton(context, ZefyrToolbarAction.headingLevel2),
         toolbar.buildButton(context, ZefyrToolbarAction.headingLevel3),

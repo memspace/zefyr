@@ -284,6 +284,9 @@ class AttributeTheme {
   /// Style used to render "bold" text.
   final TextStyle bold;
 
+  /// 新字体颜色
+  final TextStyle newTextColor;
+
   /// Style used to render "italic" text.
   final TextStyle italic;
 
@@ -298,6 +301,9 @@ class AttributeTheme {
 
   /// Style theme used to render smaller headings.
   final LineTheme heading3;
+
+  /// 红色颜色的主题
+  final LineTheme red;
 
   /// Style theme used to render bullet lists.
   final BlockTheme bulletList;
@@ -323,6 +329,8 @@ class AttributeTheme {
     this.numberList,
     this.quote,
     this.code,
+    this.red,
+    this.newTextColor,
   });
 
   /// The default attribute theme.
@@ -346,6 +354,7 @@ class AttributeTheme {
 
     return AttributeTheme(
       bold: TextStyle(fontWeight: FontWeight.bold),
+      newTextColor: TextStyle(color: Colors.blue),
       italic: TextStyle(fontStyle: FontStyle.italic),
       link: TextStyle(
         decoration: TextDecoration.underline,
@@ -373,6 +382,15 @@ class AttributeTheme {
         textStyle: defaultLineTheme.textStyle.copyWith(
           fontSize: 20.0,
           color: defaultLineTheme.textStyle.color.withOpacity(0.7),
+          height: 1.15,
+          fontWeight: FontWeight.w500,
+        ),
+        padding: EdgeInsets.only(top: 8.0),
+      ),
+      red: LineTheme(
+        textStyle: defaultLineTheme.textStyle.copyWith(
+          fontSize: 24.0,
+          color: Colors.red,
           height: 1.15,
           fontWeight: FontWeight.w500,
         ),

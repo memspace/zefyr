@@ -14,6 +14,7 @@ import 'theme.dart';
 /// List of all button actions supported by [ZefyrToolbar] buttons.
 enum ZefyrToolbarAction {
   bold,
+  newTextColor,
   italic,
   link,
   unlink,
@@ -38,6 +39,7 @@ enum ZefyrToolbarAction {
 
 final kZefyrToolbarAttributeActions = <ZefyrToolbarAction, NotusAttributeKey>{
   ZefyrToolbarAction.bold: NotusAttribute.bold,
+  ZefyrToolbarAction.newTextColor: NotusAttribute.newTextColor,
   ZefyrToolbarAction.italic: NotusAttribute.italic,
   ZefyrToolbarAction.link: NotusAttribute.link,
   ZefyrToolbarAction.heading: NotusAttribute.heading,
@@ -248,8 +250,10 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     );
   }
 
+  // todo 按钮列表
   List<Widget> _buildButtons(BuildContext context) {
     final buttons = <Widget>[
+      buildButton(context, ZefyrToolbarAction.newTextColor),
       buildButton(context, ZefyrToolbarAction.bold),
       buildButton(context, ZefyrToolbarAction.italic),
       LinkButton(),
@@ -353,6 +357,7 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.hideKeyboard: Icons.keyboard_hide,
     ZefyrToolbarAction.close: Icons.close,
     ZefyrToolbarAction.confirm: Icons.check,
+    ZefyrToolbarAction.newTextColor: Icons.sort,
   };
 
   static const kSpecialIconSizes = {

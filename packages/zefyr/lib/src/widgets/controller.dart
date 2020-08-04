@@ -162,26 +162,34 @@ class ZefyrController extends ChangeNotifier {
   }
 
   void formatText(int index, int length, NotusAttribute attribute) {
-    final change = document.format(index, length, attribute);
-    _lastChangeSource = ChangeSource.local;
-
-    if (length == 0 &&
-        (attribute.key == NotusAttribute.bold.key ||
-            attribute.key == NotusAttribute.italic.key)) {
-      // Add the attribute to our toggledStyle. It will be used later upon insertion.
-      _toggledStyles = toggledStyles.put(attribute);
-    }
+    print('格式了数据::${attribute.toString()}');
+    document.format(index, length, attribute);
+//    final change = document.format(index, length, attribute);
+//
+//    print('取到的格式::${change.toJson()}');
+//
+//    _lastChangeSource = ChangeSource.local;
+//
+//    if (length == 0 &&
+//        (attribute.key == NotusAttribute.bold.key ||
+//            attribute.key == NotusAttribute.italic.key)) {
+//      print('toggledStyle添加属性。它将使用在插入之后。');
+//      // Add the attribute to our toggledStyle. It will be used later upon insertion.
+//      _toggledStyles = toggledStyles.put(attribute);
+//    }
 
     // Transform selection against the composed change and give priority to
     // the change. This is needed in cases when format operation actually
     // inserts data into the document (e.g. embeds).
-    final base = change.transformPosition(_selection.baseOffset);
-    final extent = change.transformPosition(_selection.extentOffset);
-    final adjustedSelection =
-        _selection.copyWith(baseOffset: base, extentOffset: extent);
-    if (_selection != adjustedSelection) {
-      _updateSelectionSilent(adjustedSelection, source: _lastChangeSource);
-    }
+//    final base = change.transformPosition(_selection.baseOffset);
+//    final extent = change.transformPosition(_selection.extentOffset);
+//    final adjustedSelection =
+//        _selection.copyWith(baseOffset: base, extentOffset: extent);
+//    print('adjustedSelection::${adjustedSelection.toString()}');
+//    if (_selection != adjustedSelection) {
+//      print('等于里面的东西了');
+//      _updateSelectionSilent(adjustedSelection, source: _lastChangeSource);
+//    }
     notifyListeners();
   }
 
@@ -189,6 +197,7 @@ class ZefyrController extends ChangeNotifier {
   void formatSelection(NotusAttribute attribute) {
     final index = _selection.start;
     final length = _selection.end - index;
+    print('放入开始行:::${index},,,结束行::${length}');
     formatText(index, length, attribute);
   }
 
