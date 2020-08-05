@@ -18,7 +18,7 @@ class ZefyrParagraph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = ZefyrTheme.of(context);
-    TextStyle style = theme.defaultLineTheme.textStyle;
+    var style = theme.defaultLineTheme.textStyle;
     if (blockStyle != null) {
       style = style.merge(blockStyle);
     }
@@ -42,7 +42,7 @@ class ZefyrHeading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = themeOf(node, context);
-    TextStyle style = theme.textStyle;
+    var style = theme.textStyle;
     if (blockStyle != null) {
       style = style.merge(blockStyle);
     }

@@ -9,7 +9,7 @@ class ZefyrScaffold extends StatefulWidget {
   const ZefyrScaffold({Key key, this.child}) : super(key: key);
 
   static ZefyrScaffoldState of(BuildContext context) {
-    final _ZefyrScaffoldAccess widget =
+    final widget =
         context.dependOnInheritedWidgetOfExactType<_ZefyrScaffoldAccess>();
     return widget.scaffold;
   }
