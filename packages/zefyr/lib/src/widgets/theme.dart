@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Applies a Zefyr editor theme to descendant widgets.
 ///
@@ -287,6 +288,18 @@ class AttributeTheme {
   /// 新字体颜色
   final TextStyle newTextColor;
 
+  /// 字体背景颜色
+  final TextStyle textBgColor;
+
+  /// 字体
+  final TextStyle textFont;
+
+  /// 文字删除线
+  final TextStyle textLineThrough;
+
+  /// 文字底部线
+  final TextStyle textUnderline;
+
   /// Style used to render "italic" text.
   final TextStyle italic;
 
@@ -331,6 +344,10 @@ class AttributeTheme {
     this.code,
     this.red,
     this.newTextColor,
+    this.textBgColor,
+    this.textFont,
+    this.textLineThrough,
+    this.textUnderline,
   });
 
   /// The default attribute theme.
@@ -355,6 +372,10 @@ class AttributeTheme {
     return AttributeTheme(
       bold: TextStyle(fontWeight: FontWeight.bold),
       newTextColor: TextStyle(color: Colors.blue),
+      textBgColor: TextStyle(backgroundColor: Colors.red),
+      textFont: GoogleFonts.abel(),
+      textLineThrough: TextStyle(decoration: TextDecoration.lineThrough),
+      textUnderline: TextStyle(decoration: TextDecoration.underline),
       italic: TextStyle(fontStyle: FontStyle.italic),
       link: TextStyle(
         decoration: TextDecoration.underline,

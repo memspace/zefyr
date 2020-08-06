@@ -27,6 +27,8 @@ class ZefyrRichText extends LeafRenderObjectWidget {
       text,
       node: node,
       textDirection: Directionality.of(context),
+      // todo 文字对齐方式
+      textAlign: TextAlign.left,
     );
   }
 

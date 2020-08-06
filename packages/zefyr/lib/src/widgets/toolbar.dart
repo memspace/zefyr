@@ -15,6 +15,10 @@ import 'theme.dart';
 enum ZefyrToolbarAction {
   bold,
   newTextColor,
+  textBgColor,
+  textLineThrough,
+  textUnderline,
+  textFont,
   italic,
   link,
   unlink,
@@ -40,6 +44,10 @@ enum ZefyrToolbarAction {
 final kZefyrToolbarAttributeActions = <ZefyrToolbarAction, NotusAttributeKey>{
   ZefyrToolbarAction.bold: NotusAttribute.bold,
   ZefyrToolbarAction.newTextColor: NotusAttribute.newTextColor,
+  ZefyrToolbarAction.textBgColor: NotusAttribute.textBgColor,
+  ZefyrToolbarAction.textFont: NotusAttribute.textFont,
+  ZefyrToolbarAction.textUnderline: NotusAttribute.textUnderline,
+  ZefyrToolbarAction.textLineThrough: NotusAttribute.textLineThrough,
   ZefyrToolbarAction.italic: NotusAttribute.italic,
   ZefyrToolbarAction.link: NotusAttribute.link,
   ZefyrToolbarAction.heading: NotusAttribute.heading,
@@ -250,10 +258,37 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
     );
   }
 
+  Widget tipWidget(String tip, {Widget child}) {
+    return Tooltip(
+      child: child,
+      message: tip,
+      verticalOffset: -50,
+    );
+  }
+
   // todo 按钮列表
   List<Widget> _buildButtons(BuildContext context) {
     final buttons = <Widget>[
-      buildButton(context, ZefyrToolbarAction.newTextColor),
+      tipWidget(
+        '文字颜色',
+        child: buildButton(context, ZefyrToolbarAction.newTextColor),
+      ),
+      tipWidget(
+        '文字背景颜色',
+        child: buildButton(context, ZefyrToolbarAction.textBgColor),
+      ),
+      tipWidget(
+        '文字底部线条',
+        child: buildButton(context, ZefyrToolbarAction.textUnderline),
+      ),
+      tipWidget(
+        '文字删除线',
+        child: buildButton(context, ZefyrToolbarAction.textLineThrough),
+      ),
+      tipWidget(
+        '字体',
+        child: buildButton(context, ZefyrToolbarAction.textFont),
+      ),
       buildButton(context, ZefyrToolbarAction.bold),
       buildButton(context, ZefyrToolbarAction.italic),
       LinkButton(),
@@ -357,7 +392,11 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.hideKeyboard: Icons.keyboard_hide,
     ZefyrToolbarAction.close: Icons.close,
     ZefyrToolbarAction.confirm: Icons.check,
-    ZefyrToolbarAction.newTextColor: Icons.sort,
+    ZefyrToolbarAction.newTextColor: Icons.color_lens,
+    ZefyrToolbarAction.textBgColor: Icons.invert_colors,
+    ZefyrToolbarAction.textUnderline: Icons.border_color,
+    ZefyrToolbarAction.textLineThrough: Icons.remove,
+    ZefyrToolbarAction.textFont: Icons.font_download,
   };
 
   static const kSpecialIconSizes = {

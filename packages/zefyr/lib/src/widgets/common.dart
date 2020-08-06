@@ -145,6 +145,18 @@ class _ZefyrLineState extends State<ZefyrLine> {
     if (style.containsSame(NotusAttribute.newTextColor)) {
       result = result.merge(theme.attributeTheme.newTextColor);
     }
+    if (style.containsSame(NotusAttribute.textBgColor)) {
+      result = result.merge(theme.attributeTheme.textBgColor);
+    }
+    if (style.containsSame(NotusAttribute.textFont)) {
+      result = result.merge(theme.attributeTheme.textFont);
+    }
+    if (style.containsSame(NotusAttribute.textUnderline)) {
+      result = result.merge(theme.attributeTheme.textUnderline);
+    }
+    if (style.containsSame(NotusAttribute.textLineThrough)) {
+      result = result.merge(theme.attributeTheme.textLineThrough);
+    }
     if (style.containsSame(NotusAttribute.italic)) {
       result = result.merge(theme.attributeTheme.italic);
     }

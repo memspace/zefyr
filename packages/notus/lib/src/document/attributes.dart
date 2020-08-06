@@ -76,6 +76,10 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static final Map<String, NotusAttributeBuilder> _registry = {
     NotusAttribute.bold.key: NotusAttribute.bold,
     NotusAttribute.newTextColor.key: NotusAttribute.newTextColor,
+    NotusAttribute.textBgColor.key: NotusAttribute.textBgColor,
+    NotusAttribute.textFont.key: NotusAttribute.textFont,
+    NotusAttribute.textLineThrough.key: NotusAttribute.textLineThrough,
+    NotusAttribute.textUnderline.key: NotusAttribute.textUnderline,
     NotusAttribute.italic.key: NotusAttribute.italic,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
@@ -90,6 +94,18 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// 新字体颜色
   static const newTextColor = _NewTextColorAttribute();
+
+  /// 字体背景颜色
+  static const textBgColor = _TextBackgroundColorAttribute();
+
+  /// 字体
+  static const textFont = _TextFontAttribute();
+
+  /// 文字删除线
+  static const textLineThrough = _TextLineThroughAttribute();
+
+  /// 文字底部线
+  static const textUnderline = _TextUnderlineAttribute();
 
   /// Italic style attribute.
   static const italic = _ItalicAttribute();
@@ -333,9 +349,34 @@ class _BoldAttribute extends NotusAttribute<bool> {
   const _BoldAttribute() : super._('b', NotusAttributeScope.inline, true);
 }
 
-/// Applies bold style to a text segment.
+/// 字体颜色
 class _NewTextColorAttribute extends NotusAttribute<String> {
-  const _NewTextColorAttribute() : super._('textColor', NotusAttributeScope.inline, 'blue');
+  const _NewTextColorAttribute()
+      : super._('textColor', NotusAttributeScope.inline, 'blue');
+}
+
+/// 文字背景颜色
+class _TextBackgroundColorAttribute extends NotusAttribute<String> {
+  const _TextBackgroundColorAttribute()
+      : super._('textBgColor', NotusAttributeScope.inline, 'red');
+}
+
+/// 字体
+class _TextFontAttribute extends NotusAttribute<String> {
+  const _TextFontAttribute()
+      : super._('textFont', NotusAttributeScope.inline, 'def');
+}
+
+/// 文字删除线
+class _TextLineThroughAttribute extends NotusAttribute<bool> {
+  const _TextLineThroughAttribute()
+      : super._('textLineThrough', NotusAttributeScope.inline, true);
+}
+
+/// 文字底部线
+class _TextUnderlineAttribute extends NotusAttribute<bool> {
+  const _TextUnderlineAttribute()
+      : super._('textUnderline', NotusAttributeScope.inline, true);
 }
 
 /// Applies italic style to a text segment.
