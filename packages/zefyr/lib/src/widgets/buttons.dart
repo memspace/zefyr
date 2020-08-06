@@ -185,6 +185,7 @@ class RawZefyrButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 1.0, vertical: 6.0),
       child: RawMaterialButton(
+        splashColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: radius),
         elevation: 0.0,
         fillColor: color,
