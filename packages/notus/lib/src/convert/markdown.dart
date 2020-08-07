@@ -180,7 +180,6 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     return false;
   }
 
-  // ignore: always_declare_return_types
   void _handleSpan(String span, Delta delta, bool addNewLine,
       Map<String, dynamic> outerStyle, [bool isBlock]) {
     var start = _handleStyles(span, delta, outerStyle);
