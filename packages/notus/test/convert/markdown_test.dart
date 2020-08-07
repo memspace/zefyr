@@ -1,12 +1,13 @@
+
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'dart:convert';
 
-import 'package:notus/convert.dart';
-import 'package:notus/notus.dart';
-import 'package:quill_delta/quill_delta.dart';
+import 'dart:convert';
 import 'package:test/test.dart';
+import 'package:quill_delta/quill_delta.dart';
+import 'package:notus/notus.dart';
+import 'package:notus/convert.dart';
 
 void main() {
   group('$NotusMarkdownCodec.encode', () {
@@ -19,11 +20,11 @@ void main() {
     });
 
     test('italics', () {
-      runFor(String markdown, bool testEncode) {
+      void runFor(String markdown, bool testEncode) {
         final delta = notusMarkdown.decode(markdown);
         expect(delta.elementAt(0).data, 'italics');
-        expect(delta.elementAt(0).attributes["i"], true);
-        expect(delta.elementAt(0).attributes["b"], null);
+        expect(delta.elementAt(0).attributes['i'], true);
+        expect(delta.elementAt(0).attributes['b'], null);
         if (testEncode) {
           final andBack = notusMarkdown.encode(delta);
           expect(andBack, markdown);
@@ -35,17 +36,17 @@ void main() {
     });
 
     test('multi-word italics', () {
-      runFor(String markdown, bool testEncode) {
+      void runFor(String markdown, bool testEncode) {
         final delta = notusMarkdown.decode(markdown);
         expect(delta.elementAt(0).data, 'Okay, ');
         expect(delta.elementAt(0).attributes, null);
 
         expect(delta.elementAt(1).data, 'this is in italics');
-        expect(delta.elementAt(1).attributes["i"], true);
-        expect(delta.elementAt(1).attributes["b"], null);
+        expect(delta.elementAt(1).attributes['i'], true);
+        expect(delta.elementAt(1).attributes['b'], null);
 
         expect(delta.elementAt(3).data, 'so is all of _ this');
-        expect(delta.elementAt(3).attributes["i"], true);
+        expect(delta.elementAt(3).attributes['i'], true);
 
         expect(delta.elementAt(4).data, ' but this is not\n');
         expect(delta.elementAt(4).attributes, null);
@@ -64,11 +65,11 @@ void main() {
     });
 
     test('bold', () {
-      runFor(String markdown, bool testEncode) {
+      void runFor(String markdown, bool testEncode) {
         final delta = notusMarkdown.decode(markdown);
         expect(delta.elementAt(0).data, 'bold');
-        expect(delta.elementAt(0).attributes["b"], true);
-        expect(delta.elementAt(0).attributes["i"], null);
+        expect(delta.elementAt(0).attributes['b'], true);
+        expect(delta.elementAt(0).attributes['i'], null);
         if (testEncode) {
           final andBack = notusMarkdown.encode(delta);
           expect(andBack, markdown);
@@ -80,17 +81,17 @@ void main() {
     });
 
     test('multi-word bold', () {
-      runFor(String markdown, bool testEncode) {
+      void runFor(String markdown, bool testEncode) {
         final delta = notusMarkdown.decode(markdown);
         expect(delta.elementAt(0).data, 'Okay, ');
         expect(delta.elementAt(0).attributes, null);
 
         expect(delta.elementAt(1).data, 'this is bold');
-        expect(delta.elementAt(1).attributes["b"], true);
-        expect(delta.elementAt(1).attributes["i"], null);
+        expect(delta.elementAt(1).attributes['b'], true);
+        expect(delta.elementAt(1).attributes['i'], null);
 
         expect(delta.elementAt(3).data, 'so is all of __ this');
-        expect(delta.elementAt(3).attributes["b"], true);
+        expect(delta.elementAt(3).attributes['b'], true);
 
         expect(delta.elementAt(4).data, ' but this is not\n');
         expect(delta.elementAt(4).attributes, null);
@@ -112,27 +113,27 @@ void main() {
       var markdown = 'This **house _is a_ circus**\n\n';
       final delta = notusMarkdown.decode(markdown);
       expect(delta.elementAt(1).data, 'house ');
-      expect(delta.elementAt(1).attributes["b"], true);
-      expect(delta.elementAt(1).attributes["i"], null);
+      expect(delta.elementAt(1).attributes['b'], true);
+      expect(delta.elementAt(1).attributes['i'], null);
 
       expect(delta.elementAt(2).data, 'is a');
-      expect(delta.elementAt(2).attributes["b"], true);
-      expect(delta.elementAt(2).attributes["i"], true);
+      expect(delta.elementAt(2).attributes['b'], true);
+      expect(delta.elementAt(2).attributes['i'], true);
 
       expect(delta.elementAt(3).data, ' circus');
-      expect(delta.elementAt(3).attributes["b"], true);
-      expect(delta.elementAt(3).attributes["i"], null);
+      expect(delta.elementAt(3).attributes['b'], true);
+      expect(delta.elementAt(3).attributes['i'], null);
 
       final andBack = notusMarkdown.encode(delta);
       expect(andBack, markdown);
     });
 
     test('bold and italics', () {
-      runFor(String markdown, bool testEncode) {
+      void runFor(String markdown, bool testEncode) {
         final delta = notusMarkdown.decode(markdown);
         expect(delta.elementAt(0).data, 'this is bold and italic');
-        expect(delta.elementAt(0).attributes["b"], true);
-        expect(delta.elementAt(0).attributes["i"], true);
+        expect(delta.elementAt(0).attributes['b'], true);
+        expect(delta.elementAt(0).attributes['i'], true);
 
         expect(delta.elementAt(1).data, '\n');
         expect(delta.length, 2);
@@ -150,19 +151,19 @@ void main() {
     });
 
     test('bold and italics combinations', () {
-      runFor(String markdown, bool testEncode) {
+      void runFor(String markdown, bool testEncode) {
         final delta = notusMarkdown.decode(markdown);
         expect(delta.elementAt(0).data, 'this is bold');
-        expect(delta.elementAt(0).attributes["b"], true);
-        expect(delta.elementAt(0).attributes["i"], null);
+        expect(delta.elementAt(0).attributes['b'], true);
+        expect(delta.elementAt(0).attributes['i'], null);
 
         expect(delta.elementAt(2).data, 'this is in italics');
-        expect(delta.elementAt(2).attributes["b"], null);
-        expect(delta.elementAt(2).attributes["i"], true);
+        expect(delta.elementAt(2).attributes['b'], null);
+        expect(delta.elementAt(2).attributes['i'], true);
 
         expect(delta.elementAt(4).data, 'this is both');
-        expect(delta.elementAt(4).attributes["b"], true);
-        expect(delta.elementAt(4).attributes["i"], true);
+        expect(delta.elementAt(4).attributes['b'], true);
+        expect(delta.elementAt(4).attributes['i'], true);
 
         if (testEncode) {
           final andBack = notusMarkdown.encode(delta);
@@ -183,12 +184,12 @@ void main() {
       final delta = notusMarkdown.decode(markdown);
 
       expect(delta.elementAt(1).data, 'house');
-      expect(delta.elementAt(1).attributes["b"], true);
-      expect(delta.elementAt(1).attributes["a"], null);
+      expect(delta.elementAt(1).attributes['b'], true);
+      expect(delta.elementAt(1).attributes['a'], null);
 
       expect(delta.elementAt(3).data, 'circus');
-      expect(delta.elementAt(3).attributes["b"], null);
-      expect(delta.elementAt(3).attributes["a"], 'https://github.com');
+      expect(delta.elementAt(3).attributes['b'], null);
+      expect(delta.elementAt(3).attributes['a'], 'https://github.com');
 
       final andBack = notusMarkdown.encode(delta);
       expect(andBack, markdown);
@@ -199,12 +200,12 @@ void main() {
       final delta = notusMarkdown.decode(markdown);
 
       expect(delta.elementAt(1).data, 'house');
-      expect(delta.elementAt(1).attributes["b"], true);
-      expect(delta.elementAt(1).attributes["a"], null);
+      expect(delta.elementAt(1).attributes['b'], true);
+      expect(delta.elementAt(1).attributes['a'], null);
 
       expect(delta.elementAt(3).data, 'circus');
-      expect(delta.elementAt(3).attributes["b"], true);
-      expect(delta.elementAt(3).attributes["a"], 'https://github.com');
+      expect(delta.elementAt(3).attributes['b'], true);
+      expect(delta.elementAt(3).attributes['a'], 'https://github.com');
 
       final andBack = notusMarkdown.encode(delta);
       expect(andBack, markdown);
@@ -215,15 +216,15 @@ void main() {
       final delta = notusMarkdown.decode(markdown);
 
       expect(delta.elementAt(1).data, 'house');
-      expect(delta.elementAt(1).attributes["b"], true);
-      expect(delta.elementAt(1).attributes["a"], null);
+      expect(delta.elementAt(1).attributes['b'], true);
+      expect(delta.elementAt(1).attributes['a'], null);
 
       expect(delta.elementAt(2).data, ' is a ');
       expect(delta.elementAt(2).attributes, null);
 
       expect(delta.elementAt(3).data, 'circus');
-      expect(delta.elementAt(3).attributes["b"], true);
-      expect(delta.elementAt(3).attributes["a"], 'https://github.com');
+      expect(delta.elementAt(3).attributes['b'], true);
+      expect(delta.elementAt(3).attributes['a'], 'https://github.com');
 
       expect(delta.elementAt(4).data, '\n');
       expect(delta.length, 5);
@@ -233,10 +234,12 @@ void main() {
     });
 
     test('heading styles', () {
-      runFor(String markdown, int level) {
+      void runFor(String markdown, int level) {
         final delta = notusMarkdown.decode(markdown);
-        expect(delta.elementAt(0).data, 'This is an H$level\n');
-        expect(delta.elementAt(0).attributes['heading'], level);
+        expect(delta.elementAt(0).data, 'This is an H$level');
+
+        expect(delta.elementAt(1).data, '\n');
+        expect(delta.elementAt(1).attributes['heading'], level);
         final andBack = notusMarkdown.encode(delta);
         expect(andBack, markdown);
       }
@@ -249,6 +252,7 @@ void main() {
     test('ul', () {
       var markdown = '* a bullet point\n* another bullet point\n\n';
       final delta = notusMarkdown.decode(markdown);
+      print(delta);
 
       final andBack = notusMarkdown.encode(delta);
       expect(andBack, markdown);
@@ -268,61 +272,71 @@ void main() {
           '> quote\n> # Heading in Quote\n> # **Styled** heading in _block quote_\n> **bold text**\n> _text in italics_\n\n';
       final delta = notusMarkdown.decode(markdown);
 
-      expect(delta.elementAt(0).data, 'quote\n');
-      expect(delta.elementAt(0).attributes['block'], 'quote');
-      expect(delta.elementAt(0).attributes.length, 1);
+      expect(delta.elementAt(0).data, 'quote');
+      expect(delta.elementAt(0).attributes, null);
 
-      expect(delta.elementAt(1).data, 'Heading in Quote\n');
+      expect(delta.elementAt(1).data, '\n');
       expect(delta.elementAt(1).attributes['block'], 'quote');
-      expect(delta.elementAt(1).attributes['heading'], 1);
-      expect(delta.elementAt(1).attributes.length, 2);
+      expect(delta.elementAt(1).attributes.length, 1);
 
-      expect(delta.elementAt(2).data, 'Styled');
-      expect(delta.elementAt(2).attributes['block'], 'quote');
-      expect(delta.elementAt(2).attributes['heading'], 1);
-      expect(delta.elementAt(2).attributes['b'], true);
-      expect(delta.elementAt(2).attributes.length, 3);
+      expect(delta.elementAt(2).data, 'Heading in Quote');
+      expect(delta.elementAt(2).attributes, null);
 
-      expect(delta.elementAt(3).data, ' heading in ');
+      expect(delta.elementAt(3).data, '\n');
       expect(delta.elementAt(3).attributes['block'], 'quote');
       expect(delta.elementAt(3).attributes['heading'], 1);
       expect(delta.elementAt(3).attributes.length, 2);
 
-      expect(delta.elementAt(4).data, 'block quote');
-      expect(delta.elementAt(4).attributes['block'], 'quote');
-      expect(delta.elementAt(4).attributes['heading'], 1);
-      expect(delta.elementAt(4).attributes['i'], true);
-      expect(delta.elementAt(4).attributes.length, 3);
+      expect(delta.elementAt(4).data, 'Styled');
+      expect(delta.elementAt(4).attributes['b'], true);
+      expect(delta.elementAt(4).attributes.length, 1);
 
-      expect(delta.elementAt(6).data, 'bold text');
-      expect(delta.elementAt(6).attributes['block'], 'quote');
-      expect(delta.elementAt(6).attributes['b'], true);
-      expect(delta.elementAt(6).attributes.length, 2);
+      expect(delta.elementAt(5).data, ' heading in ');
+      expect(delta.elementAt(5).attributes, null);
 
-      expect(delta.elementAt(8).data, 'text in italics');
-      expect(delta.elementAt(8).attributes['block'], 'quote');
-      expect(delta.elementAt(8).attributes['i'], true);
-      expect(delta.elementAt(8).attributes.length, 2);
+      expect(delta.elementAt(6).data, 'block quote');
+      expect(delta.elementAt(6).attributes['i'], true);
+      expect(delta.elementAt(6).attributes.length, 1);
+
+      expect(delta.elementAt(7).data, '\n');
+      expect(delta.elementAt(7).attributes['block'], 'quote');
+      expect(delta.elementAt(7).attributes['heading'], 1);
+      expect(delta.elementAt(7).attributes.length, 2);
+
+      expect(delta.elementAt(8).data, 'bold text');
+      expect(delta.elementAt(8).attributes['b'], true);
+      expect(delta.elementAt(8).attributes.length, 1);
+
+      expect(delta.elementAt(9).data, '\n');
+      expect(delta.elementAt(9).attributes['block'], 'quote');
+      expect(delta.elementAt(9).attributes.length, 1);
+
+      expect(delta.elementAt(10).data, 'text in italics');
+      expect(delta.elementAt(10).attributes['i'], true);
+      expect(delta.elementAt(10).attributes.length, 1);
+
+      expect(delta.elementAt(11).data, '\n');
+      expect(delta.elementAt(11).attributes['block'], 'quote');
+      expect(delta.elementAt(11).attributes.length, 1);
 
       final andBack = notusMarkdown.encode(delta);
       expect(andBack, markdown);
     });
 
-    /*test('nested bq', () {
-      var markdown = '> > nested\n>* bullet\n>1. 1st point\n>1. 2nd point\n\n';
-      final delta = notusMarkdown.decode(markdown);
+//    test('nested bq', () {
+//      var markdown = '> > nested\n>* bullet\n>1. 1st point\n>1. 2nd point\n\n';
+//      final delta = notusMarkdown.decode(markdown);
+//      final andBack = notusMarkdown.encode(delta);
+//      expect(andBack, markdown);
+//    });
 
-      final andBack = notusMarkdown.encode(delta);
-      expect(andBack, markdown);
-    });
 
-    test('code in bq', () {
-      var markdown = '> ```\n> print("Hello world!")\n> ```\n\n';
-      final delta = notusMarkdown.decode(markdown);
-
-      final andBack = notusMarkdown.encode(delta);
-      expect(andBack, markdown);
-    });*/
+//    test('code in bq', () {
+//      var markdown = '> ```\n> print("Hello world!")\n> ```\n\n';
+//      final delta = notusMarkdown.decode(markdown);
+//      final andBack = notusMarkdown.encode(delta);
+//      expect(andBack, markdown);
+//    });
 
     test('multiple styles', () {
       final delta = notusMarkdown.decode(expectedMarkdown);
@@ -402,8 +416,7 @@ void main() {
     });
 
     test('heading styles', () {
-      void runFor(
-          NotusAttribute<int> attribute, String source, String expected) {
+      void runFor(NotusAttribute<int> attribute, String source, String expected) {
         final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusMarkdown.encode(delta);
         expect(result, expected);
@@ -415,8 +428,7 @@ void main() {
     });
 
     test('block styles', () {
-      void runFor(
-          NotusAttribute<String> attribute, String source, String expected) {
+      void runFor(NotusAttribute<String> attribute, String source, String expected) {
         final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
         final result = notusMarkdown.encode(delta);
         expect(result, expected);
@@ -429,8 +441,7 @@ void main() {
     });
 
     test('multiline blocks', () {
-      void runFor(
-          NotusAttribute<String> attribute, String source, String expected) {
+      void runFor(NotusAttribute<String> attribute, String source, String expected) {
         final delta = Delta()
           ..insert(source)
           ..insert('\n', attribute.toJson())

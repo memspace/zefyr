@@ -4,8 +4,8 @@
 
 import 'dart:convert';
 
-import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
+import 'package:notus/notus.dart';
 
 class NotusMarkdownCodec extends Codec<Delta, String> {
   const NotusMarkdownCodec();
@@ -47,7 +47,7 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     return delta;
   }
 
-  _handleLine(String line, Delta delta, [Map<String, dynamic> attributes]) {
+  void _handleLine(String line, Delta delta, [Map<String, dynamic> attributes, bool isBlock]) {
     if (_handleBlockQuote(line, delta, attributes)) {
       return;
     }
@@ -59,7 +59,7 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     }
 
     if (line.isNotEmpty) {
-      _handleSpan(line, delta, true, attributes);
+      _handleSpan(line, delta, true, attributes, isBlock);
     }
   }
 
@@ -97,14 +97,12 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     var match = _bqRegExp.matchAsPrefix(line);
     if (match != null) {
       var span = match.group(1);
-      Map<String, dynamic> newAttributes = {
-        'block': 'quote'
-      }; // NotusAttribute.bq.toJson();
+      var newAttributes = NotusAttribute.bq.toJson(); // NotusAttribute.bq.toJson();
       if (attributes != null) {
         newAttributes.addAll(attributes);
       }
       // all blocks are supported within bq
-      _handleLine(span, delta, newAttributes);
+      _handleLine(span, delta, newAttributes, true);
       return true;
     }
     return false;
@@ -118,12 +116,12 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
 // TODO: support nesting
 //      var depth =  match.group(1).length / 3;
       var span = match.group(2);
-      Map<String, dynamic> newAttributes = NotusAttribute.ol.toJson();
+      var newAttributes = NotusAttribute.ol.toJson();
       if (attributes != null) {
         newAttributes.addAll(attributes);
       }
       // There's probably no reason why you would have other block types on the same line
-      _handleSpan(span, delta, true, newAttributes);
+      _handleSpan(span, delta, true, newAttributes, true);
       return true;
     }
     return false;
@@ -135,22 +133,22 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     if (match != null) {
 //      var depth = match.group(1).length / 3;
       var span = match.group(2);
-      Map<String, dynamic> newAttributes = NotusAttribute.ul.toJson();
+      var newAttributes = NotusAttribute.ul.toJson();
       if (attributes != null) {
         newAttributes.addAll(attributes);
       }
       // There's probably no reason why you would have other block types on the same line
-      _handleSpan(span, delta, true, newAttributes);
+      _handleSpan(span, delta, true, newAttributes, true);
       return true;
     }
     return false;
   }
 
-  _handleHeading(String line, Delta delta, [Map<String, dynamic> attributes]) {
+  bool _handleHeading(String line, Delta delta, [Map<String, dynamic> attributes]) {
     var match = _headingRegExp.matchAsPrefix(line);
     if (match != null) {
       var level = match.group(1).length;
-      Map<String, dynamic> newAttributes = {
+      var newAttributes = <String, dynamic>{
         'heading': level
       }; // NotusAttribute.heading.withValue(level).toJson();
       if (attributes != null) {
@@ -159,7 +157,7 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
 
       var span = match.group(2);
       // TODO: true or false?
-      _handleSpan(span, delta, true, newAttributes);
+      _handleSpan(span, delta, true, newAttributes, true);
 //      delta.insert('\n', attribute.toJson());
       return true;
     }
@@ -167,8 +165,8 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     return false;
   }
 
-  _handleSpan(String span, Delta delta, bool addNewLine,
-      Map<String, dynamic> outerStyle) {
+  void _handleSpan(String span, Delta delta, bool addNewLine,
+      Map<String, dynamic> outerStyle, [bool isBlock]) {
     var start = _handleStyles(span, delta, outerStyle);
     span = span.substring(start);
 
@@ -179,7 +177,12 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
 
     if (span.isNotEmpty) {
       if (addNewLine) {
-        delta.insert('$span\n', outerStyle);
+        if(isBlock != null && isBlock){
+          delta.insert(span);
+          delta.insert('\n', outerStyle);
+        } else {
+          delta.insert('$span\n', outerStyle);
+        }
       } else {
         delta.insert(span, outerStyle);
       }
@@ -188,29 +191,36 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     }
   }
 
-  _handleStyles(String span, Delta delta, Map<String, dynamic> outerStyle) {
+  int _handleStyles(String span, Delta delta, Map<String, dynamic> outerStyle) {
     var start = 0;
 
     var matches = _styleRegExp.allMatches(span);
     matches.forEach((match) {
       if (match.start > start) {
+        var validInlineStyles = _getValidInlineStyles(outerStyle);
         if (span.substring(match.start - 1, match.start) == '[') {
-          delta.insert(span.substring(start, match.start - 1), outerStyle);
+          var text = span.substring(start, match.start - 1);
+          validInlineStyles != null ? delta.insert(text, validInlineStyles) : delta.insert(text);
           start = match.start -
               1 +
-              _handleLinks(span.substring(match.start - 1), delta, outerStyle);
+              _handleLinks(span.substring(match.start - 1), delta, validInlineStyles);
           return;
         } else {
-          delta.insert(span.substring(start, match.start), outerStyle);
+          var text = span.substring(start, match.start);
+
+          validInlineStyles != null ? delta.insert(text, validInlineStyles) : delta.insert(text);
         }
       }
 
       var text = match.group(2);
       var newStyle = Map<String, dynamic>.from(
           _attributesByStyleLength[match.group(1).length]);
-      if (outerStyle != null) {
-        newStyle.addAll(outerStyle);
+      
+      var validInlineStyles = _getValidInlineStyles(outerStyle);
+      if (validInlineStyles != null) {
+        newStyle.addAll(validInlineStyles);
       }
+
       _handleSpan(text, delta, false, newStyle);
       start = match.end;
     });
@@ -218,23 +228,49 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     return start;
   }
 
-  _handleLinks(String span, Delta delta, Map<String, dynamic> outerStyle) {
+  Map<String, dynamic> _getValidInlineStyles(Map<String, dynamic> outerStyle) {
+    Map<String, dynamic> leafStyles;
+
+    if(outerStyle == null) {
+      return null;
+    }
+
+    if(outerStyle.containsKey(NotusAttribute.bold.key)){
+      leafStyles = {'b': true};
+    }
+
+    if(outerStyle.containsKey(NotusAttribute.italic.key)){
+      leafStyles = {'i': true};
+    }
+
+    if(outerStyle.containsKey(NotusAttribute.link.key)){
+      leafStyles = {NotusAttribute.link.key: outerStyle[NotusAttribute.link.key]};
+    }
+
+    return leafStyles;
+  }
+
+  int _handleLinks(String span, Delta delta, Map<String, dynamic> outerStyle) {
     var start = 0;
 
     var matches = _linkRegExp.allMatches(span);
     matches.forEach((match) {
       if (match.start > start) {
-        delta.insert(span.substring(start, match.start)); //, outerStyle);
+        var text = span.substring(start, match.start);
+        delta.insert(text); //, outerStyle);
       }
 
       var text = match.group(1);
       var href = match.group(2);
-      Map<String, dynamic> newAttributes = {
+      var newAttributes = <String, dynamic>{
         'a': href
       }; // NotusAttribute.link.fromString(href).toJson();
-      if (outerStyle != null) {
-        newAttributes.addAll(outerStyle);
+
+      var validInlineStyles = _getValidInlineStyles(outerStyle);
+      if (validInlineStyles != null) {
+        newAttributes.addAll(validInlineStyles);
       }
+
       _handleSpan(text, delta, false, newAttributes);
       start = match.end;
     });
@@ -259,7 +295,7 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
     final lineBuffer = StringBuffer();
     NotusAttribute<String> currentBlockStyle;
     var currentInlineStyle = NotusStyle();
-    var currentBlockLines = [];
+    var currentBlockLines = <String>[];
 
     void _handleBlock(NotusAttribute<String> blockStyle) {
       if (currentBlockLines.isEmpty) {
