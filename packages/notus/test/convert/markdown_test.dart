@@ -10,7 +10,23 @@ import 'package:notus/notus.dart';
 import 'package:notus/convert.dart';
 
 void main() {
-  group('$NotusMarkdownCodec.encode', () {
+  group('$NotusMarkdownCodec.decode', () {
+    test('should convert empty markdown to valid empty notus document', () {
+      final markdown = '';
+      final newNotusDoc = NotusDocument();
+      final delta = notusMarkdown.decode(markdown);
+      expect(delta.elementAt(0).data, '\n');
+      expect(delta, newNotusDoc.toDelta());
+    });
+
+    test('should convert invalid markdown with only line breaks to valid empty notus document', () {
+      final markdown = '\n\n\n';
+      final delta = notusMarkdown.decode(markdown);
+      expect(delta.elementAt(0).data, '\n');
+      final newNotusDoc = NotusDocument();
+      expect(delta, newNotusDoc.toDelta());
+    });
+
     test('paragraphs', () {
       final markdown = 'First line\n\nSecond line\n\n';
       final delta = notusMarkdown.decode(markdown);
@@ -347,6 +363,23 @@ void main() {
   });
 
   group('$NotusMarkdownCodec.encode', () {
+    test('should convert empty valid notus document to empty markdown', () {
+      final delta = NotusDocument().toDelta();
+      final result = notusMarkdown.encode(delta);
+      expect(result, '');
+    });
+
+    test('should convert delta with only line breaks to empty markdown', () {
+      final delta = Delta()
+        ..insert('\n')
+        ..insert('\n')
+        ..insert('\n')
+        ..insert('\n');
+
+      final result = notusMarkdown.encode(delta);
+      expect(result, '');
+    });
+    
     test('split adjacent paragraphs', () {
       final delta = Delta()..insert('First line\nSecond line\n');
       final result = notusMarkdown.encode(delta);

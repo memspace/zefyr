@@ -40,11 +40,26 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     final lines = input.split('\n');
     final delta = Delta();
 
-    for (var line in lines) {
-      _handleLine(line, delta);
+    if(_allLinesEmpty(lines)) {
+      Map<String, dynamic> style;
+      _handleSpan(lines[0], delta, true, style);
+    } else {
+      for (var line in lines) {
+        _handleLine(line, delta);
+      }
     }
 
     return delta;
+  }
+
+  bool _allLinesEmpty(List<String> lines) {
+    for (var line in lines) {
+      if (line != '') {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   void _handleLine(String line, Delta delta, [Map<String, dynamic> attributes, bool isBlock]) {
@@ -165,6 +180,7 @@ class _NotusMarkdownDecoder extends Converter<String, Delta> {
     return false;
   }
 
+  // ignore: always_declare_return_types
   void _handleSpan(String span, Delta delta, bool addNewLine,
       Map<String, dynamic> outerStyle, [bool isBlock]) {
     var start = _handleStyles(span, delta, outerStyle);
@@ -297,9 +313,23 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
     var currentInlineStyle = NotusStyle();
     var currentBlockLines = <String>[];
 
+    bool _allLinesEmpty(List<String> lines) {
+      for (var line in lines) {
+        if (line != '') {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     void _handleBlock(NotusAttribute<String> blockStyle) {
       if (currentBlockLines.isEmpty) {
         return; // Empty block
+      }
+
+      if(_allLinesEmpty(currentBlockLines)){
+        return;
       }
 
       if (blockStyle == null) {
