@@ -15,6 +15,16 @@ class InputConnectionController implements TextInputClient {
   //
   // public members
   //
+  //todo: fill this
+  @override
+  void showAutocorrectionPromptRect(int start, int end) {
+    throw UnimplementedError();
+  }
+
+  @override
+  AutofillScope get currentAutofillScope {
+    throw UnimplementedError();
+  }
 
   final RemoteValueChanged onValueChanged;
 
