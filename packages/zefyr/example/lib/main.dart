@@ -1,6 +1,8 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -10,6 +12,15 @@ import 'src/view.dart';
 import 'src/text_field_page.dart';
 
 void main() {
+  /// 沉浸式状态栏
+  if (Platform.isAndroid) {
+    var systemUiOverlayStyle = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarBrightness: Brightness.dark,
+    );
+    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  }
+
   runApp(ZefyrApp());
 }
 
@@ -33,13 +44,14 @@ class ZefyrApp extends StatelessWidget {
         }),
       debugShowCheckedModeBanner: false,
       title: 'Zefyr Editor',
-      home: HomePage(),
-      routes: {
-        "/fullPage": buildFullPage,
-        "/form": buildFormPage,
-        "/view": buildViewPage,
-        "/textinput": buildTextFieldPage,
-      },
+      home: FullPageEditorScreen(),
+//      home: MyHomePage(),
+//      routes: {
+//        "/fullPage": buildFullPage,
+//        "/form": buildFormPage,
+//        "/view": buildViewPage,
+//        "/textinput": buildTextFieldPage,
+//      },
     );
   }
 
@@ -57,6 +69,36 @@ class ZefyrApp extends StatelessWidget {
 
   Widget buildTextFieldPage(BuildContext context) {
     return TextFieldScreen();
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Column(
+        children: [
+          Text.rich(
+            TextSpan(children: [
+              TextSpan(text: '啊啊啊'),
+              WidgetSpan(
+                  child: InkWell(
+                child: Text('aaa'),
+                onTap: () {
+                  print('哈哈哈哈');
+                },
+              )),
+            ]),
+          )
+        ],
+      ),
+    );
   }
 }
 

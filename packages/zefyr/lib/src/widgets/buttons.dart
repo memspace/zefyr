@@ -229,7 +229,7 @@ class _HeadingButtonState extends State<HeadingButton> {
     final buttons = Row(
       children: <Widget>[
         SizedBox(width: 8.0),
-        Text('字体大小'),
+        Text('字体规格'),
         toolbar.buildButton(context, ZefyrToolbarAction.headingLevel1),
         toolbar.buildButton(context, ZefyrToolbarAction.headingLevel2),
         toolbar.buildButton(context, ZefyrToolbarAction.headingLevel3),

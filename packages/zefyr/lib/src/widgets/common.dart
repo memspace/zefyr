@@ -131,6 +131,25 @@ class _ZefyrLineState extends State<ZefyrLine> {
     final TextNode segment = node;
     final attrs = segment.style;
 
+    // todo 这里可以用WidgetSpan
+//    if (attrs.contains(NotusAttribute.link)) {
+//      return TextSpan(
+//        children: [
+//          WidgetSpan(
+//            child: InkWell(
+//              child: Text(
+//                segment.value,
+//                style: _getTextStyle(attrs, theme),
+//              ),
+//              onTap: () {
+//                print('click link');
+//              },
+//            ),
+//          )
+//        ],
+//      );
+//    }
+
     return TextSpan(
       text: segment.value,
       style: _getTextStyle(attrs, theme),
