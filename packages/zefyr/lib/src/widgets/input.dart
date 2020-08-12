@@ -22,6 +22,9 @@ class InputConnectionController implements TextInputClient {
   }
 
   @override
+  dynamic noSuchMethod(Invocation i) => super.noSuchMethod(i);
+
+  @override
   AutofillScope get currentAutofillScope {
     throw UnimplementedError();
   }
