@@ -16,8 +16,9 @@ class ZefyrRichText extends LeafRenderObjectWidget {
   ZefyrRichText({
     @required this.node,
     @required this.text,
+    this.textAlign,
   }) : assert(node != null && text != null);
-
+  final TextAlign textAlign;
   final LineNode node;
   final TextSpan text;
 
@@ -28,7 +29,7 @@ class ZefyrRichText extends LeafRenderObjectWidget {
       node: node,
       textDirection: Directionality.of(context),
       // todo 文字对齐方式
-      textAlign: TextAlign.left,
+      textAlign: textAlign,
     );
   }
 
@@ -190,6 +191,7 @@ class RenderZefyrParagraph extends RenderParagraph
   }
 
   TextSelection _lastPaintedSelection;
+
   @override
   void paintSelection(PaintingContext context, Offset offset,
       TextSelection selection, Color selectionColor) {

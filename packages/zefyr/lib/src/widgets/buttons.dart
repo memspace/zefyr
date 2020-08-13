@@ -17,6 +17,20 @@ import 'toolbar.dart';
 ///
 /// Toolbar buttons are normally created by a [ZefyrToolbarDelegate].
 class ZefyrButton extends StatelessWidget {
+  /// Creates a toolbar button with an child.
+  ZefyrButton({
+    @required this.action,
+    @required Widget child,
+    double iconSize,
+    this.onPressed,
+  })  : assert(action != null),
+        _iconSize = iconSize,
+        _child = child,
+        _icon = null,
+        _text = null,
+        _textStyle = null,
+        super();
+
   /// Creates a toolbar button with an icon.
   ZefyrButton.icon({
     @required this.action,
@@ -28,6 +42,7 @@ class ZefyrButton extends StatelessWidget {
         _icon = icon,
         _iconSize = iconSize,
         _text = null,
+        _child = null,
         _textStyle = null,
         super();
 
@@ -44,6 +59,7 @@ class ZefyrButton extends StatelessWidget {
         assert(text != null),
         _icon = null,
         _iconSize = null,
+        _child = null,
         _text = text,
         _textStyle = style,
         super();
@@ -51,6 +67,7 @@ class ZefyrButton extends StatelessWidget {
   /// Toolbar action associated with this button.
   final ZefyrToolbarAction action;
   final IconData _icon;
+  final Widget _child;
   final double _iconSize;
   final String _text;
   final TextStyle _textStyle;
@@ -71,7 +88,14 @@ class ZefyrButton extends StatelessWidget {
     final iconColor = (pressedHandler == null)
         ? toolbarTheme.disabledIconColor
         : toolbarTheme.iconColor;
-    if (_icon != null) {
+    if (_child != null) {
+      return RawZefyrButton(
+        action: action,
+        child: _child,
+        color: _getColor(editor, toolbarTheme),
+        onPressed: _getPressedHandler(editor, toolbar),
+      );
+    } else if (_icon != null) {
       return RawZefyrButton.icon(
         action: action,
         icon: _icon,
@@ -124,11 +148,11 @@ class ZefyrButton extends StatelessWidget {
 
   void _toggleAttribute(NotusAttribute attribute, ZefyrScope editor) {
     final isToggled = editor.selectionStyle.containsSame(attribute);
-    print(
-        '是否点击::${attribute.key}，，，attribute.unset::${attribute.unset.toJson()}');
     if (isToggled) {
       editor.formatSelection(attribute.unset);
     } else {
+      print(
+          '是否点击::${attribute.key}，，，attribute.unset::${attribute.isInline}');
       editor.formatSelection(attribute);
     }
   }

@@ -194,6 +194,38 @@ class LineTheme {
   int get hashCode => hashValues(textStyle, padding);
 }
 
+//@immutable
+//class AlignTheme {
+//  AlignTheme({
+//    @required this.align,
+//  }) : assert(align != null);
+//
+//  final TextAlign align;
+//
+//  AlignTheme copyWith({TextAlign align}) {
+//    return AlignTheme(
+//      align: align,
+//    );
+//  }
+//
+//  AlignTheme merge(AlignTheme other) {
+//    if (other == null) return this;
+//    return copyWith(
+//      align: other.align,
+//    );
+//  }
+//
+//  @override
+//  bool operator ==(other) {
+//    if (other.runtimeType != runtimeType) return false;
+//    final AlignTheme otherTheme = other;
+//    return otherTheme.align == align;
+//  }
+//
+//  @override
+//  int get hashCode => hashValues(align, align);
+//}
+
 /// Holds typography values for a block of lines in Zefyr editor.
 @immutable
 class BlockTheme {
@@ -315,6 +347,12 @@ class AttributeTheme {
   /// Style theme used to render smaller headings.
   final LineTheme heading3;
 
+  final TextAlign alignLeft;
+
+  final TextAlign alignCenter;
+
+  final TextAlign alignRight;
+
   /// 红色颜色的主题
   final LineTheme red;
 
@@ -332,6 +370,9 @@ class AttributeTheme {
 
   /// Creates a [AttributeTheme] given a set of exact values.
   AttributeTheme({
+    this.alignLeft,
+    this.alignCenter,
+    this.alignRight,
     this.bold,
     this.italic,
     this.link,
@@ -371,7 +412,7 @@ class AttributeTheme {
 
     return AttributeTheme(
       bold: TextStyle(fontWeight: FontWeight.bold),
-      newTextColor: TextStyle(color: Colors.blue),
+      newTextColor: TextStyle(color: Colors.blueAccent),
       textBgColor: TextStyle(backgroundColor: Colors.red),
       textFont: GoogleFonts.abel(),
       textLineThrough: TextStyle(decoration: TextDecoration.lineThrough),
@@ -443,6 +484,9 @@ class AttributeTheme {
         inheritLineTextStyle: false,
         linePadding: EdgeInsets.zero,
       ),
+      alignLeft: TextAlign.start,
+      alignCenter: TextAlign.center,
+      alignRight: TextAlign.right,
     );
   }
 
@@ -459,6 +503,9 @@ class AttributeTheme {
     BlockTheme numberList,
     BlockTheme quote,
     BlockTheme code,
+    TextAlign alignLeft,
+    TextAlign alignCenter,
+    TextAlign alignRight,
   }) {
     return AttributeTheme(
       bold: bold ?? this.bold,
@@ -471,6 +518,9 @@ class AttributeTheme {
       numberList: numberList ?? this.numberList,
       quote: quote ?? this.quote,
       code: code ?? this.code,
+      alignLeft: alignLeft ?? this.alignLeft,
+      alignCenter: alignCenter ?? this.alignCenter,
+      alignRight: alignRight ?? this.alignRight,
     );
   }
 
@@ -485,6 +535,9 @@ class AttributeTheme {
       heading1: heading1?.merge(other.heading1) ?? other.heading1,
       heading2: heading2?.merge(other.heading2) ?? other.heading2,
       heading3: heading3?.merge(other.heading3) ?? other.heading3,
+      alignLeft: alignLeft ?? other.alignLeft,
+      alignCenter: alignCenter ?? other.alignCenter,
+      alignRight: alignRight ?? other.alignRight,
       bulletList: bulletList?.merge(other.bulletList) ?? other.bulletList,
       numberList: numberList?.merge(other.numberList) ?? other.numberList,
       quote: quote?.merge(other.quote) ?? other.quote,
@@ -505,6 +558,9 @@ class AttributeTheme {
         (otherTheme.bulletList == bulletList) &&
         (otherTheme.numberList == numberList) &&
         (otherTheme.quote == quote) &&
+        (otherTheme.alignLeft == alignLeft) &&
+        (otherTheme.alignCenter == alignCenter) &&
+        (otherTheme.alignRight == alignRight) &&
         (otherTheme.code == code);
   }
 
@@ -521,6 +577,9 @@ class AttributeTheme {
       numberList,
       quote,
       code,
+      alignLeft,
+      alignCenter,
+      alignRight,
     ]);
   }
 }

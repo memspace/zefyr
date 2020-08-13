@@ -16,8 +16,13 @@ import 'theme.dart';
 
 /// Represents single line of rich text document in Zefyr editor.
 class ZefyrLine extends StatefulWidget {
-  const ZefyrLine({Key key, @required this.node, this.style, this.padding})
-      : assert(node != null),
+  const ZefyrLine({
+    Key key,
+    @required this.node,
+    this.style,
+    this.padding,
+    this.textAlign,
+  })  : assert(node != null),
         super(key: key);
 
   /// Line in the document represented by this widget.
@@ -29,6 +34,9 @@ class ZefyrLine extends StatefulWidget {
 
   /// Padding to add around this paragraph.
   final EdgeInsets padding;
+
+  /// text align
+  final TextAlign textAlign;
 
   @override
   _ZefyrLineState createState() => _ZefyrLineState();
@@ -53,6 +61,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
       content = ZefyrRichText(
         node: widget.node,
         text: buildText(context),
+        textAlign: widget.textAlign ?? TextAlign.start,
       );
     }
 

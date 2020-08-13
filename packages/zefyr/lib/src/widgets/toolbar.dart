@@ -13,6 +13,9 @@ import 'theme.dart';
 
 /// List of all button actions supported by [ZefyrToolbar] buttons.
 enum ZefyrToolbarAction {
+  alignLeft,
+  alignCenter,
+  alignRight,
   bold,
   newTextColor,
   textBgColor,
@@ -59,6 +62,9 @@ final kZefyrToolbarAttributeActions = <ZefyrToolbarAction, NotusAttributeKey>{
   ZefyrToolbarAction.code: NotusAttribute.block.code,
   ZefyrToolbarAction.quote: NotusAttribute.block.quote,
   ZefyrToolbarAction.horizontalRule: NotusAttribute.embed.horizontalRule,
+  ZefyrToolbarAction.alignLeft: NotusAttribute.textAlign.left,
+  ZefyrToolbarAction.alignCenter: NotusAttribute.textAlign.center,
+  ZefyrToolbarAction.alignRight: NotusAttribute.textAlign.right,
 };
 
 /// Allows customizing appearance of [ZefyrToolbar].
@@ -289,6 +295,18 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
         '字体',
         child: buildButton(context, ZefyrToolbarAction.textFont),
       ),
+      tipWidget(
+        '向左对齐',
+        child: buildButton(context, ZefyrToolbarAction.alignLeft),
+      ),
+      tipWidget(
+        '居中对齐',
+        child: buildButton(context, ZefyrToolbarAction.alignCenter),
+      ),
+      tipWidget(
+        '向右对齐',
+        child: buildButton(context, ZefyrToolbarAction.alignRight),
+      ),
       buildButton(context, ZefyrToolbarAction.bold),
       buildButton(context, ZefyrToolbarAction.italic),
       LinkButton(),
@@ -373,6 +391,16 @@ class _ZefyrButtonListState extends State<ZefyrButtonList> {
 }
 
 class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
+  static const kDefaultImageIcons = {
+    ZefyrToolbarAction.newTextColor: 'ic_text_color.png',
+    ZefyrToolbarAction.textBgColor: 'ic_text_bg_color.png',
+    ZefyrToolbarAction.textUnderline: 'ic_text_underline.png',
+    ZefyrToolbarAction.textLineThrough: 'ic_textLine_through.png',
+    ZefyrToolbarAction.alignLeft: 'ic_align_left.png',
+    ZefyrToolbarAction.alignCenter: 'ic_align_center.png',
+    ZefyrToolbarAction.alignRight: 'ic_align_right.png',
+  };
+
   static const kDefaultButtonIcons = {
     ZefyrToolbarAction.bold: Icons.format_bold,
     ZefyrToolbarAction.italic: Icons.format_italic,
@@ -392,10 +420,6 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.hideKeyboard: Icons.keyboard_hide,
     ZefyrToolbarAction.close: Icons.close,
     ZefyrToolbarAction.confirm: Icons.check,
-    ZefyrToolbarAction.newTextColor: Icons.color_lens,
-    ZefyrToolbarAction.textBgColor: Icons.invert_colors,
-    ZefyrToolbarAction.textUnderline: Icons.border_color,
-    ZefyrToolbarAction.textLineThrough: Icons.remove,
     ZefyrToolbarAction.textFont: Icons.font_download,
   };
 
@@ -426,15 +450,22 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
         iconSize: size,
         onPressed: onPressed,
       );
-    } else {
+    } else if (kDefaultButtonTexts[action] != null) {
       final text = kDefaultButtonTexts[action];
-      assert(text != null);
       final style = theme.textTheme.caption
           .copyWith(fontWeight: FontWeight.bold, fontSize: 14.0);
       return ZefyrButton.text(
         action: action,
         text: text,
         style: style,
+        onPressed: onPressed,
+      );
+    } else {
+      final img = kDefaultImageIcons[action];
+      return ZefyrButton(
+        action: action,
+        child: Image.asset('assets/' + img,
+            package: 'zefyr', fit: BoxFit.cover, width: 25),
         onPressed: onPressed,
       );
     }

@@ -83,6 +83,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.italic.key: NotusAttribute.italic,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
+    NotusAttribute.textAlign.key: NotusAttribute.textAlign,
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.embed.key: NotusAttribute.embed,
   };
@@ -115,6 +116,14 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static const link = LinkAttributeBuilder._();
 
   // Line attributes
+
+  static const textAlign = TextAlignAttributeBuilder._();
+
+  static NotusAttribute<String> get left => textAlign.left;
+
+  static NotusAttribute<String> get center => textAlign.center;
+
+  static NotusAttribute<String> get right => textAlign.right;
 
   /// Heading style attribute.
   // ignore: const_eval_throws_exception
@@ -416,6 +425,19 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
 
   /// Level 3 heading, equivalent of `H3` in HTML.
   NotusAttribute<int> get level3 => NotusAttribute<int>._(key, scope, 3);
+}
+
+class TextAlignAttributeBuilder extends NotusAttributeBuilder<String> {
+  static const _kAlign = 'align';
+
+  const TextAlignAttributeBuilder._()
+      : super._(_kAlign, NotusAttributeScope.line);
+
+  NotusAttribute<String> get left => NotusAttribute<String>._(key, scope, 'left');
+
+  NotusAttribute<String> get center => NotusAttribute<String>._(key, scope, 'center');
+
+  NotusAttribute<String> get right => NotusAttribute<String>._(key, scope, 'right');
 }
 
 /// 新增加的

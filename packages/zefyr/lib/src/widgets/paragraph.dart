@@ -32,11 +32,12 @@ class ZefyrParagraph extends StatelessWidget {
 
 /// Represents heading-styled line in [ZefyrEditor].
 class ZefyrHeading extends StatelessWidget {
-  ZefyrHeading({Key key, @required this.node, this.blockStyle})
+  ZefyrHeading({Key key, @required this.node, this.blockStyle, this.align})
       : assert(node.style.contains(NotusAttribute.heading)),
         super(key: key);
 
   final LineNode node;
+  final TextAlign align;
   final TextStyle blockStyle;
 
   @override
@@ -50,6 +51,7 @@ class ZefyrHeading extends StatelessWidget {
       node: node,
       style: style,
       padding: theme.padding,
+      textAlign: align,
     );
   }
 
@@ -64,5 +66,67 @@ class ZefyrHeading extends StatelessWidget {
       return theme.attributeTheme.heading3;
     }
     throw UnimplementedError('Unsupported heading style $style');
+  }
+}
+
+/// Represents heading-styled line in [ZefyrEditor].
+class ZefyrAlign extends StatelessWidget {
+  ZefyrAlign({
+    Key key,
+    @required this.node,
+    this.blockStyle,
+    this.align,
+  })  : assert(node.style.contains(NotusAttribute.textAlign)),
+        super(key: key);
+
+  final TextAlign align;
+  final LineNode node;
+  final TextStyle blockStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ZefyrTheme.of(context);
+    final align = alignOf(node, context);
+
+    TextStyle textStyle;
+    Widget content;
+    EdgeInsets padding;
+
+    if (node.style.contains(NotusAttribute.heading)) {
+      final headingTheme = ZefyrHeading.themeOf(node, context);
+      textStyle = headingTheme.textStyle;
+      padding = headingTheme.padding;
+      content = ZefyrHeading(node: node, align: this.align ?? align);
+    } else {
+      textStyle = theme.defaultLineTheme.textStyle;
+      content = ZefyrLine(
+        node: node,
+        style: textStyle,
+        textAlign: this.align ?? align,
+      );
+      padding = EdgeInsets.all(0);
+    }
+
+    if (blockStyle != null) {
+      textStyle = textStyle.merge(blockStyle);
+    }
+    if (padding != null) {
+      return Padding(padding: padding, child: content);
+    }
+
+    return content;
+  }
+
+  static TextAlign alignOf(LineNode node, BuildContext context) {
+    final theme = ZefyrTheme.of(context);
+    final style = node.style.get(NotusAttribute.textAlign);
+    if (style == NotusAttribute.textAlign.left) {
+      return theme.attributeTheme.alignLeft;
+    } else if (style == NotusAttribute.textAlign.center) {
+      return theme.attributeTheme.alignCenter;
+    } else if (style == NotusAttribute.textAlign.right) {
+      return theme.attributeTheme.alignRight;
+    }
+    throw UnimplementedError('Unsupported align $style');
   }
 }
