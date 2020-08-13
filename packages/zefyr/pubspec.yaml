@@ -18,6 +18,8 @@ dependencies:
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
   google_fonts: 1.1.0
+  shared_preferences: 0.5.8
+  fluttertoast: 7.0.2
 
 dev_dependencies:
   flutter_test:

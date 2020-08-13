@@ -84,6 +84,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.textAlign.key: NotusAttribute.textAlign,
+    NotusAttribute.textAlign.left.key: NotusAttribute.textAlign.left,
+    NotusAttribute.textAlign.center.key: NotusAttribute.textAlign.center,
+    NotusAttribute.textAlign.right.key: NotusAttribute.textAlign.right,
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.embed.key: NotusAttribute.embed,
   };

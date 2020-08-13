@@ -4,7 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:notus/notus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'scope.dart';
 import 'theme.dart';
@@ -146,14 +148,29 @@ class ZefyrButton extends StatelessWidget {
     return null;
   }
 
-  void _toggleAttribute(NotusAttribute attribute, ZefyrScope editor) {
+  void _toggleAttribute(NotusAttribute attribute, ZefyrScope editor)async {
     final isToggled = editor.selectionStyle.containsSame(attribute);
     if (isToggled) {
       editor.formatSelection(attribute.unset);
     } else {
-      print(
-          '是否点击::${attribute.key}，，，attribute.unset::${attribute.isInline}');
       editor.formatSelection(attribute);
+      if (attribute.key != NotusAttribute.textAlign.key) {
+        return;
+      }
+      var sp = await SharedPreferences.getInstance();
+      if(sp.containsKey('cont')){
+        return;
+      }
+      await Fluttertoast.showToast(
+          msg: '如需更换对齐方式则需先取消当前对齐方式',
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black.withOpacity(0.6),
+          textColor: Colors.white,
+          fontSize: 15.0
+      );
+      await sp.setInt('cont', 0);
     }
   }
 }
