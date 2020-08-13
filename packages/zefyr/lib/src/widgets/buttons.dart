@@ -148,7 +148,7 @@ class ZefyrButton extends StatelessWidget {
     return null;
   }
 
-  void _toggleAttribute(NotusAttribute attribute, ZefyrScope editor)async {
+  void _toggleAttribute(NotusAttribute attribute, ZefyrScope editor) async {
     final isToggled = editor.selectionStyle.containsSame(attribute);
     if (isToggled) {
       editor.formatSelection(attribute.unset);
@@ -162,13 +162,12 @@ class ZefyrButton extends StatelessWidget {
         return;
       }
       await Fluttertoast.showToast(
-          msg: '如需更换对齐方式则需先取消当前对齐方式',
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black.withOpacity(0.6),
-          textColor: Colors.white,
-          fontSize: 15.0
+        msg: '如需更换对齐方式则需先取消当前对齐方式',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.cyan.withOpacity(0.6),
+        fontSize: 15,
       );
       await sp.setInt('cont', 0);
     }
