@@ -100,6 +100,11 @@ class InputConnectionController implements TextInputClient {
   }
 
   @override
+  void performPrivateCommand(String action, Map<String, dynamic> data){
+    // no-op
+  }
+
+  @override
   void updateEditingValue(TextEditingValue value) {
     if (_sentRemoteValues.contains(value)) {
       /// There is a race condition in Flutter text input plugin where sending
