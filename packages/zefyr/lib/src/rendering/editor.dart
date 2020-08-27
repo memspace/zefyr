@@ -1,8 +1,26 @@
+import 'dart:collection';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
+
+import 'text_line.dart';
+
+// Experiment: instead of trying to create a very flexible multi-child
+// container widget, let's try to create a widget similar to RenderParagraph
+// but which can actually render the whole document.
+// We can take similar approach to what is used in Flutter's TextSpan:
+// instead of trying to use NotusDocument to describe widget tree we can
+// introduce intermediate representation, e.g. ZefyrTextSpan, similar to
+// TextSpan, with two special subclasses: ZefyrLineSpan - for regular paragraphs
+// of text, and ZefyrWidgetSpan - for embedded content (images, etc).
+// We can then follow the same pattern as in RenderParagraph, where all embed
+// elements are added as children of RenderEditor.
+// During layout we call layout on all embed children and save their dimensions.
+// Then we go over all regular text spans, layout them, add paddings and such,
+// and combine with embed dimensions to determine correct position offsets for
+// each element.
 
 /// Parent data for use with [RenderEditor].
 class EditorParentData extends ContainerBoxParentData<RenderBox> {}
@@ -38,13 +56,26 @@ class RenderEditor extends RenderBox
 
   /// Returns preferred line height at specified [position] in text.
   double preferredLineHeight(int position) {
+    assert(firstChild != null);
+
     LineNode line = _document.lookupLine(position).node;
-    RenderBox child = firstChild;
-    while (child != null) {
-      EditorParentData childParentData = child.parentData;
-      child = childParentData.nextSibling;
+    final queue = Queue<RenderBox>();
+    queue.add(this);
+    RenderTextLine lineBox;
+    while (queue.isNotEmpty) {
+      final c = queue.removeLast();
+      if (c is RenderTextLine) {
+        if (c.node == line) {
+          lineBox = c;
+          break;
+        }
+      }
+      c.visitChildren((child) {
+        queue.addLast(child);
+      });
     }
-    throw UnimplementedError();
+    assert(lineBox != null);
+    return lineBox.preferredLineHeight();
   }
 
   @override
@@ -80,9 +111,9 @@ class RenderEditor extends RenderBox
             'axis to a finite dimension.'),
       ]);
     }());
-    double mainAxisExtent = 0.0;
-    RenderBox child = firstChild;
-    final BoxConstraints innerConstraints =
+    var mainAxisExtent = 0.0;
+    var child = firstChild;
+    final innerConstraints =
         BoxConstraints.tightFor(width: constraints.maxWidth);
     while (child != null) {
       child.layout(innerConstraints, parentUsesSize: true);
@@ -104,8 +135,8 @@ class RenderEditor extends RenderBox
   }
 
   double _getIntrinsicCrossAxis(_ChildSizingFunction childSize) {
-    double extent = 0.0;
-    RenderBox child = firstChild;
+    var extent = 0.0;
+    var child = firstChild;
     while (child != null) {
       extent = math.max(extent, childSize(child));
       final EditorParentData childParentData = child.parentData;
@@ -115,8 +146,8 @@ class RenderEditor extends RenderBox
   }
 
   double _getIntrinsicMainAxis(_ChildSizingFunction childSize) {
-    double extent = 0.0;
-    RenderBox child = firstChild;
+    var extent = 0.0;
+    var child = firstChild;
     while (child != null) {
       extent += childSize(child);
       final EditorParentData childParentData = child.parentData;

@@ -416,8 +416,7 @@ class RawEditorState extends State<RawEditor>
   bool get selectAllEnabled => widget.toolbarOptions.selectAll;
 
   TextDirection get _textDirection {
-    final TextDirection result =
-        widget.textDirection ?? Directionality.of(context);
+    final result = widget.textDirection ?? Directionality.of(context);
     assert(result != null,
         '$runtimeType created without a textDirection and with no ambient Directionality.');
     return result;
