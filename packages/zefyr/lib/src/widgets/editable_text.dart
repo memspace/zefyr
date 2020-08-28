@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
@@ -163,7 +164,10 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       controls: widget.selectionControls ?? defaultSelectionControls(context),
     ));
 
-    return Stack(fit: StackFit.expand, children: layers);
+    return MouseRegion(
+      cursor: SystemMouseCursors.text,
+      child: Stack(fit: StackFit.expand, children: layers),
+    );
   }
 
   @override
