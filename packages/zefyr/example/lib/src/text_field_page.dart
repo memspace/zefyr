@@ -1,5 +1,8 @@
 import 'package:example/src/full_page.dart';
 import 'package:flutter/material.dart';
+import 'package:notus/notus.dart';
+import 'package:quill_delta/quill_delta.dart';
+import 'package:zefyr/src/zefyr_dev.dart';
 
 class TextFieldScreen extends StatefulWidget {
   TextFieldScreen({Key key, this.title}) : super(key: key);
@@ -20,8 +23,20 @@ class TextFieldScreen extends StatefulWidget {
 }
 
 class _TextFieldScreenState extends State<TextFieldScreen> {
-  final TextEditingController _singleTextFieldcontroller =
-      TextEditingController();
+  ZefyrController _controller = ZefyrController();
+  FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    final document = NotusDocument.fromDelta(Delta()
+      ..insert(
+          'Here we go again\nHello world!\nHere we go again\nHello world!\nHere we go again\n')
+      ..insert('This is ')
+      ..insert('bold', {'b': true})
+      ..insert(' text.\n'));
+    _controller = ZefyrController(document);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,19 +44,33 @@ class _TextFieldScreenState extends State<TextFieldScreen> {
       appBar: AppBar(
         title: ZefyrLogo(),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _singleTextFieldcontroller,
-                maxLines: 1000,
-              ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+          child: RawEditor(
+            controller: _controller,
+            focusNode: _focusNode,
+            showCursor: true,
+            cursorStyle: CursorStyle(
+              color: Colors.blue,
+              backgroundColor: Colors.grey,
+              width: 2.0,
+              radius: Radius.circular(1),
+              opacityAnimates: true,
             ),
-          ],
+          ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          setState(() {
+            _controller.updateSelection(TextSelection.collapsed(offset: 1));
+            _controller.document
+                .insert(_controller.document.length - 1, 'More text\n');
+          });
+        },
       ),
     );
   }

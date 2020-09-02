@@ -1,45 +1,40 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
 import '../rendering/editor.dart';
+import '_controller.dart';
 import '_cursor.dart';
+import '_editable_text_line.dart';
+import '_text_line.dart';
 
 class RawEditor extends StatefulWidget {
   RawEditor({
     Key key,
-    @required this.document,
     @required this.controller,
     @required this.focusNode,
     this.readOnly = false,
     this.autocorrect = true,
     this.enableSuggestions = true,
     StrutStyle strutStyle,
-    @required this.cursorColor,
-    @required this.backgroundCursorColor,
+    bool showCursor,
+    this.cursorStyle,
     this.textDirection,
     this.locale,
     this.textScaleFactor,
     this.maxHeight,
     this.minHeight,
     this.autofocus = false,
-    bool showCursor,
     this.showSelectionHandles = false,
     this.selectionColor,
     this.selectionControls,
     TextInputType keyboardType,
     this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
-    this.cursorWidth = 2.0,
-    this.cursorRadius,
-    this.cursorOpacityAnimates = false,
-    this.cursorOffset,
-    this.paintCursorAboveText = false,
     this.scrollPadding = const EdgeInsets.all(20.0),
     this.keyboardAppearance = Brightness.light,
     this.dragStartBehavior = DragStartBehavior.start,
@@ -52,17 +47,14 @@ class RawEditor extends StatefulWidget {
       paste: true,
       selectAll: true,
     ),
-  })  : assert(document != null),
-        assert(controller != null),
+  })  : assert(controller != null),
         assert(focusNode != null),
         assert(autocorrect != null),
         assert(enableSuggestions != null),
         assert(showSelectionHandles != null),
         assert(enableInteractiveSelection != null),
         assert(readOnly != null),
-        assert(cursorColor != null),
-        assert(cursorOpacityAnimates != null),
-        assert(backgroundCursorColor != null),
+        assert(!showCursor || cursorStyle != null),
         assert(maxHeight == null || maxHeight > 0),
         assert(minHeight == null || minHeight >= 0),
         assert(
@@ -80,11 +72,8 @@ class RawEditor extends StatefulWidget {
         showCursor = showCursor ?? !readOnly,
         super(key: key);
 
-  /// Document being edited in this editor.
-  final NotusDocument document;
-
-  /// Controls the text being edited.
-  final TextEditingController controller;
+  /// Controls the document being edited.
+  final ZefyrController controller;
 
   /// Controls whether this widget has keyboard focus.
   final FocusNode focusNode;
@@ -120,8 +109,12 @@ class RawEditor extends StatefulWidget {
   ///
   /// See also:
   ///
+  ///  * [cursorStyle], which controls the cursor visual representation.
   ///  * [showSelectionHandles], which controls the visibility of the selection handles.
   final bool showCursor;
+
+  /// The style to be used for the editing cursor.
+  final CursorStyle cursorStyle;
 
   /// Whether to enable autocorrection.
   ///
@@ -159,6 +152,7 @@ class RawEditor extends StatefulWidget {
   /// default values, and will instead inherit omitted/null properties from the
   /// [TextStyle] instead. See [StrutStyle.inheritFromTextStyle].
   StrutStyle get strutStyle {
+    final style = TextStyle(); // TODO: remove hardcode
     if (_strutStyle == null) {
       return style != null
           ? StrutStyle.fromTextStyle(style, forceStrutHeight: true)
@@ -210,18 +204,6 @@ class RawEditor extends StatefulWidget {
   /// [MediaQuery], or 1.0 if there is no [MediaQuery] in scope.
   final double textScaleFactor;
 
-  /// The color to use when painting the cursor.
-  ///
-  /// Cannot be null.
-  final Color cursorColor;
-
-  /// The color to use when painting the background cursor aligned with the text
-  /// while rendering the floating cursor.
-  ///
-  /// Cannot be null. By default it is the disabled grey color from
-  /// CupertinoColors.
-  final Color backgroundCursorColor;
-
   /// The maximum height this editor can have.
   ///
   /// If this is null then there is no limit to the editor's height and it will
@@ -257,43 +239,6 @@ class RawEditor extends StatefulWidget {
 
   /// The type of action button to use with the soft keyboard.
   final TextInputAction textInputAction;
-
-  /// How thick the cursor will be.
-  ///
-  /// Defaults to 2.0
-  ///
-  /// The cursor will draw under the text. The cursor width will extend
-  /// to the right of the boundary between characters for left-to-right text
-  /// and to the left for right-to-left text. This corresponds to extending
-  /// downstream relative to the selected position. Negative values may be used
-  /// to reverse this behavior.
-  final double cursorWidth;
-
-  /// How rounded the corners of the cursor should be.
-  ///
-  /// By default, the cursor has no radius.
-  final Radius cursorRadius;
-
-  /// Whether the cursor will animate from fully transparent to fully opaque
-  /// during each cursor blink.
-  ///
-  /// By default, the cursor opacity will animate on iOS platforms and will not
-  /// animate on Android platforms.
-  final bool cursorOpacityAnimates;
-
-  /// The offset that is used, in pixels, when painting the cursor on screen.
-  ///
-  /// By default, the cursor position should be set to an offset of
-  /// (-[cursorWidth] * 0.5, 0.0) on iOS platforms and (0, 0) on Android
-  /// platforms. The origin from where the offset is applied to is the arbitrary
-  /// location where the cursor ends up being rendered from by default.
-  final Offset cursorOffset;
-
-  /// If the cursor should be painted on top of the text or underneath it.
-  ///
-  /// By default, the cursor should be painted on top for iOS platforms and
-  /// underneath for Android platforms.
-  final bool paintCursorAboveText;
 
   /// The appearance of the keyboard.
   ///
@@ -347,8 +292,8 @@ class RawEditor extends StatefulWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(
-        DiagnosticsProperty<TextEditingController>('controller', controller));
+    properties
+        .add(DiagnosticsProperty<ZefyrController>('controller', controller));
     properties.add(DiagnosticsProperty<FocusNode>('focusNode', focusNode));
     properties.add(DiagnosticsProperty<bool>('autocorrect', autocorrect,
         defaultValue: true));
@@ -382,7 +327,7 @@ class RawEditorState extends State<RawEditor>
         AutomaticKeepAliveClientMixin<RawEditor>,
         WidgetsBindingObserver,
         TickerProviderStateMixin<RawEditor>
-    implements TextInputClient, TextSelectionDelegate {
+/*implements TextInputClient, TextSelectionDelegate*/ {
   final GlobalKey _editorKey = GlobalKey();
 
   CursorController _cursorController;
@@ -435,141 +380,166 @@ class RawEditorState extends State<RawEditor>
   @override
   void initState() {
     super.initState();
+
     widget.controller.addListener(_didChangeTextEditingValue);
-    _focusAttachment = widget.focusNode.attach(context);
-    widget.focusNode.addListener(_handleFocusChanged);
+
+//    _focusAttachment = widget.focusNode.attach(context);
+//    widget.focusNode.addListener(_handleFocusChanged);
     _scrollController = widget.scrollController ?? ScrollController();
-    _scrollController.addListener(() {
-      _selectionOverlay?.updateForScroll();
-    });
+//    _scrollController.addListener(() {
+//      _selectionOverlay?.updateForScroll();
+//    });
     _cursorController = CursorController(
+      showCursor: ValueNotifier<bool>(widget.showCursor ?? false),
+      style: widget.cursorStyle ??
+          CursorStyle(
+            // TODO: fallback to current theme's accent color
+            color: Colors.blueAccent,
+            backgroundColor: Colors.grey,
+            width: 2.0,
+          ),
       tickerProvider: this,
-      cursorColor: widget.cursorColor,
-      cursorOpacityAnimates: widget.cursorOpacityAnimates,
-      showCursor: widget.showCursor,
-      onCursorColorChanged: _handleCursorColorChanged,
     );
+    _cursorController.startOrStopCursorTimerIfNeeded(
+        true, TextSelection.collapsed(offset: 0));
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_didAutoFocus && widget.autofocus) {
-      FocusScope.of(context).autofocus(widget.focusNode);
-      _didAutoFocus = true;
-    }
+//    if (!_didAutoFocus && widget.autofocus) {
+//      FocusScope.of(context).autofocus(widget.focusNode);
+//      _didAutoFocus = true;
+//    }
   }
 
   @override
   void didUpdateWidget(RawEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.controller != oldWidget.controller) {
-      oldWidget.controller.removeListener(_didChangeTextEditingValue);
-      widget.controller.addListener(_didChangeTextEditingValue);
-      _updateRemoteEditingValueIfNeeded();
-    }
-    if (widget.controller.selection != oldWidget.controller.selection) {
-      _selectionOverlay?.update(_value);
-    }
-    _selectionOverlay?.handlesVisible = widget.showSelectionHandles;
-    if (widget.focusNode != oldWidget.focusNode) {
-      oldWidget.focusNode.removeListener(_handleFocusChanged);
-      _focusAttachment?.detach();
-      _focusAttachment = widget.focusNode.attach(context);
-      widget.focusNode.addListener(_handleFocusChanged);
-      updateKeepAlive();
-    }
-    if (widget.readOnly) {
-      _closeInputConnectionIfNeeded();
-    } else {
-      if (oldWidget.readOnly && _hasFocus) _openInputConnection();
-    }
-    if (widget.style != oldWidget.style) {
-      final TextStyle style = widget.style;
-      _textInputConnection?.setStyle(
-        fontFamily: style.fontFamily,
-        fontSize: style.fontSize,
-        fontWeight: style.fontWeight,
-        textDirection: _textDirection,
-        textAlign: widget.textAlign,
-      );
-    }
+
+    _cursorController.showCursor.value = widget.showCursor;
+    _cursorController.style = widget.cursorStyle;
+
+//    if (widget.controller != oldWidget.controller) {
+//      oldWidget.controller.removeListener(_didChangeTextEditingValue);
+//      widget.controller.addListener(_didChangeTextEditingValue);
+//      _updateRemoteEditingValueIfNeeded();
+//    }
+//    if (widget.controller.selection != oldWidget.controller.selection) {
+//      _selectionOverlay?.update(_value);
+//    }
+//    _selectionOverlay?.handlesVisible = widget.showSelectionHandles;
+//    if (widget.focusNode != oldWidget.focusNode) {
+//      oldWidget.focusNode.removeListener(_handleFocusChanged);
+//      _focusAttachment?.detach();
+//      _focusAttachment = widget.focusNode.attach(context);
+//      widget.focusNode.addListener(_handleFocusChanged);
+//      updateKeepAlive();
+//    }
+//    if (widget.readOnly) {
+//      _closeInputConnectionIfNeeded();
+//    } else {
+//      if (oldWidget.readOnly && _hasFocus) _openInputConnection();
+//    }
+//    if (widget.style != oldWidget.style) {
+//      final TextStyle style = widget.style;
+//      _textInputConnection?.setStyle(
+//        fontFamily: style.fontFamily,
+//        fontSize: style.fontSize,
+//        fontWeight: style.fontWeight,
+//        textDirection: _textDirection,
+//        textAlign: widget.textAlign,
+//      );
+//    }
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(_didChangeTextEditingValue);
-
-    _closeInputConnectionIfNeeded();
-    assert(!_hasInputConnection);
-    _selectionOverlay?.dispose();
-    _selectionOverlay = null;
-    _focusAttachment.detach();
-    widget.focusNode.removeListener(_handleFocusChanged);
+//    widget.controller.removeListener(_didChangeTextEditingValue);
+//
+//    _closeInputConnectionIfNeeded();
+//    assert(!_hasInputConnection);
+//    _selectionOverlay?.dispose();
+//    _selectionOverlay = null;
+//    _focusAttachment.detach();
+//    widget.focusNode.removeListener(_handleFocusChanged);
+    _cursorController.dispose();
     super.dispose();
+  }
+
+  void _didChangeTextEditingValue() {
+//    _updateRemoteEditingValueIfNeeded();
+//    _startOrStopCursorTimerIfNeeded();
+//    _updateOrDisposeSelectionOverlayIfNeeded();
+//    _textChangedSinceLastCaretUpdate = true;
+    // TODO(abarth): Teach RenderEditable about ValueNotifier<TextEditingValue>
+    // to avoid this setState().
+    setState(() {/* We use widget.controller.value in build(). */});
   }
 
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
-    _focusAttachment.reparent();
+//    _focusAttachment.reparent();
     super.build(context); // See AutomaticKeepAliveClientMixin.
 
-    final TextSelectionControls controls = widget.selectionControls;
+//    final TextSelectionControls controls = widget.selectionControls;
 
-    return Scrollable(
-      excludeFromSemantics: true,
-      axisDirection: AxisDirection.down,
-      controller: _scrollController,
-      physics: widget.scrollPhysics,
-      dragStartBehavior: widget.dragStartBehavior,
-      viewportBuilder: (BuildContext context, ViewportOffset offset) {
-        return CompositedTransformTarget(
-          link: _toolbarLayerLink,
-          child: Semantics(
-            onCopy: _semanticsOnCopy(controls),
-            onCut: _semanticsOnCut(controls),
-            onPaste: _semanticsOnPaste(controls),
-            child: _Editor(
-              key: _editorKey,
-              children: _buildParagraphs(context),
-              document: widget.document,
-              textDirection: _textDirection,
-              cursorColor: _cursorController.cursorColor,
-              backgroundCursorColor: widget.backgroundCursorColor,
-              showCursor: _cursorController.cursorBlink,
-              hasFocus: widget.focusNode.hasFocus,
-              startHandleLayerLink: _startHandleLayerLink,
-              endHandleLayerLink: _endHandleLayerLink,
-              maxHeight: widget.maxHeight,
-              minHeight: widget.minHeight,
-              strutStyle: widget.strutStyle,
-              selectionColor: widget.selectionColor,
-              textScaleFactor: widget.textScaleFactor ??
-                  MediaQuery.textScaleFactorOf(context),
-              offset: offset,
-              readOnly: widget.readOnly,
-              locale: widget.locale,
-              cursorWidth: widget.cursorWidth,
-              cursorRadius: widget.cursorRadius,
-              cursorOffset: widget.cursorOffset,
-              paintCursorAboveText: widget.paintCursorAboveText,
-              devicePixelRatio: _devicePixelRatio,
-              enableInteractiveSelection: widget.enableInteractiveSelection,
-              textSelectionDelegate: this,
+    return MouseRegion(
+      cursor: SystemMouseCursors.text,
+      child: Container(
+        constraints: BoxConstraints(maxHeight: 300),
+        child: SingleChildScrollView(
+//      excludeFromSemantics: true,
+//      axisDirection: AxisDirection.down,
+          controller: _scrollController,
+          physics: widget.scrollPhysics,
+          dragStartBehavior: widget.dragStartBehavior,
+          child: CompositedTransformTarget(
+            link: _toolbarLayerLink,
+            child: Semantics(
+//            onCopy: _semanticsOnCopy(controls),
+//            onCut: _semanticsOnCut(controls),
+//            onPaste: _semanticsOnPaste(controls),
+              child: _Editor(
+                key: _editorKey,
+                children: _buildParagraphs(context),
+                document: widget.controller.document,
+                textDirection: _textDirection,
+                hasFocus: widget.focusNode.hasFocus,
+                startHandleLayerLink: _startHandleLayerLink,
+                endHandleLayerLink: _endHandleLayerLink,
+                maxHeight: widget.maxHeight,
+                minHeight: widget.minHeight,
+                strutStyle: widget.strutStyle,
+                selectionColor: widget.selectionColor,
+                textScaleFactor: widget.textScaleFactor ??
+                    MediaQuery.textScaleFactorOf(context),
+                readOnly: widget.readOnly,
+                locale: widget.locale,
+                devicePixelRatio: _devicePixelRatio,
+                enableInteractiveSelection: widget.enableInteractiveSelection,
+                textSelectionDelegate: null, /* TODO: change to `this` */
+              ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
   List<Widget> _buildParagraphs(BuildContext context) {
-    return [];
-  }
-
-  void _handleCursorColorChanged(Color cursorColor) {
-    renderEditor.cursorColor = cursorColor;
+    final result = <Widget>[];
+    for (LineNode node in widget.controller.document.root.children) {
+      result.add(EditableTextLine(
+        node: node,
+        padding: EdgeInsets.all(8),
+        cursorController: _cursorController,
+        selection: widget.controller.selection,
+        child: TextLine(node: node),
+      ));
+    }
+    return result;
   }
 }
 
@@ -579,9 +549,6 @@ class _Editor extends MultiChildRenderObjectWidget {
     @required List<Widget> children,
     @required this.document,
     @required this.textDirection,
-    @required this.cursorColor,
-    @required this.backgroundCursorColor,
-    @required this.showCursor,
     @required this.hasFocus,
     @required this.startHandleLayerLink,
     @required this.endHandleLayerLink,
@@ -590,13 +557,8 @@ class _Editor extends MultiChildRenderObjectWidget {
     @required this.strutStyle,
     @required this.selectionColor,
     @required this.textScaleFactor,
-    @required this.offset,
     @required this.readOnly,
     @required this.locale,
-    @required this.cursorWidth,
-    @required this.cursorRadius,
-    @required this.cursorOffset,
-    @required this.paintCursorAboveText,
     @required this.devicePixelRatio,
     @required this.enableInteractiveSelection,
     @required this.textSelectionDelegate,
@@ -604,9 +566,6 @@ class _Editor extends MultiChildRenderObjectWidget {
 
   final NotusDocument document;
   final TextDirection textDirection;
-  final Color cursorColor;
-  final Color backgroundCursorColor;
-  final ValueNotifier<bool> showCursor;
   final bool hasFocus;
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
@@ -615,13 +574,8 @@ class _Editor extends MultiChildRenderObjectWidget {
   final StrutStyle strutStyle;
   final Color selectionColor;
   final double textScaleFactor;
-  final ViewportOffset offset;
   final bool readOnly;
   final Locale locale;
-  final double cursorWidth;
-  final Radius cursorRadius;
-  final bool paintCursorAboveText;
-  final Offset cursorOffset;
   final double devicePixelRatio;
   final bool enableInteractiveSelection;
   final TextSelectionDelegate textSelectionDelegate;
@@ -630,14 +584,15 @@ class _Editor extends MultiChildRenderObjectWidget {
   RenderEditor createRenderObject(BuildContext context) {
     return RenderEditor(
       document: document,
-      textDirection: textDirection,
+//      textDirection: textDirection,
     );
   }
 
   @override
   void updateRenderObject(
       BuildContext context, covariant RenderEditor renderObject) {
-    // TODO
+    renderObject.document = document;
+//    renderObject.textDirection = textDirection;
   }
 
   @override
