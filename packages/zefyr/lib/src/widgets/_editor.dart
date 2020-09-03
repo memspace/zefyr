@@ -7,9 +7,13 @@ import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
 import '../rendering/editor.dart';
+import '../services/keyboard.dart';
 import '_controller.dart';
 import '_cursor.dart';
 import '_editable_text_line.dart';
+import '_editor_input_client_mixin.dart';
+import '_editor_keyboard_mixin.dart';
+import '_editor_selection_delegate_mixin.dart';
 import '_text_line.dart';
 
 class RawEditor extends StatefulWidget {
@@ -322,16 +326,38 @@ class RawEditor extends StatefulWidget {
   }
 }
 
-class RawEditorState extends State<RawEditor>
+/// Base interface for the editor state which defines contract used by
+/// various mixins.
+///
+/// Following mixins rely on this interface:
+///
+///   * [RawEditorStateKeyboardMixin],
+///   * [RawEditorStateTextInputClientMixin]
+///   * [RawEditorStateSelectionDelegateMixin]
+///
+abstract class EditorState extends State<RawEditor> {
+  TextEditingValue get textEditingValue;
+  set textEditingValue(TextEditingValue value);
+  RenderEditor get renderEditor;
+}
+
+class RawEditorState extends EditorState
     with
         AutomaticKeepAliveClientMixin<RawEditor>,
         WidgetsBindingObserver,
-        TickerProviderStateMixin<RawEditor>
-/*implements TextInputClient, TextSelectionDelegate*/ {
+        TickerProviderStateMixin<RawEditor>,
+        RawEditorStateKeyboardMixin,
+        RawEditorStateTextInputClientMixin,
+        RawEditorStateSelectionDelegateMixin
+    implements TextSelectionDelegate {
   final GlobalKey _editorKey = GlobalKey();
 
+  // Cursor
   CursorController _cursorController;
   FloatingCursorController _floatingCursorController;
+
+  // Keyboard
+  KeyboardListener _keyboardListener;
 
   TextInputConnection _textInputConnection;
   TextSelectionOverlay _selectionOverlay;
@@ -344,21 +370,10 @@ class RawEditorState extends State<RawEditor>
 
   bool _didAutoFocus = false;
   FocusAttachment _focusAttachment;
+  bool get _hasFocus => widget.focusNode.hasFocus;
 
   @override
   bool get wantKeepAlive => widget.focusNode.hasFocus;
-
-  @override
-  bool get cutEnabled => widget.toolbarOptions.cut && !widget.readOnly;
-
-  @override
-  bool get copyEnabled => widget.toolbarOptions.copy;
-
-  @override
-  bool get pasteEnabled => widget.toolbarOptions.paste && !widget.readOnly;
-
-  @override
-  bool get selectAllEnabled => widget.toolbarOptions.selectAll;
 
   TextDirection get _textDirection {
     final result = widget.textDirection ?? Directionality.of(context);
@@ -373,7 +388,25 @@ class RawEditorState extends State<RawEditor>
   /// The renderer for this widget's editor descendant.
   ///
   /// This property is typically used to notify the renderer of input gestures.
+  @override
   RenderEditor get renderEditor => _editorKey.currentContext.findRenderObject();
+
+  // Start text Input connection
+
+  /// Express interest in interacting with the keyboard.
+  ///
+  /// If this control is already attached to the keyboard, this function will
+  /// request that the keyboard become visible. Otherwise, this function will
+  /// ask the focus system that it become focused. If successful in acquiring
+  /// focus, the control will then attach to the keyboard and request that the
+  /// keyboard become visible.
+  void requestKeyboard() {
+    if (_hasFocus) {
+      openConnectionIfNeeded();
+    } else {
+      widget.focusNode.requestFocus();
+    }
+  }
 
   // State lifecycle:
 
@@ -383,12 +416,12 @@ class RawEditorState extends State<RawEditor>
 
     widget.controller.addListener(_didChangeTextEditingValue);
 
-//    _focusAttachment = widget.focusNode.attach(context);
-//    widget.focusNode.addListener(_handleFocusChanged);
     _scrollController = widget.scrollController ?? ScrollController();
 //    _scrollController.addListener(() {
 //      _selectionOverlay?.updateForScroll();
 //    });
+
+    // Cursor
     _cursorController = CursorController(
       showCursor: ValueNotifier<bool>(widget.showCursor ?? false),
       style: widget.cursorStyle ??
@@ -400,17 +433,27 @@ class RawEditorState extends State<RawEditor>
           ),
       tickerProvider: this,
     );
-    _cursorController.startOrStopCursorTimerIfNeeded(
-        true, TextSelection.collapsed(offset: 0));
+
+    // Keyboard
+    _keyboardListener = KeyboardListener(
+      onCursorMovement: handleCursorMovement,
+      onShortcut: handleShortcut,
+      onDelete: handleDelete,
+    );
+
+    // Focus
+    _focusAttachment = widget.focusNode.attach(context,
+        onKey: (node, event) => _keyboardListener.handleKeyEvent(event));
+    widget.focusNode.addListener(_handleFocusChanged);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-//    if (!_didAutoFocus && widget.autofocus) {
-//      FocusScope.of(context).autofocus(widget.focusNode);
-//      _didAutoFocus = true;
-//    }
+    if (!_didAutoFocus && widget.autofocus) {
+      FocusScope.of(context).autofocus(widget.focusNode);
+      _didAutoFocus = true;
+    }
   }
 
   @override
@@ -420,27 +463,32 @@ class RawEditorState extends State<RawEditor>
     _cursorController.showCursor.value = widget.showCursor;
     _cursorController.style = widget.cursorStyle;
 
-//    if (widget.controller != oldWidget.controller) {
-//      oldWidget.controller.removeListener(_didChangeTextEditingValue);
-//      widget.controller.addListener(_didChangeTextEditingValue);
-//      _updateRemoteEditingValueIfNeeded();
-//    }
+    if (widget.controller != oldWidget.controller) {
+      oldWidget.controller.removeListener(_didChangeTextEditingValue);
+      widget.controller.addListener(_didChangeTextEditingValue);
+      updateRemoteValueIfNeeded();
+    }
+
+    if (widget.focusNode != oldWidget.focusNode) {
+      oldWidget.focusNode.removeListener(_handleFocusChanged);
+      _focusAttachment?.detach();
+      _focusAttachment = widget.focusNode.attach(context,
+          onKey: (node, event) => _keyboardListener.handleKeyEvent(event));
+      widget.focusNode.addListener(_handleFocusChanged);
+      updateKeepAlive();
+    }
+
 //    if (widget.controller.selection != oldWidget.controller.selection) {
 //      _selectionOverlay?.update(_value);
 //    }
 //    _selectionOverlay?.handlesVisible = widget.showSelectionHandles;
-//    if (widget.focusNode != oldWidget.focusNode) {
-//      oldWidget.focusNode.removeListener(_handleFocusChanged);
-//      _focusAttachment?.detach();
-//      _focusAttachment = widget.focusNode.attach(context);
-//      widget.focusNode.addListener(_handleFocusChanged);
-//      updateKeepAlive();
-//    }
-//    if (widget.readOnly) {
-//      _closeInputConnectionIfNeeded();
-//    } else {
-//      if (oldWidget.readOnly && _hasFocus) _openInputConnection();
-//    }
+
+    if (widget.readOnly) {
+      closeConnectionIfNeeded();
+    } else if (oldWidget.readOnly && _hasFocus) {
+      openConnectionIfNeeded();
+    }
+
 //    if (widget.style != oldWidget.style) {
 //      final TextStyle style = widget.style;
 //      _textInputConnection?.setStyle(
@@ -455,32 +503,62 @@ class RawEditorState extends State<RawEditor>
 
   @override
   void dispose() {
-//    widget.controller.removeListener(_didChangeTextEditingValue);
-//
-//    _closeInputConnectionIfNeeded();
-//    assert(!_hasInputConnection);
+    closeConnectionIfNeeded();
+    assert(!hasConnection);
 //    _selectionOverlay?.dispose();
 //    _selectionOverlay = null;
-//    _focusAttachment.detach();
-//    widget.focusNode.removeListener(_handleFocusChanged);
+    widget.controller.removeListener(_didChangeTextEditingValue);
+    widget.focusNode.removeListener(_handleFocusChanged);
+    _focusAttachment.detach();
     _cursorController.dispose();
     super.dispose();
   }
 
   void _didChangeTextEditingValue() {
-//    _updateRemoteEditingValueIfNeeded();
-//    _startOrStopCursorTimerIfNeeded();
+    requestKeyboard();
+
+    updateRemoteValueIfNeeded();
+    _cursorController.startOrStopCursorTimerIfNeeded(
+        _hasFocus, widget.controller.selection);
+    if (hasConnection) {
+      // To keep the cursor from blinking while typing, we want to restart the
+      // cursor timer every time a new character is typed.
+      _cursorController.stopCursorTimer(resetCharTicks: false);
+      _cursorController.startCursorTimer();
+    }
 //    _updateOrDisposeSelectionOverlayIfNeeded();
 //    _textChangedSinceLastCaretUpdate = true;
-    // TODO(abarth): Teach RenderEditable about ValueNotifier<TextEditingValue>
-    // to avoid this setState().
+
     setState(() {/* We use widget.controller.value in build(). */});
+  }
+
+  void _handleFocusChanged() {
+    openOrCloseConnection();
+    _cursorController.startOrStopCursorTimerIfNeeded(
+        _hasFocus, widget.controller.selection);
+//    _updateOrDisposeSelectionOverlayIfNeeded();
+    if (_hasFocus) {
+      // Listen for changing viewInsets, which indicates keyboard showing up.
+      WidgetsBinding.instance.addObserver(this);
+//      _lastBottomViewInset = WidgetsBinding.instance.window.viewInsets.bottom;
+//      _showCaretOnScreen();
+//      if (!_value.selection.isValid) {
+      // Place cursor at the end if the selection is invalid when we receive focus.
+//        _handleSelectionChanged(TextSelection.collapsed(offset: _value.text.length), renderEditable, null);
+//      }
+    } else {
+      WidgetsBinding.instance.removeObserver(this);
+      // Clear the selection and composition state if this widget lost focus.
+//      _value = TextEditingValue(text: _value.text);
+//      _currentPromptRectRange = null;
+    }
+    updateKeepAlive();
   }
 
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
-//    _focusAttachment.reparent();
+    _focusAttachment.reparent();
     super.build(context); // See AutomaticKeepAliveClientMixin.
 
 //    final TextSelectionControls controls = widget.selectionControls;
@@ -505,8 +583,11 @@ class RawEditorState extends State<RawEditor>
                 key: _editorKey,
                 children: _buildParagraphs(context),
                 document: widget.controller.document,
+                selection: widget.controller.selection,
+                hasFocus: _hasFocus,
+                textSelectionDelegate: this,
+                // Not implemented fields:
                 textDirection: _textDirection,
-                hasFocus: widget.focusNode.hasFocus,
                 startHandleLayerLink: _startHandleLayerLink,
                 endHandleLayerLink: _endHandleLayerLink,
                 maxHeight: widget.maxHeight,
@@ -519,7 +600,6 @@ class RawEditorState extends State<RawEditor>
                 locale: widget.locale,
                 devicePixelRatio: _devicePixelRatio,
                 enableInteractiveSelection: widget.enableInteractiveSelection,
-                textSelectionDelegate: null, /* TODO: change to `this` */
               ),
             ),
           ),
@@ -548,8 +628,11 @@ class _Editor extends MultiChildRenderObjectWidget {
     @required Key key,
     @required List<Widget> children,
     @required this.document,
-    @required this.textDirection,
     @required this.hasFocus,
+    @required this.selection,
+    @required this.textSelectionDelegate,
+    // Not implemented fields:
+    @required this.textDirection,
     @required this.startHandleLayerLink,
     @required this.endHandleLayerLink,
     @required this.maxHeight,
@@ -561,12 +644,13 @@ class _Editor extends MultiChildRenderObjectWidget {
     @required this.locale,
     @required this.devicePixelRatio,
     @required this.enableInteractiveSelection,
-    @required this.textSelectionDelegate,
   }) : super(key: key, children: children);
 
   final NotusDocument document;
-  final TextDirection textDirection;
   final bool hasFocus;
+  final TextSelection selection;
+  final TextSelectionDelegate textSelectionDelegate;
+  final TextDirection textDirection;
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
   final double maxHeight;
@@ -578,13 +662,12 @@ class _Editor extends MultiChildRenderObjectWidget {
   final Locale locale;
   final double devicePixelRatio;
   final bool enableInteractiveSelection;
-  final TextSelectionDelegate textSelectionDelegate;
 
   @override
   RenderEditor createRenderObject(BuildContext context) {
     return RenderEditor(
       document: document,
-//      textDirection: textDirection,
+      hasFocus: hasFocus,
     );
   }
 
@@ -592,7 +675,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   void updateRenderObject(
       BuildContext context, covariant RenderEditor renderObject) {
     renderObject.document = document;
-//    renderObject.textDirection = textDirection;
+    renderObject.hasFocus = hasFocus;
   }
 
   @override

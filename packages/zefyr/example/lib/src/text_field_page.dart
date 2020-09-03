@@ -24,14 +24,14 @@ class TextFieldScreen extends StatefulWidget {
 
 class _TextFieldScreenState extends State<TextFieldScreen> {
   ZefyrController _controller = ZefyrController();
-  FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     final document = NotusDocument.fromDelta(Delta()
       ..insert(
-          'Here we go again\nHello world!\nHere we go again\nHello world!\nHere we go again\n')
+          '👍 Here we go again\nHello world!\nHere we go again. This is a very long paragraph of text to test keyboard event handling.\nHello world!\nHere we go again\n')
       ..insert('This is ')
       ..insert('bold', {'b': true})
       ..insert(' text.\n'));
@@ -51,6 +51,7 @@ class _TextFieldScreenState extends State<TextFieldScreen> {
           child: RawEditor(
             controller: _controller,
             focusNode: _focusNode,
+            autofocus: true,
             showCursor: true,
             cursorStyle: CursorStyle(
               color: Colors.blue,
@@ -66,9 +67,8 @@ class _TextFieldScreenState extends State<TextFieldScreen> {
         child: Icon(Icons.add),
         onPressed: () {
           setState(() {
-            _controller.updateSelection(TextSelection.collapsed(offset: 1));
             _controller.document
-                .insert(_controller.document.length - 1, 'More text\n');
+                .insert(_controller.document.length - 1, '\nMore text 👍');
           });
         },
       ),

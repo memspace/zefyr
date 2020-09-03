@@ -1,11 +1,11 @@
 import 'dart:math' as math;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
 
 import 'editable_box.dart';
-import 'editable_keyboard_listener.dart';
 
 /// Parent data for use with [RenderEditor].
 class EditorParentData extends ContainerBoxParentData<RenderEditableBox> {}
@@ -14,12 +14,10 @@ typedef _ChildSizingFunction = double Function(RenderBox child);
 
 /// Base interface for any editable render object.
 abstract class RenderAbstractEditor {
-  TextSelection get selection;
-
   TextSelection selectWordAtPosition(TextPosition position);
   TextSelection selectLineAtPosition(TextPosition position);
 
-  /// Returns preferred line height at specified [position] in text.
+  /// Returns preferred line height at specified `position` in text.
   double preferredLineHeightAtPosition(TextPosition position);
 
   Offset getOffsetForCaret(TextPosition position);
@@ -40,32 +38,13 @@ class RenderEditor extends RenderBox
   RenderEditor({
     List<RenderEditableBox> children,
     @required NotusDocument document,
-    bool hasFocus,
-    TextSelection selection,
+    @required bool hasFocus,
     EdgeInsets floatingCursorAddedMargin =
         const EdgeInsets.fromLTRB(4, 4, 4, 5),
   })  : assert(document != null),
-        _document = document,
-        _selection = selection {
+        assert(hasFocus != null),
+        _document = document {
     addAll(children);
-    _keyboardListener = EditableKeyboardListener(
-        editable: this, onSelectionChanged: _handleKeyboardSelectionChange);
-  }
-
-  EditableKeyboardListener _keyboardListener;
-
-  void _handleKeyboardSelectionChange(TextSelection newSelection) {}
-
-  @override
-  TextSelection get selection => _selection;
-  TextSelection _selection;
-  set selection(TextSelection value) {
-    assert(value != null);
-    if (_selection == value) {
-      return;
-    }
-    _selection = value;
-    markNeedsPaint();
   }
 
   set document(NotusDocument value) {
@@ -88,11 +67,6 @@ class RenderEditor extends RenderBox
       return;
     }
     _hasFocus = value;
-    if (_hasFocus) {
-      _keyboardListener.attach();
-    } else {
-      _keyboardListener.detach();
-    }
     markNeedsSemanticsUpdate();
   }
 
@@ -113,9 +87,6 @@ class RenderEditor extends RenderBox
 //    _longPress.dispose();
 //    _offset.removeListener(markNeedsPaint);
 //    _showCursor.removeListener(markNeedsPaint);
-    if (_keyboardListener.isAttached) {
-      _keyboardListener.detach();
-    }
     super.detach();
   }
 
@@ -244,17 +215,20 @@ class RenderEditor extends RenderBox
 //    _textLayoutLastMaxWidth == constraints.maxWidth &&
 //        _textLayoutLastMinWidth == constraints.minWidth,
 //    'Last width ($_textLayoutLastMinWidth, $_textLayoutLastMaxWidth) not the same as max width constraint (${constraints.minWidth}, ${constraints.maxWidth}).');
-//    final TextRange word = _textPainter.getWordBoundary(position);
+    final child = childAtPosition(position);
+    final documentOffset = child.node.documentOffset;
+    final localPosition = TextPosition(
+        offset: position.offset - documentOffset, affinity: position.affinity);
+    final localWord = child.getWordBoundary(localPosition);
+    final word = TextRange(
+      start: localWord.start + documentOffset,
+      end: localWord.end + documentOffset,
+    );
 //     When long-pressing past the end of the text, we want a collapsed cursor.
-//    if (position.offset >= word.end) {
-//      return TextSelection.fromPosition(position);
-//    }
-    // If text is obscured, the entire sentence should be treated as one word.
-//    if (obscureText) {
-//      return TextSelection(baseOffset: 0, extentOffset: _plainText.length);
-//    }
-//    return TextSelection(baseOffset: word.start, extentOffset: word.end);
-    throw UnimplementedError();
+    if (position.offset >= word.end) {
+      return TextSelection.fromPosition(position);
+    }
+    return TextSelection(baseOffset: word.start, extentOffset: word.end);
   }
 
   @override
@@ -336,6 +310,6 @@ class RenderEditor extends RenderBox
     final child = childAtOffset(offset);
     final BoxParentData parentData = child.parentData;
     final localOffset = offset - parentData.offset;
-    return childAtOffset(offset).getPositionForOffset(localOffset);
+    return child.getPositionForOffset(localOffset);
   }
 }

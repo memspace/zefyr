@@ -30,4 +30,14 @@ class RenderParagraphProxy extends RenderProxyBox
   double getFullHeightForCaret(TextPosition position, Rect caretPrototype) {
     return child.getFullHeightForCaret(position, caretPrototype);
   }
+
+  @override
+  TextRange getWordBoundary(TextPosition position) {
+    return child.getWordBoundary(position);
+  }
+
+  @override
+  TextRange getLineBoundary(TextPosition position) {
+    throw UnimplementedError();
+  }
 }

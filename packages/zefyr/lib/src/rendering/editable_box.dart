@@ -19,6 +19,9 @@ abstract class RenderEditableMetricsProvider implements RenderBox {
   TextPosition getPositionForOffset(Offset offset);
   double /*?*/ getFullHeightForCaret(
       TextPosition position, Rect caretPrototype);
+
+  TextRange getWordBoundary(TextPosition position);
+  TextRange getLineBoundary(TextPosition position);
 }
 
 /// Base class for render boxes of editable content.
@@ -31,8 +34,46 @@ abstract class RenderEditableBox extends RenderBox {
   double get preferredLineHeight;
   Rect get caretPrototype;
 
+  /// Returns the offset at which to paint the caret.
+  ///
+  /// The `position` parameter must be relative to the [node]'s content.
+  ///
+  /// Valid only after [layout].
   Offset getOffsetForCaret(TextPosition position);
+
+  /// Returns the position within the text for the given pixel offset.
+  ///
+  /// The `offset` parameter must be local to this box coordinate system.
+  ///
+  /// Valid only after [layout].
   TextPosition getPositionForOffset(Offset offset);
+
+  /// Returns `true` if specified `offset` is within the content boundaries.
+  ///
+  /// The `offset` parameter must be local to this box coordinate system.
+  bool offsetInsideContent(Offset offset);
+
+  /// Returns the text range of the word at the given offset. Characters not
+  /// part of a word, such as spaces, symbols, and punctuation, have word breaks
+  /// on both sides. In such cases, this method will return a text range that
+  /// contains the given text position.
+  ///
+  /// Word boundaries are defined more precisely in Unicode Standard Annex #29
+  /// <http://www.unicode.org/reports/tr29/#Word_Boundaries>.
+  ///
+  /// The `position` parameter must be relative to the [node]'s content.
+  ///
+  /// Valid only after [layout].
+  TextRange getWordBoundary(TextPosition position);
+
+  /// Returns the text range of the line at the given offset.
+  ///
+  /// The newline, if any, is included in the range.
+  ///
+  /// The `position` parameter must be relative to the [node]'s content.
+  ///
+  /// Valid only after [layout].
+  TextRange getLineBoundary(TextPosition position);
 }
 
 class RenderSingleChildEditableBox extends RenderEditableBox
@@ -127,16 +168,39 @@ class RenderSingleChildEditableBox extends RenderEditableBox
   @override
   double get preferredLineHeight => child.preferredLineHeight;
 
+  /// The [position] parameter is expected to be relative to the [node]'s offset.
   @override
   ui.Offset getOffsetForCaret(ui.TextPosition position) {
     return child.getOffsetForCaret(position, caretPrototype) +
         _resolvedPadding.topLeft;
   }
 
+  /// The [offset] parameter is expected to be relative to this render object.
   @override
   ui.TextPosition getPositionForOffset(ui.Offset offset) {
     final shiftedOffset = offset - _resolvedPadding.topLeft;
     return child.getPositionForOffset(shiftedOffset);
+  }
+
+  @override
+  bool offsetInsideContent(ui.Offset offset) {
+    final shiftedOffset = offset - _resolvedPadding.topLeft;
+    return child.size.contains(shiftedOffset);
+  }
+
+  @override
+  TextRange getWordBoundary(TextPosition position) {
+    return child.getWordBoundary(position);
+  }
+
+  @override
+  TextRange getLineBoundary(TextPosition position) {
+    // As a workaround we do not proxy this call to the child since
+    // this render object already represents a single line of text, so
+    // we can infer this value from the document node itself.
+    // TODO: we can proxy this to the child when getLineBoundary is exposed on RenderParagraph
+    final start = node.documentOffset;
+    return TextRange(start: start, end: start + node.length);
   }
 
   /// Marks the render object as needing to be laid out again and have its text
