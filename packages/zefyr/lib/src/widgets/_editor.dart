@@ -15,12 +15,15 @@ import '_editor_input_client_mixin.dart';
 import '_editor_keyboard_mixin.dart';
 import '_editor_selection_delegate_mixin.dart';
 import '_text_line.dart';
+import '_text_selection.dart';
 
 class RawEditor extends StatefulWidget {
   RawEditor({
     Key key,
     @required this.controller,
     @required this.focusNode,
+    @required this.selectionColor,
+    this.enableInteractiveSelection = true,
     this.readOnly = false,
     this.autocorrect = true,
     this.enableSuggestions = true,
@@ -34,7 +37,6 @@ class RawEditor extends StatefulWidget {
     this.minHeight,
     this.autofocus = false,
     this.showSelectionHandles = false,
-    this.selectionColor,
     this.selectionControls,
     TextInputType keyboardType,
     this.textInputAction,
@@ -42,7 +44,6 @@ class RawEditor extends StatefulWidget {
     this.scrollPadding = const EdgeInsets.all(20.0),
     this.keyboardAppearance = Brightness.light,
     this.dragStartBehavior = DragStartBehavior.start,
-    this.enableInteractiveSelection = true,
     this.scrollController,
     this.scrollPhysics,
     this.toolbarOptions = const ToolbarOptions(
@@ -53,10 +54,11 @@ class RawEditor extends StatefulWidget {
     ),
   })  : assert(controller != null),
         assert(focusNode != null),
+        assert(selectionColor != null),
+        assert(enableInteractiveSelection != null),
         assert(autocorrect != null),
         assert(enableSuggestions != null),
         assert(showSelectionHandles != null),
-        assert(enableInteractiveSelection != null),
         assert(readOnly != null),
         assert(!showCursor || cursorStyle != null),
         assert(maxHeight == null || maxHeight > 0),
@@ -360,10 +362,12 @@ class RawEditorState extends EditorState
   KeyboardListener _keyboardListener;
 
   TextInputConnection _textInputConnection;
-  TextSelectionOverlay _selectionOverlay;
+  EditorTextSelectionOverlay _selectionOverlay;
 
   ScrollController _scrollController;
 
+  final ClipboardStatusNotifier _clipboardStatus =
+      kIsWeb ? null : ClipboardStatusNotifier();
   final LayerLink _toolbarLayerLink = LayerLink();
   final LayerLink _startHandleLayerLink = LayerLink();
   final LayerLink _endHandleLayerLink = LayerLink();
@@ -414,12 +418,14 @@ class RawEditorState extends EditorState
   void initState() {
     super.initState();
 
+    _clipboardStatus?.addListener(_onChangedClipboardStatus);
+
     widget.controller.addListener(_didChangeTextEditingValue);
 
     _scrollController = widget.scrollController ?? ScrollController();
-//    _scrollController.addListener(() {
-//      _selectionOverlay?.updateForScroll();
-//    });
+    _scrollController.addListener(() {
+      _selectionOverlay?.updateForScroll();
+    });
 
     // Cursor
     _cursorController = CursorController(
@@ -478,10 +484,10 @@ class RawEditorState extends EditorState
       updateKeepAlive();
     }
 
-//    if (widget.controller.selection != oldWidget.controller.selection) {
-//      _selectionOverlay?.update(_value);
-//    }
-//    _selectionOverlay?.handlesVisible = widget.showSelectionHandles;
+    if (widget.controller.selection != oldWidget.controller.selection) {
+      _selectionOverlay?.update(textEditingValue);
+    }
+    _selectionOverlay?.handlesVisible = widget.showSelectionHandles;
 
     if (widget.readOnly) {
       closeConnectionIfNeeded();
@@ -505,12 +511,14 @@ class RawEditorState extends EditorState
   void dispose() {
     closeConnectionIfNeeded();
     assert(!hasConnection);
-//    _selectionOverlay?.dispose();
-//    _selectionOverlay = null;
+    _selectionOverlay?.dispose();
+    _selectionOverlay = null;
     widget.controller.removeListener(_didChangeTextEditingValue);
     widget.focusNode.removeListener(_handleFocusChanged);
     _focusAttachment.detach();
     _cursorController.dispose();
+    _clipboardStatus?.removeListener(_onChangedClipboardStatus);
+    _clipboardStatus?.dispose();
     super.dispose();
   }
 
@@ -526,7 +534,8 @@ class RawEditorState extends EditorState
       _cursorController.stopCursorTimer(resetCharTicks: false);
       _cursorController.startCursorTimer();
     }
-//    _updateOrDisposeSelectionOverlayIfNeeded();
+
+    _updateOrDisposeSelectionOverlayIfNeeded();
 //    _textChangedSinceLastCaretUpdate = true;
 
     setState(() {/* We use widget.controller.value in build(). */});
@@ -536,7 +545,7 @@ class RawEditorState extends EditorState
     openOrCloseConnection();
     _cursorController.startOrStopCursorTimerIfNeeded(
         _hasFocus, widget.controller.selection);
-//    _updateOrDisposeSelectionOverlayIfNeeded();
+    _updateOrDisposeSelectionOverlayIfNeeded();
     if (_hasFocus) {
       // Listen for changing viewInsets, which indicates keyboard showing up.
       WidgetsBinding.instance.addObserver(this);
@@ -549,10 +558,52 @@ class RawEditorState extends EditorState
     } else {
       WidgetsBinding.instance.removeObserver(this);
       // Clear the selection and composition state if this widget lost focus.
-//      _value = TextEditingValue(text: _value.text);
+      widget.controller.updateSelection(TextSelection.collapsed(offset: 0),
+          source: ChangeSource.local);
 //      _currentPromptRectRange = null;
     }
     updateKeepAlive();
+  }
+
+  void _updateOrDisposeSelectionOverlayIfNeeded() {
+    if (_selectionOverlay != null) {
+      if (_hasFocus) {
+        _selectionOverlay.update(textEditingValue);
+      } else {
+        _selectionOverlay.dispose();
+        _selectionOverlay = null;
+      }
+    } else if (_hasFocus) {
+      _selectionOverlay?.hide();
+      _selectionOverlay = null;
+
+      if (widget.selectionControls != null) {
+        _selectionOverlay = EditorTextSelectionOverlay(
+          clipboardStatus: _clipboardStatus,
+          context: context,
+          value: textEditingValue,
+          debugRequiredFor: widget,
+          toolbarLayerLink: _toolbarLayerLink,
+          startHandleLayerLink: _startHandleLayerLink,
+          endHandleLayerLink: _endHandleLayerLink,
+          renderObject: renderEditor,
+          selectionControls: widget.selectionControls,
+          selectionDelegate: this,
+          dragStartBehavior: widget.dragStartBehavior,
+          // onSelectionHandleTapped: widget.onSelectionHandleTapped,
+        );
+        _selectionOverlay.handlesVisible = widget.showSelectionHandles;
+        _selectionOverlay.showHandles();
+        // if (widget.onSelectionChanged != null)
+        //   widget.onSelectionChanged(selection, cause);
+      }
+    }
+  }
+
+  void _onChangedClipboardStatus() {
+    setState(() {
+      // Inform the widget that the value of clipboardStatus has changed.
+    });
   }
 
   @override
@@ -581,15 +632,14 @@ class RawEditorState extends EditorState
 //            onPaste: _semanticsOnPaste(controls),
               child: _Editor(
                 key: _editorKey,
-                children: _buildParagraphs(context),
+                children: _buildChildren(context),
                 document: widget.controller.document,
                 selection: widget.controller.selection,
                 hasFocus: _hasFocus,
-                textSelectionDelegate: this,
-                // Not implemented fields:
                 textDirection: _textDirection,
                 startHandleLayerLink: _startHandleLayerLink,
                 endHandleLayerLink: _endHandleLayerLink,
+                // Not implemented fields:
                 maxHeight: widget.maxHeight,
                 minHeight: widget.minHeight,
                 strutStyle: widget.strutStyle,
@@ -608,14 +658,16 @@ class RawEditorState extends EditorState
     );
   }
 
-  List<Widget> _buildParagraphs(BuildContext context) {
+  List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
     for (LineNode node in widget.controller.document.root.children) {
       result.add(EditableTextLine(
         node: node,
-        padding: EdgeInsets.all(8),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         cursorController: _cursorController,
         selection: widget.controller.selection,
+        selectionColor: widget.selectionColor,
+        enableInteractiveSelection: widget.enableInteractiveSelection,
         child: TextLine(node: node),
       ));
     }
@@ -628,46 +680,60 @@ class _Editor extends MultiChildRenderObjectWidget {
     @required Key key,
     @required List<Widget> children,
     @required this.document,
+    @required this.textDirection,
     @required this.hasFocus,
     @required this.selection,
-    @required this.textSelectionDelegate,
-    // Not implemented fields:
-    @required this.textDirection,
+    @required this.selectionColor,
+    @required this.enableInteractiveSelection,
     @required this.startHandleLayerLink,
     @required this.endHandleLayerLink,
+    // Not implemented fields:
     @required this.maxHeight,
     @required this.minHeight,
     @required this.strutStyle,
-    @required this.selectionColor,
     @required this.textScaleFactor,
     @required this.readOnly,
     @required this.locale,
     @required this.devicePixelRatio,
-    @required this.enableInteractiveSelection,
   }) : super(key: key, children: children);
 
   final NotusDocument document;
+  final TextDirection textDirection;
   final bool hasFocus;
   final TextSelection selection;
-  final TextSelectionDelegate textSelectionDelegate;
-  final TextDirection textDirection;
+  final Color selectionColor;
+
+  /// Whether to enable user interface affordances for changing the
+  /// text selection.
+  ///
+  /// For example, setting this to true will enable features such as
+  /// long-pressing the TextField to select text and show the
+  /// cut/copy/paste menu, and tapping to move the text caret.
+  ///
+  /// When this is false, the text selection cannot be adjusted by
+  /// the user, text cannot be copied, and the user cannot paste into
+  /// the text field from the clipboard.
+  final bool enableInteractiveSelection;
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
+  // Not implemented fields:
   final double maxHeight;
   final double minHeight;
   final StrutStyle strutStyle;
-  final Color selectionColor;
   final double textScaleFactor;
   final bool readOnly;
   final Locale locale;
   final double devicePixelRatio;
-  final bool enableInteractiveSelection;
 
   @override
   RenderEditor createRenderObject(BuildContext context) {
     return RenderEditor(
       document: document,
+      textDirection: textDirection,
       hasFocus: hasFocus,
+      selection: selection,
+      startHandleLayerLink: startHandleLayerLink,
+      endHandleLayerLink: endHandleLayerLink,
     );
   }
 
@@ -675,7 +741,11 @@ class _Editor extends MultiChildRenderObjectWidget {
   void updateRenderObject(
       BuildContext context, covariant RenderEditor renderObject) {
     renderObject.document = document;
+    renderObject.textDirection = textDirection;
     renderObject.hasFocus = hasFocus;
+    renderObject.selection = selection;
+    renderObject.startHandleLayerLink = startHandleLayerLink;
+    renderObject.endHandleLayerLink = endHandleLayerLink;
   }
 
   @override

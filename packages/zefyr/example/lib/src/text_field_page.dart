@@ -1,4 +1,5 @@
 import 'package:example/src/full_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
@@ -38,8 +39,68 @@ class _TextFieldScreenState extends State<TextFieldScreen> {
     _controller = ZefyrController(document);
   }
 
+  Color _defaultSelectionColor(BuildContext context, Color primary) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return primary.withOpacity(isDark ? 0.40 : 0.12);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final selectionTheme = TextSelectionTheme.of(context);
+
+    TextSelectionControls textSelectionControls;
+    bool paintCursorAboveText;
+    bool cursorOpacityAnimates;
+    Offset cursorOffset;
+    Color cursorColor;
+    Color selectionColor;
+    Color autocorrectionTextRectColor;
+    Radius cursorRadius;
+
+    switch (theme.platform) {
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+        // forcePressEnabled = true;
+        textSelectionControls = cupertinoTextSelectionControls;
+        paintCursorAboveText = true;
+        cursorOpacityAnimates = true;
+        if (theme.useTextSelectionTheme) {
+          cursorColor ??= selectionTheme.cursorColor ??
+              CupertinoTheme.of(context).primaryColor;
+          selectionColor = selectionTheme.selectionColor ??
+              _defaultSelectionColor(
+                  context, CupertinoTheme.of(context).primaryColor);
+        } else {
+          cursorColor ??= CupertinoTheme.of(context).primaryColor;
+          selectionColor = theme.textSelectionColor;
+        }
+        cursorRadius ??= const Radius.circular(2.0);
+        cursorOffset = Offset(
+            iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
+        autocorrectionTextRectColor = selectionColor;
+        break;
+
+      case TargetPlatform.android:
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
+        // forcePressEnabled = false;
+        textSelectionControls = materialTextSelectionControls;
+        paintCursorAboveText = false;
+        cursorOpacityAnimates = false;
+        if (theme.useTextSelectionTheme) {
+          cursorColor ??=
+              selectionTheme.cursorColor ?? theme.colorScheme.primary;
+          selectionColor = selectionTheme.selectionColor ??
+              _defaultSelectionColor(context, theme.colorScheme.primary);
+        } else {
+          cursorColor ??= theme.cursorColor;
+          selectionColor = theme.textSelectionColor;
+        }
+        break;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: ZefyrLogo(),
@@ -47,14 +108,20 @@ class _TextFieldScreenState extends State<TextFieldScreen> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
-          decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.grey.shade400, width: 0),
+          ),
           child: RawEditor(
             controller: _controller,
             focusNode: _focusNode,
             autofocus: true,
             showCursor: true,
+            selectionColor: selectionColor,
+            showSelectionHandles: true,
+            selectionControls: cupertinoTextSelectionControls,
             cursorStyle: CursorStyle(
-              color: Colors.blue,
+              color: cursorColor,
               backgroundColor: Colors.grey,
               width: 2.0,
               radius: Radius.circular(1),
@@ -67,8 +134,7 @@ class _TextFieldScreenState extends State<TextFieldScreen> {
         child: Icon(Icons.add),
         onPressed: () {
           setState(() {
-            _controller.document
-                .insert(_controller.document.length - 1, '\nMore text 👍');
+            _controller.replaceText(32, 0, '👍');
           });
         },
       ),

@@ -40,4 +40,9 @@ class RenderParagraphProxy extends RenderProxyBox
   TextRange getLineBoundary(TextPosition position) {
     throw UnimplementedError();
   }
+
+  @override
+  List<TextBox> getBoxesForSelection(TextSelection selection) {
+    return child.getBoxesForSelection(selection);
+  }
 }

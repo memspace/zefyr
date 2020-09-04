@@ -22,9 +22,9 @@ class TextLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = buildText(context, node);
     return _RichTextProxy(
-      paragraphStyle: text.style,
       child: RichText(
         text: buildText(context, node),
+        strutStyle: StrutStyle.fromTextStyle(text.style),
       ),
     );
   }
@@ -35,8 +35,8 @@ class TextLine extends StatelessWidget {
         .toList(growable: false);
     final style = TextStyle(
       color: Colors.grey.shade900,
-      fontFamily: '.SF UI Text',
-      fontSize: 16,
+      // fontFamily: '.SF UI Text',
+      fontSize: 14,
     );
     return TextSpan(style: style, children: children);
   }
@@ -61,13 +61,8 @@ class TextLine extends StatelessWidget {
 }
 
 class _RichTextProxy extends SingleChildRenderObjectWidget {
-  final TextStyle paragraphStyle;
-
   /// Child argument should be an instance of RichText widget.
-  _RichTextProxy({
-    @required RichText child,
-    @required this.paragraphStyle,
-  }) : super(child: child);
+  _RichTextProxy({@required RichText child}) : super(child: child);
 
   @override
   RenderObject createRenderObject(BuildContext context) {

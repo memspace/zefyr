@@ -14,6 +14,8 @@ class EditableTextLine extends SingleChildRenderObjectWidget {
   final TextDirection textDirection;
   final CursorController cursorController;
   final TextSelection selection;
+  final Color selectionColor;
+  final bool enableInteractiveSelection;
 
   /// Creates an editable line of text represented by [node].
   EditableTextLine({
@@ -23,11 +25,16 @@ class EditableTextLine extends SingleChildRenderObjectWidget {
     this.textDirection,
     @required TextLine child,
     @required this.cursorController,
-    this.selection,
+    @required this.selection,
+    @required this.selectionColor,
+    @required this.enableInteractiveSelection,
   })  : assert(node != null),
         assert(padding != null),
         assert(child != null),
         assert(cursorController != null),
+        assert(selection != null),
+        assert(selectionColor != null),
+        assert(enableInteractiveSelection != null),
         super(key: key, child: child);
 
   @override
@@ -38,6 +45,8 @@ class EditableTextLine extends SingleChildRenderObjectWidget {
       textDirection: textDirection,
       cursorController: cursorController,
       selection: selection,
+      selectionColor: selectionColor,
+      enableInteractiveSelection: enableInteractiveSelection,
     );
   }
 
@@ -49,5 +58,7 @@ class EditableTextLine extends SingleChildRenderObjectWidget {
     renderObject.textDirection = textDirection;
     renderObject.cursorController = cursorController;
     renderObject.selection = selection;
+    renderObject.selectionColor = selectionColor;
+    renderObject.enableInteractiveSelection = enableInteractiveSelection;
   }
 }

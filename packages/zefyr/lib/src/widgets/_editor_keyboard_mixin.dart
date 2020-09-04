@@ -189,7 +189,7 @@ mixin RawEditorStateKeyboardMixin on EditorState {
         if (leftArrow) {
           // When going left, we want to skip over any whitespace before the line,
           // so we go back to the first non-whitespace before asking for the line
-          // bounds, since _selectLineAtOffset finds the line boundaries without
+          // bounds, since selectLineAtPosition finds the line boundaries without
           // including whitespace (like the newline).
           final int startPoint =
               previousCharacter(newSelection.extentOffset, plainText, false);
@@ -340,8 +340,16 @@ mixin RawEditorStateKeyboardMixin on EditorState {
     }
     if (shortcut == InputShortcut.cut) {
       if (!selection.isCollapsed) {
+        final data = selection.textInside(plainText);
         // ignore: unawaited_futures
-        Clipboard.setData(ClipboardData(text: selection.textInside(plainText)));
+        Clipboard.setData(ClipboardData(text: data));
+
+        widget.controller.replaceText(
+          selection.start,
+          data.length,
+          '',
+          selection: TextSelection.collapsed(offset: selection.start),
+        );
 
         textEditingValue = TextEditingValue(
           text:
@@ -357,12 +365,13 @@ mixin RawEditorStateKeyboardMixin on EditorState {
       final TextEditingValue value = textEditingValue;
       final ClipboardData data = await Clipboard.getData(Clipboard.kTextPlain);
       if (data != null) {
-        textEditingValue = TextEditingValue(
-          text: value.selection.textBefore(value.text) +
-              data.text +
-              value.selection.textAfter(value.text),
+        final length = selection.end - selection.start;
+        widget.controller.replaceText(
+          selection.start,
+          length,
+          data.text,
           selection: TextSelection.collapsed(
-              offset: value.selection.start + data.text.length),
+              offset: selection.start + data.text.length),
         );
       }
       return;

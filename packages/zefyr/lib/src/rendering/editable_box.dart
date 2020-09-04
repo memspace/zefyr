@@ -8,6 +8,7 @@ import 'package:notus/notus.dart';
 import 'package:zefyr/src/rendering/cursor_painter.dart';
 
 import '../widgets/_cursor.dart';
+import '../widgets/selection_utils.dart';
 
 const double _kCaretGap = 1.0; // pixels
 const double _kCaretHeightOffset = 2.0; // pixels
@@ -22,6 +23,15 @@ abstract class RenderEditableMetricsProvider implements RenderBox {
 
   TextRange getWordBoundary(TextPosition position);
   TextRange getLineBoundary(TextPosition position);
+
+  /// Returns a list of rects that bound the given selection.
+  ///
+  /// A given selection might have more than one rect if this text painter
+  /// contains bidirectional text because logically contiguous text might not be
+  /// visually contiguous.
+  ///
+  /// Valid only after [layout].
+  List<ui.TextBox> getBoxesForSelection(TextSelection selection);
 }
 
 /// Base class for render boxes of editable content.
@@ -74,6 +84,15 @@ abstract class RenderEditableBox extends RenderBox {
   ///
   /// Valid only after [layout].
   TextRange getLineBoundary(TextPosition position);
+
+  /// Returns a list of rects that bound the given selection.
+  ///
+  /// A given selection might have more than one rect if this text painter
+  /// contains bidirectional text because logically contiguous text might not be
+  /// visually contiguous.
+  ///
+  /// Valid only after [layout].
+  List<ui.TextBox> getBoxesForSelection(TextSelection selection);
 }
 
 class RenderSingleChildEditableBox extends RenderEditableBox
@@ -84,14 +103,15 @@ class RenderSingleChildEditableBox extends RenderEditableBox
     @required LineNode node,
     @required EdgeInsetsGeometry padding,
     @required TextDirection textDirection,
-    TextAlign textAlign = TextAlign.start,
     @required CursorController cursorController,
-    TextSelection selection,
+    @required TextSelection selection,
+    @required Color selectionColor,
+    @required bool enableInteractiveSelection,
     double devicePixelRatio = 1.0,
-    // TODO fields are below:
+    // Not implemented fields are below:
+    TextAlign textAlign = TextAlign.start,
     bool hasFocus,
     StrutStyle strutStyle,
-    Color selectionColor,
     double textScaleFactor = 1.0,
 //    this.onSelectionChanged,
 //    this.onCaretChanged,
@@ -103,7 +123,6 @@ class RenderSingleChildEditableBox extends RenderEditableBox
     Locale locale,
     ui.BoxHeightStyle selectionHeightStyle = ui.BoxHeightStyle.tight,
     ui.BoxWidthStyle selectionWidthStyle = ui.BoxWidthStyle.tight,
-    bool enableInteractiveSelection,
     EdgeInsets floatingCursorAddedMargin =
         const EdgeInsets.fromLTRB(4, 4, 4, 5),
     Clip clipBehavior = Clip.hardEdge,
@@ -121,9 +140,119 @@ class RenderSingleChildEditableBox extends RenderEditableBox
         _padding = padding,
         _node = node,
         _cursorController = cursorController,
-        _devicePixelRatio = devicePixelRatio,
-        _selection = selection {
+        _selection = selection,
+        _enableInteractiveSelection = enableInteractiveSelection,
+        _devicePixelRatio = devicePixelRatio {
     this.child = child;
+  }
+
+  //
+
+  // Start selection implementation
+
+  List<ui.TextBox> _selectionRects;
+
+  /// The region of text that is selected, if any.
+  ///
+  /// The caret position is represented by a collapsed selection.
+  ///
+  /// If [selection] is null, there is no selection and attempts to
+  /// manipulate the selection will throw.
+  TextSelection get selection => _selection;
+  TextSelection _selection;
+  set selection(TextSelection value) {
+    if (_selection == value) return;
+    final hadSelection = containsSelection;
+    if (attached && containsCursor) {
+      _cursorController.removeListener(markNeedsLayout);
+      _cursorController.cursorColor.removeListener(markNeedsPaint);
+    }
+    _selection = value;
+    _selectionRects = null;
+    _containsCursor = null;
+    if (attached && containsCursor) {
+      _cursorController.addListener(markNeedsLayout);
+      _cursorController.cursorColor.addListener(markNeedsPaint);
+    }
+
+    if (hadSelection || containsSelection) {
+      markNeedsPaint();
+    }
+  }
+
+  /// The color to use when painting the selection.
+  Color /*?*/ get selectionColor => _selectionColor;
+  Color /*?*/ _selectionColor;
+  set selectionColor(Color /*?*/ value) {
+    if (_selectionColor == value) return;
+    _selectionColor = value;
+    if (containsSelection) markNeedsPaint();
+  }
+
+  /// Whether to allow the user to change the selection.
+  ///
+  /// Since this render object does not handle selection manipulation
+  /// itself, this actually only affects whether the accessibility
+  /// hints provided to the system (via
+  /// [describeSemanticsConfiguration]) will enable selection
+  /// manipulation. It's the responsibility of this object's owner
+  /// to provide selection manipulation affordances.
+  ///
+  /// This field is used by [selectionEnabled] (which then controls
+  /// the accessibility hints mentioned above).
+  bool /*?*/ get enableInteractiveSelection => _enableInteractiveSelection;
+  bool /*?*/ _enableInteractiveSelection;
+  set enableInteractiveSelection(bool /*?*/ value) {
+    if (_enableInteractiveSelection == value) return;
+    _enableInteractiveSelection = value;
+    markNeedsTextLayout();
+    markNeedsSemanticsUpdate(); // TODO: should probably update semantics on the RenderEditor instead.
+  }
+
+  /// Whether interactive selection are enabled based on the value of
+  /// [enableInteractiveSelection].
+  ///
+  /// If [enableInteractiveSelection] is not set then defaults to `true`.
+  bool get selectionEnabled {
+    return enableInteractiveSelection ?? true;
+  }
+
+  bool get containsSelection {
+    return intersectsWithSelection(_selection);
+  }
+
+  /// Returns `true` if this box intersects with document [selection].
+  bool intersectsWithSelection(TextSelection selection) {
+    final base = node.documentOffset;
+    final extent = base + node.length;
+    return selectionIntersectsWith(base, extent, selection);
+  }
+
+  /// Returns part of [documentSelection] local to this box. May return
+  /// `null`.
+  ///
+  /// [documentSelection] must not be collapsed.
+  TextSelection getLocalSelection(TextSelection documentSelection) {
+    if (!intersectsWithSelection(documentSelection)) return null;
+
+    final nodeBase = node.documentOffset;
+    final nodeExtent = nodeBase + node.length;
+    return selectionRestrict(nodeBase, nodeExtent, documentSelection);
+  }
+
+  // End selection implementation
+
+  //
+
+  /// The pixel ratio of the current device.
+  ///
+  /// Should be obtained by querying MediaQuery for the devicePixelRatio.
+  double get devicePixelRatio => _devicePixelRatio;
+  double _devicePixelRatio;
+  set devicePixelRatio(double value) {
+    if (devicePixelRatio == value) return;
+    _devicePixelRatio = value;
+    markNeedsTextLayout();
   }
 
   // Start RenderEditableBox implementation
@@ -137,6 +266,7 @@ class RenderSingleChildEditableBox extends RenderEditableBox
       return;
     }
     _node = value;
+    _containsCursor = null;
     markNeedsLayout();
   }
 
@@ -154,17 +284,6 @@ class RenderSingleChildEditableBox extends RenderEditableBox
     _markNeedsPaddingResolution();
   }
 
-  /// The pixel ratio of the current device.
-  ///
-  /// Should be obtained by querying MediaQuery for the devicePixelRatio.
-  double get devicePixelRatio => _devicePixelRatio;
-  double _devicePixelRatio;
-  set devicePixelRatio(double value) {
-    if (devicePixelRatio == value) return;
-    _devicePixelRatio = value;
-    markNeedsTextLayout();
-  }
-
   @override
   double get preferredLineHeight => child.preferredLineHeight;
 
@@ -175,7 +294,8 @@ class RenderSingleChildEditableBox extends RenderEditableBox
         _resolvedPadding.topLeft;
   }
 
-  /// The [offset] parameter is expected to be relative to this render object.
+  /// The [offset] parameter is expected to be local coordinates of this render
+  /// object.
   @override
   ui.TextPosition getPositionForOffset(ui.Offset offset) {
     final shiftedOffset = offset - _resolvedPadding.topLeft;
@@ -199,8 +319,21 @@ class RenderSingleChildEditableBox extends RenderEditableBox
     // this render object already represents a single line of text, so
     // we can infer this value from the document node itself.
     // TODO: we can proxy this to the child when getLineBoundary is exposed on RenderParagraph
-    final start = node.documentOffset;
-    return TextRange(start: start, end: start + node.length);
+    return TextRange(start: 0, end: node.length - 1); // do not include "\n"
+  }
+
+  @override
+  List<ui.TextBox> getBoxesForSelection(TextSelection selection) {
+    final boxes = child.getBoxesForSelection(selection);
+    return boxes.map((box) {
+      return ui.TextBox.fromLTRBD(
+        box.left + _resolvedPadding.left,
+        box.top + _resolvedPadding.top,
+        box.right + _resolvedPadding.left,
+        box.bottom + _resolvedPadding.top,
+        box.direction,
+      );
+    }).toList(growable: false);
   }
 
   /// Marks the render object as needing to be laid out again and have its text
@@ -276,8 +409,14 @@ class RenderSingleChildEditableBox extends RenderEditableBox
   double get cursorHeight =>
       _cursorController.style.height ?? preferredLineHeight;
 
+  /// We cache containsCursor value because this method depends on the node
+  /// state. In some cases the node gets detached from its document before this
+  /// render object is detached from the render tree. This causes containsCursor
+  /// to fail with an NPE when it's called from [detach].
+  bool _containsCursor;
   bool get containsCursor {
-    return selection.isCollapsed && node.containsOffset(selection.baseOffset);
+    return _containsCursor ??=
+        selection.isCollapsed && node.containsOffset(selection.baseOffset);
   }
 
   @override
@@ -315,34 +454,7 @@ class RenderSingleChildEditableBox extends RenderEditableBox
 
   // End caret implementation
 
-  // Start selection implementation
-
-  List<ui.TextBox> _selectionRects;
-
-  /// The region of text that is selected, if any.
-  ///
-  /// The caret position is represented by a collapsed selection.
-  ///
-  /// If [selection] is null, there is no selection and attempts to
-  /// manipulate the selection will throw.
-  TextSelection get selection => _selection;
-  TextSelection _selection;
-  set selection(TextSelection value) {
-    if (_selection == value) return;
-    if (attached && containsCursor) {
-      _cursorController.removeListener(markNeedsLayout);
-      _cursorController.cursorColor.removeListener(markNeedsPaint);
-    }
-    _selection = value;
-    _selectionRects = null;
-    if (attached && containsCursor) {
-      _cursorController.addListener(markNeedsLayout);
-      _cursorController.cursorColor.addListener(markNeedsPaint);
-    }
-    markNeedsPaint();
-  }
-
-  // End selection implementation
+  //
 
   // Start render box overrides
 
@@ -409,8 +521,11 @@ class RenderSingleChildEditableBox extends RenderEditableBox
   @override
   void performLayout() {
     final constraints = this.constraints;
+    _selectionRects = null;
+
     _resolvePadding();
     assert(_resolvedPadding != null);
+
     if (child == null) {
       size = constraints.constrain(Size(
         _resolvedPadding.left + _resolvedPadding.right,
@@ -427,6 +542,7 @@ class RenderSingleChildEditableBox extends RenderEditableBox
       _resolvedPadding.left + child.size.width + _resolvedPadding.right,
       _resolvedPadding.top + child.size.height + _resolvedPadding.bottom,
     ));
+
     _computeCaretPrototype();
   }
 
@@ -444,26 +560,44 @@ class RenderSingleChildEditableBox extends RenderEditableBox
       final childParentData = child.parentData as BoxParentData;
       final effectiveOffset = offset + childParentData.offset;
 
-      if (containsCursor && !_cursorController.style.paintAboveText) {
-        final cursorOffset = effectiveOffset.translate(-_kCaretGap, 0);
-        final position = TextPosition(
-          offset: selection.baseOffset - node.documentOffset,
-          affinity: selection.base.affinity,
+      if (selectionEnabled && containsSelection) {
+        final localSelection = getLocalSelection(selection);
+        _selectionRects ??= child.getBoxesForSelection(
+          localSelection, /*, boxHeightStyle: _selectionHeightStyle, boxWidthStyle: _selectionWidthStyle*/
         );
-        _cursorPainter.paint(context.canvas, cursorOffset, position);
+        _paintSelection(context, effectiveOffset);
+      }
+
+      if (containsCursor && !_cursorController.style.paintAboveText) {
+        _paintCursor(context, effectiveOffset);
       }
 
       context.paintChild(child, effectiveOffset);
 
       if (containsCursor && _cursorController.style.paintAboveText) {
-        final cursorOffset = effectiveOffset.translate(-_kCaretGap, 0);
-        final position = TextPosition(
-          offset: selection.baseOffset - node.documentOffset,
-          affinity: selection.base.affinity,
-        );
-        _cursorPainter.paint(context.canvas, cursorOffset, position);
+        _paintCursor(context, effectiveOffset);
       }
     }
+  }
+
+  void _paintSelection(PaintingContext context, Offset effectiveOffset) {
+    // assert(_textLayoutLastMaxWidth == constraints.maxWidth &&
+    //     _textLayoutLastMinWidth == constraints.minWidth,
+    // 'Last width ($_textLayoutLastMinWidth, $_textLayoutLastMaxWidth) not the same as max width constraint (${constraints.minWidth}, ${constraints.maxWidth}).');
+    assert(_selectionRects != null);
+    final paint = Paint()..color = _selectionColor /*!*/;
+    for (final box in _selectionRects /*!*/) {
+      context.canvas.drawRect(box.toRect().shift(effectiveOffset), paint);
+    }
+  }
+
+  void _paintCursor(PaintingContext context, Offset effectiveOffset) {
+    final cursorOffset = effectiveOffset.translate(-_kCaretGap, 0);
+    final position = TextPosition(
+      offset: selection.baseOffset - node.documentOffset,
+      affinity: selection.base.affinity,
+    );
+    _cursorPainter.paint(context.canvas, cursorOffset, position);
   }
 
   // End render box overrides
