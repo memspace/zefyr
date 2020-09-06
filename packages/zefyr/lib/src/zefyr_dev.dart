@@ -2,6 +2,8 @@ export 'rendering/editor.dart';
 export 'widgets/_controller.dart';
 export 'widgets/_cursor.dart';
 export 'widgets/_editor.dart';
+export 'widgets/_editor_toolbar.dart';
+export 'widgets/_field.dart';
 
 /// RawEditor [RenderEditor]
 ///   - EditableRichText [RenderEditableParagraph] - LineNode, handles caret, background, padding, selection boxes, etc

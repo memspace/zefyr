@@ -38,8 +38,8 @@ class EditableTextLine extends SingleChildRenderObjectWidget {
         super(key: key, child: child);
 
   @override
-  RenderSingleChildEditableBox createRenderObject(BuildContext context) {
-    return RenderSingleChildEditableBox(
+  RenderEditableSingleChildBox createRenderObject(BuildContext context) {
+    return RenderEditableSingleChildBox(
       node: node,
       padding: padding,
       textDirection: textDirection,
@@ -52,7 +52,7 @@ class EditableTextLine extends SingleChildRenderObjectWidget {
 
   @override
   void updateRenderObject(BuildContext context,
-      covariant RenderSingleChildEditableBox renderObject) {
+      covariant RenderEditableSingleChildBox renderObject) {
     renderObject.node = node;
     renderObject.padding = padding;
     renderObject.textDirection = textDirection;

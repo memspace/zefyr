@@ -40,9 +40,12 @@ abstract class RenderEditableMetricsProvider implements RenderBox {
 /// regular (non-editable) render boxes which implement
 /// [RenderEditableMetricsProvider].
 abstract class RenderEditableBox extends RenderBox {
-  Node get node;
-  double get preferredLineHeight;
-  Rect get caretPrototype;
+  ContainerNode get node;
+
+  /// Returns preferred line height at specified `position` in text.
+  ///
+  /// The `position` parameter must be relative to the [node]'s content.
+  double preferredLineHeight(TextPosition position);
 
   /// Returns the offset at which to paint the caret.
   ///
@@ -95,10 +98,10 @@ abstract class RenderEditableBox extends RenderBox {
   List<ui.TextBox> getBoxesForSelection(TextSelection selection);
 }
 
-class RenderSingleChildEditableBox extends RenderEditableBox
+class RenderEditableSingleChildBox extends RenderEditableBox
     with RenderObjectWithChildMixin<RenderEditableMetricsProvider> {
   /// Creates new editable paragraph render box.
-  RenderSingleChildEditableBox({
+  RenderEditableSingleChildBox({
     RenderEditableMetricsProvider child,
     @required LineNode node,
     @required EdgeInsetsGeometry padding,
@@ -141,6 +144,7 @@ class RenderSingleChildEditableBox extends RenderEditableBox
         _node = node,
         _cursorController = cursorController,
         _selection = selection,
+        _selectionColor = selectionColor,
         _enableInteractiveSelection = enableInteractiveSelection,
         _devicePixelRatio = devicePixelRatio {
     this.child = child;
@@ -285,12 +289,16 @@ class RenderSingleChildEditableBox extends RenderEditableBox
   }
 
   @override
-  double get preferredLineHeight => child.preferredLineHeight;
+  double preferredLineHeight(TextPosition position) {
+    // For single line nodes this value is constant because we're using the same
+    // text painter.
+    return child.preferredLineHeight;
+  }
 
   /// The [position] parameter is expected to be relative to the [node]'s offset.
   @override
   ui.Offset getOffsetForCaret(ui.TextPosition position) {
-    return child.getOffsetForCaret(position, caretPrototype) +
+    return child.getOffsetForCaret(position, _caretPrototype) +
         _resolvedPadding.topLeft;
   }
 
@@ -407,7 +415,10 @@ class RenderSingleChildEditableBox extends RenderEditableBox
   double get _caretMargin => _kCaretGap + cursorWidth;
   double get cursorWidth => _cursorController.style.width;
   double get cursorHeight =>
-      _cursorController.style.height ?? preferredLineHeight;
+      _cursorController.style.height ??
+      // hard code position to 0 here but it really doesn't matter since it's
+      // the same for the entire paragraph of text.
+      preferredLineHeight(TextPosition(offset: 0));
 
   /// We cache containsCursor value because this method depends on the node
   /// state. In some cases the node gets detached from its document before this
@@ -419,8 +430,6 @@ class RenderSingleChildEditableBox extends RenderEditableBox
         selection.isCollapsed && node.containsOffset(selection.baseOffset);
   }
 
-  @override
-  Rect get caretPrototype => _caretPrototype;
   /*late*/ Rect _caretPrototype;
 
   // TODO(garyq): This is no longer producing the highest-fidelity caret
@@ -603,5 +612,263 @@ class RenderSingleChildEditableBox extends RenderEditableBox
   // End render box overrides
 }
 
-// For multi-child render objects (blocks).
-class RenderContainerEditableBox {}
+class EditableContainerParentData
+    extends ContainerBoxParentData<RenderEditableBox> {}
+
+typedef _ChildSizingFunction = double Function(RenderBox child);
+
+/// Multi-child render box of editable content.
+class RenderEditableContainerBox extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderEditableBox,
+            EditableContainerParentData>,
+        RenderBoxContainerDefaultsMixin<RenderEditableBox,
+            EditableContainerParentData> {
+  RenderEditableContainerBox({
+    List<RenderEditableBox> children,
+    @required ContainerNode node,
+    @required TextDirection textDirection,
+  })  : assert(node != null),
+        assert(textDirection != null),
+        _node = node,
+        _textDirection = textDirection {
+    addAll(children);
+  }
+
+  ContainerNode get node => _node;
+  ContainerNode _node;
+  set node(ContainerNode value) {
+    assert(value != null);
+    if (_node == value) return;
+    _node = value;
+    markNeedsLayout();
+  }
+
+  TextDirection get textDirection => _textDirection;
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
+    if (_textDirection == value) {
+      return;
+    }
+    _textDirection = value;
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! EditableContainerParentData) {
+      child.parentData = EditableContainerParentData();
+    }
+  }
+
+  @override
+  void performLayout() {
+    assert(() {
+      if (!constraints.hasBoundedHeight) return true;
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary(
+            'RenderEditor must have unlimited space along its main axis.'),
+        ErrorDescription(
+            'RenderEditor does not clip or resize its children, so it must be '
+            'placed in a parent that does not constrain the main '
+            'axis.'),
+        ErrorHint('You probably want to put the RenderEditor inside a '
+            'RenderViewport with a matching main axis.')
+      ]);
+    }());
+    assert(() {
+      if (constraints.hasBoundedWidth) return true;
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary(
+            'RenderEditor must have a bounded constraint for its cross axis.'),
+        ErrorDescription(
+            'RenderEditor forces its children to expand to fit the RenderEditor\'s container, '
+            'so it must be placed in a parent that constrains the cross '
+            'axis to a finite dimension.'),
+      ]);
+    }());
+    var mainAxisExtent = 0.0;
+    var child = firstChild;
+    final innerConstraints =
+        BoxConstraints.tightFor(width: constraints.maxWidth);
+    while (child != null) {
+      child.layout(innerConstraints, parentUsesSize: true);
+      final EditableContainerParentData childParentData = child.parentData;
+      childParentData.offset = Offset(0.0, mainAxisExtent);
+      mainAxisExtent += child.size.height;
+      assert(child.parentData == childParentData);
+      child = childParentData.nextSibling;
+    }
+    size = constraints.constrain(Size(constraints.maxWidth, mainAxisExtent));
+
+    assert(size.isFinite);
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+//    properties.add(EnumProperty<AxisDirection>('axisDirection', axisDirection));
+  }
+
+  double _getIntrinsicCrossAxis(_ChildSizingFunction childSize) {
+    var extent = 0.0;
+    var child = firstChild;
+    while (child != null) {
+      extent = math.max(extent, childSize(child));
+      final EditableContainerParentData childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+    return extent;
+  }
+
+  double _getIntrinsicMainAxis(_ChildSizingFunction childSize) {
+    var extent = 0.0;
+    var child = firstChild;
+    while (child != null) {
+      extent += childSize(child);
+      final EditableContainerParentData childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+    return extent;
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    return _getIntrinsicCrossAxis(
+        (RenderBox child) => child.getMinIntrinsicWidth(height));
+  }
+
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    return _getIntrinsicCrossAxis(
+        (RenderBox child) => child.getMaxIntrinsicWidth(height));
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) {
+    return _getIntrinsicMainAxis(
+        (RenderBox child) => child.getMinIntrinsicHeight(width));
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    return _getIntrinsicMainAxis(
+        (RenderBox child) => child.getMaxIntrinsicHeight(width));
+  }
+
+  @override
+  double computeDistanceToActualBaseline(TextBaseline baseline) {
+    return defaultComputeDistanceToFirstActualBaseline(baseline);
+  }
+
+  RenderEditableBox childAtPosition(TextPosition position) {
+    assert(firstChild != null);
+
+    final targetNode = node.lookup(position.offset).node;
+
+    var child = firstChild;
+    RenderEditableBox renderObject;
+    while (child != null) {
+      if (child.node == targetNode) {
+        renderObject = child;
+        break;
+      }
+      child = childAfter(child);
+    }
+    assert(renderObject != null);
+    return renderObject;
+  }
+
+  RenderEditableBox childAtOffset(Offset offset) {
+    assert(firstChild != null);
+
+    if (offset.dy <= 0) return firstChild;
+    if (offset.dy >= size.height) return lastChild;
+
+    var child = firstChild;
+    var dy = 0.0;
+    var dx = -offset.dx;
+    while (child != null) {
+      if (child.size.contains(offset.translate(dx, -dy))) {
+        return child;
+      }
+      dy += child.size.height;
+      child = childAfter(child);
+    }
+    throw StateError('No child at offset $offset.');
+  }
+}
+
+class RenderEditableBlockBox extends RenderEditableContainerBox
+    implements RenderEditableBox {
+  ///
+  RenderEditableBlockBox({
+    List<RenderEditableBox> children,
+    @required BlockNode node,
+    @required TextDirection textDirection,
+  })  : assert(node != null),
+        assert(textDirection != null),
+        super(
+          children: children,
+          node: node,
+          textDirection: textDirection,
+        );
+
+  @override
+  List<ui.TextBox> getBoxesForSelection(TextSelection selection) {
+    throw UnimplementedError();
+    //
+    // final boxes = child.getBoxesForSelection(selection);
+    // return boxes.map((box) {
+    //   return ui.TextBox.fromLTRBD(
+    //     box.left + _resolvedPadding.left,
+    //     box.top + _resolvedPadding.top,
+    //     box.right + _resolvedPadding.left,
+    //     box.bottom + _resolvedPadding.top,
+    //     box.direction,
+    //   );
+    // }).toList(growable: false);
+  }
+
+  @override
+  ui.TextRange getLineBoundary(ui.TextPosition position) {
+    // TODO: implement getLineBoundary
+    throw UnimplementedError();
+  }
+
+  @override
+  ui.Offset getOffsetForCaret(ui.TextPosition position) {
+    // TODO: implement getOffsetForCaret
+    throw UnimplementedError();
+  }
+
+  @override
+  ui.TextPosition getPositionForOffset(ui.Offset offset) {
+    // TODO: implement getPositionForOffset
+    throw UnimplementedError();
+  }
+
+  @override
+  ui.TextRange getWordBoundary(ui.TextPosition position) {
+    final child = childAtPosition(position);
+    final localPosition =
+        TextPosition(offset: position.offset - child.node.offset);
+    return child.getWordBoundary(localPosition);
+  }
+
+  @override
+  bool offsetInsideContent(ui.Offset offset) {
+    throw UnimplementedError();
+    // final shiftedOffset = offset - _resolvedPadding.topLeft;
+    // return child.size.contains(shiftedOffset);
+  }
+
+  @override
+  double preferredLineHeight(TextPosition position) {
+    final child = childAtPosition(position);
+    final localPosition =
+        TextPosition(offset: position.offset - child.node.offset);
+    return child.preferredLineHeight(localPosition);
+  }
+
+  // End RenderEditableBox implementation
+}

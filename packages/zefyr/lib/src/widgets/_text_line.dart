@@ -35,6 +35,7 @@ class TextLine extends StatelessWidget {
         .toList(growable: false);
     final style = TextStyle(
       color: Colors.grey.shade900,
+      height: 1.45,
       // fontFamily: '.SF UI Text',
       fontSize: 14,
     );
@@ -50,6 +51,9 @@ class TextLine extends StatelessWidget {
     var style = TextStyle();
     if (attrs.contains(NotusAttribute.bold)) {
       style = style.copyWith(fontWeight: FontWeight.bold);
+    }
+    if (attrs.contains(NotusAttribute.italic)) {
+      style = style.copyWith(fontStyle: FontStyle.italic);
     }
 
     return TextSpan(

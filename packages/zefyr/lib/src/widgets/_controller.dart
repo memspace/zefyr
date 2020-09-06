@@ -23,6 +23,20 @@ class ZefyrController extends ChangeNotifier {
   NotusStyle get toggledStyles => _toggledStyles;
   NotusStyle _toggledStyles = NotusStyle();
 
+  /// Returns style of specified text range.
+  ///
+  /// If nothing is selected but we've toggled an attribute,
+  /// we also merge those in our style before returning.
+  NotusStyle getSelectionStyle() {
+    final start = _selection.start;
+    final length = _selection.end - start;
+    var lineStyle = document.collectStyle(start, length);
+
+    lineStyle = lineStyle.mergeAll(toggledStyles);
+
+    return lineStyle;
+  }
+
   /// Replaces [length] characters in the document starting at [index] with
   /// provided [text].
   ///
@@ -80,6 +94,38 @@ class ZefyrController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void formatText(int index, int length, NotusAttribute attribute) {
+    final change = document.format(index, length, attribute);
+    // _lastChangeSource = ChangeSource.local;
+    final source = ChangeSource.local;
+
+    if (length == 0 &&
+        (attribute.key == NotusAttribute.bold.key ||
+            attribute.key == NotusAttribute.italic.key)) {
+      // Add the attribute to our toggledStyle. It will be used later upon insertion.
+      _toggledStyles = toggledStyles.put(attribute);
+    }
+
+    // Transform selection against the composed change and give priority to
+    // the change. This is needed in cases when format operation actually
+    // inserts data into the document (e.g. embeds).
+    final base = change.transformPosition(_selection.baseOffset);
+    final extent = change.transformPosition(_selection.extentOffset);
+    final adjustedSelection =
+        _selection.copyWith(baseOffset: base, extentOffset: extent);
+    if (_selection != adjustedSelection) {
+      _updateSelectionSilent(adjustedSelection, source: source);
+    }
+    notifyListeners();
+  }
+
+  /// Formats current selection with [attribute].
+  void formatSelection(NotusAttribute attribute) {
+    final index = _selection.start;
+    final length = _selection.end - index;
+    formatText(index, length, attribute);
+  }
+
   /// Updates selection with specified [value].
   ///
   /// [value] and [source] cannot be `null`.
@@ -112,7 +158,7 @@ class ZefyrController extends ChangeNotifier {
     return TextEditingValue(
       text: document.toPlainText(),
       selection: selection,
-      composing: TextRange.collapsed(-1),
+      composing: TextRange.empty,
     );
   }
 }

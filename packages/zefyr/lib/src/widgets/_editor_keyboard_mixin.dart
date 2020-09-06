@@ -250,7 +250,8 @@ mixin RawEditorStateKeyboardMixin on EditorState {
       final localPosition = TextPosition(
           offset: originPosition.offset - child.node.documentOffset);
       final localCaretOffset = child.getOffsetForCaret(localPosition);
-      final double preferredLineHeight = child.preferredLineHeight;
+      final double preferredLineHeight =
+          child.preferredLineHeight(localPosition);
       final double verticalOffset =
           upArrow ? -0.5 * preferredLineHeight : 1.5 * preferredLineHeight;
 

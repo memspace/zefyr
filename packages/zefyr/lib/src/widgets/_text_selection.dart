@@ -18,6 +18,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import '../rendering/editor.dart';
+import '_editor.dart';
 
 /// A duration that controls how often the drag selection update callback is
 /// called.
@@ -319,10 +320,9 @@ class EditorTextSelectionOverlay {
       renderObject.localToGlobal(renderObject.size.bottomRight(Offset.zero)),
     );
 
-    final baseLineHeight =
-        renderObject.preferredLineHeightAtPosition(_selection.base);
+    final baseLineHeight = renderObject.preferredLineHeight(_selection.base);
     final extentLineHeight =
-        renderObject.preferredLineHeightAtPosition(_selection.extent);
+        renderObject.preferredLineHeight(_selection.extent);
     final smallestLineHeight = math.min(baseLineHeight, extentLineHeight);
     final bool isMultiline =
         endpoints.last.point.dy - endpoints.first.point.dy >
@@ -462,8 +462,7 @@ class _TextSelectionHandleOverlayState
     final textPosition = widget.position == _TextSelectionHandlePosition.start
         ? widget.selection.base
         : widget.selection.extent;
-    final lineHeight =
-        widget.renderObject.preferredLineHeightAtPosition(textPosition);
+    final lineHeight = widget.renderObject.preferredLineHeight(textPosition);
     final Size handleSize = widget.selectionControls.getHandleSize(lineHeight);
     _dragPosition = details.globalPosition + Offset(0.0, -handleSize.height);
   }
@@ -538,8 +537,7 @@ class _TextSelectionHandleOverlayState
     final textPosition = widget.position == _TextSelectionHandlePosition.start
         ? widget.selection.base
         : widget.selection.extent;
-    final lineHeight =
-        widget.renderObject.preferredLineHeightAtPosition(textPosition);
+    final lineHeight = widget.renderObject.preferredLineHeight(textPosition);
 
     final Offset handleAnchor =
         widget.selectionControls.getHandleAnchor(type, lineHeight);
@@ -634,7 +632,7 @@ class _TextSelectionHandleOverlayState
 abstract class EditorTextSelectionGestureDetectorBuilderDelegate {
   /// [GlobalKey] to the [EditableText] for which the
   /// [EditorTextSelectionGestureDetectorBuilder] will build a [EditorTextSelectionGestureDetector].
-  GlobalKey<EditableTextState> get editableTextKey;
+  GlobalKey<EditorState> get editableTextKey;
 
   /// Whether the textfield should respond to force presses.
   bool get forcePressEnabled;
@@ -688,12 +686,12 @@ class EditorTextSelectionGestureDetectorBuilder {
   /// The [State] of the [EditableText] for which the builder will provide a
   /// [EditorTextSelectionGestureDetector].
   @protected
-  EditableTextState get editableText => delegate.editableTextKey.currentState;
+  EditorState get editor => delegate.editableTextKey.currentState;
 
   /// The [RenderObject] of the [EditableText] for which the builder will
   /// provide a [EditorTextSelectionGestureDetector].
   @protected
-  RenderEditable get renderEditable => editableText.renderEditable;
+  RenderEditor get renderEditor => editor.renderEditor;
 
   /// Handler for [EditorTextSelectionGestureDetector.onTapDown].
   ///
@@ -705,7 +703,7 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///  * [EditorTextSelectionGestureDetector.onTapDown], which triggers this callback.
   @protected
   void onTapDown(TapDownDetails details) {
-    renderEditable.handleTapDown(details);
+    renderEditor.handleTapDown(details);
     // The selection overlay should only be shown when the user is interacting
     // through a touch screen (via either a finger or a stylus). A mouse shouldn't
     // trigger the selection overlay.
@@ -732,7 +730,7 @@ class EditorTextSelectionGestureDetectorBuilder {
     assert(delegate.forcePressEnabled);
     _shouldShowSelectionToolbar = true;
     if (delegate.selectionEnabled) {
-      renderEditable.selectWordsInRange(
+      renderEditor.selectWordsInRange(
         from: details.globalPosition,
         cause: SelectionChangedCause.forcePress,
       );
@@ -753,11 +751,11 @@ class EditorTextSelectionGestureDetectorBuilder {
   @protected
   void onForcePressEnd(ForcePressDetails details) {
     assert(delegate.forcePressEnabled);
-    renderEditable.selectWordsInRange(
+    renderEditor.selectWordsInRange(
       from: details.globalPosition,
       cause: SelectionChangedCause.forcePress,
     );
-    if (shouldShowSelectionToolbar) editableText.showToolbar();
+    if (shouldShowSelectionToolbar) editor.showToolbar();
   }
 
   /// Handler for [EditorTextSelectionGestureDetector.onSingleTapUp].
@@ -771,7 +769,7 @@ class EditorTextSelectionGestureDetectorBuilder {
   @protected
   void onSingleTapUp(TapUpDetails details) {
     if (delegate.selectionEnabled) {
-      renderEditable.selectWordEdge(cause: SelectionChangedCause.tap);
+      renderEditor.selectWordEdge(cause: SelectionChangedCause.tap);
     }
   }
 
@@ -800,7 +798,7 @@ class EditorTextSelectionGestureDetectorBuilder {
   @protected
   void onSingleLongTapStart(LongPressStartDetails details) {
     if (delegate.selectionEnabled) {
-      renderEditable.selectPositionAt(
+      renderEditor.selectPositionAt(
         from: details.globalPosition,
         cause: SelectionChangedCause.longPress,
       );
@@ -819,7 +817,7 @@ class EditorTextSelectionGestureDetectorBuilder {
   @protected
   void onSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details) {
     if (delegate.selectionEnabled) {
-      renderEditable.selectPositionAt(
+      renderEditor.selectPositionAt(
         from: details.globalPosition,
         cause: SelectionChangedCause.longPress,
       );
@@ -836,7 +834,7 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///    callback.
   @protected
   void onSingleLongTapEnd(LongPressEndDetails details) {
-    if (shouldShowSelectionToolbar) editableText.showToolbar();
+    if (shouldShowSelectionToolbar) editor.showToolbar();
   }
 
   /// Handler for [EditorTextSelectionGestureDetector.onDoubleTapDown].
@@ -851,8 +849,8 @@ class EditorTextSelectionGestureDetectorBuilder {
   @protected
   void onDoubleTapDown(TapDownDetails details) {
     if (delegate.selectionEnabled) {
-      renderEditable.selectWord(cause: SelectionChangedCause.tap);
-      if (shouldShowSelectionToolbar) editableText.showToolbar();
+      renderEditor.selectWord(cause: SelectionChangedCause.tap);
+      if (shouldShowSelectionToolbar) editor.showToolbar();
     }
   }
 
@@ -866,7 +864,7 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///    this callback.
   @protected
   void onDragSelectionStart(DragStartDetails details) {
-    renderEditable.selectPositionAt(
+    renderEditor.selectPositionAt(
       from: details.globalPosition,
       cause: SelectionChangedCause.drag,
     );
@@ -884,7 +882,7 @@ class EditorTextSelectionGestureDetectorBuilder {
   @protected
   void onDragSelectionUpdate(
       DragStartDetails startDetails, DragUpdateDetails updateDetails) {
-    renderEditable.selectPositionAt(
+    renderEditor.selectPositionAt(
       from: startDetails.globalPosition,
       to: updateDetails.globalPosition,
       cause: SelectionChangedCause.drag,

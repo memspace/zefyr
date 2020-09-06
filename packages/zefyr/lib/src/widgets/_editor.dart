@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
@@ -341,6 +342,7 @@ abstract class EditorState extends State<RawEditor> {
   TextEditingValue get textEditingValue;
   set textEditingValue(TextEditingValue value);
   RenderEditor get renderEditor;
+  bool showToolbar();
 }
 
 class RawEditorState extends EditorState
@@ -410,6 +412,28 @@ class RawEditorState extends EditorState
     } else {
       widget.focusNode.requestFocus();
     }
+  }
+
+  /// Shows the selection toolbar at the location of the current cursor.
+  ///
+  /// Returns `false` if a toolbar couldn't be shown, such as when the toolbar
+  /// is already shown, or when no text selection currently exists.
+  @override
+  bool showToolbar() {
+    // Web is using native dom elements to enable clipboard functionality of the
+    // toolbar: copy, paste, select, cut. It might also provide additional
+    // functionality depending on the browser (such as translate). Due to this
+    // we should not show a Flutter toolbar for the editable text elements.
+    if (kIsWeb) {
+      return false;
+    }
+
+    if (_selectionOverlay == null || _selectionOverlay.toolbarIsVisible) {
+      return false;
+    }
+
+    _selectionOverlay.showToolbar();
+    return true;
   }
 
   // State lifecycle:
@@ -535,10 +559,32 @@ class RawEditorState extends EditorState
       _cursorController.startCursorTimer();
     }
 
-    _updateOrDisposeSelectionOverlayIfNeeded();
+    // Refresh selection overlay after the build step had a chance to
+    // update and register all children of RenderEditor. Otherwise this will
+    // fail in situations where a new line of text is entered, which adds
+    // a new RenderEditableBox child. If we try to update selection overlay
+    // immediately it'll not be able to find the new child since it hasn't been
+    // built yet.
+    SchedulerBinding.instance.addPostFrameCallback(
+        (Duration _) => _updateOrDisposeSelectionOverlayIfNeeded());
 //    _textChangedSinceLastCaretUpdate = true;
 
     setState(() {/* We use widget.controller.value in build(). */});
+  }
+
+  void _handleSelectionChanged(
+      TextSelection selection, SelectionChangedCause cause) {
+    // We return early if the selection is not valid. This can happen when the
+    // text of [EditableText] is updated at the same time as the selection is
+    // changed by a gesture event.
+    // if (!widget.controller.isSelectionWithinTextBounds(selection))
+    //   return;
+
+    widget.controller.updateSelection(selection, source: ChangeSource.local);
+
+    // This will show the keyboard for all selection changes on the
+    // EditableWidget, not just changes triggered by user gestures.
+    requestKeyboard();
   }
 
   void _handleFocusChanged() {
@@ -617,7 +663,7 @@ class RawEditorState extends EditorState
     return MouseRegion(
       cursor: SystemMouseCursors.text,
       child: Container(
-        constraints: BoxConstraints(maxHeight: 300),
+        // constraints: BoxConstraints(maxHeight: 300),
         child: SingleChildScrollView(
 //      excludeFromSemantics: true,
 //      axisDirection: AxisDirection.down,
@@ -639,6 +685,7 @@ class RawEditorState extends EditorState
                 textDirection: _textDirection,
                 startHandleLayerLink: _startHandleLayerLink,
                 endHandleLayerLink: _endHandleLayerLink,
+                onSelectionChanged: _handleSelectionChanged,
                 // Not implemented fields:
                 maxHeight: widget.maxHeight,
                 minHeight: widget.minHeight,
@@ -687,6 +734,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     @required this.enableInteractiveSelection,
     @required this.startHandleLayerLink,
     @required this.endHandleLayerLink,
+    @required this.onSelectionChanged,
     // Not implemented fields:
     @required this.maxHeight,
     @required this.minHeight,
@@ -716,6 +764,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   final bool enableInteractiveSelection;
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
+  final TextSelectionChangedHandler onSelectionChanged;
   // Not implemented fields:
   final double maxHeight;
   final double minHeight;
@@ -734,6 +783,7 @@ class _Editor extends MultiChildRenderObjectWidget {
       selection: selection,
       startHandleLayerLink: startHandleLayerLink,
       endHandleLayerLink: endHandleLayerLink,
+      onSelectionChanged: onSelectionChanged,
     );
   }
 
@@ -741,11 +791,13 @@ class _Editor extends MultiChildRenderObjectWidget {
   void updateRenderObject(
       BuildContext context, covariant RenderEditor renderObject) {
     renderObject.document = document;
+    renderObject.node = document.root;
     renderObject.textDirection = textDirection;
     renderObject.hasFocus = hasFocus;
     renderObject.selection = selection;
     renderObject.startHandleLayerLink = startHandleLayerLink;
     renderObject.endHandleLayerLink = endHandleLayerLink;
+    renderObject.onSelectionChanged = onSelectionChanged;
   }
 
   @override
