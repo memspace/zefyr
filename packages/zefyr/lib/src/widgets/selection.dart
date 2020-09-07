@@ -273,8 +273,13 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     _longPressPosition = null;
     HitTestResult result = HitTestResult();
     WidgetsBinding.instance.hitTest(result, globalPoint);
-    final box = _getEditableBox(result);
+    var box = _getEditableBox(result);
     if (box == null) {
+      if (isToolbarVisible) {
+        hideToolbar();
+      } else {
+        showToolbar();
+      }
       return;
     }
     final localPoint = box.globalToLocal(globalPoint);
@@ -284,6 +289,13 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
       baseOffset: word.start,
       extentOffset: word.end,
     );
+    if (selection.baseOffset == 0 && selection.extentOffset == 0) {
+      if (isToolbarVisible) {
+        hideToolbar();
+      } else {
+        showToolbar();
+      }
+    }
     _scope.controller.updateSelection(selection, source: ChangeSource.local);
   }
 
