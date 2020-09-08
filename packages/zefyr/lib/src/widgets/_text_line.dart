@@ -35,9 +35,9 @@ class TextLine extends StatelessWidget {
         .toList(growable: false);
     final style = TextStyle(
       color: Colors.grey.shade900,
-      height: 1.45,
+      // height: 1.35,
       // fontFamily: '.SF UI Text',
-      fontSize: 14,
+      fontSize: 16,
     );
     return TextSpan(style: style, children: children);
   }

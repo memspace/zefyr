@@ -29,6 +29,7 @@ class ToggleButton extends StatefulWidget {
 final Map<ToggleAttribute, NotusAttribute> _attributeMap = {
   ToggleAttribute.bold: NotusAttribute.bold,
   ToggleAttribute.italic: NotusAttribute.italic,
+  ToggleAttribute.quote: NotusAttribute.block.quote,
 };
 
 class _ToggleButtonState extends State<ToggleButton> {
@@ -102,6 +103,7 @@ Widget _defaultToggleButtonBuilder(BuildContext context,
 final Map<ToggleAttribute, IconData> _defaultToggleIcons = {
   ToggleAttribute.bold: Icons.format_bold,
   ToggleAttribute.italic: Icons.format_italic,
+  ToggleAttribute.quote: Icons.format_quote,
 };
 
 class EditorToolbar extends StatefulWidget implements PreferredSizeWidget {
@@ -122,6 +124,11 @@ class EditorToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       ToggleButton(
         attribute: ToggleAttribute.italic,
+        controller: controller,
+        childBuilder: _defaultToggleButtonBuilder,
+      ),
+      ToggleButton(
+        attribute: ToggleAttribute.quote,
         controller: controller,
         childBuilder: _defaultToggleButtonBuilder,
       ),

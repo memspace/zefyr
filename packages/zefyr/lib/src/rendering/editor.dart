@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
 
+import '../widgets/selection_utils.dart';
 import 'editable_box.dart';
 
 /// Signature for the callback that reports when the user changes the selection
@@ -22,7 +23,6 @@ abstract class RenderAbstractEditor {
   /// Returns preferred line height at specified `position` in text.
   double preferredLineHeight(TextPosition position);
 
-  Offset getOffsetForCaret(TextPosition position);
   TextPosition getPositionForOffset(Offset offset);
 
   /// Returns the local coordinates of the endpoints of the given selection.
@@ -207,22 +207,10 @@ class RenderEditor extends RenderEditableContainerBox
     assert(constraints != null);
     // _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
 
-    TextSelection localSelection(
-        RenderEditableBox box, TextSelection selection) {
-      final documentOffset = box.node.documentOffset;
-      final base = math.max(selection.start - documentOffset, 0);
-      final extent =
-          math.min(selection.end - documentOffset, box.node.length - 1);
-      return selection.copyWith(
-        baseOffset: base,
-        extentOffset: extent,
-      );
-    }
-
     if (selection.isCollapsed) {
       final child = childAtPosition(selection.extent);
-      final localPosition = TextPosition(
-          offset: selection.extentOffset - child.node.documentOffset);
+      final localPosition =
+          TextPosition(offset: selection.extentOffset - child.node.offset);
       final localOffset = child.getOffsetForCaret(localPosition);
       final BoxParentData parentData = child.parentData;
       final start = Offset(0.0, child.preferredLineHeight(localPosition)) +
@@ -230,46 +218,43 @@ class RenderEditor extends RenderEditableContainerBox
           parentData.offset;
       return <TextSelectionPoint>[TextSelectionPoint(start, null)];
     } else {
-      final startChild = childAtPosition(TextPosition(offset: selection.start));
-      final startSelection = localSelection(startChild, selection);
-      final BoxParentData startParentData = startChild.parentData;
-      Offset start;
-      TextDirection startDirection;
-      if (startSelection.isCollapsed) {
-        final localOffset = startChild.getOffsetForCaret(startSelection.extent);
-        start =
-            Offset(0.0, startChild.preferredLineHeight(startSelection.extent)) +
-                localOffset +
-                startParentData.offset;
-      } else {
-        final startBoxes = startChild.getBoxesForSelection(startSelection);
-        start = Offset(startBoxes.first.start, startBoxes.first.bottom) +
-            startParentData.offset;
-        startDirection = startBoxes.first.direction;
+      final baseNode = node.lookup(selection.start).node;
+
+      var baseChild = firstChild;
+      while (baseChild != null) {
+        if (baseChild.node == baseNode) {
+          break;
+        }
+        baseChild = childAfter(baseChild);
       }
+      assert(baseChild != null);
 
-      final endChild = childAtPosition(TextPosition(offset: selection.end));
-      final BoxParentData endParentData = endChild.parentData;
-      final endSelection = localSelection(endChild, selection);
+      final BoxParentData baseParentData = baseChild.parentData;
+      final baseSelection =
+          localSelection(baseChild.node, selection, fromParent: true);
+      var basePoint = baseChild.getBaseEndpointForSelection(baseSelection);
+      basePoint = TextSelectionPoint(
+          basePoint.point + baseParentData.offset, basePoint.direction);
 
-      Offset end;
-      TextDirection endDirection;
-      if (endSelection.isCollapsed) {
-        final localOffset = endChild.getOffsetForCaret(endSelection.extent);
-        end = Offset(0.0, endChild.preferredLineHeight(endSelection.extent)) +
-            localOffset +
-            endParentData.offset;
-      } else {
-        final endBoxes = endChild.getBoxesForSelection(endSelection);
-        end = Offset(endBoxes.last.end, endBoxes.last.bottom) +
-            endParentData.offset;
-        endDirection = endBoxes.last.direction;
+      final extentNode = node.lookup(selection.end).node;
+      var extentChild = baseChild;
+      while (extentChild != null) {
+        if (extentChild.node == extentNode) {
+          break;
+        }
+        extentChild = childAfter(extentChild);
       }
+      assert(extentChild != null);
 
-      return <TextSelectionPoint>[
-        TextSelectionPoint(start, startDirection),
-        TextSelectionPoint(end, endDirection),
-      ];
+      final BoxParentData extentParentData = extentChild.parentData;
+      final extentSelection =
+          localSelection(extentChild.node, selection, fromParent: true);
+      var extentPoint =
+          extentChild.getExtentEndpointForSelection(extentSelection);
+      extentPoint = TextSelectionPoint(
+          extentPoint.point + extentParentData.offset, extentPoint.direction);
+
+      return <TextSelectionPoint>[basePoint, extentPoint];
     }
   }
 
@@ -322,15 +307,15 @@ class RenderEditor extends RenderEditableContainerBox
     }
     final position = getPositionForOffset(_lastTapDownPosition);
     final child = childAtPosition(position);
-    final documentOffset = child.node.documentOffset;
+    final nodeOffset = child.node.offset;
     final localPosition = TextPosition(
-      offset: position.offset - documentOffset,
+      offset: position.offset - nodeOffset,
       affinity: position.affinity,
     );
     final localWord = child.getWordBoundary(localPosition);
     final word = TextRange(
-      start: localWord.start + documentOffset,
-      end: localWord.end + documentOffset,
+      start: localWord.start + nodeOffset,
+      end: localWord.end + nodeOffset,
     );
     if (position.offset - word.start <= 1) {
       _handleSelectionChange(
@@ -395,13 +380,13 @@ class RenderEditor extends RenderEditableContainerBox
 //        _textLayoutLastMinWidth == constraints.minWidth,
 //    'Last width ($_textLayoutLastMinWidth, $_textLayoutLastMaxWidth) not the same as max width constraint (${constraints.minWidth}, ${constraints.maxWidth}).');
     final child = childAtPosition(position);
-    final documentOffset = child.node.documentOffset;
+    final nodeOffset = child.node.offset;
     final localPosition = TextPosition(
-        offset: position.offset - documentOffset, affinity: position.affinity);
+        offset: position.offset - nodeOffset, affinity: position.affinity);
     final localWord = child.getWordBoundary(localPosition);
     final word = TextRange(
-      start: localWord.start + documentOffset,
-      end: localWord.end + documentOffset,
+      start: localWord.start + nodeOffset,
+      end: localWord.end + nodeOffset,
     );
     // When long-pressing past the end of the text, we want a collapsed cursor.
     if (position.offset >= word.end) {
@@ -417,13 +402,13 @@ class RenderEditor extends RenderEditableContainerBox
 //        _textLayoutLastMinWidth == constraints.minWidth,
 //    'Last width ($_textLayoutLastMinWidth, $_textLayoutLastMaxWidth) not the same as max width constraint (${constraints.minWidth}, ${constraints.maxWidth}).');
     final child = childAtPosition(position);
-    final documentOffset = child.node.documentOffset;
+    final nodeOffset = child.node.offset;
     final localPosition = TextPosition(
-        offset: position.offset - documentOffset, affinity: position.affinity);
+        offset: position.offset - nodeOffset, affinity: position.affinity);
     final localLineRange = child.getLineBoundary(localPosition);
     final line = TextRange(
-      start: localLineRange.start + documentOffset,
-      end: localLineRange.end + documentOffset,
+      start: localLineRange.start + nodeOffset,
+      end: localLineRange.end + nodeOffset,
     );
 
     // When long-pressing past the end of the text, we want a collapsed cursor.
@@ -522,17 +507,7 @@ class RenderEditor extends RenderEditableContainerBox
     return child.preferredLineHeight(localPosition);
   }
 
-  @override
-  Offset getOffsetForCaret(TextPosition position) {
-    final child = childAtPosition(position);
-    final localPosition = TextPosition(
-      offset: position.offset - child.node.documentOffset,
-      affinity: position.affinity,
-    );
-    // TODO: this might need to shift the offset from the child's local coordinates.
-    return childAtPosition(position).getOffsetForCaret(localPosition);
-  }
-
+  /// The `offset` parameter must be in global coordinates.
   @override
   TextPosition getPositionForOffset(Offset offset) {
     final local = globalToLocal(offset);
@@ -542,7 +517,7 @@ class RenderEditor extends RenderEditableContainerBox
     final localOffset = local - parentData.offset;
     final localPosition = child.getPositionForOffset(localOffset);
     return TextPosition(
-      offset: localPosition.offset + child.node.documentOffset,
+      offset: localPosition.offset + child.node.offset,
       affinity: localPosition.affinity,
     );
   }

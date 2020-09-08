@@ -234,51 +234,40 @@ mixin RawEditorStateKeyboardMixin on EditorState {
     // case where the user moves the cursor to the end or beginning of the text
     // and then back up or down.
     if (downArrow || upArrow) {
-      // The caret offset gives a location in the upper left hand corner of
-      // the caret so the middle of the line above is a half line above that
-      // point and the line below is 1.5 lines below that point.
-      // This only works for situations within single paragraph of text because
-      // there is additional padding between each paragraph. For situations
-      // when the caret needs to cross to a neighboring paragraph we check
-      // if the shifted point is within the content bounds of current paragraph
-      // and if not then a neighboring paragraph is used to determine the caret
-      // position.
       final originPosition = TextPosition(
           offset: upArrow ? selection.baseOffset : selection.extentOffset);
 
       final child = renderEditor.childAtPosition(originPosition);
       final localPosition = TextPosition(
           offset: originPosition.offset - child.node.documentOffset);
-      final localCaretOffset = child.getOffsetForCaret(localPosition);
-      final double preferredLineHeight =
-          child.preferredLineHeight(localPosition);
-      final double verticalOffset =
-          upArrow ? -0.5 * preferredLineHeight : 1.5 * preferredLineHeight;
 
-      final shiftedLocalOffset = localCaretOffset.translate(0, verticalOffset);
-      TextPosition position;
+      TextPosition position = upArrow
+          ? child.getPositionAbove(localPosition)
+          : child.getPositionBelow(localPosition);
 
-      if (child.offsetInsideContent(shiftedLocalOffset)) {
-        final newLocalPosition = child.getPositionForOffset(shiftedLocalOffset);
-        position = TextPosition(
-            offset: child.node.documentOffset + newLocalPosition.offset);
-      } else {
+      if (position == null) {
+        // There was no text above/below in the current child, check the direct
+        // sibling.
         final sibling = upArrow
             ? renderEditor.childBefore(child)
             : renderEditor.childAfter(child);
         if (sibling == null) {
           // reached beginning or end of the document, move to the
           // first/last character
-          position = TextPosition(offset: upArrow ? 0 : plainText.length);
+          position = TextPosition(offset: upArrow ? 0 : plainText.length - 1);
         } else {
+          final caretOffset = child.getOffsetForCaret(localPosition);
           final testPosition =
               TextPosition(offset: upArrow ? sibling.node.length - 1 : 0);
           final testOffset = sibling.getOffsetForCaret(testPosition);
-          final finalOffset = Offset(localCaretOffset.dx, testOffset.dy);
-          final newLocalPosition = sibling.getPositionForOffset(finalOffset);
+          final finalOffset = Offset(caretOffset.dx, testOffset.dy);
+          final siblingPosition = sibling.getPositionForOffset(finalOffset);
           position = TextPosition(
-              offset: sibling.node.documentOffset + newLocalPosition.offset);
+              offset: sibling.node.documentOffset + siblingPosition.offset);
         }
+      } else {
+        position =
+            TextPosition(offset: child.node.documentOffset + position.offset);
       }
 
       // To account for the possibility where the user vertically highlights

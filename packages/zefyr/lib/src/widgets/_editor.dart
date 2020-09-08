@@ -11,6 +11,7 @@ import '../rendering/editor.dart';
 import '../services/keyboard.dart';
 import '_controller.dart';
 import '_cursor.dart';
+import '_editable_text_block.dart';
 import '_editable_text_line.dart';
 import '_editor_input_client_mixin.dart';
 import '_editor_keyboard_mixin.dart';
@@ -707,16 +708,30 @@ class RawEditorState extends EditorState
 
   List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
-    for (LineNode node in widget.controller.document.root.children) {
-      result.add(EditableTextLine(
-        node: node,
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        cursorController: _cursorController,
-        selection: widget.controller.selection,
-        selectionColor: widget.selectionColor,
-        enableInteractiveSelection: widget.enableInteractiveSelection,
-        child: TextLine(node: node),
-      ));
+    for (final node in widget.controller.document.root.children) {
+      if (node is LineNode) {
+        result.add(EditableTextLine(
+          node: node,
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          cursorController: _cursorController,
+          selection: widget.controller.selection,
+          selectionColor: widget.selectionColor,
+          enableInteractiveSelection: widget.enableInteractiveSelection,
+          body: TextLine(node: node, textDirection: _textDirection),
+        ));
+      } else if (node is BlockNode) {
+        result.add(EditableTextBlock(
+          node: node,
+          textDirection: _textDirection,
+          // padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          cursorController: _cursorController,
+          selection: widget.controller.selection,
+          selectionColor: widget.selectionColor,
+          enableInteractiveSelection: widget.enableInteractiveSelection,
+        ));
+      } else {
+        throw StateError('Unreachable.');
+      }
     }
     return result;
   }
