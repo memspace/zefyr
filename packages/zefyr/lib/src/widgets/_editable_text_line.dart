@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
-import '../rendering/text_line.dart';
+import '../rendering/editable_text_line.dart';
 import '_cursor.dart';
 import '_text_line.dart';
 
