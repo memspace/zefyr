@@ -750,6 +750,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     @required this.startHandleLayerLink,
     @required this.endHandleLayerLink,
     @required this.onSelectionChanged,
+    this.padding = EdgeInsets.zero,
     // Not implemented fields:
     @required this.maxHeight,
     @required this.minHeight,
@@ -780,6 +781,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
   final TextSelectionChangedHandler onSelectionChanged;
+  final EdgeInsetsGeometry padding;
   // Not implemented fields:
   final double maxHeight;
   final double minHeight;
@@ -799,6 +801,7 @@ class _Editor extends MultiChildRenderObjectWidget {
       startHandleLayerLink: startHandleLayerLink,
       endHandleLayerLink: endHandleLayerLink,
       onSelectionChanged: onSelectionChanged,
+      padding: padding,
     );
   }
 
@@ -813,6 +816,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     renderObject.startHandleLayerLink = startHandleLayerLink;
     renderObject.endHandleLayerLink = endHandleLayerLink;
     renderObject.onSelectionChanged = onSelectionChanged;
+    renderObject.padding = padding;
   }
 
   @override

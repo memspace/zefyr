@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
 
-import '../widgets/selection_utils.dart';
-
 abstract class RenderEditableMetricsProvider implements RenderBox {
   double get preferredLineHeight;
 
@@ -129,6 +127,8 @@ class EditableContainerParentData
 typedef _ChildSizingFunction = double Function(RenderBox child);
 
 /// Multi-child render box of editable content.
+///
+/// Common ancestor for [RenderEditor] and [RenderEditableTextBlock].
 class RenderEditableContainerBox extends RenderBox
     with
         ContainerRenderObjectMixin<RenderEditableBox,
@@ -139,10 +139,14 @@ class RenderEditableContainerBox extends RenderBox
     List<RenderEditableBox> children,
     @required ContainerNode node,
     @required TextDirection textDirection,
+    @required EdgeInsetsGeometry padding,
   })  : assert(node != null),
         assert(textDirection != null),
+        assert(padding != null),
+        assert(padding.isNonNegative),
         _node = node,
-        _textDirection = textDirection {
+        _textDirection = textDirection,
+        _padding = padding {
     addAll(children);
   }
 
@@ -164,112 +168,41 @@ class RenderEditableContainerBox extends RenderBox
     _textDirection = value;
   }
 
-  @override
-  void setupParentData(RenderBox child) {
-    if (child.parentData is! EditableContainerParentData) {
-      child.parentData = EditableContainerParentData();
+  // Start padding implementation
+
+  /// The amount to pad the children in each dimension.
+  ///
+  /// If this is set to an [EdgeInsetsDirectional] object, then [textDirection]
+  /// must not be null.
+  EdgeInsetsGeometry get padding => _padding;
+  EdgeInsetsGeometry _padding;
+  set padding(EdgeInsetsGeometry value) {
+    assert(value != null);
+    assert(value.isNonNegative);
+    if (_padding == value) {
+      return;
     }
+    _padding = value;
+    _markNeedsPaddingResolution();
   }
 
-  @override
-  void performLayout() {
-    assert(() {
-      if (!constraints.hasBoundedHeight) return true;
-      throw FlutterError.fromParts(<DiagnosticsNode>[
-        ErrorSummary(
-            'RenderEditor must have unlimited space along its main axis.'),
-        ErrorDescription(
-            'RenderEditor does not clip or resize its children, so it must be '
-            'placed in a parent that does not constrain the main '
-            'axis.'),
-        ErrorHint('You probably want to put the RenderEditor inside a '
-            'RenderViewport with a matching main axis.')
-      ]);
-    }());
-    assert(() {
-      if (constraints.hasBoundedWidth) return true;
-      throw FlutterError.fromParts(<DiagnosticsNode>[
-        ErrorSummary(
-            'RenderEditor must have a bounded constraint for its cross axis.'),
-        ErrorDescription(
-            'RenderEditor forces its children to expand to fit the RenderEditor\'s container, '
-            'so it must be placed in a parent that constrains the cross '
-            'axis to a finite dimension.'),
-      ]);
-    }());
-    var mainAxisExtent = 0.0;
-    var child = firstChild;
-    final innerConstraints =
-        BoxConstraints.tightFor(width: constraints.maxWidth);
-    while (child != null) {
-      child.layout(innerConstraints, parentUsesSize: true);
-      final EditableContainerParentData childParentData = child.parentData;
-      childParentData.offset = Offset(0.0, mainAxisExtent);
-      mainAxisExtent += child.size.height;
-      assert(child.parentData == childParentData);
-      child = childParentData.nextSibling;
+  EdgeInsets _resolvedPadding;
+
+  void _resolvePadding() {
+    if (_resolvedPadding != null) {
+      return;
     }
-    size = constraints.constrain(Size(constraints.maxWidth, mainAxisExtent));
+    _resolvedPadding = padding.resolve(textDirection);
+    _resolvedPadding = _resolvedPadding.copyWith(left: _resolvedPadding.left);
 
-    assert(size.isFinite);
+    assert(_resolvedPadding.isNonNegative);
   }
 
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-//    properties.add(EnumProperty<AxisDirection>('axisDirection', axisDirection));
+  void _markNeedsPaddingResolution() {
+    _resolvedPadding = null;
+    markNeedsLayout();
   }
-
-  double _getIntrinsicCrossAxis(_ChildSizingFunction childSize) {
-    var extent = 0.0;
-    var child = firstChild;
-    while (child != null) {
-      extent = math.max(extent, childSize(child));
-      final EditableContainerParentData childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-    return extent;
-  }
-
-  double _getIntrinsicMainAxis(_ChildSizingFunction childSize) {
-    var extent = 0.0;
-    var child = firstChild;
-    while (child != null) {
-      extent += childSize(child);
-      final EditableContainerParentData childParentData = child.parentData;
-      child = childParentData.nextSibling;
-    }
-    return extent;
-  }
-
-  @override
-  double computeMinIntrinsicWidth(double height) {
-    return _getIntrinsicCrossAxis(
-        (RenderBox child) => child.getMinIntrinsicWidth(height));
-  }
-
-  @override
-  double computeMaxIntrinsicWidth(double height) {
-    return _getIntrinsicCrossAxis(
-        (RenderBox child) => child.getMaxIntrinsicWidth(height));
-  }
-
-  @override
-  double computeMinIntrinsicHeight(double width) {
-    return _getIntrinsicMainAxis(
-        (RenderBox child) => child.getMinIntrinsicHeight(width));
-  }
-
-  @override
-  double computeMaxIntrinsicHeight(double width) {
-    return _getIntrinsicMainAxis(
-        (RenderBox child) => child.getMaxIntrinsicHeight(width));
-  }
-
-  @override
-  double computeDistanceToActualBaseline(TextBaseline baseline) {
-    return defaultComputeDistanceToFirstActualBaseline(baseline);
-  }
+  // End padding implementation
 
   RenderEditableBox childAtPosition(TextPosition position) {
     assert(firstChild != null);
@@ -310,199 +243,142 @@ class RenderEditableContainerBox extends RenderBox
     }
     throw StateError('No child at offset $offset.');
   }
-}
 
-class RenderEditableTextBlock extends RenderEditableContainerBox
-    implements RenderEditableBox {
-  ///
-  RenderEditableTextBlock({
-    List<RenderEditableBox> children,
-    @required BlockNode node,
-    @required TextDirection textDirection,
-  })  : assert(node != null),
-        assert(textDirection != null),
-        super(
-          children: children,
-          node: node,
-          textDirection: textDirection,
-        );
+  // Start RenderBox overrides
 
   @override
-  TextRange getLineBoundary(TextPosition position) {
-    final child = childAtPosition(position);
-    final positionInChild = TextPosition(
-      offset: position.offset - child.node.offset,
-      affinity: position.affinity,
-    );
-    final rangeInChild = child.getLineBoundary(positionInChild);
-    return TextRange(
-      start: rangeInChild.start + child.node.offset,
-      end: rangeInChild.end + child.node.offset,
-    );
-  }
-
-  @override
-  Offset getOffsetForCaret(TextPosition position) {
-    final child = childAtPosition(position);
-    final localPosition = TextPosition(
-      offset: position.offset - child.node.offset,
-      affinity: position.affinity,
-    );
-    final BoxParentData parentData = child.parentData;
-    return child.getOffsetForCaret(localPosition) + parentData.offset;
-  }
-
-  /// This method unlike [RenderEditor.getPositionForOffset] expects the
-  /// `offset` parameter to be local to the coordinate system of this render
-  /// object.
-  @override
-  TextPosition getPositionForOffset(Offset offset) {
-    final child = childAtOffset(offset);
-    final localPosition = child.getPositionForOffset(offset);
-    return TextPosition(
-      offset: localPosition.offset + child.node.offset,
-      affinity: localPosition.affinity,
-    );
-  }
-
-  @override
-  TextRange getWordBoundary(TextPosition position) {
-    final child = childAtPosition(position);
-    final localPosition =
-        TextPosition(offset: position.offset - child.node.offset);
-    return child.getWordBoundary(localPosition);
-  }
-
-  @override
-  TextPosition getPositionAbove(TextPosition position) {
-    assert(position.offset < node.length);
-
-    final child = childAtPosition(position);
-    final childLocalPosition =
-        TextPosition(offset: position.offset - child.node.offset);
-    // ignore: omit_local_variable_types
-    TextPosition result = child.getPositionAbove(childLocalPosition);
-    if (result != null) {
-      return TextPosition(offset: result.offset + child.node.offset);
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! EditableContainerParentData) {
+      child.parentData = EditableContainerParentData();
     }
-
-    final sibling = childBefore(child);
-    if (sibling == null) {
-      return null; // There is no more text above `position` in this block.
-    }
-
-    final caretOffset = child.getOffsetForCaret(childLocalPosition);
-    final testPosition = TextPosition(offset: sibling.node.length - 1);
-    final testOffset = sibling.getOffsetForCaret(testPosition);
-    final finalOffset = Offset(caretOffset.dx, testOffset.dy);
-    final siblingLocalPosition = sibling.getPositionForOffset(finalOffset);
-    return TextPosition(
-        offset: sibling.node.offset + siblingLocalPosition.offset);
   }
 
   @override
-  TextPosition getPositionBelow(TextPosition position) {
-    assert(position.offset < node.length);
+  void performLayout() {
+    assert(() {
+      if (!constraints.hasBoundedHeight) return true;
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary(
+            'RenderEditableContainerBox must have unlimited space along its main axis.'),
+        ErrorDescription(
+            'RenderEditableContainerBox does not clip or resize its children, so it must be '
+            'placed in a parent that does not constrain the main '
+            'axis.'),
+        ErrorHint(
+            'You probably want to put the RenderEditableContainerBox inside a '
+            'RenderViewport with a matching main axis.')
+      ]);
+    }());
+    assert(() {
+      if (constraints.hasBoundedWidth) return true;
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary(
+            'RenderEditableContainerBox must have a bounded constraint for its cross axis.'),
+        ErrorDescription(
+            'RenderEditableContainerBox forces its children to expand to fit the RenderEditableContainerBox\'s container, '
+            'so it must be placed in a parent that constrains the cross '
+            'axis to a finite dimension.'),
+      ]);
+    }());
 
-    final child = childAtPosition(position);
-    final childLocalPosition =
-        TextPosition(offset: position.offset - child.node.offset);
-    // ignore: omit_local_variable_types
-    TextPosition result = child.getPositionBelow(childLocalPosition);
-    if (result != null) {
-      return TextPosition(offset: result.offset + child.node.offset);
+    _resolvePadding();
+    assert(_resolvedPadding != null);
+
+    var mainAxisExtent = _resolvedPadding.top;
+    var child = firstChild;
+    final innerConstraints =
+        BoxConstraints.tightFor(width: constraints.maxWidth)
+            .deflate(_resolvedPadding);
+    while (child != null) {
+      child.layout(innerConstraints, parentUsesSize: true);
+      final EditableContainerParentData childParentData = child.parentData;
+      childParentData.offset = Offset(_resolvedPadding.left, mainAxisExtent);
+      mainAxisExtent += child.size.height;
+      assert(child.parentData == childParentData);
+      child = childParentData.nextSibling;
     }
+    mainAxisExtent += _resolvedPadding.bottom;
+    size = constraints.constrain(Size(constraints.maxWidth, mainAxisExtent));
 
-    final sibling = childAfter(child);
-    if (sibling == null) {
-      return null; // There is no more text below `position` in this block.
-    }
-
-    final caretOffset = child.getOffsetForCaret(childLocalPosition);
-    final testPosition = TextPosition(offset: 0);
-    final testOffset = sibling.getOffsetForCaret(testPosition);
-    final finalOffset = Offset(caretOffset.dx, testOffset.dy);
-    final siblingLocalPosition = sibling.getPositionForOffset(finalOffset);
-    return TextPosition(
-        offset: sibling.node.offset + siblingLocalPosition.offset);
+    assert(size.isFinite);
   }
 
   @override
-  double preferredLineHeight(TextPosition position) {
-    final child = childAtPosition(position);
-    final localPosition =
-        TextPosition(offset: position.offset - child.node.offset);
-    return child.preferredLineHeight(localPosition);
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+//    properties.add(EnumProperty<AxisDirection>('axisDirection', axisDirection));
+  }
+
+  double _getIntrinsicCrossAxis(_ChildSizingFunction childSize) {
+    var extent = 0.0;
+    var child = firstChild;
+    while (child != null) {
+      extent = math.max(extent, childSize(child));
+      final EditableContainerParentData childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+    return extent;
+  }
+
+  double _getIntrinsicMainAxis(_ChildSizingFunction childSize) {
+    var extent = 0.0;
+    var child = firstChild;
+    while (child != null) {
+      extent += childSize(child);
+      final EditableContainerParentData childParentData = child.parentData;
+      child = childParentData.nextSibling;
+    }
+    return extent;
   }
 
   @override
-  TextSelectionPoint getBaseEndpointForSelection(TextSelection selection) {
-    if (selection.isCollapsed) {
-      final localOffset = getOffsetForCaret(selection.extent);
-      final point =
-          Offset(0.0, preferredLineHeight(selection.extent)) + localOffset;
-      return TextSelectionPoint(point, null);
-    }
-
-    final baseNode = node.lookup(selection.start).node;
-    var baseChild = firstChild;
-    while (baseChild != null) {
-      if (baseChild.node == baseNode) {
-        break;
-      }
-      baseChild = childAfter(baseChild);
-    }
-    assert(baseChild != null);
-
-    final BoxParentData baseParentData = baseChild.parentData;
-    final baseSelection =
-        localSelection(baseChild.node, selection, fromParent: true);
-    var basePoint = baseChild.getBaseEndpointForSelection(baseSelection);
-    return TextSelectionPoint(
-        basePoint.point + baseParentData.offset, basePoint.direction);
+  double computeMinIntrinsicWidth(double height) {
+    _resolvePadding();
+    final horizontalPadding = _resolvedPadding.left + _resolvedPadding.right;
+    final verticalPadding = _resolvedPadding.top + _resolvedPadding.bottom;
+    return _getIntrinsicCrossAxis((RenderBox child) {
+      final childHeight = math.max(0.0, height - verticalPadding);
+      return child.getMinIntrinsicWidth(childHeight) + horizontalPadding;
+    });
   }
 
   @override
-  TextSelectionPoint getExtentEndpointForSelection(TextSelection selection) {
-    if (selection.isCollapsed) {
-      final localOffset = getOffsetForCaret(selection.extent);
-      final point =
-          Offset(0.0, preferredLineHeight(selection.extent)) + localOffset;
-      return TextSelectionPoint(point, null);
-    }
-
-    final extentNode = node.lookup(selection.end).node;
-
-    var extentChild = firstChild;
-    while (extentChild != null) {
-      if (extentChild.node == extentNode) {
-        break;
-      }
-      extentChild = childAfter(extentChild);
-    }
-    assert(extentChild != null);
-
-    final BoxParentData extentParentData = extentChild.parentData;
-    final extentSelection =
-        localSelection(extentChild.node, selection, fromParent: true);
-    var extentPoint =
-        extentChild.getExtentEndpointForSelection(extentSelection);
-    return TextSelectionPoint(
-        extentPoint.point + extentParentData.offset, extentPoint.direction);
-  }
-
-  // End RenderEditableBox implementation
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    // final paint = Paint()..color = Colors.pink.shade50;
-    // final rect = ui.Rect.fromPoints(Offset.zero, size.bottomRight(Offset.zero));
-    // context.canvas.drawRect(rect.shift(offset), paint);
-    defaultPaint(context, offset);
+  double computeMaxIntrinsicWidth(double height) {
+    _resolvePadding();
+    final horizontalPadding = _resolvedPadding.left + _resolvedPadding.right;
+    final verticalPadding = _resolvedPadding.top + _resolvedPadding.bottom;
+    return _getIntrinsicCrossAxis((RenderBox child) {
+      final childHeight = math.max(0.0, height - verticalPadding);
+      return child.getMaxIntrinsicWidth(childHeight) + horizontalPadding;
+    });
   }
 
   @override
-  bool hitTestChildren(BoxHitTestResult result, {Offset position}) {
-    return defaultHitTestChildren(result, position: position);
+  double computeMinIntrinsicHeight(double width) {
+    _resolvePadding();
+    final horizontalPadding = _resolvedPadding.left + _resolvedPadding.right;
+    final verticalPadding = _resolvedPadding.top + _resolvedPadding.bottom;
+    return _getIntrinsicMainAxis((RenderBox child) {
+      final childWidth = math.max(0.0, width - horizontalPadding);
+      return child.getMinIntrinsicHeight(childWidth) + verticalPadding;
+    });
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    _resolvePadding();
+    final horizontalPadding = _resolvedPadding.left + _resolvedPadding.right;
+    final verticalPadding = _resolvedPadding.top + _resolvedPadding.bottom;
+    return _getIntrinsicMainAxis((RenderBox child) {
+      final childWidth = math.max(0.0, width - horizontalPadding);
+      return child.getMaxIntrinsicHeight(childWidth) + verticalPadding;
+    });
+  }
+
+  @override
+  double computeDistanceToActualBaseline(TextBaseline baseline) {
+    _resolvePadding();
+    return defaultComputeDistanceToFirstActualBaseline(baseline) +
+        _resolvedPadding.top;
   }
 }

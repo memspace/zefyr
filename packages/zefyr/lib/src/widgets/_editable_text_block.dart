@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
-import '../rendering/editable_box.dart';
+import '../rendering/editable_text_block.dart';
 import '_cursor.dart';
 import '_editable_text_line.dart';
 import '_text_line.dart';
@@ -29,6 +29,7 @@ class EditableTextBlock extends StatelessWidget {
     return _EditableBlock(
       node: node,
       textDirection: textDirection,
+      padding: EdgeInsets.only(left: 16, right: 16),
       children: _buildChildren(context),
     );
   }
@@ -38,10 +39,13 @@ class EditableTextBlock extends StatelessWidget {
       return EditableTextLine(
         node: child,
         padding: EdgeInsets.zero,
-        leading: VerticalDivider(
-          color: Colors.grey.shade200,
-          width: 16,
-          thickness: 4,
+        leading: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(width: 4.0, color: Colors.grey.shade300),
+            ),
+          ),
+          padding: EdgeInsets.only(left: 16),
         ),
         body: TextLine(
           node: child,
@@ -59,11 +63,13 @@ class EditableTextBlock extends StatelessWidget {
 class _EditableBlock extends MultiChildRenderObjectWidget {
   final BlockNode node;
   final TextDirection textDirection;
+  final EdgeInsets padding;
 
   _EditableBlock({
     Key key,
     @required this.node,
     @required this.textDirection,
+    this.padding = EdgeInsets.zero,
     @required List<Widget> children,
   }) : super(key: key, children: children);
 
@@ -72,6 +78,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
     return RenderEditableTextBlock(
       node: node,
       textDirection: textDirection,
+      padding: padding,
     );
   }
 
@@ -80,5 +87,6 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
       BuildContext context, covariant RenderEditableTextBlock renderObject) {
     renderObject.node = node;
     renderObject.textDirection = textDirection;
+    renderObject.padding = padding;
   }
 }

@@ -571,6 +571,7 @@ class RenderEditableTextLine extends RenderEditableBox
 
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
+    _resolvePadding();
     // The baseline of this widget is the baseline of the body.
     return body.getDistanceToActualBaseline(baseline) + _resolvedPadding.top;
   }

@@ -96,6 +96,7 @@ class RenderEditor extends RenderEditableContainerBox
     @required TextSelection selection,
     @required LayerLink startHandleLayerLink,
     @required LayerLink endHandleLayerLink,
+    @required EdgeInsetsGeometry padding,
     TextSelectionChangedHandler onSelectionChanged,
     EdgeInsets floatingCursorAddedMargin =
         const EdgeInsets.fromLTRB(4, 4, 4, 5),
@@ -112,6 +113,7 @@ class RenderEditor extends RenderEditableContainerBox
           children: children,
           node: document.root,
           textDirection: textDirection,
+          padding: padding,
         );
 
   NotusDocument _document;
