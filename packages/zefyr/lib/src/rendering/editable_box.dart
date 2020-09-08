@@ -227,12 +227,13 @@ class RenderEditableContainerBox extends RenderBox
   /// returns the last child.
   RenderEditableBox childAtOffset(Offset offset) {
     assert(firstChild != null);
+    _resolvePadding();
 
-    if (offset.dy <= 0) return firstChild;
-    if (offset.dy >= size.height) return lastChild;
+    if (offset.dy <= _resolvedPadding.top) return firstChild;
+    if (offset.dy >= size.height - _resolvedPadding.bottom) return lastChild;
 
     var child = firstChild;
-    var dy = 0.0;
+    var dy = _resolvedPadding.top;
     var dx = -offset.dx;
     while (child != null) {
       if (child.size.contains(offset.translate(dx, -dy))) {

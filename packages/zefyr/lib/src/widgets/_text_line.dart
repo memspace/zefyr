@@ -33,8 +33,11 @@ class TextLine extends StatelessWidget {
     final children = node.children
         .map((node) => _segmentToTextSpan(node /*, theme*/))
         .toList(growable: false);
+    final color = node.style.contains(NotusAttribute.block.quote)
+        ? Colors.grey.shade600
+        : Colors.grey.shade900;
     final style = TextStyle(
-      color: Colors.grey.shade900,
+      color: color,
       // height: 1.35,
       // fontFamily: '.SF UI Text',
       fontSize: 16,

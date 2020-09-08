@@ -29,7 +29,7 @@ class EditableTextBlock extends StatelessWidget {
     return _EditableBlock(
       node: node,
       textDirection: textDirection,
-      padding: EdgeInsets.only(left: 16, right: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       children: _buildChildren(context),
     );
   }
