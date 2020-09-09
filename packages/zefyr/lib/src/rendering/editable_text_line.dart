@@ -292,11 +292,20 @@ class RenderEditableTextLine extends RenderEditableBox
 
   @override
   TextRange getLineBoundary(TextPosition position) {
-    // As a workaround we do not proxy this call to the child since
-    // this render object already represents a single line of text, so
-    // we can infer this value from the document node itself.
-    // TODO: we can proxy this to the child when getLineBoundary is exposed on RenderParagraph
-    return TextRange(start: 0, end: node.length - 1); // do not include "\n"
+    // getOffsetForCaret returns top-left corner of the caret. To find all
+    // selection boxes on the same line we shift caret offset by 0.5 of
+    // preferredLineHeight so that it's in the middle of the line and filter out
+    // boxes which do not include this offset on the Y axis.
+    final caret = getOffsetForCaret(position);
+    final lineDy = caret.translate(0.0, 0.5 * preferredLineHeight(position)).dy;
+    final boxes = getBoxesForSelection(
+        TextSelection(baseOffset: 0, extentOffset: node.length - 1));
+    final lineBoxes = boxes
+        .where((element) => element.top < lineDy && element.bottom > lineDy)
+        .toList(growable: false);
+    final start = getPositionForOffset(Offset(lineBoxes.first.left, lineDy));
+    final end = getPositionForOffset(Offset(lineBoxes.last.right, lineDy));
+    return TextRange(start: start.offset, end: end.offset);
   }
 
   @override

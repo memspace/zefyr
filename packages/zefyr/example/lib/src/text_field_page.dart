@@ -55,6 +55,7 @@ class _TextFieldScreenState extends State<TextFieldScreen> {
           child: ZefyrField(
             controller: _controller,
             focusNode: _focusNode,
+            padding: EdgeInsets.symmetric(horizontal: 8),
           ),
         ),
       ),

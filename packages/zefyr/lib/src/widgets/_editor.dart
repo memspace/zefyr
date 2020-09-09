@@ -18,12 +18,14 @@ import '_editor_keyboard_mixin.dart';
 import '_editor_selection_delegate_mixin.dart';
 import '_text_line.dart';
 import '_text_selection.dart';
+import '_theme.dart';
 
 class RawEditor extends StatefulWidget {
   RawEditor({
     Key key,
     @required this.controller,
     @required this.focusNode,
+    this.padding = EdgeInsets.zero,
     @required this.selectionColor,
     this.enableInteractiveSelection = true,
     this.readOnly = false,
@@ -85,6 +87,9 @@ class RawEditor extends StatefulWidget {
 
   /// Controls whether this widget has keyboard focus.
   final FocusNode focusNode;
+
+  /// Space around the editor contents.
+  final EdgeInsetsGeometry padding;
 
   /// Whether the text can be changed.
   ///
@@ -357,6 +362,9 @@ class RawEditorState extends EditorState
     implements TextSelectionDelegate {
   final GlobalKey _editorKey = GlobalKey();
 
+  // Theme
+  ZefyrThemeData _themeData;
+
   // Cursor
   CursorController _cursorController;
   FloatingCursorController _floatingCursorController;
@@ -481,6 +489,12 @@ class RawEditorState extends EditorState
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final parentTheme = ZefyrTheme.of(context, nullOk: true);
+    final fallbackTheme = ZefyrThemeData.fallback(context);
+    _themeData = (parentTheme != null)
+        ? fallbackTheme.merge(parentTheme)
+        : fallbackTheme;
+
     if (!_didAutoFocus && widget.autofocus) {
       FocusScope.of(context).autofocus(widget.focusNode);
       _didAutoFocus = true;
@@ -604,9 +618,13 @@ class RawEditorState extends EditorState
 //      }
     } else {
       WidgetsBinding.instance.removeObserver(this);
+      // TODO: teach editor about state of the toolbar and whether the user is in the middle of applying styles.
+      //       this is needed because some buttons in toolbar can steal focus from the editor
+      //       but we want to preserve the selection, maybe adjusting its style slightly.
+      //
       // Clear the selection and composition state if this widget lost focus.
-      widget.controller.updateSelection(TextSelection.collapsed(offset: 0),
-          source: ChangeSource.local);
+      // widget.controller.updateSelection(TextSelection.collapsed(offset: 0),
+      //     source: ChangeSource.local);
 //      _currentPromptRectRange = null;
     }
     updateKeepAlive();
@@ -661,43 +679,47 @@ class RawEditorState extends EditorState
 
 //    final TextSelectionControls controls = widget.selectionControls;
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.text,
-      child: Container(
-        // constraints: BoxConstraints(maxHeight: 300),
-        child: SingleChildScrollView(
+    return ZefyrTheme(
+      data: _themeData,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.text,
+        child: Container(
+          // constraints: BoxConstraints(maxHeight: 300),
+          child: SingleChildScrollView(
 //      excludeFromSemantics: true,
 //      axisDirection: AxisDirection.down,
-          controller: _scrollController,
-          physics: widget.scrollPhysics,
-          dragStartBehavior: widget.dragStartBehavior,
-          child: CompositedTransformTarget(
-            link: _toolbarLayerLink,
-            child: Semantics(
+            controller: _scrollController,
+            physics: widget.scrollPhysics,
+            dragStartBehavior: widget.dragStartBehavior,
+            child: CompositedTransformTarget(
+              link: _toolbarLayerLink,
+              child: Semantics(
 //            onCopy: _semanticsOnCopy(controls),
 //            onCut: _semanticsOnCut(controls),
 //            onPaste: _semanticsOnPaste(controls),
-              child: _Editor(
-                key: _editorKey,
-                children: _buildChildren(context),
-                document: widget.controller.document,
-                selection: widget.controller.selection,
-                hasFocus: _hasFocus,
-                textDirection: _textDirection,
-                startHandleLayerLink: _startHandleLayerLink,
-                endHandleLayerLink: _endHandleLayerLink,
-                onSelectionChanged: _handleSelectionChanged,
-                // Not implemented fields:
-                maxHeight: widget.maxHeight,
-                minHeight: widget.minHeight,
-                strutStyle: widget.strutStyle,
-                selectionColor: widget.selectionColor,
-                textScaleFactor: widget.textScaleFactor ??
-                    MediaQuery.textScaleFactorOf(context),
-                readOnly: widget.readOnly,
-                locale: widget.locale,
-                devicePixelRatio: _devicePixelRatio,
-                enableInteractiveSelection: widget.enableInteractiveSelection,
+                child: _Editor(
+                  key: _editorKey,
+                  children: _buildChildren(context),
+                  document: widget.controller.document,
+                  selection: widget.controller.selection,
+                  hasFocus: _hasFocus,
+                  textDirection: _textDirection,
+                  startHandleLayerLink: _startHandleLayerLink,
+                  endHandleLayerLink: _endHandleLayerLink,
+                  onSelectionChanged: _handleSelectionChanged,
+                  padding: widget.padding,
+                  // Not implemented fields:
+                  maxHeight: widget.maxHeight,
+                  minHeight: widget.minHeight,
+                  strutStyle: widget.strutStyle,
+                  selectionColor: widget.selectionColor,
+                  textScaleFactor: widget.textScaleFactor ??
+                      MediaQuery.textScaleFactorOf(context),
+                  readOnly: widget.readOnly,
+                  locale: widget.locale,
+                  devicePixelRatio: _devicePixelRatio,
+                  enableInteractiveSelection: widget.enableInteractiveSelection,
+                ),
               ),
             ),
           ),
@@ -712,7 +734,7 @@ class RawEditorState extends EditorState
       if (node is LineNode) {
         result.add(EditableTextLine(
           node: node,
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: _getPaddingForLine(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,
           selectionColor: widget.selectionColor,
@@ -734,6 +756,19 @@ class RawEditorState extends EditorState
       }
     }
     return result;
+  }
+
+  EdgeInsetsGeometry _getPaddingForLine(LineNode node, ZefyrThemeData theme) {
+    final style = node.style.get(NotusAttribute.heading);
+    if (style == NotusAttribute.heading.level1) {
+      return theme.headingTheme.level1.padding;
+    } else if (style == NotusAttribute.heading.level2) {
+      return theme.headingTheme.level2.padding;
+    } else if (style == NotusAttribute.heading.level3) {
+      return theme.headingTheme.level3.padding;
+    }
+
+    return theme.paragraphTheme.padding;
   }
 }
 

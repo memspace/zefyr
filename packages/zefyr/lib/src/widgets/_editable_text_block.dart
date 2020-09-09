@@ -5,6 +5,7 @@ import '../rendering/editable_text_block.dart';
 import '_cursor.dart';
 import '_editable_text_line.dart';
 import '_text_line.dart';
+import '_theme.dart';
 
 class EditableTextBlock extends StatelessWidget {
   final BlockNode node;
@@ -26,10 +27,11 @@ class EditableTextBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ZefyrTheme.of(context);
     return _EditableBlock(
       node: node,
       textDirection: textDirection,
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: _getPaddingForBlock(node, theme),
       children: _buildChildren(context),
     );
   }
@@ -57,6 +59,14 @@ class EditableTextBlock extends StatelessWidget {
         enableInteractiveSelection: enableInteractiveSelection,
       );
     }).toList(growable: false);
+  }
+
+  EdgeInsetsGeometry _getPaddingForBlock(BlockNode node, ZefyrThemeData theme) {
+    final style = node.style.get(NotusAttribute.block);
+    if (style == NotusAttribute.block.quote) {
+      return theme.blockTheme.quote.padding;
+    }
+    throw StateError('Unreachable.');
   }
 }
 

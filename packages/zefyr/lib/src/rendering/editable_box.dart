@@ -14,7 +14,6 @@ abstract class RenderEditableMetricsProvider implements RenderBox {
       TextPosition position, Rect caretPrototype);
 
   TextRange getWordBoundary(TextPosition position);
-  TextRange getLineBoundary(TextPosition position);
 
   /// Returns a list of rects that bound the given selection.
   ///

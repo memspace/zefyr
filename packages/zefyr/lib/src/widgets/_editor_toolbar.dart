@@ -10,12 +10,12 @@ enum ToggleAttribute { bold, italic, bulletList, numberList, code, quote }
 typedef ToggleButtonBuilder = Widget Function(BuildContext context,
     ToggleAttribute attribute, bool isToggled, VoidCallback onPressed);
 
-class ToggleButton extends StatefulWidget {
+class ToggleStyleButton extends StatefulWidget {
   final ToggleAttribute attribute;
   final ZefyrController controller;
   final ToggleButtonBuilder childBuilder;
 
-  const ToggleButton({
+  const ToggleStyleButton({
     Key key,
     @required this.attribute,
     @required this.controller,
@@ -23,19 +23,19 @@ class ToggleButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ToggleButtonState createState() => _ToggleButtonState();
+  _ToggleStyleButtonState createState() => _ToggleStyleButtonState();
 }
 
-final Map<ToggleAttribute, NotusAttribute> _attributeMap = {
+final Map<ToggleAttribute, NotusAttribute> _toggleAttributeMap = {
   ToggleAttribute.bold: NotusAttribute.bold,
   ToggleAttribute.italic: NotusAttribute.italic,
   ToggleAttribute.quote: NotusAttribute.block.quote,
 };
 
-class _ToggleButtonState extends State<ToggleButton> {
+class _ToggleStyleButtonState extends State<ToggleStyleButton> {
   bool _isToggled;
 
-  NotusAttribute get _attribute => _attributeMap[widget.attribute];
+  NotusAttribute get _attribute => _toggleAttributeMap[widget.attribute];
 
   void _didChangeEditingValue() {
     setState(() {
@@ -51,7 +51,7 @@ class _ToggleButtonState extends State<ToggleButton> {
   }
 
   @override
-  void didUpdateWidget(covariant ToggleButton oldWidget) {
+  void didUpdateWidget(covariant ToggleStyleButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_didChangeEditingValue);
@@ -86,16 +86,17 @@ Widget _defaultToggleButtonBuilder(BuildContext context,
   return ZIconButton(
     highlightElevation: 0,
     hoverElevation: 0,
+    size: 32,
     icon: Icon(
       _defaultToggleIcons[attribute],
-      size: 20,
+      size: 18,
       color: isToggled
           ? Theme.of(context).primaryIconTheme.color
           : Theme.of(context).iconTheme.color,
     ),
     fillColor: isToggled
         ? Theme.of(context).toggleableActiveColor
-        : Theme.of(context).buttonColor,
+        : Theme.of(context).canvasColor,
     onPressed: onPressed,
   );
 }
@@ -105,6 +106,120 @@ final Map<ToggleAttribute, IconData> _defaultToggleIcons = {
   ToggleAttribute.italic: Icons.format_italic,
   ToggleAttribute.quote: Icons.format_quote,
 };
+
+typedef DropdownButtonBuilder = Widget Function(
+  BuildContext context,
+  NotusAttribute value,
+  ValueChanged<NotusAttribute> onSelected,
+);
+
+class SelectStyleButton extends StatefulWidget {
+  final ZefyrController controller;
+  final DropdownButtonBuilder childBuilder;
+
+  const SelectStyleButton({
+    Key key,
+    @required this.controller,
+    @required this.childBuilder,
+  }) : super(key: key);
+
+  @override
+  _SelectStyleButtonState createState() => _SelectStyleButtonState();
+}
+
+class _SelectStyleButtonState extends State<SelectStyleButton> {
+  NotusAttribute _value;
+
+  void _didChangeEditingValue() {
+    setState(() {
+      _value =
+          widget.controller.getSelectionStyle().get(NotusAttribute.heading) ??
+              NotusAttribute.heading.unset;
+    });
+  }
+
+  void _selectAttribute(value) {
+    widget.controller.formatSelection(value);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _value =
+        widget.controller.getSelectionStyle().get(NotusAttribute.heading) ??
+            NotusAttribute.heading.unset;
+    widget.controller.addListener(_didChangeEditingValue);
+  }
+
+  @override
+  void didUpdateWidget(covariant SelectStyleButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_didChangeEditingValue);
+      widget.controller.addListener(_didChangeEditingValue);
+      _value =
+          widget.controller.getSelectionStyle().get(NotusAttribute.heading) ??
+              NotusAttribute.heading.unset;
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_didChangeEditingValue);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.childBuilder(context, _value, _selectAttribute);
+  }
+}
+
+Widget _selectHeadingStyleButtonBuilder(BuildContext context,
+    NotusAttribute value, ValueChanged<NotusAttribute> onSelected) {
+  final style = TextStyle(fontSize: 12);
+
+  final valueToText = {
+    NotusAttribute.heading.unset: 'Normal text',
+    NotusAttribute.heading.level1: 'Heading 1',
+    NotusAttribute.heading.level2: 'Heading 2',
+    NotusAttribute.heading.level3: 'Heading 3',
+  };
+
+  return ZDropdownButton<NotusAttribute>(
+    highlightElevation: 0,
+    hoverElevation: 0,
+    height: 32,
+    child: Text(
+      valueToText[value],
+      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+    ),
+    initialValue: value,
+    items: [
+      PopupMenuItem(
+        child: Text(valueToText[NotusAttribute.heading.unset], style: style),
+        value: NotusAttribute.heading.unset,
+        height: 32,
+      ),
+      PopupMenuItem(
+        child: Text(valueToText[NotusAttribute.heading.level1], style: style),
+        value: NotusAttribute.heading.level1,
+        height: 32,
+      ),
+      PopupMenuItem(
+        child: Text(valueToText[NotusAttribute.heading.level2], style: style),
+        value: NotusAttribute.heading.level2,
+        height: 32,
+      ),
+      PopupMenuItem(
+        child: Text(valueToText[NotusAttribute.heading.level3], style: style),
+        value: NotusAttribute.heading.level3,
+        height: 32,
+      ),
+    ],
+    onSelected: onSelected,
+  );
+}
 
 class EditorToolbar extends StatefulWidget implements PreferredSizeWidget {
   final List<Widget> children;
@@ -117,21 +232,29 @@ class EditorToolbar extends StatefulWidget implements PreferredSizeWidget {
     @required FocusNode editorFocusNode,
   }) {
     return EditorToolbar(key: key, children: [
-      ToggleButton(
+      ToggleStyleButton(
         attribute: ToggleAttribute.bold,
         controller: controller,
         childBuilder: _defaultToggleButtonBuilder,
       ),
-      ToggleButton(
+      SizedBox(width: 1),
+      ToggleStyleButton(
         attribute: ToggleAttribute.italic,
         controller: controller,
         childBuilder: _defaultToggleButtonBuilder,
       ),
-      ToggleButton(
+      VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
+      SelectStyleButton(
+        controller: controller,
+        childBuilder: _selectHeadingStyleButtonBuilder,
+      ),
+      VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
+      ToggleStyleButton(
         attribute: ToggleAttribute.quote,
         controller: controller,
         childBuilder: _defaultToggleButtonBuilder,
       ),
+      // VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
     ]);
   }
 
@@ -178,17 +301,115 @@ class ZIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RawMaterialButton(
-      child: icon,
-      visualDensity: VisualDensity.compact,
+    return ConstrainedBox(
       constraints: BoxConstraints.tightFor(width: size, height: size),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-      padding: EdgeInsets.zero,
-      fillColor: fillColor,
-      elevation: 0,
-      hoverElevation: hoverElevation,
-      highlightElevation: hoverElevation,
-      onPressed: onPressed,
+      child: RawMaterialButton(
+        child: icon,
+        visualDensity: VisualDensity.compact,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+        padding: EdgeInsets.zero,
+        fillColor: fillColor,
+        elevation: 0,
+        hoverElevation: hoverElevation,
+        highlightElevation: hoverElevation,
+        onPressed: onPressed,
+      ),
+    );
+  }
+}
+
+class ZDropdownButton<T> extends StatefulWidget {
+  final double height;
+  final Color fillColor;
+  final double hoverElevation;
+  final double highlightElevation;
+  final Widget child;
+  final T initialValue;
+  final List<PopupMenuEntry<T>> items;
+  final ValueChanged<T> onSelected;
+
+  const ZDropdownButton({
+    Key key,
+    this.height = 40,
+    this.fillColor,
+    this.hoverElevation = 1,
+    this.highlightElevation = 1,
+    @required this.child,
+    @required this.initialValue,
+    @required this.items,
+    @required this.onSelected,
+  }) : super(key: key);
+
+  @override
+  _ZDropdownButtonState<T> createState() => _ZDropdownButtonState<T>();
+}
+
+class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: BoxConstraints.tightFor(height: widget.height),
+      child: RawMaterialButton(
+        child: _buildContent(context),
+        visualDensity: VisualDensity.compact,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+        padding: EdgeInsets.zero,
+        fillColor: widget.fillColor,
+        elevation: 0,
+        hoverElevation: widget.hoverElevation,
+        highlightElevation: widget.hoverElevation,
+        onPressed: _showMenu,
+      ),
+    );
+  }
+
+  void _showMenu() {
+    final popupMenuTheme = PopupMenuTheme.of(context);
+    final button = context.findRenderObject() as RenderBox;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(Offset.zero, ancestor: overlay),
+        // button.localToGlobal(widget.offset, ancestor: overlay),
+        button.localToGlobal(button.size.bottomLeft(Offset.zero),
+            ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+    showMenu<T>(
+      context: context,
+      elevation: 4, // widget.elevation ?? popupMenuTheme.elevation,
+      initialValue: widget.initialValue,
+      items: widget.items,
+      position: position,
+      shape: popupMenuTheme.shape, // widget.shape ?? popupMenuTheme.shape,
+      color: popupMenuTheme.color, // widget.color ?? popupMenuTheme.color,
+      // captureInheritedThemes: widget.captureInheritedThemes,
+    ).then((T newValue) {
+      if (!mounted) return null;
+      if (newValue == null) {
+        // if (widget.onCanceled != null) widget.onCanceled();
+        return null;
+      }
+      if (widget.onSelected != null) {
+        widget.onSelected(newValue);
+      }
+    });
+  }
+
+  Widget _buildContent(BuildContext context) {
+    return ConstrainedBox(
+      constraints: BoxConstraints.tightFor(width: 110),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Row(
+          children: [
+            widget.child,
+            Expanded(child: Container()),
+            Icon(Icons.arrow_drop_down, size: 14)
+          ],
+        ),
+      ),
     );
   }
 }

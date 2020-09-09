@@ -116,11 +116,13 @@ class _TextFieldSelectionGestureDetectorBuilder
 class ZefyrField extends StatefulWidget {
   final ZefyrController controller;
   final FocusNode focusNode;
+  final EdgeInsetsGeometry padding;
 
   const ZefyrField({
     Key key,
     @required this.controller,
     @required this.focusNode,
+    this.padding = EdgeInsets.zero,
   }) : super(key: key);
 
   @override
@@ -201,6 +203,7 @@ class _ZefyrFieldState extends State<ZefyrField>
       key: _editorKey,
       controller: widget.controller,
       focusNode: widget.focusNode,
+      padding: widget.padding,
       autofocus: true,
       showCursor: true,
       selectionColor: selectionColor,
