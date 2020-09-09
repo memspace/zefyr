@@ -153,6 +153,9 @@ class _ZefyrLineState extends State<ZefyrLine> {
     if (style.containsSame(NotusAttribute.italic)) {
       result = result.merge(theme.attributeTheme.italic);
     }
+    if (style.containsSame(NotusAttribute.strikethrough)) {
+      result = result.merge(theme.attributeTheme.strikethrough);
+    }
     if (style.contains(NotusAttribute.link)) {
       result = result.merge(theme.attributeTheme.link);
     }
@@ -160,6 +163,10 @@ class _ZefyrLineState extends State<ZefyrLine> {
     //Colors
     if (style.contains(NotusAttribute.cPink)) {
       final textColor = hexStringToColor(style.value<String>(NotusAttribute.cPink));
+      result = result.copyWith(color: textColor);
+    }
+    if (style.contains(NotusAttribute.cNeonPink)) {
+      final textColor = hexStringToColor(style.value<String>(NotusAttribute.cNeonPink));
       result = result.copyWith(color: textColor);
     }
     if (style.contains(NotusAttribute.cMaroonRed)) {
@@ -188,7 +195,10 @@ class _ZefyrLineState extends State<ZefyrLine> {
       final textColor = hexStringToColor(style.value<String>(NotusAttribute.cYellow));
       result = result.copyWith(color: textColor);
     }
-
+    if (style.contains(NotusAttribute.cNeonYellow)) {
+      final textColor = hexStringToColor(style.value<String>(NotusAttribute.cNeonYellow));
+      result = result.copyWith(color: textColor);
+    }
     if (style.contains(NotusAttribute.cForestGreen)) {
       final textColor = hexStringToColor(style.value<String>(NotusAttribute.cForestGreen));
       result = result.copyWith(color: textColor);
@@ -199,6 +209,10 @@ class _ZefyrLineState extends State<ZefyrLine> {
     }
     if (style.contains(NotusAttribute.cTeaGreen)) {
       final textColor = hexStringToColor(style.value<String>(NotusAttribute.cTeaGreen));
+      result = result.copyWith(color: textColor);
+    }
+    if (style.contains(NotusAttribute.cNeonGreen)) {
+      final textColor = hexStringToColor(style.value<String>(NotusAttribute.cNeonGreen));
       result = result.copyWith(color: textColor);
     }
     if (style.contains(NotusAttribute.cTealGreen)) {
@@ -227,6 +241,10 @@ class _ZefyrLineState extends State<ZefyrLine> {
       final textColor = hexStringToColor(style.value<String>(NotusAttribute.cPlum));
       result = result.copyWith(color: textColor);
     }
+    if (style.contains(NotusAttribute.cNeonPurple)) {
+      final textColor = hexStringToColor(style.value<String>(NotusAttribute.cNeonPurple));
+      result = result.copyWith(color: textColor);
+    }
     if (style.contains(NotusAttribute.cSuedePurple)) {
       final textColor = hexStringToColor(style.value<String>(NotusAttribute.cSuedePurple));
       result = result.copyWith(color: textColor);
@@ -234,6 +252,7 @@ class _ZefyrLineState extends State<ZefyrLine> {
     if (style.contains(NotusAttribute.cOrchidPurple)) {
       final textColor = hexStringToColor(style.value<String>(NotusAttribute.cOrchidPurple));
       result = result.copyWith(color: textColor);
+    }
     }
     return result;
   }

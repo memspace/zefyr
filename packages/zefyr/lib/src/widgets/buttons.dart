@@ -336,16 +336,20 @@ class _ModeColorButtonState extends State<ModeColorButton> {
     List<Widget> darkModeColors = [
       SizedBox(width: 8.0),
       toolbar.buildButton(context, ZefyrToolbarAction.colorPink),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorNeonPink),
       toolbar.buildButton(context, ZefyrToolbarAction.colorCherryRed),
       toolbar.buildButton(context, ZefyrToolbarAction.colorCoralRed),
       toolbar.buildButton(context, ZefyrToolbarAction.colorOrange),
       toolbar.buildButton(context, ZefyrToolbarAction.colorYellow),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorNeonYellow),
       toolbar.buildButton(context, ZefyrToolbarAction.colorAppleGreen),
       toolbar.buildButton(context, ZefyrToolbarAction.colorTeaGreen),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorNeonGreen),
       toolbar.buildButton(context, ZefyrToolbarAction.colorLightBlue),
       toolbar.buildButton(context, ZefyrToolbarAction.colorOceanBlue),
       toolbar.buildButton(context, ZefyrToolbarAction.colorLilBlue),
       toolbar.buildButton(context, ZefyrToolbarAction.colorPlum),
+      toolbar.buildButton(context, ZefyrToolbarAction.colorNeonPurple),
     ];
 
     List<Widget> lightModeColors = [

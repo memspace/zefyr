@@ -67,6 +67,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 ///
 ///   * [NotusAttribute.bold]
 ///   * [NotusAttribute.italic]
+///   * [NotusAttribute.strikethrough]
 ///   * [NotusAttribute.link]
 ///   * [NotusAttribute.heading]
 ///   * [NotusAttribute.block]
@@ -74,6 +75,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static final Map<String, NotusAttributeBuilder> _registry = {
     NotusAttribute.bold.key: NotusAttribute.bold,
     NotusAttribute.italic.key: NotusAttribute.italic,
+    NotusAttribute.strikethrough.key: NotusAttribute.strikethrough,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
@@ -89,6 +91,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Italic style attribute.
   static const italic = _ItalicAttribute();
 
+  /// Italic style attribute.
+  static const strikethrough = _StrikeThroughAttribute();
+
   /// Link style attribute.
   // ignore: const_eval_throws_exception
   static const link = LinkAttributeBuilder._();
@@ -98,6 +103,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Aliases for [NotusAttribute.color.<color_foo>].
   static NotusAttribute<String> get cPink => color.pink;
+  static NotusAttribute<String> get cNeonPink => color.neonPink;
   static NotusAttribute<String> get cMaroonRed => color.maroonRed;
   static NotusAttribute<String> get cCherryRed => color.cherryRed;
   static NotusAttribute<String> get cCoralRed => color.coralRed;
@@ -106,10 +112,12 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static NotusAttribute<String> get cOrange => color.orange;
 
   static NotusAttribute<String> get cYellow => color.yellow;
+  static NotusAttribute<String> get cNeonYellow => color.neonYellow;
 
   static NotusAttribute<String> get cForestGreen => color.forestGreen;
   static NotusAttribute<String> get cAppleGreen => color.appleGreen;
   static NotusAttribute<String> get cTeaGreen => color.teaGreen;
+  static NotusAttribute<String> get cNeonGreen => color.neonGreen;
   static NotusAttribute<String> get cTealGreen => color.tealGreen;
 
   static NotusAttribute<String> get cLBlue => color.lightBlue;
@@ -118,6 +126,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static NotusAttribute<String> get cNavyBlue => color.navyBlue;
 
   static NotusAttribute<String> get cPlum => color.plum;
+  static NotusAttribute<String> get cNeonPurple => color.neonPurple;
   static NotusAttribute<String> get cSuedePurple => color.suedePurple;
   static NotusAttribute<String> get cOrchidPurple => color.orchidPurple;
 
@@ -362,6 +371,11 @@ class _ItalicAttribute extends NotusAttribute<bool> {
   const _ItalicAttribute() : super._('i', NotusAttributeScope.inline, true);
 }
 
+/// Applies strikethrough style to a text segment.
+class _StrikeThroughAttribute extends NotusAttribute<bool> {
+  const _StrikeThroughAttribute() : super._('st', NotusAttributeScope.inline, true);
+}
+
 /// Builder for link attribute values.
 ///
 /// There is no need to use this class directly, consider using
@@ -402,6 +416,7 @@ class ColorAttributeBuilder extends NotusAttributeBuilder<String> {
       : super._(_kColor, NotusAttributeScope.inline);
 
   NotusAttribute<String> get pink => NotusAttribute<String>._(key, scope, "ffbcbc");
+  NotusAttribute<String> get neonPink => NotusAttribute<String>._(key, scope, "ff3796");
   NotusAttribute<String> get maroonRed => NotusAttribute<String>._(key, scope, "751011");
   NotusAttribute<String> get cherryRed => NotusAttribute<String>._(key, scope, "e43f5a");
   NotusAttribute<String> get coralRed => NotusAttribute<String>._(key, scope, "f47c7c");
@@ -410,10 +425,12 @@ class ColorAttributeBuilder extends NotusAttributeBuilder<String> {
   NotusAttribute<String> get orange => NotusAttribute<String>._(key, scope, "FE8C03");
 
   NotusAttribute<String> get yellow => NotusAttribute<String>._(key, scope, "f7f48b");
+  NotusAttribute<String> get neonYellow => NotusAttribute<String>._(key, scope, "fdff38");
 
   NotusAttribute<String> get forestGreen => NotusAttribute<String>._(key, scope, "004a18");
   NotusAttribute<String> get appleGreen => NotusAttribute<String>._(key, scope, "a1de93");
   NotusAttribute<String> get teaGreen => NotusAttribute<String>._(key, scope, "acecd5");
+  NotusAttribute<String> get neonGreen => NotusAttribute<String>._(key, scope, "00faac");
   NotusAttribute<String> get tealGreen => NotusAttribute<String>._(key, scope, "048481");
 
   NotusAttribute<String> get lightBlue => NotusAttribute<String>._(key, scope, "beebe9");
@@ -422,6 +439,7 @@ class ColorAttributeBuilder extends NotusAttributeBuilder<String> {
   NotusAttribute<String> get navyBlue => NotusAttribute<String>._(key, scope, "162447");
 
   NotusAttribute<String> get plum => NotusAttribute<String>._(key, scope, "d7aefc");
+  NotusAttribute<String> get neonPurple => NotusAttribute<String>._(key, scope, "dc2ade");
   NotusAttribute<String> get suedePurple => NotusAttribute<String>._(key, scope, "834c69");
   NotusAttribute<String> get orchidPurple => NotusAttribute<String>._(key, scope, "543864");
 
