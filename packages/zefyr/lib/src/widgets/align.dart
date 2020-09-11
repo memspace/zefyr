@@ -60,9 +60,17 @@ class ZefyrAlign extends StatelessWidget {
         textAlign: textAlign,
       );
     }
+
+    /// Uniquekey is needed because if the user switches from one alignment to another
+    /// it won't change immediately, since the change in alignment is change in style
+    /// flutter won't reflect it automatically, so generate a unique key each time.
     return Row(
-      key: UniqueKey(),
-      children: <Widget>[Expanded(child: content)],
+      key: ValueKey(textAlign),
+      children: <Widget>[
+        Expanded(
+          child: content,
+        ),
+      ],
     );
   }
 }
