@@ -734,7 +734,9 @@ class RawEditorState extends EditorState
       if (node is LineNode) {
         result.add(EditableTextLine(
           node: node,
-          padding: _getPaddingForLine(node, _themeData),
+          textDirection: _textDirection,
+          indentWidth: 0,
+          spacing: _getSpacingForLine(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,
           selectionColor: widget.selectionColor,
@@ -745,7 +747,7 @@ class RawEditorState extends EditorState
         result.add(EditableTextBlock(
           node: node,
           textDirection: _textDirection,
-          // padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          spacing: _getSpacingForBlock(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,
           selectionColor: widget.selectionColor,
@@ -758,17 +760,28 @@ class RawEditorState extends EditorState
     return result;
   }
 
-  EdgeInsetsGeometry _getPaddingForLine(LineNode node, ZefyrThemeData theme) {
+  VerticalSpacing _getSpacingForLine(LineNode node, ZefyrThemeData theme) {
     final style = node.style.get(NotusAttribute.heading);
     if (style == NotusAttribute.heading.level1) {
-      return theme.headingTheme.level1.padding;
+      return theme.heading1.spacing;
     } else if (style == NotusAttribute.heading.level2) {
-      return theme.headingTheme.level2.padding;
+      return theme.heading2.spacing;
     } else if (style == NotusAttribute.heading.level3) {
-      return theme.headingTheme.level3.padding;
+      return theme.heading3.spacing;
     }
 
-    return theme.paragraphTheme.padding;
+    return theme.paragraph.spacing;
+  }
+
+  VerticalSpacing _getSpacingForBlock(BlockNode node, ZefyrThemeData theme) {
+    final style = node.style.get(NotusAttribute.block);
+    if (style == NotusAttribute.block.code) {
+      return theme.code.spacing;
+    } else if (style == NotusAttribute.block.quote) {
+      return theme.quote.spacing;
+    } else {
+      return theme.lists.spacing;
+    }
   }
 }
 

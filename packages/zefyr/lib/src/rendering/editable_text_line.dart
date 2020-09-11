@@ -11,8 +11,8 @@ import '../widgets/selection_utils.dart';
 import 'cursor_painter.dart';
 import 'editable_box.dart';
 
-const double _kCaretGap = 1.0; // pixels
-const double _kCaretHeightOffset = 2.0; // pixels
+const double _kCursorGap = 1.0; // pixels
+const double _kCursorHeightOffset = 2.0; // pixels
 
 enum TextLineSlot { leading, body }
 
@@ -48,9 +48,6 @@ class RenderEditableTextLine extends RenderEditableBox
     EdgeInsets floatingCursorAddedMargin =
         const EdgeInsets.fromLTRB(4, 4, 4, 5),
     Clip clipBehavior = Clip.hardEdge,
-//    @required this.textSelectionDelegate,
-//    @required LayerLink startHandleLayerLink,
-//    @required LayerLink endHandleLayerLink,
 //    TextRange promptRectRange,
 //    Color promptRectColor,
   })  : assert(node != null),
@@ -391,7 +388,7 @@ class RenderEditableTextLine extends RenderEditableBox
     }
     _resolvedPadding = padding.resolve(textDirection);
     _resolvedPadding =
-        _resolvedPadding.copyWith(left: _resolvedPadding.left + _caretMargin);
+        _resolvedPadding.copyWith(left: _resolvedPadding.left + cursorMargin);
 
     assert(_resolvedPadding.isNonNegative);
   }
@@ -418,7 +415,8 @@ class RenderEditableTextLine extends RenderEditableBox
     markNeedsLayout();
   }
 
-  double get _caretMargin => _kCaretGap + cursorWidth;
+  @override
+  double get cursorMargin => _kCursorGap + cursorWidth;
   double get cursorWidth => _cursorController.style.width;
   double get cursorHeight =>
       _cursorController.style.height ??
@@ -461,8 +459,8 @@ class RenderEditableTextLine extends RenderEditableBox
       case TargetPlatform.fuchsia:
       case TargetPlatform.linux:
       case TargetPlatform.windows:
-        _caretPrototype = Rect.fromLTWH(0.0, _kCaretHeightOffset, cursorWidth,
-            cursorHeight - 2.0 * _kCaretHeightOffset);
+        _caretPrototype = Rect.fromLTWH(0.0, _kCursorHeightOffset, cursorWidth,
+            cursorHeight - 2.0 * _kCursorHeightOffset);
         break;
     }
   }
@@ -602,31 +600,26 @@ class RenderEditableTextLine extends RenderEditableBox
     }
     final innerConstraints = constraints.deflate(_resolvedPadding);
 
-    final indentWidth = 16.0; // TODO: move to widget fields.
-    final actualIndentWidth = leading == null ? 0.0 : indentWidth;
+    final indentWidth = textDirection == TextDirection.ltr
+        ? _resolvedPadding.left
+        : _resolvedPadding.right;
 
-    final bodyConstraints =
-        innerConstraints.deflate(EdgeInsets.only(left: actualIndentWidth));
-    body.layout(bodyConstraints, parentUsesSize: true);
+    body.layout(innerConstraints, parentUsesSize: true);
     final bodyParentData = body.parentData as BoxParentData;
-    bodyParentData.offset =
-        Offset(_resolvedPadding.left + actualIndentWidth, _resolvedPadding.top);
+    bodyParentData.offset = Offset(_resolvedPadding.left, _resolvedPadding.top);
 
     if (leading != null) {
       final leadingConstraints = innerConstraints.copyWith(
-          minWidth: actualIndentWidth,
-          maxWidth: actualIndentWidth,
+          minWidth: indentWidth,
+          maxWidth: indentWidth,
           maxHeight: body.size.height);
       leading.layout(leadingConstraints, parentUsesSize: true);
       final parentData = leading.parentData as BoxParentData;
-      parentData.offset = Offset(_resolvedPadding.left, _resolvedPadding.top);
+      parentData.offset = Offset(0.0, _resolvedPadding.top);
     }
 
     size = constraints.constrain(Size(
-      _resolvedPadding.left +
-          actualIndentWidth +
-          body.size.width +
-          _resolvedPadding.right,
+      _resolvedPadding.left + body.size.width + _resolvedPadding.right,
       _resolvedPadding.top + body.size.height + _resolvedPadding.bottom,
     ));
 
@@ -684,7 +677,7 @@ class RenderEditableTextLine extends RenderEditableBox
   }
 
   void _paintCursor(PaintingContext context, Offset effectiveOffset) {
-    final cursorOffset = effectiveOffset.translate(-_kCaretGap, 0);
+    final cursorOffset = effectiveOffset.translate(-_kCursorGap, 0);
     final position = TextPosition(
       offset: selection.extentOffset - node.documentOffset,
       affinity: selection.base.affinity,

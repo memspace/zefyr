@@ -10,8 +10,7 @@ abstract class RenderEditableMetricsProvider implements RenderBox {
 
   Offset getOffsetForCaret(TextPosition position, Rect caretPrototype);
   TextPosition getPositionForOffset(Offset offset);
-  double /*?*/ getFullHeightForCaret(
-      TextPosition position, Rect caretPrototype);
+  double /*?*/ getFullHeightForCaret(TextPosition position);
 
   TextRange getWordBoundary(TextPosition position);
 
@@ -32,6 +31,8 @@ abstract class RenderEditableMetricsProvider implements RenderBox {
 /// [RenderEditableMetricsProvider].
 abstract class RenderEditableBox extends RenderBox {
   ContainerNode get node;
+
+  double get cursorMargin;
 
   /// Returns preferred line height at specified `position` in text.
   ///
@@ -185,6 +186,7 @@ class RenderEditableContainerBox extends RenderBox
     _markNeedsPaddingResolution();
   }
 
+  EdgeInsets get resolvedPadding => _resolvedPadding;
   EdgeInsets _resolvedPadding;
 
   void _resolvePadding() {

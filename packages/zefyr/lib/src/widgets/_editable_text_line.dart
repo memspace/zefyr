@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/widgets/_theme.dart';
 
 import '../rendering/editable_text_line.dart';
 import '_cursor.dart';
@@ -9,35 +10,53 @@ import '_text_line.dart';
 ///
 /// This widget adds editing features to the otherwise static [TextLine] widget.
 class EditableTextLine extends RenderObjectWidget {
+  /// The line node represented by this widget.
   final LineNode node;
+
+  /// A widget to display before the body.
   final Widget leading;
+
+  /// The primary rich text content of this widget. Usually [TextLine] widget.
   final Widget body;
-  final EdgeInsetsGeometry padding;
+
+  /// Width of indentation space before the [body].
+  final double indentWidth;
+
+  /// Space above and below [body] of this text line.
+  final VerticalSpacing spacing;
+
   final TextDirection textDirection;
   final CursorController cursorController;
   final TextSelection selection;
   final Color selectionColor;
   final bool enableInteractiveSelection;
 
-  /// Creates an editable line of text represented by [node].
+  /// Creates an editable line of text.
   EditableTextLine({
     Key key,
     @required this.node,
     this.leading,
     @required this.body,
-    @required this.padding,
-    this.textDirection,
+    this.indentWidth = 0.0,
+    this.spacing = const VerticalSpacing(),
+    @required this.textDirection,
     @required this.cursorController,
     @required this.selection,
     @required this.selectionColor,
     @required this.enableInteractiveSelection,
   })  : assert(node != null),
-        assert(padding != null),
+        assert(indentWidth != null),
         assert(cursorController != null),
         assert(selection != null),
         assert(selectionColor != null),
         assert(enableInteractiveSelection != null),
         super(key: key);
+
+  EdgeInsetsGeometry get _padding => EdgeInsetsDirectional.only(
+        start: indentWidth,
+        top: spacing.top,
+        bottom: spacing.bottom,
+      );
 
   @override
   RenderObjectElement createElement() => _RenderEditableTextLineElement(this);
@@ -46,7 +65,7 @@ class EditableTextLine extends RenderObjectWidget {
   RenderEditableTextLine createRenderObject(BuildContext context) {
     return RenderEditableTextLine(
       node: node,
-      padding: padding,
+      padding: _padding,
       textDirection: textDirection,
       cursorController: cursorController,
       selection: selection,
@@ -59,7 +78,7 @@ class EditableTextLine extends RenderObjectWidget {
   void updateRenderObject(
       BuildContext context, covariant RenderEditableTextLine renderObject) {
     renderObject.node = node;
-    renderObject.padding = padding;
+    renderObject.padding = _padding;
     renderObject.textDirection = textDirection;
     renderObject.cursorController = cursorController;
     renderObject.selection = selection;

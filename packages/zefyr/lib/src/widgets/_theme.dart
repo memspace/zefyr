@@ -50,182 +50,69 @@ class ZefyrTheme extends InheritedWidget {
   }
 }
 
-/// Holds colors and typography styles for [ZefyrEditor].
-class ZefyrThemeData {
-  final TextStyle boldStyle;
-  final TextStyle italicStyle;
-  final TextStyle linkStyle;
-  final StyleTheme paragraphTheme;
-  final HeadingTheme headingTheme;
-  final BlockTheme blockTheme;
-  final Color selectionColor;
-  final Color cursorColor;
+/// Vertical spacing around a block of text.
+class VerticalSpacing {
+  final double top;
+  final double bottom;
 
-  /// Size of indentation for blocks.
-  final double indentSize;
-  final ZefyrToolbarTheme toolbarTheme;
-
-  factory ZefyrThemeData.fallback(BuildContext context) {
-    final themeData = Theme.of(context);
-    final defaultStyle = DefaultTextStyle.of(context);
-    final paragraphStyle = defaultStyle.style.copyWith(
-      fontSize: 16.0,
-      height: 1.3,
-    );
-    const padding = EdgeInsets.symmetric(vertical: 8.0);
-    final boldStyle = TextStyle(fontWeight: FontWeight.bold);
-    final italicStyle = TextStyle(fontStyle: FontStyle.italic);
-    final linkStyle = TextStyle(
-        color: themeData.accentColor, decoration: TextDecoration.underline);
-
-    return ZefyrThemeData(
-      boldStyle: boldStyle,
-      italicStyle: italicStyle,
-      linkStyle: linkStyle,
-      paragraphTheme: StyleTheme(textStyle: paragraphStyle, padding: padding),
-      headingTheme: HeadingTheme.fallback(context),
-      blockTheme: BlockTheme.fallback(context),
-      selectionColor: themeData.textSelectionColor,
-      cursorColor: themeData.cursorColor,
-      indentSize: 16.0,
-      toolbarTheme: ZefyrToolbarTheme.fallback(context),
-    );
-  }
-
-  const ZefyrThemeData({
-    this.boldStyle,
-    this.italicStyle,
-    this.linkStyle,
-    this.paragraphTheme,
-    this.headingTheme,
-    this.blockTheme,
-    this.selectionColor,
-    this.cursorColor,
-    this.indentSize,
-    this.toolbarTheme,
-  });
-
-  ZefyrThemeData copyWith({
-    TextStyle textStyle,
-    TextStyle boldStyle,
-    TextStyle italicStyle,
-    TextStyle linkStyle,
-    StyleTheme paragraphTheme,
-    HeadingTheme headingTheme,
-    BlockTheme blockTheme,
-    Color selectionColor,
-    Color cursorColor,
-    double indentSize,
-    ZefyrToolbarTheme toolbarTheme,
-  }) {
-    return ZefyrThemeData(
-      boldStyle: boldStyle ?? this.boldStyle,
-      italicStyle: italicStyle ?? this.italicStyle,
-      linkStyle: linkStyle ?? this.linkStyle,
-      paragraphTheme: paragraphTheme ?? this.paragraphTheme,
-      headingTheme: headingTheme ?? this.headingTheme,
-      blockTheme: blockTheme ?? this.blockTheme,
-      selectionColor: selectionColor ?? this.selectionColor,
-      cursorColor: cursorColor ?? this.cursorColor,
-      indentSize: indentSize ?? this.indentSize,
-      toolbarTheme: toolbarTheme ?? this.toolbarTheme,
-    );
-  }
-
-  ZefyrThemeData merge(ZefyrThemeData other) {
-    return copyWith(
-      boldStyle: other.boldStyle,
-      italicStyle: other.italicStyle,
-      linkStyle: other.linkStyle,
-      paragraphTheme: other.paragraphTheme,
-      headingTheme: other.headingTheme,
-      blockTheme: other.blockTheme,
-      selectionColor: other.selectionColor,
-      cursorColor: other.cursorColor,
-      indentSize: other.indentSize,
-      toolbarTheme: other.toolbarTheme,
-    );
-  }
+  const VerticalSpacing({this.top = 0.0, this.bottom = 0.0});
+  const VerticalSpacing.zero()
+      : top = 0.0,
+        bottom = 0.0;
 }
 
-/// Theme for heading-styled lines of text.
-class HeadingTheme {
+class ZefyrThemeData {
+  /// Style of bold text.
+  final TextStyle bold;
+
+  /// Style of italic text.
+  final TextStyle italic;
+
+  /// Style of links in text.
+  final TextStyle link;
+
+  /// Default style theme for regular paragraphs of text.
+  final TextBlockTheme paragraph; // spacing: top: 6, bottom: 10
   /// Style theme for level 1 headings.
-  final StyleTheme level1;
+  final TextBlockTheme heading1;
 
   /// Style theme for level 2 headings.
-  final StyleTheme level2;
+  final TextBlockTheme heading2;
 
   /// Style theme for level 3 headings.
-  final StyleTheme level3;
+  final TextBlockTheme heading3;
 
-  HeadingTheme({
-    @required this.level1,
-    @required this.level2,
-    @required this.level3,
-  });
+  /// Style theme for bullet and number lists.
+  final TextBlockTheme lists;
 
-  /// Creates fallback theme for headings.
-  factory HeadingTheme.fallback(BuildContext context) {
-    final defaultStyle = DefaultTextStyle.of(context);
-    return HeadingTheme(
-      level1: StyleTheme(
-        textStyle: defaultStyle.style.copyWith(
-          fontSize: 34.0,
-          color: defaultStyle.style.color.withOpacity(0.70),
-          height: 1.15,
-          fontWeight: FontWeight.w300,
-        ),
-        padding: EdgeInsets.only(top: 16.0, bottom: 0.0),
-      ),
-      level2: StyleTheme(
-        textStyle: TextStyle(
-          fontSize: 24.0,
-          color: defaultStyle.style.color.withOpacity(0.70),
-          height: 1.15,
-          fontWeight: FontWeight.normal,
-        ),
-        padding: EdgeInsets.only(bottom: 0.0, top: 8.0),
-      ),
-      level3: StyleTheme(
-        textStyle: TextStyle(
-          fontSize: 20.0,
-          color: defaultStyle.style.color.withOpacity(0.70),
-          height: 1.25,
-          fontWeight: FontWeight.w500,
-        ),
-        padding: EdgeInsets.only(bottom: 0.0, top: 8.0),
-      ),
-    );
-  }
-}
+  /// Style theme for quote blocks.
+  final TextBlockTheme quote;
 
-/// Theme for a block of lines in a document.
-class BlockTheme {
-  /// Style theme for bullet lists.
-  final StyleTheme bulletList;
+  /// Style theme for code blocks.
+  final TextBlockTheme code;
 
-  /// Style theme for number lists.
-  final StyleTheme numberList;
-
-  /// Style theme for code snippets.
-  final StyleTheme code;
-
-  /// Style theme for quotes.
-  final StyleTheme quote;
-
-  BlockTheme({
-    @required this.bulletList,
-    @required this.numberList,
+  ZefyrThemeData({
+    @required this.bold,
+    @required this.italic,
+    @required this.link,
+    @required this.paragraph,
+    @required this.heading1,
+    @required this.heading2,
+    @required this.heading3,
+    @required this.lists,
     @required this.quote,
     @required this.code,
   });
 
-  /// Creates fallback theme for blocks.
-  factory BlockTheme.fallback(BuildContext context) {
+  factory ZefyrThemeData.fallback(BuildContext context) {
     final themeData = Theme.of(context);
-    final defaultTextStyle = DefaultTextStyle.of(context);
-    final padding = const EdgeInsets.symmetric(vertical: 8.0);
+    final defaultStyle = DefaultTextStyle.of(context);
+    final baseStyle = defaultStyle.style.copyWith(
+      fontSize: 16.0,
+      height: 1.3,
+    );
+    final baseSpacing = VerticalSpacing(top: 6.0, bottom: 10);
+
     String fontFamily;
     switch (themeData.platform) {
       case TargetPlatform.iOS:
@@ -240,93 +127,141 @@ class BlockTheme {
         break;
     }
 
-    return BlockTheme(
-      bulletList: StyleTheme(padding: padding),
-      numberList: StyleTheme(padding: padding),
-      quote: StyleTheme(
-        textStyle: TextStyle(
-          color: defaultTextStyle.style.color.withOpacity(0.6),
-        ),
-        padding: padding,
+    return ZefyrThemeData(
+      bold: TextStyle(fontWeight: FontWeight.bold),
+      italic: TextStyle(fontStyle: FontStyle.italic),
+      link: TextStyle(
+        color: themeData.accentColor,
+        decoration: TextDecoration.underline,
       ),
-      code: StyleTheme(
-        textStyle: TextStyle(
-          color: defaultTextStyle.style.color.withOpacity(0.8),
+      paragraph: TextBlockTheme(
+        style: baseStyle,
+        spacing: baseSpacing,
+        // lineSpacing is not relevant for paragraphs since they consist of one line
+      ),
+      heading1: TextBlockTheme(
+        style: defaultStyle.style.copyWith(
+          fontSize: 34.0,
+          color: defaultStyle.style.color.withOpacity(0.70),
+          height: 1.15,
+          fontWeight: FontWeight.w300,
+        ),
+        spacing: VerticalSpacing(top: 16.0, bottom: 0.0),
+      ),
+      heading2: TextBlockTheme(
+        style: TextStyle(
+          fontSize: 24.0,
+          color: defaultStyle.style.color.withOpacity(0.70),
+          height: 1.15,
+          fontWeight: FontWeight.normal,
+        ),
+        spacing: VerticalSpacing(bottom: 0.0, top: 8.0),
+      ),
+      heading3: TextBlockTheme(
+        style: TextStyle(
+          fontSize: 20.0,
+          color: defaultStyle.style.color.withOpacity(0.70),
+          height: 1.25,
+          fontWeight: FontWeight.w500,
+        ),
+        spacing: VerticalSpacing(bottom: 0.0, top: 8.0),
+      ),
+      lists: TextBlockTheme(
+        style: baseStyle,
+        spacing: baseSpacing,
+        lineSpacing: VerticalSpacing(bottom: 6),
+      ),
+      quote: TextBlockTheme(
+        style: TextStyle(color: baseStyle.color.withOpacity(0.6)),
+        spacing: baseSpacing,
+        lineSpacing: VerticalSpacing(top: 6, bottom: 2),
+        decoration: BoxDecoration(
+          border: Border(
+            left: BorderSide(width: 4, color: Colors.grey.shade300),
+          ),
+        ),
+      ),
+      code: TextBlockTheme(
+        style: TextStyle(
+          color: baseStyle.color.withOpacity(0.8),
           fontFamily: fontFamily,
           fontSize: 14.0,
           height: 1.25,
         ),
-        padding: padding,
+        spacing: baseSpacing,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(3),
+        ),
       ),
     );
   }
-}
 
-/// Theme for a specific attribute style.
-///
-/// Used in [HeadingTheme] and [BlockTheme], as well as in
-/// [ZefyrThemeData.paragraphTheme].
-class StyleTheme {
-  /// Text style of this theme.
-  final TextStyle textStyle;
-
-  /// Padding to apply around lines of text.
-  final EdgeInsets padding;
-
-  /// Creates a new [StyleTheme].
-  StyleTheme({
-    this.textStyle,
-    this.padding,
-  });
-}
-
-/// Defines styles and colors for [ZefyrToolbar].
-class ZefyrToolbarTheme {
-  /// The background color of toolbar.
-  final Color color;
-
-  /// Color of buttons in toggled state.
-  final Color toggleColor;
-
-  /// Color of button icons.
-  final Color iconColor;
-
-  /// Color of button icons in disabled state.
-  final Color disabledIconColor;
-
-  /// Creates fallback theme for editor toolbars.
-  factory ZefyrToolbarTheme.fallback(BuildContext context) {
-    final theme = Theme.of(context);
-    return ZefyrToolbarTheme._(
-      color: theme.primaryColorBrightness == Brightness.light
-          ? Colors.grey.shade300
-          : Colors.grey.shade800,
-      toggleColor: theme.primaryColorBrightness == Brightness.light
-          ? Colors.grey.shade400
-          : Colors.grey.shade900,
-      iconColor: theme.primaryIconTheme.color,
-      disabledIconColor: theme.disabledColor,
-    );
-  }
-
-  ZefyrToolbarTheme._({
-    @required this.color,
-    @required this.toggleColor,
-    @required this.iconColor,
-    @required this.disabledIconColor,
-  });
-
-  ZefyrToolbarTheme copyWith({
-    Color color,
-    Color toggleColor,
-    Color iconColor,
-    Color disabledIconColor,
+  ZefyrThemeData copyWith({
+    TextStyle bold,
+    TextStyle italic,
+    TextStyle link,
+    TextBlockTheme paragraph,
+    TextBlockTheme heading1,
+    TextBlockTheme heading2,
+    TextBlockTheme heading3,
+    TextBlockTheme lists,
+    TextBlockTheme quote,
+    TextBlockTheme code,
   }) {
-    return ZefyrToolbarTheme._(
-      color: color ?? this.color,
-      toggleColor: toggleColor ?? this.toggleColor,
-      iconColor: iconColor ?? this.iconColor,
-      disabledIconColor: disabledIconColor ?? this.disabledIconColor,
+    return ZefyrThemeData(
+      bold: bold ?? this.bold,
+      italic: italic ?? this.italic,
+      link: link ?? this.link,
+      paragraph: paragraph ?? this.paragraph,
+      heading1: heading1 ?? this.heading1,
+      heading2: heading2 ?? this.heading2,
+      heading3: heading3 ?? this.heading3,
+      lists: lists ?? this.lists,
+      quote: quote ?? this.quote,
+      code: code ?? this.code,
     );
   }
+
+  ZefyrThemeData merge(ZefyrThemeData other) {
+    return copyWith(
+      bold: other.bold,
+      italic: other.italic,
+      link: other.link,
+      paragraph: other.paragraph,
+      heading1: other.heading1,
+      heading2: other.heading2,
+      heading3: other.heading3,
+      lists: other.lists,
+      quote: other.quote,
+      code: other.code,
+    );
+  }
+}
+
+/// Style theme applied to a block of rich text, including single-line
+/// paragraphs.
+class TextBlockTheme {
+  /// Base text style for a text block.
+  final TextStyle style;
+
+  /// Vertical spacing around a text block.
+  final VerticalSpacing spacing;
+
+  /// Vertical spacing for individual lines within a text block.
+  ///
+  final VerticalSpacing lineSpacing;
+
+  /// Decoration of a text block.
+  ///
+  /// Decoration, if present, is painted in the content area, excluding
+  /// any [spacing].
+  final BoxDecoration decoration;
+
+  TextBlockTheme({
+    @required this.style,
+    @required this.spacing,
+    this.lineSpacing = const VerticalSpacing.zero(),
+    this.decoration,
+  });
 }

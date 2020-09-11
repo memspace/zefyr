@@ -41,15 +41,6 @@ class TextLine extends StatelessWidget {
     final children = node.children
         .map((node) => _segmentToTextSpan(node, theme))
         .toList(growable: false);
-    final color = node.style.contains(NotusAttribute.block.quote)
-        ? Colors.grey.shade600
-        : Colors.grey.shade900;
-    // final style = TextStyle(
-    //   color: color,
-    //   // height: 1.35,
-    //   // fontFamily: '.SF UI Text',
-    //   fontSize: 16,
-    // );
     return TextSpan(
       style: _getParagraphTextStyle(node.style, theme),
       children: children,
@@ -74,29 +65,41 @@ class TextLine extends StatelessWidget {
   }
 
   TextStyle _getParagraphTextStyle(NotusStyle style, ZefyrThemeData theme) {
-    // TODO: apply block-level style
-    final style = node.style.get(NotusAttribute.heading);
-    if (style == NotusAttribute.heading.level1) {
-      return theme.headingTheme.level1.textStyle;
-    } else if (style == NotusAttribute.heading.level2) {
-      return theme.headingTheme.level2.textStyle;
-    } else if (style == NotusAttribute.heading.level3) {
-      return theme.headingTheme.level3.textStyle;
+    var textStyle = TextStyle();
+    final heading = node.style.get(NotusAttribute.heading);
+    if (heading == NotusAttribute.heading.level1) {
+      textStyle = textStyle.merge(theme.heading1.style);
+    } else if (heading == NotusAttribute.heading.level2) {
+      textStyle = textStyle.merge(theme.heading2.style);
+    } else if (heading == NotusAttribute.heading.level3) {
+      textStyle = textStyle.merge(theme.heading3.style);
+    } else {
+      textStyle = textStyle.merge(theme.paragraph.style);
     }
 
-    return theme.paragraphTheme.textStyle;
+    final block = style.get(NotusAttribute.block);
+    if (block == NotusAttribute.block.quote) {
+      textStyle = textStyle.merge(theme.quote.style);
+    } else if (block == NotusAttribute.block.code) {
+      textStyle = textStyle.merge(theme.code.style);
+    } else if (block != null) {
+      // lists
+      textStyle = textStyle.merge(theme.lists.style);
+    }
+
+    return textStyle;
   }
 
   TextStyle _getInlineTextStyle(NotusStyle style, ZefyrThemeData theme) {
     var result = TextStyle();
     if (style.containsSame(NotusAttribute.bold)) {
-      result = result.merge(theme.boldStyle);
+      result = result.merge(theme.bold);
     }
     if (style.containsSame(NotusAttribute.italic)) {
-      result = result.merge(theme.italicStyle);
+      result = result.merge(theme.italic);
     }
     if (style.contains(NotusAttribute.link)) {
-      result = result.merge(theme.linkStyle);
+      result = result.merge(theme.link);
     }
     return result;
   }

@@ -29,7 +29,10 @@ class ToggleStyleButton extends StatefulWidget {
 final Map<ToggleAttribute, NotusAttribute> _toggleAttributeMap = {
   ToggleAttribute.bold: NotusAttribute.bold,
   ToggleAttribute.italic: NotusAttribute.italic,
+  ToggleAttribute.numberList: NotusAttribute.block.numberList,
+  ToggleAttribute.bulletList: NotusAttribute.block.bulletList,
   ToggleAttribute.quote: NotusAttribute.block.quote,
+  ToggleAttribute.code: NotusAttribute.block.code,
 };
 
 class _ToggleStyleButtonState extends State<ToggleStyleButton> {
@@ -39,14 +42,15 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
 
   void _didChangeEditingValue() {
     setState(() {
-      _isToggled = widget.controller.getSelectionStyle().contains(_attribute);
+      _isToggled =
+          widget.controller.getSelectionStyle().containsSame(_attribute);
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _isToggled = widget.controller.getSelectionStyle().contains(_attribute);
+    _isToggled = widget.controller.getSelectionStyle().containsSame(_attribute);
     widget.controller.addListener(_didChangeEditingValue);
   }
 
@@ -56,7 +60,8 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_didChangeEditingValue);
       widget.controller.addListener(_didChangeEditingValue);
-      _isToggled = widget.controller.getSelectionStyle().contains(_attribute);
+      _isToggled =
+          widget.controller.getSelectionStyle().containsSame(_attribute);
     }
   }
 
@@ -104,7 +109,10 @@ Widget _defaultToggleButtonBuilder(BuildContext context,
 final Map<ToggleAttribute, IconData> _defaultToggleIcons = {
   ToggleAttribute.bold: Icons.format_bold,
   ToggleAttribute.italic: Icons.format_italic,
+  ToggleAttribute.numberList: Icons.format_list_numbered,
+  ToggleAttribute.bulletList: Icons.format_list_bulleted,
   ToggleAttribute.quote: Icons.format_quote,
+  ToggleAttribute.code: Icons.code,
 };
 
 typedef DropdownButtonBuilder = Widget Function(
@@ -250,7 +258,22 @@ class EditorToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       ToggleStyleButton(
+        attribute: ToggleAttribute.numberList,
+        controller: controller,
+        childBuilder: _defaultToggleButtonBuilder,
+      ),
+      ToggleStyleButton(
+        attribute: ToggleAttribute.bulletList,
+        controller: controller,
+        childBuilder: _defaultToggleButtonBuilder,
+      ),
+      ToggleStyleButton(
         attribute: ToggleAttribute.quote,
+        controller: controller,
+        childBuilder: _defaultToggleButtonBuilder,
+      ),
+      ToggleStyleButton(
+        attribute: ToggleAttribute.code,
         controller: controller,
         childBuilder: _defaultToggleButtonBuilder,
       ),

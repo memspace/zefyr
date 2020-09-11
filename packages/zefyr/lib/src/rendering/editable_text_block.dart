@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
@@ -15,14 +16,53 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
     @required BlockNode node,
     @required TextDirection textDirection,
     @required EdgeInsetsGeometry padding,
+    @required Decoration decoration,
+    ImageConfiguration configuration = ImageConfiguration.empty,
   })  : assert(node != null),
         assert(textDirection != null),
+        assert(decoration != null),
+        _decoration = decoration,
+        _configuration = configuration,
         super(
           children: children,
           node: node,
           textDirection: textDirection,
           padding: padding,
         );
+
+  BoxPainter /*?*/ _painter;
+
+  /// What decoration to paint.
+  ///
+  /// Commonly a [BoxDecoration].
+  Decoration get decoration => _decoration;
+  Decoration _decoration;
+  set decoration(Decoration value) {
+    assert(value != null);
+    if (value == _decoration) return;
+    _painter?.dispose();
+    _painter = null;
+    _decoration = value;
+    markNeedsPaint();
+  }
+
+  /// The settings to pass to the decoration when painting, so that it can
+  /// resolve images appropriately. See [ImageProvider.resolve] and
+  /// [BoxPainter.paint].
+  ///
+  /// The [ImageConfiguration.textDirection] field is also used by
+  /// direction-sensitive [Decoration]s for painting and hit-testing.
+  ImageConfiguration get configuration => _configuration;
+  ImageConfiguration _configuration;
+  set configuration(ImageConfiguration value) {
+    assert(value != null);
+    if (value == _configuration) return;
+    _configuration = value;
+    markNeedsPaint();
+  }
+
+  @override
+  double get cursorMargin => firstChild.cursorMargin;
 
   @override
   TextRange getLineBoundary(TextPosition position) {
@@ -67,9 +107,14 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
   @override
   TextRange getWordBoundary(TextPosition position) {
     final child = childAtPosition(position);
-    final localPosition =
-        TextPosition(offset: position.offset - child.node.offset);
-    return child.getWordBoundary(localPosition);
+    // memoize node's offset since it's not cached by the document.
+    final nodeOffset = child.node.offset;
+    final childPosition = TextPosition(offset: position.offset - nodeOffset);
+    final childWord = child.getWordBoundary(childPosition);
+    return TextRange(
+      start: childWord.start + nodeOffset,
+      end: childWord.end + nodeOffset,
+    );
   }
 
   @override
@@ -193,8 +238,59 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
   // End RenderEditableBox implementation
 
   @override
+  void detach() {
+    _painter?.dispose();
+    _painter = null;
+    super.detach();
+    // Since we're disposing of our painter, we won't receive change
+    // notifications. We mark ourselves as needing paint so that we will
+    // resubscribe to change notifications. If we didn't do this, then, for
+    // example, animated GIFs would stop animating when a DecoratedBox gets
+    // moved around the tree due to GlobalKey reparenting.
+    markNeedsPaint();
+  }
+
+  @override
   void paint(PaintingContext context, Offset offset) {
+    _paintDecoration(context, offset);
     defaultPaint(context, offset);
+  }
+
+  void _paintDecoration(PaintingContext context, Offset offset) {
+    assert(size.width != null);
+    assert(size.height != null);
+    _painter ??= _decoration.createBoxPainter(markNeedsPaint);
+    final decorationSize = resolvedPadding.deflateSize(size);
+    final filledConfiguration = configuration.copyWith(size: decorationSize);
+    int /*?*/ debugSaveCount;
+    assert(() {
+      debugSaveCount = context.canvas.getSaveCount();
+      return true;
+    }());
+
+    // We want the decoration to align with the text so we adjust left padding
+    // by cursorMargin.
+    final decorationOffset = offset.translate(
+        resolvedPadding.left + cursorMargin, resolvedPadding.top);
+    _painter.paint(context.canvas, decorationOffset, filledConfiguration);
+    assert(() {
+      if (debugSaveCount != context.canvas.getSaveCount()) {
+        throw FlutterError.fromParts(<DiagnosticsNode>[
+          ErrorSummary(
+              '${_decoration.runtimeType} painter had mismatching save and restore calls.'),
+          ErrorDescription(
+              'Before painting the decoration, the canvas save count was $debugSaveCount. '
+              'After painting it, the canvas save count was ${context.canvas.getSaveCount()}. '
+              'Every call to save() or saveLayer() must be matched by a call to restore().'),
+          DiagnosticsProperty<Decoration>('The decoration was', decoration,
+              style: DiagnosticsTreeStyle.errorProperty),
+          DiagnosticsProperty<BoxPainter>('The painter was', _painter,
+              style: DiagnosticsTreeStyle.errorProperty),
+        ]);
+      }
+      return true;
+    }());
+    if (decoration.isComplex) context.setIsComplexHint();
   }
 
   @override

@@ -39,8 +39,7 @@ class CursorPainter {
     Rect caretRect = cursorPrototype.shift(caretOffset);
     if (style.offset != null) caretRect = caretRect.shift(style.offset);
 
-    final double caretHeight =
-        editable.getFullHeightForCaret(textPosition, cursorPrototype);
+    final double caretHeight = editable.getFullHeightForCaret(textPosition);
     if (caretHeight != null) {
       switch (defaultTargetPlatform) {
         case TargetPlatform.iOS:

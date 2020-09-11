@@ -207,7 +207,7 @@ class _ZefyrFieldState extends State<ZefyrField>
       autofocus: true,
       showCursor: true,
       selectionColor: selectionColor,
-      showSelectionHandles: true,
+      showSelectionHandles: false,
       selectionControls: cupertinoTextSelectionControls,
       cursorStyle: CursorStyle(
         color: cursorColor,
