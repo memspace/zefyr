@@ -15,6 +15,7 @@ class EditableTextBlock extends StatelessWidget {
   final TextSelection selection;
   final Color selectionColor;
   final bool enableInteractiveSelection;
+  final EdgeInsets contentPadding;
 
   const EditableTextBlock({
     Key key,
@@ -25,6 +26,7 @@ class EditableTextBlock extends StatelessWidget {
     @required this.selection,
     @required this.selectionColor,
     @required this.enableInteractiveSelection,
+    this.contentPadding,
   }) : super(key: key);
 
   @override
@@ -34,6 +36,7 @@ class EditableTextBlock extends StatelessWidget {
       node: node,
       textDirection: textDirection,
       padding: spacing,
+      contentPadding: contentPadding,
       decoration: _getDecorationForBlock(node, theme) ?? BoxDecoration(),
       children: _buildChildren(context),
     );
@@ -74,12 +77,23 @@ class EditableTextBlock extends StatelessWidget {
         index: index,
         count: count,
         style: theme.paragraph.style,
-        width: 32,
+        width: 32.0,
+        padding: 8.0,
       );
     } else if (block == NotusAttribute.block.bulletList) {
       return _BulletPoint(
         style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
         width: 32,
+      );
+    } else if (block == NotusAttribute.block.code) {
+      return _NumberPoint(
+        index: index,
+        count: count,
+        style: theme.code.style
+            .copyWith(color: theme.code.style.color.withOpacity(0.4)),
+        width: 32.0,
+        padding: 16.0,
+        withDot: false,
       );
     } else {
       return null;
@@ -91,7 +105,7 @@ class EditableTextBlock extends StatelessWidget {
     if (block == NotusAttribute.block.quote) {
       return 16.0;
     } else if (block == NotusAttribute.block.code) {
-      return 0.0;
+      return 32.0;
     } else {
       return 32.0;
     }
@@ -159,18 +173,22 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
   final TextDirection textDirection;
   final VerticalSpacing padding;
   final Decoration decoration;
+  final EdgeInsets contentPadding;
 
   _EditableBlock({
     Key key,
     @required this.node,
     @required this.textDirection,
     this.padding = const VerticalSpacing(),
+    this.contentPadding,
     @required this.decoration,
     @required List<Widget> children,
   }) : super(key: key, children: children);
 
   EdgeInsets get _padding =>
       EdgeInsets.only(top: padding.top, bottom: padding.bottom);
+
+  EdgeInsets get _contentPadding => contentPadding ?? EdgeInsets.zero;
 
   @override
   RenderEditableTextBlock createRenderObject(BuildContext context) {
@@ -179,6 +197,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
       textDirection: textDirection,
       padding: _padding,
       decoration: decoration,
+      contentPadding: _contentPadding,
     );
   }
 
@@ -189,6 +208,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
     renderObject.textDirection = textDirection;
     renderObject.padding = _padding;
     renderObject.decoration = decoration;
+    renderObject.contentPadding = _contentPadding;
   }
 }
 
@@ -197,6 +217,8 @@ class _NumberPoint extends StatelessWidget {
   final int count;
   final TextStyle style;
   final double width;
+  final bool withDot;
+  final double padding;
 
   const _NumberPoint({
     Key key,
@@ -204,15 +226,16 @@ class _NumberPoint extends StatelessWidget {
     @required this.count,
     @required this.style,
     @required this.width,
+    this.withDot = true,
+    this.padding = 0.0,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final theme = ZefyrTheme.of(context);
     return Container(
       alignment: AlignmentDirectional.topEnd,
-      child: Text('$index.', style: style),
+      child: Text(withDot ? '$index.' : '$index', style: style),
       width: width,
-      padding: EdgeInsetsDirectional.only(end: 8.0),
+      padding: EdgeInsetsDirectional.only(end: padding),
     );
   }
 }

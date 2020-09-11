@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
-import '../rendering/paragraph_proxy.dart';
+import '_rich_text_proxy.dart';
 import '_theme.dart';
 
 /// Line of text in Zefyr editor.
@@ -23,7 +23,7 @@ class TextLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = buildText(context, node);
     final strutStyle = StrutStyle.fromTextStyle(text.style);
-    return _RichTextProxy(
+    return RichTextProxy(
       textStyle: text.style,
       textDirection: textDirection,
       strutStyle: strutStyle,
@@ -102,52 +102,5 @@ class TextLine extends StatelessWidget {
       result = result.merge(theme.link);
     }
     return result;
-  }
-}
-
-class _RichTextProxy extends SingleChildRenderObjectWidget {
-  /// Child argument should be an instance of RichText widget.
-  _RichTextProxy({
-    @required RichText child,
-    @required this.textStyle,
-    @required this.textDirection,
-    this.textScaleFactor = 1.0,
-    @required this.locale,
-    @required this.strutStyle,
-    this.textWidthBasis = TextWidthBasis.parent,
-    this.textHeightBehavior,
-  }) : super(child: child);
-
-  final TextStyle textStyle;
-  final TextDirection textDirection;
-  final double textScaleFactor;
-  final Locale locale;
-  final StrutStyle strutStyle;
-  final TextWidthBasis textWidthBasis;
-  final TextHeightBehavior textHeightBehavior;
-
-  @override
-  RenderParagraphProxy createRenderObject(BuildContext context) {
-    return RenderParagraphProxy(
-      textStyle: textStyle,
-      textDirection: textDirection,
-      textScaleFactor: textScaleFactor,
-      locale: locale,
-      strutStyle: strutStyle,
-      textWidthBasis: textWidthBasis,
-      textHeightBehavior: textHeightBehavior,
-    );
-  }
-
-  @override
-  void updateRenderObject(
-      BuildContext context, covariant RenderParagraphProxy renderObject) {
-    renderObject.textStyle = textStyle;
-    renderObject.textDirection = textDirection;
-    renderObject.textScaleFactor = textScaleFactor;
-    renderObject.locale = locale;
-    renderObject.strutStyle = strutStyle;
-    renderObject.textWidthBasis = textWidthBasis;
-    renderObject.textHeightBehavior = textHeightBehavior;
   }
 }

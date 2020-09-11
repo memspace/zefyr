@@ -744,6 +744,7 @@ class RawEditorState extends EditorState
           body: TextLine(node: node, textDirection: _textDirection),
         ));
       } else if (node is BlockNode) {
+        final block = node.style.get(NotusAttribute.block);
         result.add(EditableTextBlock(
           node: node,
           textDirection: _textDirection,
@@ -752,6 +753,9 @@ class RawEditorState extends EditorState
           selection: widget.controller.selection,
           selectionColor: widget.selectionColor,
           enableInteractiveSelection: widget.enableInteractiveSelection,
+          contentPadding: (block == NotusAttribute.block.code)
+              ? EdgeInsets.all(16.0)
+              : null,
         ));
       } else {
         throw StateError('Unreachable.');

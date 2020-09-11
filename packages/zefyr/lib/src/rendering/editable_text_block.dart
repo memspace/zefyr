@@ -18,17 +18,37 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
     @required EdgeInsetsGeometry padding,
     @required Decoration decoration,
     ImageConfiguration configuration = ImageConfiguration.empty,
+    EdgeInsets contentPadding = EdgeInsets.zero,
   })  : assert(node != null),
         assert(textDirection != null),
         assert(decoration != null),
+        assert(padding != null),
+        assert(contentPadding != null),
         _decoration = decoration,
         _configuration = configuration,
+        _savedPadding = padding,
+        _contentPadding = contentPadding,
         super(
           children: children,
           node: node,
           textDirection: textDirection,
-          padding: padding,
+          padding: padding.add(contentPadding),
         );
+
+  EdgeInsetsGeometry _savedPadding;
+  EdgeInsets _contentPadding;
+  set contentPadding(EdgeInsets value) {
+    assert(value != null);
+    if (_contentPadding == value) return;
+    _contentPadding = value;
+    super.padding = _savedPadding.add(_contentPadding);
+  }
+
+  @override
+  set padding(EdgeInsetsGeometry value) {
+    super.padding = value.add(_contentPadding);
+    _savedPadding = value;
+  }
 
   BoxPainter /*?*/ _painter;
 
@@ -260,7 +280,10 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
     assert(size.width != null);
     assert(size.height != null);
     _painter ??= _decoration.createBoxPainter(markNeedsPaint);
-    final decorationSize = resolvedPadding.deflateSize(size);
+
+    final decorationPadding = resolvedPadding - _contentPadding;
+
+    final decorationSize = decorationPadding.deflateSize(size);
     final filledConfiguration = configuration.copyWith(size: decorationSize);
     int /*?*/ debugSaveCount;
     assert(() {
@@ -271,7 +294,7 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
     // We want the decoration to align with the text so we adjust left padding
     // by cursorMargin.
     final decorationOffset = offset.translate(
-        resolvedPadding.left + cursorMargin, resolvedPadding.top);
+        decorationPadding.left + cursorMargin, decorationPadding.top);
     _painter.paint(context.canvas, decorationOffset, filledConfiguration);
     assert(() {
       if (debugSaveCount != context.canvas.getSaveCount()) {
