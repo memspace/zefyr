@@ -1,3 +1,4 @@
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:zefyr/util.dart';
@@ -43,7 +44,11 @@ mixin RawEditorStateTextInputClientMixin on EditorState
           keyboardAppearance: widget.keyboardAppearance,
           textCapitalization: widget.textCapitalization,
         ),
-      )..setEditingState(_lastKnownRemoteTextEditingValue);
+      );
+
+      _updateSizeAndTransform();
+      _textInputConnection.setEditingState(_lastKnownRemoteTextEditingValue);
+
       _sentRemoteValues.add(_lastKnownRemoteTextEditingValue);
     }
     _textInputConnection.show();
@@ -188,5 +193,13 @@ mixin RawEditorStateTextInputClientMixin on EditorState
     }
   }
 
-  // End TextInputClient implementation
+  void _updateSizeAndTransform() {
+    if (hasConnection) {
+      final size = renderEditor.size;
+      final transform = renderEditor.getTransformTo(null);
+      _textInputConnection.setEditableSizeAndTransform(size, transform);
+      SchedulerBinding.instance
+          .addPostFrameCallback((Duration _) => _updateSizeAndTransform());
+    }
+  }
 }
