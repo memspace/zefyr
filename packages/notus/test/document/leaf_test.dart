@@ -1,16 +1,18 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'package:test/test.dart';
-import 'package:quill_delta/quill_delta.dart';
+import 'dart:convert';
+
 import 'package:notus/notus.dart';
+import 'package:quill_delta/quill_delta.dart';
+import 'package:test/test.dart';
 
 final boldStyle = NotusStyle().merge(NotusAttribute.bold);
 final boldUnsetStyle = NotusStyle().put(NotusAttribute.bold.unset);
 final italicStyle = NotusStyle().merge(NotusAttribute.italic);
 
 void main() {
-  group('$TextNode', () {
+  group('TextNode', () {
     LineNode line;
     TextNode node;
 
@@ -26,6 +28,11 @@ void main() {
       expect(node.length, 0);
       expect(node.style, NotusStyle());
       expect(node.toDelta(), isEmpty);
+    });
+
+    test('toPlainText', () {
+      final node = TextNode('London');
+      expect(node.toPlainText(), 'London');
     });
 
     test('toString', () {
@@ -108,6 +115,95 @@ void main() {
         line.children.elementAt(2).toDelta(),
         Delta()..insert('don', b),
       );
+    });
+  });
+
+  group('EmbeddableObject', () {
+    test('equality', () {
+      final embed1 = EmbeddableObject('hr');
+      final embed2 = EmbeddableObject('hr');
+      final embed3 = EmbeddableObject('image');
+      expect(embed1, embed2);
+      expect(embed1, isNot(equals(embed3)));
+    });
+
+    test('hashCode', () {
+      final embed1 = EmbeddableObject('hr');
+      final embed2 = EmbeddableObject('hr');
+      final embed3 = EmbeddableObject('image');
+      final set = <EmbeddableObject>{};
+      set.addAll([embed1, embed2, embed3]);
+      expect(set, hasLength(2));
+      expect(set, contains(embed1));
+      expect(set, contains(embed2));
+      expect(set, contains(embed3));
+    });
+
+    test('json serialization', () {
+      final embed = EmbeddableObject('hr');
+      final json = jsonEncode(embed);
+      expect(json, '{"type":"hr"}');
+      expect(EmbeddableObject.fromJson(jsonDecode(json)), embed);
+    });
+  });
+
+  group('EmbedNode', () {
+    LineNode line;
+    EmbedNode node;
+
+    setUp(() {
+      line = LineNode();
+      line.insert(0, EmbeddableObject('hr'), null);
+      node = line.children.first;
+    });
+
+    test('toPlainText', () {
+      expect(node.toPlainText(), EmbedNode.kObjectReplacementCharacter);
+    });
+
+    test('length', () {
+      expect(node.length, 1);
+    });
+
+    test('toDelta', () {
+      expect(node.toDelta(), Delta()..insert(EmbeddableObject('hr')));
+    });
+
+    test('splitAt', () {
+      expect(node.splitAt(0), node);
+      expect(node.splitAt(1), isNull);
+    });
+
+    test('cutAt', () {
+      expect(node.cutAt(0), node);
+      line.insert(0, EmbeddableObject('hr'), null);
+      node = line.children.first;
+      expect(node.cutAt(1), isNull);
+    });
+
+    test('isolate', () {
+      expect(node.isolate(0, 1), node);
+    });
+  });
+
+  group('LeafNode', () {
+    test('factory constructor', () {
+      final embed = LeafNode(EmbeddableObject('hr'));
+      final text = LeafNode('Text');
+      expect(embed, isA<EmbedNode>());
+      expect(text, isA<TextNode>());
+    });
+
+    test('data cannot be null', () {
+      expect(() => LeafNode(), throwsA(const TypeMatcher<AssertionError>()));
+    });
+
+    test('applyStyle allows inline styles only', () {
+      final text = LeafNode('Text');
+      final style = NotusStyle().put(NotusAttribute.block.numberList);
+
+      expect(() => text.applyStyle(style),
+          throwsA(const TypeMatcher<AssertionError>()));
     });
   });
 }

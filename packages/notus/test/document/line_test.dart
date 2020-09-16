@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:notus/notus.dart';
+import 'package:notus/src/document/embeds.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:test/test.dart';
 
@@ -29,7 +30,7 @@ void main() {
     test('hasEmbed', () {
       final node = LineNode();
       expect(node.hasEmbed, isFalse);
-      node.add(EmbedNode());
+      node.add(EmbedNode(EmbeddableObject('hr')));
       expect(node.hasEmbed, isTrue);
     });
 
@@ -266,9 +267,7 @@ void main() {
 
     test('collectStyle with embed nodes', () {
       root.insert(0, 'Hello world\n\nMore text.\n', null);
-      var style = NotusStyle();
-      style = style.put(NotusAttribute.embed.horizontalRule);
-      root.insert(12, EmbedNode.kPlainTextPlaceholder, style);
+      root.insert(12, EmbeddableObject('hr'), null);
 
       var lookup = root.lookup(0);
       LineNode line = lookup.node;

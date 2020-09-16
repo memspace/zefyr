@@ -76,8 +76,8 @@ abstract class Node extends LinkedListEntry<Node> {
   /// Returns plain-text representation of this node.
   String toPlainText();
 
-  /// Insert [text] at specified character [index] with style [style].
-  void insert(int index, String text, NotusStyle style);
+  /// Insert [data] at specified character [index] with style [style].
+  void insert(int index, Object data, NotusStyle style);
 
   /// Format [length] characters of this node starting from [index] with
   /// specified style [style].
@@ -233,17 +233,17 @@ abstract class ContainerNode<T extends Node> extends Node {
   int get length => _children.fold(0, (current, node) => current + node.length);
 
   @override
-  void insert(int index, String value, NotusStyle style) {
+  void insert(int index, Object data, NotusStyle style) {
     assert(index == 0 || (index > 0 && index < length));
 
     if (isEmpty) {
       assert(index == 0);
       final node = defaultChild;
       add(node);
-      node.insert(index, value, style);
+      node.insert(index, data, style);
     } else {
       final result = lookup(index);
-      result.node.insert(result.offset, value, style);
+      result.node.insert(result.offset, data, style);
     }
   }
 

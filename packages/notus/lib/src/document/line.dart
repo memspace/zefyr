@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'dart:math' as math;
 
+import 'package:notus/src/document/embeds.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 import 'attributes.dart';
@@ -20,7 +21,7 @@ import 'node.dart';
 class LineNode extends ContainerNode<LeafNode>
     with StyledNodeMixin
     implements StyledNode {
-  /// Returns `true` if this line contains an embed.
+  /// Returns `true` if this line contains an embedded object.
   bool get hasEmbed {
     if (childCount == 1) {
       return children.single is EmbedNode;
@@ -48,6 +49,8 @@ class LineNode extends ContainerNode<LeafNode>
   }
 
   /// Creates new empty [LineNode] with the same style.
+  ///
+  /// Returned line node is detached.
   LineNode clone() {
     final node = LineNode();
     node.applyStyle(style);
@@ -163,7 +166,7 @@ class LineNode extends ContainerNode<LeafNode>
   @override
   Delta toDelta() {
     final delta = children
-        .map((text) => text.toDelta())
+        .map((child) => child.toDelta())
         .fold(Delta(), (a, b) => a.concat(b));
     var attributes = style;
     if (parent is BlockNode) {
@@ -190,7 +193,19 @@ class LineNode extends ContainerNode<LeafNode>
   }
 
   @override
-  void insert(int index, String text, NotusStyle style) {
+  void insert(int index, Object data, NotusStyle style) {
+    if (data is EmbeddableObject) {
+      // We do not check whether this line already has any children here as
+      // inserting an embed into a line with other text is acceptable from the
+      // Delta format perspective.
+      // We rely on heuristic rules to ensure that embeds occupy an entire line.
+      _insertSafe(index, data, style);
+      return;
+    }
+
+    assert(data is String);
+
+    final text = data as String;
     final lf = text.indexOf('\n');
     if (lf == -1) {
       _insertSafe(index, text, style);
@@ -223,7 +238,7 @@ class LineNode extends ContainerNode<LeafNode>
     final thisLength = this.length;
 
     final local = math.min(thisLength - index, length);
-    // If index is at line-break character this is line/block format update.
+    // If index is at newline character then this is a line/block style update.
     final isLineFormat = (index + local == thisLength) && local == 1;
 
     if (isLineFormat) {
@@ -232,7 +247,7 @@ class LineNode extends ContainerNode<LeafNode>
           'It is not allowed to apply inline attributes to line itself.');
       _formatAndOptimize(style);
     } else {
-      // otherwise forward to children as it's inline format update.
+      // Otherwise forward to children as it's an inline format update.
       assert(index + local != thisLength,
           'It is not allowed to apply inline attributes to line itself.');
       assert(style.values
@@ -252,10 +267,10 @@ class LineNode extends ContainerNode<LeafNode>
     final local = math.min(this.length - index, length);
     final isLFDeleted = (index + local == this.length);
     if (isLFDeleted) {
-      // Our line-break deleted with all style information.
+      // Our newline character deleted with all style information.
       clearStyle();
       if (local > 1) {
-        // Exclude line-break from delete range for children.
+        // Exclude newline character from delete range for children.
         super.delete(index, local - 1);
       }
     } else {
@@ -275,8 +290,8 @@ class LineNode extends ContainerNode<LeafNode>
       // check again we still have a line after us.
       assert(nextLine != null);
 
-      // Move remaining stuff in this line to next line so that all attributes
-      // of nextLine are preserved.
+      // Move remaining children in this line to the next line so that all
+      // attributes of nextLine are preserved.
       nextLine.moveChildren(this); // TODO: avoid double move
       moveChildren(nextLine);
     }
@@ -319,18 +334,21 @@ class LineNode extends ContainerNode<LeafNode>
     }
   }
 
-  void _insertSafe(int index, String text, NotusStyle style) {
+  void _insertSafe(int index, Object data, NotusStyle style) {
     assert(index == 0 || (index > 0 && index < length));
-    assert(text.contains('\n') == false);
-    if (text.isEmpty) return;
+
+    if (data is String) {
+      assert(data.contains('\n') == false);
+      if (data.isEmpty) return;
+    }
 
     if (isEmpty) {
-      final child = LeafNode(text);
+      final child = LeafNode(data);
       add(child);
       child.formatAndOptimize(style);
     } else {
       final result = lookup(index, inclusive: true);
-      result.node.insert(result.offset, text, style);
+      result.node.insert(result.offset, data, style);
     }
   }
 }

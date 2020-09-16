@@ -155,7 +155,7 @@ void main() {
       expect(root.toDelta(), expected);
     });
 
-    test('insert line-break at the begining of the document', () {
+    test('insert line-break at the beginning of the document', () {
       root.insert(
           0, 'London Grammar Songs\nHey now\nStrong\nIf You Wait', null);
       root.retain(20, 1, ulAttrs);

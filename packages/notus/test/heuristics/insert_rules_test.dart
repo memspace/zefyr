@@ -1,9 +1,9 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'package:test/test.dart';
-import 'package:quill_delta/quill_delta.dart';
 import 'package:notus/notus.dart';
+import 'package:quill_delta/quill_delta.dart';
+import 'package:test/test.dart';
 
 final ul = NotusAttribute.ul.toJson();
 final bold = NotusAttribute.bold.toJson();
@@ -225,6 +225,71 @@ void main() {
         ..retain(8)
         ..insert('also ')
         ..insert('\n', ul);
+      expect(actual, isNotNull);
+      expect(actual, expected);
+    });
+  });
+
+  group('$InsertEmbedsRule', () {
+    final rule = InsertEmbedsRule();
+
+    test('insert on an empty line', () {
+      final doc = Delta()
+        ..insert('One and two')
+        ..insert('\n')
+        ..insert('\n')
+        ..insert('Three')
+        ..insert('\n');
+      final actual = rule.apply(doc, 12, EmbeddableObject('hr'));
+      final expected = Delta()
+        ..retain(12)
+        ..insert(EmbeddableObject('hr'));
+      expect(actual, isNotNull);
+      expect(actual, expected);
+    });
+
+    test('insert in the beginning of a line', () {
+      final doc = Delta()
+        ..insert('One and two\n')
+        ..insert('embed here\n')
+        ..insert('Three')
+        ..insert('\n');
+      final actual = rule.apply(doc, 12, EmbeddableObject('hr'));
+      final expected = Delta()
+        ..retain(12)
+        ..insert(EmbeddableObject('hr'))
+        ..insert('\n');
+      expect(actual, isNotNull);
+      expect(actual, expected);
+    });
+
+    test('insert in the end of a line', () {
+      final doc = Delta()
+        ..insert('One and two\n')
+        ..insert('embed here\n')
+        ..insert('Three')
+        ..insert('\n');
+      final actual = rule.apply(doc, 11, EmbeddableObject('hr'));
+      final expected = Delta()
+        ..retain(11)
+        ..insert('\n')
+        ..insert(EmbeddableObject('hr'));
+      expect(actual, isNotNull);
+      expect(actual, expected);
+    });
+
+    test('insert in the middle of a line', () {
+      final doc = Delta()
+        ..insert('One and two\n')
+        ..insert('embed here\n')
+        ..insert('Three')
+        ..insert('\n');
+      final actual = rule.apply(doc, 17, EmbeddableObject('hr'));
+      final expected = Delta()
+        ..retain(17)
+        ..insert('\n')
+        ..insert(EmbeddableObject('hr'))
+        ..insert('\n');
       expect(actual, isNotNull);
       expect(actual, expected);
     });

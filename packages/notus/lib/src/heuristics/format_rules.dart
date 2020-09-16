@@ -16,7 +16,7 @@ abstract class FormatRule {
 }
 
 /// Produces Delta with line-level attributes applied strictly to
-/// line-break characters.
+/// newline characters.
 class ResolveLineFormatRule extends FormatRule {
   const ResolveLineFormatRule() : super();
 
@@ -28,12 +28,13 @@ class ResolveLineFormatRule extends FormatRule {
     final iter = DeltaIterator(document);
     iter.skip(index);
 
-    // Apply line styles to all line-break characters within range of this
+    // Apply line styles to all newline characters within range of this
     // retain operation.
     var current = 0;
     while (current < length && iter.hasNext) {
       final op = iter.next(length - current);
-      if (op.data.contains('\n')) {
+      final opText = op.data is String ? op.data as String : '';
+      if (opText.contains('\n')) {
         final delta = _applyAttribute(op.data, attribute);
         result = result.concat(delta);
       } else {
@@ -41,10 +42,11 @@ class ResolveLineFormatRule extends FormatRule {
       }
       current += op.length;
     }
-    // And include extra line-break after retain
+    // And include extra newline after retain
     while (iter.hasNext) {
       final op = iter.next();
-      final lf = op.data.indexOf('\n');
+      final opText = op.data is String ? op.data as String : '';
+      final lf = opText.indexOf('\n');
       if (lf == -1) {
         result..retain(op.length);
         continue;
@@ -71,7 +73,7 @@ class ResolveLineFormatRule extends FormatRule {
 }
 
 /// Produces Delta with inline-level attributes applied too all characters
-/// except line-breaks.
+/// except newlines.
 class ResolveInlineFormatRule extends FormatRule {
   const ResolveInlineFormatRule();
 
@@ -83,18 +85,19 @@ class ResolveInlineFormatRule extends FormatRule {
     final iter = DeltaIterator(document);
     iter.skip(index);
 
-    // Apply inline styles to all non-line-break characters within range of this
+    // Apply inline styles to all non-newline characters within range of this
     // retain operation.
     var current = 0;
     while (current < length && iter.hasNext) {
       final op = iter.next(length - current);
-      var lf = op.data.indexOf('\n');
+      final opText = op.data is String ? op.data as String : '';
+      var lf = opText.indexOf('\n');
       if (lf != -1) {
         var pos = 0;
         while (lf != -1) {
           result..retain(lf - pos, attribute.toJson())..retain(1);
           pos = lf + 1;
-          lf = op.data.indexOf('\n', pos);
+          lf = opText.indexOf('\n', pos);
         }
         if (pos < op.length) result.retain(op.length - pos, attribute.toJson());
       } else {
@@ -142,77 +145,5 @@ class FormatLinkAtCaretPositionRule extends FormatRule {
     result..retain(startIndex)..retain(retain, attribute.toJson());
 
     return result;
-  }
-}
-
-/// Handles all format operations which manipulate embeds.
-class FormatEmbedsRule extends FormatRule {
-  const FormatEmbedsRule();
-
-  @override
-  Delta apply(Delta document, int index, int length, NotusAttribute attribute) {
-    // We are only interested in embed attributes
-    if (attribute is! EmbedAttribute) return null;
-    EmbedAttribute embed = attribute;
-
-    if (length == 1 && embed.isUnset) {
-      // Remove the embed.
-      return Delta()
-        ..retain(index)
-        ..delete(length);
-    } else {
-      // If length is 0 we treat it as an insert at specified [index].
-      // If length is non-zero we treat it as a replace of selected range
-      // with the embed.
-      assert(!embed.isUnset);
-      return _insertEmbed(document, index, length, embed);
-    }
-  }
-
-  Delta _insertEmbed(
-      Delta document, int index, int length, EmbedAttribute embed) {
-    final result = Delta()..retain(index);
-    final iter = DeltaIterator(document);
-    final previous = iter.skip(index);
-    iter.skip(length); // ignore deleted part.
-    final target = iter.next();
-
-    // Check if [index] is on an empty line already.
-    final isNewlineBefore = previous == null || previous.data.endsWith('\n');
-    final isNewlineAfter = target.data.startsWith('\n');
-    final isOnEmptyLine = isNewlineBefore && isNewlineAfter;
-    if (isOnEmptyLine) {
-      return result..insert(EmbedNode.kPlainTextPlaceholder, embed.toJson());
-    }
-    // We are on a non-empty line, split it (preserving style if needed)
-    // and insert our embed.
-    final lineStyle = _getLineStyle(iter, target);
-    if (!isNewlineBefore) {
-      result..insert('\n', lineStyle);
-    }
-    result..insert(EmbedNode.kPlainTextPlaceholder, embed.toJson());
-    if (!isNewlineAfter) {
-      result..insert('\n');
-    }
-    result.delete(length);
-    return result;
-  }
-
-  Map<String, dynamic> _getLineStyle(
-      DeltaIterator iterator, Operation current) {
-    if (current.data.contains('\n')) {
-      return current.attributes;
-    }
-    // Continue looking for line-break.
-    Map<String, dynamic> attributes;
-    while (iterator.hasNext) {
-      final op = iterator.next();
-      final lf = op.data.indexOf('\n');
-      if (lf >= 0) {
-        attributes = op.attributes;
-        break;
-      }
-    }
-    return attributes;
   }
 }

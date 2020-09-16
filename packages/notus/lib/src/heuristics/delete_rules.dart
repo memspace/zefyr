@@ -2,7 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 /// A heuristic rule for delete operations.
@@ -28,11 +27,11 @@ class CatchAllDeleteRule extends DeleteRule {
   }
 }
 
-/// Preserves line format when user deletes the line's line-break character
+/// Preserves line format when user deletes the line's newline character
 /// effectively merging it with the next line.
 ///
-/// This rule makes sure to apply all style attributes of deleted line-break
-/// to the next available line-break, which may reset any style attributes
+/// This rule makes sure to apply all style attributes of deleted newline
+/// to the next available newline, which may reset any style attributes
 /// already present there.
 class PreserveLineStyleOnMergeRule extends DeleteRule {
   const PreserveLineStyleOnMergeRule();
@@ -43,15 +42,17 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
     iter.skip(index);
     final target = iter.next(1);
     if (target.data != '\n') return null;
+
     iter.skip(length - 1);
     final result = Delta()
       ..retain(index)
       ..delete(length);
 
-    // Look for next line-break to apply the attributes
+    // Look for next newline to apply the attributes
     while (iter.hasNext) {
       final op = iter.next();
-      final lf = op.data.indexOf('\n');
+      final opText = op.data is String ? op.data as String : '';
+      final lf = opText.indexOf('\n');
       if (lf == -1) {
         result..retain(op.length);
         continue;
@@ -74,7 +75,7 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
   }
 }
 
-/// Prevents user from merging line containing an embed with other lines.
+/// Prevents user from merging a line containing an embed with other lines.
 class EnsureEmbedLineRule extends DeleteRule {
   const EnsureEmbedLineRule();
 
@@ -82,14 +83,14 @@ class EnsureEmbedLineRule extends DeleteRule {
   Delta apply(Delta document, int index, int length) {
     final iter = DeltaIterator(document);
 
-    // First, check if line-break deleted after an embed.
+    // First, check if newline deleted after an embed.
     var op = iter.skip(index);
     var indexDelta = 0;
     var lengthDelta = 0;
     var remaining = length;
     var foundEmbed = false;
     var hasLineBreakBefore = false;
-    if (op != null && op.data.endsWith(kZeroWidthSpace)) {
+    if (op != null && op.data is! String) {
       foundEmbed = true;
       var candidate = iter.next(1);
       remaining--;
@@ -106,17 +107,20 @@ class EnsureEmbedLineRule extends DeleteRule {
         }
       }
     } else {
-      // If op is `null` it's a beginning of the doc, e.g. implicit line break.
-      hasLineBreakBefore = op == null || op.data.endsWith('\n');
+      // If op is `null` it's beginning of the doc, e.g. implicit line break.
+      final opText = op?.data as String;
+      hasLineBreakBefore = op == null || opText.endsWith('\n');
     }
 
-    // Second, check if line-break deleted before an embed.
+    // Second, check if newline deleted before an embed.
     op = iter.skip(remaining);
-    if (op != null && op.data.endsWith('\n')) {
+    final opText = op?.data is String ? op.data as String : '';
+    if (op != null && opText.endsWith('\n')) {
       final candidate = iter.next(1);
-      // If there is a line-break before deleted range we allow the operation
-      // since it results in a correctly formatted line with single embed in it.
-      if (candidate.data == kZeroWidthSpace && !hasLineBreakBefore) {
+      // If there is a newline before deleted range we allow the operation
+      // since it results in a correctly formatted line with a single embed in
+      // it.
+      if (candidate.data is! String && !hasLineBreakBefore) {
         foundEmbed = true;
         lengthDelta -= 1;
       }
@@ -128,6 +132,6 @@ class EnsureEmbedLineRule extends DeleteRule {
         ..delete(length + lengthDelta);
     }
 
-    return null; // fallback
+    return null;
   }
 }
