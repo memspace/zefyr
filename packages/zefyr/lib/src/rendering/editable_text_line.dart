@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
@@ -653,13 +654,17 @@ class RenderEditableTextLine extends RenderEditableBox
         _paintSelection(context, effectiveOffset);
       }
 
-      if (containsCursor && !_cursorController.style.paintAboveText) {
+      if (_cursorController.showCursor.value &&
+          containsCursor &&
+          !_cursorController.style.paintAboveText) {
         _paintCursor(context, effectiveOffset);
       }
 
       context.paintChild(body, effectiveOffset);
 
-      if (containsCursor && _cursorController.style.paintAboveText) {
+      if (_cursorController.showCursor.value &&
+          containsCursor &&
+          _cursorController.style.paintAboveText) {
         _paintCursor(context, effectiveOffset);
       }
     }

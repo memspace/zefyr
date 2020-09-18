@@ -317,6 +317,7 @@ mixin RawEditorStateKeyboardMixin on EditorState {
 
   // Handles shortcut functionality including cut, copy, paste and select all
   // using control/command + (X, C, V, A).
+  // TODO: Add support for formatting shortcuts: Cmd+B (bold), Cmd+I (italic)
   Future<void> handleShortcut(InputShortcut shortcut) async {
     final selection = widget.controller.selection;
     final plainText = textEditingValue.text;
@@ -328,7 +329,7 @@ mixin RawEditorStateKeyboardMixin on EditorState {
       }
       return;
     }
-    if (shortcut == InputShortcut.cut) {
+    if (shortcut == InputShortcut.cut && !widget.readOnly) {
       if (!selection.isCollapsed) {
         final data = selection.textInside(plainText);
         // ignore: unawaited_futures
@@ -349,7 +350,7 @@ mixin RawEditorStateKeyboardMixin on EditorState {
       }
       return;
     }
-    if (shortcut == InputShortcut.paste) {
+    if (shortcut == InputShortcut.paste && !widget.readOnly) {
       // Snapshot the input before using `await`.
       // See https://github.com/flutter/flutter/issues/11427
       final TextEditingValue value = textEditingValue;
@@ -366,7 +367,8 @@ mixin RawEditorStateKeyboardMixin on EditorState {
       }
       return;
     }
-    if (shortcut == InputShortcut.selectAll) {
+    if (shortcut == InputShortcut.selectAll &&
+        widget.enableInteractiveSelection) {
       final newSelection = selection.copyWith(
         baseOffset: 0,
         extentOffset: textEditingValue.text.length,

@@ -10,7 +10,7 @@ import 'package:notus/notus.dart';
 bool intersectsWithSelection(Node node, TextSelection selection,
     {bool fromParent = false}) {
   final base = fromParent ? node.offset : node.documentOffset;
-  final extent = base + node.length;
+  final extent = base + node.length - 1;
   return base <= selection.end && selection.start <= extent;
 }
 

@@ -53,8 +53,9 @@ class ZefyrImage extends StatefulWidget {
 
 class _ZefyrImageState extends State<ZefyrImage> {
   String get imageSource {
-    EmbedAttribute attribute = widget.node.style.get(NotusAttribute.embed);
-    return attribute.value['source'] as String;
+    throw UnimplementedError();
+    // EmbedAttribute attribute = widget.node.style.get(NotusAttribute.embed);
+    // return attribute.value['source'] as String;
   }
 
   @override

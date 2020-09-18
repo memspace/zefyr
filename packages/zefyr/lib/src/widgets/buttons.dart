@@ -281,7 +281,7 @@ class _ImageButtonState extends State<ImageButton> {
     final image =
         await editor.imageDelegate.pickImage(editor.imageDelegate.cameraSource);
     if (image != null) {
-      editor.formatSelection(NotusAttribute.embed.image(image));
+      // editor.formatSelection(NotusAttribute.embed.image(image));
     }
   }
 
@@ -290,7 +290,7 @@ class _ImageButtonState extends State<ImageButton> {
     final image = await editor.imageDelegate
         .pickImage(editor.imageDelegate.gallerySource);
     if (image != null) {
-      editor.formatSelection(NotusAttribute.embed.image(image));
+      // editor.formatSelection(NotusAttribute.embed.image(image));
     }
   }
 }

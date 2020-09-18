@@ -5,6 +5,146 @@ import '_controller.dart';
 
 const double kToolbarHeight = 56.0;
 
+class InsertEmbedButton extends StatelessWidget {
+  final ZefyrController controller;
+  final IconData icon;
+
+  const InsertEmbedButton({
+    Key key,
+    @required this.controller,
+    @required this.icon,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return ZIconButton(
+      highlightElevation: 0,
+      hoverElevation: 0,
+      size: 32,
+      icon: Icon(
+        icon,
+        size: 18,
+        color: Theme.of(context).iconTheme.color,
+      ),
+      fillColor: Theme.of(context).canvasColor,
+      onPressed: () {
+        final index = controller.selection.baseOffset;
+        final length = controller.selection.extentOffset - index;
+        controller.replaceText(index, length, EmbeddableObject('hr'));
+      },
+    );
+  }
+}
+
+class LinkButton extends StatefulWidget {
+  final ZefyrController controller;
+  final IconData icon;
+
+  const LinkButton({
+    Key key,
+    @required this.controller,
+    this.icon,
+  }) : super(key: key);
+
+  @override
+  _LinkButtonState createState() => _LinkButtonState();
+}
+
+class _LinkButtonState extends State<LinkButton> {
+  void _didChangeSelection() {
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_didChangeSelection);
+  }
+
+  @override
+  void didUpdateWidget(covariant LinkButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_didChangeSelection);
+      widget.controller.addListener(_didChangeSelection);
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.controller.removeListener(_didChangeSelection);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isEnabled = !widget.controller.selection.isCollapsed;
+    final pressedHandler = isEnabled ? () => _openLinkDialog(context) : null;
+    return ZIconButton(
+      highlightElevation: 0,
+      hoverElevation: 0,
+      size: 32,
+      icon: Icon(
+        widget.icon ?? Icons.link,
+        size: 18,
+        color: isEnabled ? theme.iconTheme.color : theme.disabledColor,
+      ),
+      fillColor: Theme.of(context).canvasColor,
+      onPressed: pressedHandler,
+    );
+  }
+
+  void _openLinkDialog(BuildContext context) {
+    showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return LinkDialog();
+      },
+    ).then(_linkSubmitted);
+  }
+
+  void _linkSubmitted(String value) {
+    if (value == null || value.isEmpty) return;
+    widget.controller.formatSelection(NotusAttribute.link.fromString(value));
+  }
+}
+
+class LinkDialog extends StatefulWidget {
+  const LinkDialog({Key key}) : super(key: key);
+  @override
+  _LinkDialogState createState() => _LinkDialogState();
+}
+
+class _LinkDialogState extends State<LinkDialog> {
+  String _link = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: TextField(
+        decoration: InputDecoration(labelText: 'Paste a link'),
+        onChanged: _linkChanged,
+      ),
+      actions: [
+        FlatButton(
+          onPressed: _link.isNotEmpty ? _applyLink : null,
+          child: Text('Apply'),
+        ),
+      ],
+    );
+  }
+
+  void _linkChanged(String value) {
+    setState(() {
+      _link = value;
+    });
+  }
+
+  void _applyLink() {
+    Navigator.pop(context, _link);
+  }
+}
+
 enum ToggleAttribute { bold, italic, bulletList, numberList, code, quote }
 
 typedef ToggleButtonBuilder = Widget Function(BuildContext context,
@@ -268,16 +408,26 @@ class EditorToolbar extends StatefulWidget implements PreferredSizeWidget {
         childBuilder: _defaultToggleButtonBuilder,
       ),
       ToggleStyleButton(
-        attribute: ToggleAttribute.quote,
-        controller: controller,
-        childBuilder: _defaultToggleButtonBuilder,
-      ),
-      ToggleStyleButton(
         attribute: ToggleAttribute.code,
         controller: controller,
         childBuilder: _defaultToggleButtonBuilder,
       ),
-      // VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
+      VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
+      ToggleStyleButton(
+        attribute: ToggleAttribute.quote,
+        controller: controller,
+        childBuilder: _defaultToggleButtonBuilder,
+      ),
+      VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
+      LinkButton(controller: controller),
+      InsertEmbedButton(
+        controller: controller,
+        icon: Icons.image_outlined,
+      ),
+      InsertEmbedButton(
+        controller: controller,
+        icon: Icons.horizontal_rule,
+      ),
     ]);
   }
 

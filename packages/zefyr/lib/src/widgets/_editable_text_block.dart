@@ -251,7 +251,6 @@ class _BulletPoint extends StatelessWidget {
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final theme = ZefyrTheme.of(context);
     return Container(
       alignment: AlignmentDirectional.topEnd,
       child: Text('•', style: style),

@@ -20,6 +20,13 @@ import '_text_line.dart';
 import '_text_selection.dart';
 import '_theme.dart';
 
+typedef ZefyrEmbedBuilder = Widget Function(
+    BuildContext context, EmbeddableObject object);
+
+abstract class ZefyrEmbedDelegate {
+  Widget buildEmbed(BuildContext context, EmbeddableObject object);
+}
+
 class RawEditor extends StatefulWidget {
   RawEditor({
     Key key,
@@ -29,6 +36,7 @@ class RawEditor extends StatefulWidget {
     @required this.selectionColor,
     this.enableInteractiveSelection = true,
     this.readOnly = false,
+    this.onLaunchUrl,
     this.autocorrect = true,
     this.enableSuggestions = true,
     StrutStyle strutStyle,
@@ -64,7 +72,6 @@ class RawEditor extends StatefulWidget {
         assert(enableSuggestions != null),
         assert(showSelectionHandles != null),
         assert(readOnly != null),
-        assert(!showCursor || cursorStyle != null),
         assert(maxHeight == null || maxHeight > 0),
         assert(minHeight == null || minHeight >= 0),
         assert(
@@ -98,6 +105,8 @@ class RawEditor extends StatefulWidget {
   ///
   /// Defaults to false. Must not be null.
   final bool readOnly;
+
+  final ValueChanged<String> onLaunchUrl;
 
   /// Configuration of toolbar options.
   ///
@@ -348,7 +357,9 @@ abstract class EditorState extends State<RawEditor> {
   TextEditingValue get textEditingValue;
   set textEditingValue(TextEditingValue value);
   RenderEditor get renderEditor;
+  EditorTextSelectionOverlay get selectionOverlay;
   bool showToolbar();
+  void hideToolbar();
 }
 
 class RawEditorState extends EditorState
@@ -365,14 +376,16 @@ class RawEditorState extends EditorState
   // Theme
   ZefyrThemeData _themeData;
 
-  // Cursor
+  // Cursors
   CursorController _cursorController;
   FloatingCursorController _floatingCursorController;
 
   // Keyboard
   KeyboardListener _keyboardListener;
 
-  TextInputConnection _textInputConnection;
+  // Selection overlay
+  @override
+  EditorTextSelectionOverlay get selectionOverlay => _selectionOverlay;
   EditorTextSelectionOverlay _selectionOverlay;
 
   ScrollController _scrollController;
@@ -528,10 +541,12 @@ class RawEditorState extends EditorState
     }
     _selectionOverlay?.handlesVisible = widget.showSelectionHandles;
 
-    if (widget.readOnly) {
+    if (!shouldCreateInputConnection) {
       closeConnectionIfNeeded();
-    } else if (oldWidget.readOnly && _hasFocus) {
-      openConnectionIfNeeded();
+    } else {
+      if (oldWidget.readOnly && _hasFocus) {
+        openConnectionIfNeeded();
+      }
     }
 
 //    if (widget.style != oldWidget.style) {
@@ -564,6 +579,7 @@ class RawEditorState extends EditorState
   void _didChangeTextEditingValue() {
     requestKeyboard();
 
+    _showCaretOnScreen();
     updateRemoteValueIfNeeded();
     _cursorController.startOrStopCursorTimerIfNeeded(
         _hasFocus, widget.controller.selection);
@@ -663,6 +679,35 @@ class RawEditorState extends EditorState
         //   widget.onSelectionChanged(selection, cause);
       }
     }
+  }
+
+  // Animation configuration for scrolling the caret back on screen.
+  static const Duration _caretAnimationDuration = Duration(milliseconds: 100);
+  static const Curve _caretAnimationCurve = Curves.fastOutSlowIn;
+
+  bool _showCaretOnScreenScheduled = false;
+
+  void _showCaretOnScreen() {
+    if (!widget.showCursor || _showCaretOnScreenScheduled) {
+      return;
+    }
+
+    _showCaretOnScreenScheduled = true;
+    SchedulerBinding.instance.addPostFrameCallback((Duration _) {
+      _showCaretOnScreenScheduled = false;
+
+      final offset = renderEditor.getOffsetToRevealCursor(
+          _scrollController.position.viewportDimension,
+          _scrollController.offset);
+
+      if (offset != null) {
+        _scrollController.animateTo(
+          offset,
+          duration: _caretAnimationDuration,
+          curve: _caretAnimationCurve,
+        );
+      }
+    });
   }
 
   void _onChangedClipboardStatus() {
@@ -804,11 +849,11 @@ class _Editor extends MultiChildRenderObjectWidget {
     @required this.onSelectionChanged,
     this.padding = EdgeInsets.zero,
     // Not implemented fields:
+    @required this.readOnly,
     @required this.maxHeight,
     @required this.minHeight,
     @required this.strutStyle,
     @required this.textScaleFactor,
-    @required this.readOnly,
     @required this.locale,
     @required this.devicePixelRatio,
   }) : super(key: key, children: children);

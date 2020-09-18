@@ -8,8 +8,6 @@ import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 
 import 'editable_box.dart';
-import 'horizontal_rule.dart';
-import 'image.dart';
 import 'rich_text.dart';
 import 'scope.dart';
 import 'theme.dart';
@@ -152,15 +150,15 @@ class _ZefyrLineState extends State<ZefyrLine> {
   }
 
   Widget buildEmbed(BuildContext context, ZefyrScope scope) {
-    EmbedNode node = widget.node.children.single;
-    EmbedAttribute embed = node.style.get(NotusAttribute.embed);
-
-    if (embed.type == EmbedType.horizontalRule) {
-      return ZefyrHorizontalRule(node: node);
-    } else if (embed.type == EmbedType.image) {
-      return ZefyrImage(node: node, delegate: scope.imageDelegate);
-    } else {
-      throw UnimplementedError('Unimplemented embed type ${embed.type}');
-    }
+    // EmbedNode node = widget.node.children.single;
+    // EmbedAttribute embed = node.style.get(NotusAttribute.embed);
+    //
+    // if (embed.type == EmbedType.horizontalRule) {
+    //   return ZefyrHorizontalRule(node: node);
+    // } else if (embed.type == EmbedType.image) {
+    //   return ZefyrImage(node: node, delegate: scope.imageDelegate);
+    // } else {
+    throw UnimplementedError('Unimplemented embed type');
+    // }
   }
 }

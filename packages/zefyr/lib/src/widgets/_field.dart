@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:notus/notus.dart';
 
 import '_controller.dart';
 import '_cursor.dart';
@@ -55,9 +56,31 @@ class _TextFieldSelectionGestureDetectorBuilder
     }
   }
 
+  void _launchUrlIfNeeded(TapUpDetails details) {
+    final pos = renderEditor.getPositionForOffset(details.globalPosition);
+    final result = editor.widget.controller.document.lookupLine(pos.offset);
+    if (result.node == null) return;
+    final line = result.node as LineNode;
+    final segmentResult = line.lookup(result.offset);
+    if (segmentResult.node == null) return;
+    final segment = segmentResult.node as LeafNode;
+    if (segment.style.contains(NotusAttribute.link) &&
+        editor.widget.onLaunchUrl != null) {
+      if (editor.widget.readOnly) {
+        editor.widget.onLaunchUrl(segment.style.get(NotusAttribute.link).value);
+      } else {
+        // TODO: Implement a toolbar to display the URL and allow to launch it.
+        // editor.showToolbar();
+      }
+    }
+  }
+
   @override
   void onSingleTapUp(TapUpDetails details) {
-    // editor.hideToolbar();
+    editor.hideToolbar();
+
+    _launchUrlIfNeeded(details);
+
     if (delegate.selectionEnabled) {
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
@@ -117,12 +140,18 @@ class ZefyrField extends StatefulWidget {
   final ZefyrController controller;
   final FocusNode focusNode;
   final EdgeInsetsGeometry padding;
+  final bool readOnly;
+  final bool showCursor;
+  final ValueChanged<String> onLaunchUrl;
 
   const ZefyrField({
     Key key,
     @required this.controller,
     @required this.focusNode,
     this.padding = EdgeInsets.zero,
+    this.readOnly = false,
+    this.showCursor,
+    this.onLaunchUrl,
   }) : super(key: key);
 
   @override
@@ -204,11 +233,8 @@ class _ZefyrFieldState extends State<ZefyrField>
       controller: widget.controller,
       focusNode: widget.focusNode,
       padding: widget.padding,
-      autofocus: true,
-      showCursor: true,
-      selectionColor: selectionColor,
-      showSelectionHandles: false,
-      selectionControls: cupertinoTextSelectionControls,
+      readOnly: widget.readOnly,
+      showCursor: widget.showCursor,
       cursorStyle: CursorStyle(
         color: cursorColor,
         backgroundColor: Colors.grey,
@@ -216,6 +242,11 @@ class _ZefyrFieldState extends State<ZefyrField>
         radius: Radius.circular(1),
         opacityAnimates: true,
       ),
+      onLaunchUrl: widget.onLaunchUrl,
+      autofocus: true,
+      selectionColor: selectionColor,
+      showSelectionHandles: false,
+      selectionControls: cupertinoTextSelectionControls,
     );
 
     return _selectionGestureDetectorBuilder.buildGestureDetector(

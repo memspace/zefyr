@@ -23,7 +23,7 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
 
   @override
   void hideToolbar() {
-    // TODO: implement hideToolbar
+    selectionOverlay?.hide();
   }
 
   @override

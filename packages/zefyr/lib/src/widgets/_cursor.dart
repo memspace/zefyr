@@ -208,7 +208,10 @@ class CursorController extends ChangeNotifier {
   }
 
   void startOrStopCursorTimerIfNeeded(bool hasFocus, TextSelection selection) {
-    if (_cursorTimer == null && hasFocus && selection.isCollapsed) {
+    if (showCursor.value &&
+        _cursorTimer == null &&
+        hasFocus &&
+        selection.isCollapsed) {
       startCursorTimer();
     } else if (_cursorTimer != null && (!hasFocus || !selection.isCollapsed)) {
       stopCursorTimer();

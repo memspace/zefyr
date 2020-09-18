@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
+import '_embed_proxy.dart';
 import '_rich_text_proxy.dart';
 import '_theme.dart';
 
@@ -9,7 +10,7 @@ import '_theme.dart';
 /// This widget allows to render non-editable line of rich text, but can be
 /// wrapped with [EditableTextLine] which adds editing features.
 class TextLine extends StatelessWidget {
-  /// Line of text represented by this paragraph.
+  /// Line of text represented by this widget.
   final LineNode node;
   final TextDirection textDirection;
 
@@ -21,6 +22,16 @@ class TextLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (node.hasEmbed) {
+      // TODO: actually embed correct object type, hardcoded HR now for testing
+      return EmbedProxy(
+        child: Divider(
+          height: 16 * 1.3,
+          thickness: 2,
+          color: Colors.grey.shade200,
+        ),
+      );
+    }
     final text = buildText(context, node);
     final strutStyle = StrutStyle.fromTextStyle(text.style);
     return RichTextProxy(
@@ -50,13 +61,6 @@ class TextLine extends StatelessWidget {
   TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme) {
     final TextNode segment = node;
     final attrs = segment.style;
-    var style = TextStyle();
-    if (attrs.contains(NotusAttribute.bold)) {
-      style = style.copyWith(fontWeight: FontWeight.bold);
-    }
-    if (attrs.contains(NotusAttribute.italic)) {
-      style = style.copyWith(fontStyle: FontStyle.italic);
-    }
 
     return TextSpan(
       text: segment.value,

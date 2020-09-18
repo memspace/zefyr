@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -10,6 +11,21 @@ mixin RawEditorStateTextInputClientMixin on EditorState
   final List<TextEditingValue> _sentRemoteValues = [];
   TextInputConnection _textInputConnection;
   TextEditingValue _lastKnownRemoteTextEditingValue;
+
+  /// Whether to create an input connection with the platform for text editing
+  /// or not.
+  ///
+  /// Read-only input fields do not need a connection with the platform since
+  /// there's no need for text editing capabilities (e.g. virtual keyboard).
+  ///
+  /// On the web, we always need a connection because we want some browser
+  /// functionalities to continue to work on read-only input fields like:
+  ///
+  /// - Relevant context menu.
+  /// - cmd/ctrl+c shortcut to copy.
+  /// - cmd/ctrl+a to select all.
+  /// - Changing the selection using a physical keyboard.
+  bool get shouldCreateInputConnection => kIsWeb || !widget.readOnly;
 
   void _remoteValueChanged(
       int start, String deleted, String inserted, TextSelection selection) {
@@ -32,12 +48,17 @@ mixin RawEditorStateTextInputClientMixin on EditorState
   }
 
   void openConnectionIfNeeded() {
+    if (!shouldCreateInputConnection) {
+      return;
+    }
+
     if (!hasConnection) {
       _lastKnownRemoteTextEditingValue = textEditingValue;
       _textInputConnection = TextInput.attach(
         this,
         TextInputConfiguration(
           inputType: TextInputType.multiline,
+          readOnly: widget.readOnly,
           obscureText: false,
           autocorrect: widget.autocorrect,
           inputAction: TextInputAction.newline,
@@ -105,11 +126,15 @@ mixin RawEditorStateTextInputClientMixin on EditorState
 
   @override
   void updateEditingValue(TextEditingValue value) {
+    if (!shouldCreateInputConnection) {
+      return;
+    }
+
     if (_sentRemoteValues.contains(value)) {
       /// There is a race condition in Flutter text input plugin where sending
       /// updates to native side too often results in broken behavior.
       /// TextInputConnection.setEditingValue is an async call to native side.
-      /// For each such call native side _always_ an sends update which triggers
+      /// For each such call native side _always_ sends an update which triggers
       /// this method (updateEditingValue) with the same value we've sent it.
       /// If multiple calls to setEditingValue happen too fast and we only
       /// track the last sent value then there is no way for us to filter out

@@ -47,12 +47,14 @@ class ZefyrController extends ChangeNotifier {
   /// in any cases as we don't want to keep it except on inserts.
   ///
   /// Optionally updates selection if provided.
-  void replaceText(int index, int length, String text,
+  void replaceText(int index, int length, Object data,
       {TextSelection selection}) {
+    assert(data is String || data is EmbeddableObject);
     Delta delta;
 
-    if (length > 0 || text.isNotEmpty) {
-      delta = document.replace(index, length, text);
+    final isDataNotEmpty = data is String ? data.isNotEmpty : true;
+    if (length > 0 || isDataNotEmpty) {
+      delta = document.replace(index, length, data);
       // If the delta is an insert operation and we have toggled
       // some styles, then apply those styles to the inserted text.
       if (delta != null &&
@@ -60,9 +62,10 @@ class ZefyrController extends ChangeNotifier {
           delta.isNotEmpty &&
           delta.length <= 2 && // covers single insert and a retain+insert
           delta.last.isInsert) {
+        final dataLength = data is String ? data.length : 1;
         final retainDelta = Delta()
           ..retain(index)
-          ..retain(text.length, toggledStyles.toJson());
+          ..retain(dataLength, toggledStyles.toJson());
         document.compose(retainDelta, ChangeSource.local);
       }
     }
@@ -78,7 +81,7 @@ class ZefyrController extends ChangeNotifier {
         // is different from user's version (in deletes and inserts).
         final user = Delta()
           ..retain(index)
-          ..insert(text)
+          ..insert(data)
           ..delete(length);
         var positionDelta = getPositionDelta(user, delta);
         _updateSelectionSilent(

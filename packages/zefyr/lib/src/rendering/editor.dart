@@ -204,6 +204,38 @@ class RenderEditor extends RenderEditableContainerBox
   ValueListenable<bool> get selectionEndInViewport => _selectionEndInViewport;
   final ValueNotifier<bool> _selectionEndInViewport = ValueNotifier<bool>(true);
 
+  /// Finds the closest scroll offset that fully reveals the editing cursor.
+  ///
+  /// Returns `null` if the cursor is currently visible.
+  double /*?*/ getOffsetToRevealCursor(
+      double viewportHeight, double scrollOffset) {
+    const kMargin = 8.0;
+    // Endpoints coordinates represents lower left or lower right corner of
+    // the selection. If we want to scroll up to reveal the caret we need to
+    // adjust the dy value by the height of the line. We also add a small margin
+    // so that the caret is not too close to the edge of the viewport.
+    final endpoints = getEndpointsForSelection(selection);
+    if (endpoints.length == 1) {
+      // Collapsed selection => caret
+      final child = childAtPosition(selection.extent);
+      final childPosition =
+          TextPosition(offset: selection.extentOffset - child.node.offset);
+      final caretTop = endpoints.single.point.dy -
+          child.preferredLineHeight(childPosition) -
+          kMargin;
+      final caretBottom = endpoints.single.point.dy + kMargin;
+      double dy;
+      if (caretTop < scrollOffset) {
+        dy = caretTop;
+      } else if (caretBottom > scrollOffset + viewportHeight) {
+        dy = caretBottom - viewportHeight;
+      }
+      return dy;
+    }
+    // TODO: Implement for non-collapsed selection.
+    return null;
+  }
+
   @override
   List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
     assert(constraints != null);
