@@ -18,7 +18,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import '../rendering/editor.dart';
-import '_editor.dart';
+import 'editor.dart';
 
 /// A duration that controls how often the drag selection update callback is
 /// called.

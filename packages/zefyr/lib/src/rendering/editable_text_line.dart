@@ -7,7 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
 
-import '../widgets/_cursor.dart';
+import '../widgets/cursor.dart';
 import '../widgets/selection_utils.dart';
 import 'cursor_painter.dart';
 import 'editable_box.dart';
@@ -17,9 +17,7 @@ const double _kCursorHeightOffset = 2.0; // pixels
 
 enum TextLineSlot { leading, body }
 
-class RenderEditableTextLine extends RenderEditableBox
-// with RenderObjectWithChildMixin<RenderEditableMetricsProvider>
-{
+class RenderEditableTextLine extends RenderEditableBox {
   /// Creates new editable paragraph render box.
   RenderEditableTextLine({
     // RenderEditableMetricsProvider child,
@@ -32,23 +30,10 @@ class RenderEditableTextLine extends RenderEditableBox
     @required bool enableInteractiveSelection,
     double devicePixelRatio = 1.0,
     // Not implemented fields are below:
-    TextAlign textAlign = TextAlign.start,
-    bool hasFocus,
-    StrutStyle strutStyle,
-    double textScaleFactor = 1.0,
-//    this.onSelectionChanged,
-//    this.onCaretChanged,
-//    this.ignorePointer = false,
-    bool readOnly = false,
-    bool forceLine = true,
-    TextHeightBehavior textHeightBehavior,
-    TextWidthBasis textWidthBasis = TextWidthBasis.parent,
-    Locale locale,
     ui.BoxHeightStyle selectionHeightStyle = ui.BoxHeightStyle.tight,
     ui.BoxWidthStyle selectionWidthStyle = ui.BoxWidthStyle.tight,
     EdgeInsets floatingCursorAddedMargin =
         const EdgeInsets.fromLTRB(4, 4, 4, 5),
-    Clip clipBehavior = Clip.hardEdge,
 //    TextRange promptRectRange,
 //    Color promptRectColor,
   })  : assert(node != null),
@@ -63,9 +48,7 @@ class RenderEditableTextLine extends RenderEditableBox
         _selection = selection,
         _selectionColor = selectionColor,
         _enableInteractiveSelection = enableInteractiveSelection,
-        _devicePixelRatio = devicePixelRatio {
-    // this.child = child;
-  }
+        _devicePixelRatio = devicePixelRatio;
 
   //
 
@@ -175,9 +158,9 @@ class RenderEditableTextLine extends RenderEditableBox
     _leading = _updateChild(_leading, value, TextLineSlot.leading);
   }
 
-  RenderEditableMetricsProvider get body => _body;
-  RenderEditableMetricsProvider _body;
-  set body(RenderEditableMetricsProvider value) {
+  RenderContentProxyBox get body => _body;
+  RenderContentProxyBox _body;
+  set body(RenderContentProxyBox value) {
     _body = _updateChild(_body, value, TextLineSlot.body);
   }
 

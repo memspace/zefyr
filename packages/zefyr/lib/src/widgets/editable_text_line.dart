@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
-import 'package:zefyr/src/widgets/_theme.dart';
 
 import '../rendering/editable_text_line.dart';
-import '_cursor.dart';
-import '_text_line.dart';
+import 'cursor.dart';
+import 'text_line.dart';
+import 'theme.dart';
 
 /// Line of editable text in Zefyr editor.
 ///
@@ -30,6 +30,7 @@ class EditableTextLine extends RenderObjectWidget {
   final TextSelection selection;
   final Color selectionColor;
   final bool enableInteractiveSelection;
+  final double devicePixelRatio;
 
   /// Creates an editable line of text.
   EditableTextLine({
@@ -44,6 +45,7 @@ class EditableTextLine extends RenderObjectWidget {
     @required this.selection,
     @required this.selectionColor,
     @required this.enableInteractiveSelection,
+    @required this.devicePixelRatio,
   })  : assert(node != null),
         assert(indentWidth != null),
         assert(cursorController != null),
@@ -71,6 +73,7 @@ class EditableTextLine extends RenderObjectWidget {
       selection: selection,
       selectionColor: selectionColor,
       enableInteractiveSelection: enableInteractiveSelection,
+      devicePixelRatio: devicePixelRatio,
     );
   }
 
@@ -84,6 +87,7 @@ class EditableTextLine extends RenderObjectWidget {
     renderObject.selection = selection;
     renderObject.selectionColor = selectionColor;
     renderObject.enableInteractiveSelection = enableInteractiveSelection;
+    renderObject.devicePixelRatio = devicePixelRatio;
   }
 }
 

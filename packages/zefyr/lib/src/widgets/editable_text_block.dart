@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
 import '../rendering/editable_text_block.dart';
-import '_cursor.dart';
-import '_editable_text_line.dart';
-import '_text_line.dart';
-import '_theme.dart';
+import 'cursor.dart';
+import 'editable_text_line.dart';
+import 'text_line.dart';
+import 'theme.dart';
 
 class EditableTextBlock extends StatelessWidget {
   final BlockNode node;
@@ -31,6 +31,8 @@ class EditableTextBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    assert(debugCheckHasMediaQuery(context));
+
     final theme = ZefyrTheme.of(context);
     return _EditableBlock(
       node: node,
@@ -55,6 +57,7 @@ class EditableTextBlock extends StatelessWidget {
         spacing: _getSpacingForLine(line, index, count, theme),
         leading: _buildLeading(context, line, index, count),
         indentWidth: _getIndentWidth(),
+        devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         body: TextLine(
           node: line,
           textDirection: textDirection,

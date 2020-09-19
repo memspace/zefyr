@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
-import '_controller.dart';
+import 'controller.dart';
 
 const double kToolbarHeight = 56.0;
 

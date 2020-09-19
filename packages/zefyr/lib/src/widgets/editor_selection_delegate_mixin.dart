@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:notus/notus.dart';
 
-import '_editor.dart';
+import 'editor.dart';
 
 mixin RawEditorStateSelectionDelegateMixin on EditorState
     implements TextSelectionDelegate {

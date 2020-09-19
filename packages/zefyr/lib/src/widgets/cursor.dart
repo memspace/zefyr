@@ -14,6 +14,7 @@ const Duration _kCursorBlinkHalfPeriod = Duration(milliseconds: 500);
 // transparent.
 const Duration _kCursorBlinkWaitForStart = Duration(milliseconds: 150);
 
+/// Style properties of editing cursor.
 class CursorStyle {
   /// The color to use when painting the cursor.
   ///

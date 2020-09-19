@@ -5,7 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
 
-abstract class RenderEditableMetricsProvider implements RenderBox {
+/// A common interface to render boxes which represent a piece of rich text
+/// content.
+///
+/// See also:
+///   * [RenderParagraphProxy] implementation of this interface which wraps
+///     built-in [RenderParagraph]
+///   * [RenderEmbedProxy] implementation of this interface which wraps
+///     an arbitrary render box representing an embeddable object.
+abstract class RenderContentProxyBox implements RenderBox {
   double get preferredLineHeight;
 
   Offset getOffsetForCaret(TextPosition position, Rect caretPrototype);
@@ -28,10 +36,12 @@ abstract class RenderEditableMetricsProvider implements RenderBox {
 ///
 /// Implementations of this class usually work as a wrapper around
 /// regular (non-editable) render boxes which implement
-/// [RenderEditableMetricsProvider].
+/// [RenderContentProxyBox].
 abstract class RenderEditableBox extends RenderBox {
+  /// The document node represented by this render box.
   ContainerNode get node;
 
+  /// Horizontal margin taken by the cursor.
   double get cursorMargin;
 
   /// Returns preferred line height at specified `position` in text.
@@ -205,6 +215,10 @@ class RenderEditableContainerBox extends RenderBox
   }
   // End padding implementation
 
+  /// Returns child of this container at specified `position` in text.
+  ///
+  /// The `position` parameter is expected to be relative to the [node] of
+  /// this container.
   RenderEditableBox childAtPosition(TextPosition position) {
     assert(firstChild != null);
 

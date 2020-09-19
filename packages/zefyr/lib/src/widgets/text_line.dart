@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
-import '_embed_proxy.dart';
-import '_rich_text_proxy.dart';
-import '_theme.dart';
+import 'editable_text_line.dart';
+import 'embed_proxy.dart';
+import 'rich_text_proxy.dart';
+import 'theme.dart';
 
 /// Line of text in Zefyr editor.
 ///
@@ -22,6 +23,8 @@ class TextLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    assert(debugCheckHasMediaQuery(context));
+
     if (node.hasEmbed) {
       // TODO: actually embed correct object type, hardcoded HR now for testing
       return EmbedProxy(
@@ -33,7 +36,8 @@ class TextLine extends StatelessWidget {
       );
     }
     final text = buildText(context, node);
-    final strutStyle = StrutStyle.fromTextStyle(text.style);
+    final strutStyle =
+        StrutStyle.fromTextStyle(text.style, forceStrutHeight: true);
     return RichTextProxy(
       textStyle: text.style,
       textDirection: textDirection,
@@ -43,6 +47,7 @@ class TextLine extends StatelessWidget {
         text: buildText(context, node),
         textDirection: textDirection,
         strutStyle: strutStyle,
+        textScaleFactor: MediaQuery.textScaleFactorOf(context),
       ),
     );
   }

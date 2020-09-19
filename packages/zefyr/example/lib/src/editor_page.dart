@@ -32,12 +32,10 @@ class EditorPageState extends State<EditorPage> {
   Widget build(BuildContext context) {
     final body = (_controller == null)
         ? Center(child: CircularProgressIndicator())
-        : ZefyrScaffold(
-            child: ZefyrEditor(
-              padding: EdgeInsets.all(16),
-              controller: _controller,
-              focusNode: _focusNode,
-            ),
+        : ZefyrField(
+            padding: EdgeInsets.all(16),
+            controller: _controller,
+            focusNode: _focusNode,
           );
 
     return Scaffold(

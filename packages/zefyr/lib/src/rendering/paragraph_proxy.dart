@@ -6,7 +6,7 @@ import 'editable_box.dart';
 /// Proxy to built-in [RenderParagraph] so that it can be used inside Zefyr
 /// editor.
 class RenderParagraphProxy extends RenderProxyBox
-    implements RenderEditableMetricsProvider {
+    implements RenderContentProxyBox {
   RenderParagraphProxy({
     RenderParagraph child,
     @required TextStyle textStyle,

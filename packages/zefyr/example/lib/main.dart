@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'src/form.dart';
 import 'src/full_page.dart';
 import 'src/text_field_page.dart';
-import 'src/view.dart';
 
 void main() {
   runApp(ZefyrApp());
@@ -37,7 +36,6 @@ class ZefyrApp extends StatelessWidget {
       routes: {
         '/fullPage': buildFullPage,
         '/form': buildFormPage,
-        '/view': buildViewPage,
         '/textinput': buildTextFieldPage,
       },
     );
@@ -49,10 +47,6 @@ class ZefyrApp extends StatelessWidget {
 
   Widget buildFormPage(BuildContext context) {
     return FormEmbeddedScreen();
-  }
-
-  Widget buildViewPage(BuildContext context) {
-    return ViewScreen();
   }
 
   Widget buildTextFieldPage(BuildContext context) {
@@ -76,10 +70,6 @@ class HomePage extends StatelessWidget {
           RaisedButton(
             onPressed: () => nav.pushNamed('/form'),
             child: Text('Embedded in a form'),
-          ),
-          RaisedButton(
-            onPressed: () => nav.pushNamed('/view'),
-            child: Text('Read-only embeddable view'),
           ),
           RaisedButton(
             onPressed: () => nav.pushNamed('/textinput'),

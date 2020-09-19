@@ -8,6 +8,7 @@ import 'package:notus/notus.dart';
 import '../widgets/selection_utils.dart';
 import 'editable_box.dart';
 
+// TODO: Move contentPadding to RenderEditableContainerBox as having it here is a bit  messy.
 class RenderEditableTextBlock extends RenderEditableContainerBox
     implements RenderEditableBox {
   ///
@@ -165,7 +166,7 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
   }
 
   @override
-  TextPosition getPositionBelow(TextPosition position) {
+  TextPosition /*?*/ getPositionBelow(TextPosition position) {
     assert(position.offset < node.length);
 
     final child = childAtPosition(position);

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:zefyr/src/zefyr_dev.dart';
+import 'package:zefyr/zefyr.dart';
 
 class TextFieldScreen extends StatefulWidget {
   TextFieldScreen({Key key, this.title}) : super(key: key);

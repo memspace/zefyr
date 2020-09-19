@@ -9,7 +9,7 @@ import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
 
 import '../services/keyboard.dart';
-import '_editor.dart';
+import 'editor.dart';
 
 // Check if the given code unit is a white space or separator
 // character.

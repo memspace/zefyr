@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:zefyr/util.dart';
 
-import '_editor.dart';
+import 'editor.dart';
 
 mixin RawEditorStateTextInputClientMixin on EditorState
     implements TextInputClient {

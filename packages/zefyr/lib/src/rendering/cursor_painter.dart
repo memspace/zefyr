@@ -4,13 +4,14 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
-import '../widgets/_cursor.dart';
+import '../widgets/cursor.dart';
 import 'editable_box.dart';
 
 const double _kCaretHeightOffset = 2.0; // pixels
 
+/// Paints editing cursor.
 class CursorPainter {
-  final RenderEditableMetricsProvider editable;
+  final RenderContentProxyBox editable;
   final CursorStyle style;
   final Rect cursorPrototype;
   final Color effectiveColor;
@@ -26,10 +27,6 @@ class CursorPainter {
 
   /// Paints cursor on [canvas] at specified [textPosition].
   void paint(Canvas canvas, Offset effectiveOffset, TextPosition textPosition) {
-//    assert(
-//        _textLayoutLastMaxWidth == constraints.maxWidth &&
-//            _textLayoutLastMinWidth == constraints.minWidth,
-//        'Last width ($_textLayoutLastMinWidth, $_textLayoutLastMaxWidth) not the same as max width constraint (${constraints.minWidth}, ${constraints.maxWidth}).');
     assert(cursorPrototype != null);
 
     final paint = Paint()..color = effectiveColor;
@@ -79,15 +76,10 @@ class CursorPainter {
       final RRect caretRRect = RRect.fromRectAndRadius(caretRect, style.radius);
       canvas.drawRRect(caretRRect, paint);
     }
-
-//    if (caretRect != _lastCaretRect) {
-//      _lastCaretRect = caretRect;
-//      if (onCaretChanged != null) onCaretChanged(caretRect);
-//    }
   }
 
-  Offset _getPixelPerfectCursorOffset(RenderEditableMetricsProvider editable,
-      Rect caretRect, double devicePixelRatio) {
+  Offset _getPixelPerfectCursorOffset(
+      RenderContentProxyBox editable, Rect caretRect, double devicePixelRatio) {
     final Offset caretPosition = editable.localToGlobal(caretRect.topLeft);
     final double pixelMultiple = 1.0 / devicePixelRatio;
     final double pixelPerfectOffsetX = caretPosition.dx.isFinite

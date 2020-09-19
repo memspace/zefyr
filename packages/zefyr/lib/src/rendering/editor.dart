@@ -15,7 +15,7 @@ import 'editable_box.dart';
 typedef TextSelectionChangedHandler = void Function(
     TextSelection selection, SelectionChangedCause cause);
 
-/// Base interface for any editable render object.
+/// Base interface for editable render objects.
 abstract class RenderAbstractEditor {
   TextSelection selectWordAtPosition(TextPosition position);
   TextSelection selectLineAtPosition(TextPosition position);
@@ -84,8 +84,10 @@ abstract class RenderAbstractEditor {
   void selectPosition({@required SelectionChangedCause cause});
 }
 
-/// Displays its children sequentially along a given axis, forcing them to the
-/// dimensions of the parent in the other axis.
+/// Displays a Notus document as a vertical list of document segments (lines
+/// and blocks).
+///
+/// Children of [RenderEditor] must be instances of [RenderEditableBox].
 class RenderEditor extends RenderEditableContainerBox
     implements RenderAbstractEditor {
   RenderEditor({
@@ -483,16 +485,12 @@ class RenderEditor extends RenderEditableContainerBox
 //      ..onTapDown = _handleTapDown
 //      ..onTap = _handleTap;
 //    _longPress = LongPressGestureRecognizer(debugOwner: this)..onLongPress = _handleLongPress;
-//    _offset.addListener(markNeedsPaint);
-//    _showCursor.addListener(markNeedsPaint);
   }
 
   @override
   void detach() {
 //    _tap.dispose();
 //    _longPress.dispose();
-//    _offset.removeListener(markNeedsPaint);
-//    _showCursor.removeListener(markNeedsPaint);
     super.detach();
   }
 
