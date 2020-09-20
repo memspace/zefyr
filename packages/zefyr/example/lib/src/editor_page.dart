@@ -65,7 +65,7 @@ class EditorPageState extends State<EditorPage> {
       return NotusDocument.fromJson(jsonDecode(contents));
     }
     final delta = Delta()..insert('Zefyr Quick Start\n');
-    return NotusDocument.fromDelta(delta);
+    return NotusDocument()..compose(delta, ChangeSource.local);
   }
 
   void _saveDocument(BuildContext context) {

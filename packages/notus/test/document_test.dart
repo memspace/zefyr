@@ -11,8 +11,7 @@ import 'package:test/test.dart';
 import 'matchers.dart';
 
 NotusDocument dartconfDoc() {
-  final delta = Delta()..insert('DartConf\nLos Angeles\n');
-  return NotusDocument.fromDelta(delta);
+  return NotusDocument()..insert(0, 'DartConf\nLos Angeles');
 }
 
 NotusDocument dartconfEmbedDoc() {
@@ -20,8 +19,8 @@ NotusDocument dartconfEmbedDoc() {
     ..insert('DartConf\n')
     ..insert(EmbeddableObject('hr'))
     ..insert('\n')
-    ..insert('Los Angeles\n');
-  return NotusDocument.fromDelta(delta);
+    ..insert('Los Angeles');
+  return NotusDocument()..compose(delta, ChangeSource.local);
 }
 
 final ul = NotusAttribute.ul.toJson();
@@ -35,7 +34,7 @@ void main() {
         ..retain(5)
         ..insert('\n');
       expect(() {
-        NotusDocument.fromDelta(badDelta);
+        NotusDocument.fromJson(jsonDecode(jsonEncode(badDelta)));
       }, throwsArgumentError);
     });
 
@@ -71,7 +70,7 @@ void main() {
     test('document delta must end with line-break character', () {
       final delta = Delta()..insert('DartConf\nLos Angeles');
       expect(() {
-        NotusDocument.fromDelta(delta);
+        NotusDocument.fromJson(jsonDecode(jsonEncode(delta)));
       }, throwsA(const TypeMatcher<AssertionError>()));
     });
 

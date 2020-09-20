@@ -35,6 +35,11 @@ class NotusChange {
   final ChangeSource source;
 }
 
+Object _deltaDataDecoder(Object data) {
+  if (data is String) return data;
+  return EmbeddableObject.fromJson(data);
+}
+
 /// A rich text document.
 class NotusDocument {
   /// Creates new empty Notus document.
@@ -46,10 +51,13 @@ class NotusDocument {
 
   NotusDocument.fromJson(List data)
       : _heuristics = NotusHeuristics.fallback,
-        _delta = _migrateDelta(Delta.fromJson(data)) {
+        _delta = _migrateDelta(
+            Delta.fromJson(data, dataDecoder: _deltaDataDecoder)) {
     _loadDocument(_delta);
   }
 
+  @Deprecated(
+      'Use "fromJson" constructor instead. This constructor will be removed in 1.0.')
   NotusDocument.fromDelta(Delta delta)
       : assert(delta != null),
         _heuristics = NotusHeuristics.fallback,
