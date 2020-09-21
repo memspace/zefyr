@@ -29,7 +29,10 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
           maxLines: 5,
         ),
         buildEditor(),
-        TextField(decoration: InputDecoration(labelText: 'Email')),
+        TextField(
+          decoration: InputDecoration(labelText: 'Details'),
+          maxLines: 3,
+        ),
       ],
     );
 
