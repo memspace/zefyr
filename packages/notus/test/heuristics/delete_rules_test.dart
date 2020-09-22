@@ -62,7 +62,7 @@ void main() {
     test('ensures line-break before embed', () {
       final doc = Delta()
         ..insert('Document\n')
-        ..insert(EmbeddableObject('hr'), null)
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n');
       final actual = rule.apply(doc, 8, 1);
       final expected = Delta()..retain(8);
@@ -72,7 +72,7 @@ void main() {
     test('ensures line-break after embed', () {
       final doc = Delta()
         ..insert('Document\n')
-        ..insert(EmbeddableObject('hr'), null)
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n');
       final actual = rule.apply(doc, 10, 1);
       final expected = Delta()..retain(11);
@@ -82,9 +82,9 @@ void main() {
     test('still deletes everything between embeds', () {
       final doc = Delta()
         ..insert('Document\n')
-        ..insert(EmbeddableObject('hr'), null)
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\nSome text\n')
-        ..insert(EmbeddableObject('hr'), null)
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n');
       final actual = rule.apply(doc, 10, 11);
       final expected = Delta()
@@ -96,7 +96,7 @@ void main() {
     test('allows deleting empty line after embed', () {
       final doc = Delta()
         ..insert('Document\n')
-        ..insert(EmbeddableObject('hr'), null)
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n')
         ..insert('\n', NotusAttribute.block.bulletList.toJson())
         ..insert('Text')
@@ -113,7 +113,7 @@ void main() {
         ..insert('Document\n')
         ..insert('\n')
         ..insert('\n')
-        ..insert(EmbeddableObject('hr'), null)
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n')
         ..insert('Text')
         ..insert('\n');

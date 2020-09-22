@@ -17,7 +17,7 @@ NotusDocument dartconfDoc() {
 NotusDocument dartconfEmbedDoc() {
   final delta = Delta()
     ..insert('DartConf\n')
-    ..insert(EmbeddableObject('hr'))
+    ..insert(BlockEmbed.horizontalRule)
     ..insert('\n')
     ..insert('Los Angeles');
   return NotusDocument()..compose(delta, ChangeSource.local);
@@ -65,6 +65,26 @@ void main() {
       final doc = dartconfEmbedDoc();
       expect(doc.toPlainText(),
           'DartConf\n${EmbedNode.kObjectReplacementCharacter}\nLos Angeles\n');
+    });
+
+    test('load document with 0.x version embeds', () {
+      final delta = Delta()
+        ..insert('DartConf\n')
+        ..insert('\u200B', {
+          'embed': {'type': 'hr'}
+        })
+        ..insert('\n')
+        ..insert('Los Angeles\n');
+      final doc = NotusDocument.fromJson(jsonDecode(jsonEncode(delta)));
+
+      expect(doc.toPlainText(),
+          'DartConf\n${EmbedNode.kObjectReplacementCharacter}\nLos Angeles\n');
+      final LineNode line = doc.root.children.toList()[1];
+      final LeafNode node = line.children.single;
+      expect(node, isA<EmbedNode>());
+      expect(node.value, isA<BlockEmbed>());
+      final BlockEmbed embed = node.value;
+      expect(embed.type, equals('hr'));
     });
 
     test('document delta must end with line-break character', () {
@@ -185,6 +205,26 @@ void main() {
       }, throwsA(const TypeMatcher<AssertionError>()));
     });
 
+    test('compose normalizes change delta containing embeds', () async {
+      final doc = dartconfDoc();
+      final firstChangeFuture = doc.changes.first;
+      final embed = BlockEmbed.horizontalRule;
+      final change = Delta()
+        ..retain(5)
+        ..insert('\n')
+        ..insert(embed.toJson())
+        ..insert('\n');
+      doc.compose(change, ChangeSource.local);
+      final firstChange = await firstChangeFuture;
+      final expected = Delta()
+        ..retain(5)
+        ..insert('\n')
+        ..insert(embed)
+        ..insert('\n');
+      expect(firstChange.change, equals(expected));
+      expect(firstChange.change.toList()[2].data, isA<EmbeddableObject>());
+    });
+
     test('replace applies heuristic rules', () {
       final doc = dartconfDoc();
       doc.format(0, 0, NotusAttribute.h1);
@@ -240,7 +280,7 @@ void main() {
 
     test('insert embed after line-break', () {
       final doc = dartconfDoc();
-      doc.insert(9, EmbeddableObject('hr'));
+      doc.insert(9, BlockEmbed.horizontalRule);
       expect(doc.root.children, hasLength(3));
       expect(doc.root.first.toPlainText(), 'DartConf\n');
       expect(doc.root.last.toPlainText(), 'Los Angeles\n');
@@ -253,7 +293,7 @@ void main() {
 
     test('insert embed before line-break', () {
       final doc = dartconfDoc();
-      doc.insert(8, EmbeddableObject('hr'));
+      doc.insert(8, BlockEmbed.horizontalRule);
       expect(doc.root.children, hasLength(3));
       expect(doc.root.first.toPlainText(), 'DartConf\n');
       expect(doc.root.last.toPlainText(), 'Los Angeles\n');
@@ -266,7 +306,7 @@ void main() {
 
     test('insert embed in the middle of a line', () {
       final doc = dartconfDoc();
-      doc.insert(4, EmbeddableObject('hr'));
+      doc.insert(4, BlockEmbed.horizontalRule);
       expect(doc.root.children, hasLength(4));
       expect(doc.root.children.elementAt(0).toPlainText(), 'Dart\n');
       expect(doc.root.children.elementAt(1).toPlainText(),
@@ -280,7 +320,7 @@ void main() {
 
     test('delete embed', () {
       final doc = dartconfDoc();
-      doc.insert(8, EmbeddableObject('hr'));
+      doc.insert(8, BlockEmbed.horizontalRule);
       expect(doc.root.children, hasLength(3));
       doc.delete(9, 1);
       expect(doc.root.children, hasLength(3));
@@ -297,7 +337,7 @@ void main() {
 
     test('insert text before embed', () {
       final doc = dartconfDoc();
-      doc.insert(8, EmbeddableObject('hr'));
+      doc.insert(8, BlockEmbed.horizontalRule);
       expect(doc.root.children, hasLength(3));
       doc.insert(9, 'text');
       expect(doc.root.children, hasLength(4));
@@ -308,7 +348,7 @@ void main() {
 
     test('insert text after embed', () {
       final doc = dartconfDoc();
-      doc.insert(8, EmbeddableObject('hr'));
+      doc.insert(8, BlockEmbed.horizontalRule);
       expect(doc.root.children, hasLength(3));
       doc.insert(10, 'text');
       expect(doc.root.children, hasLength(4));
@@ -319,7 +359,7 @@ void main() {
 
     test('replace text with embed', () {
       final doc = dartconfDoc();
-      doc.replace(4, 4, EmbeddableObject('hr'));
+      doc.replace(4, 4, BlockEmbed.horizontalRule);
       expect(doc.root.children, hasLength(3));
       expect(doc.root.children.elementAt(0).toPlainText(), 'Dart\n');
       expect(doc.root.children.elementAt(1).toPlainText(),
@@ -329,8 +369,8 @@ void main() {
 
     test('replace embed with embed', () {
       final doc = dartconfDoc();
-      doc.replace(4, 4, EmbeddableObject('hr'));
-      doc.replace(5, 1, EmbeddableObject('hr'));
+      doc.replace(4, 4, BlockEmbed.horizontalRule);
+      doc.replace(5, 1, BlockEmbed.horizontalRule);
 
       // This test case is flawed. Technically we'd want the result to be a
       // clean replacement of old embed with the new one. But because of how

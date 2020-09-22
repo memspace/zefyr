@@ -240,10 +240,10 @@ void main() {
         ..insert('\n')
         ..insert('Three')
         ..insert('\n');
-      final actual = rule.apply(doc, 12, EmbeddableObject('hr'));
+      final actual = rule.apply(doc, 12, BlockEmbed.horizontalRule);
       final expected = Delta()
         ..retain(12)
-        ..insert(EmbeddableObject('hr'));
+        ..insert(BlockEmbed.horizontalRule);
       expect(actual, isNotNull);
       expect(actual, expected);
     });
@@ -254,10 +254,10 @@ void main() {
         ..insert('embed here\n')
         ..insert('Three')
         ..insert('\n');
-      final actual = rule.apply(doc, 12, EmbeddableObject('hr'));
+      final actual = rule.apply(doc, 12, BlockEmbed.horizontalRule);
       final expected = Delta()
         ..retain(12)
-        ..insert(EmbeddableObject('hr'))
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n');
       expect(actual, isNotNull);
       expect(actual, expected);
@@ -269,11 +269,11 @@ void main() {
         ..insert('embed here\n')
         ..insert('Three')
         ..insert('\n');
-      final actual = rule.apply(doc, 11, EmbeddableObject('hr'));
+      final actual = rule.apply(doc, 11, BlockEmbed.horizontalRule);
       final expected = Delta()
         ..retain(11)
         ..insert('\n')
-        ..insert(EmbeddableObject('hr'));
+        ..insert(BlockEmbed.horizontalRule);
       expect(actual, isNotNull);
       expect(actual, expected);
     });
@@ -284,11 +284,11 @@ void main() {
         ..insert('embed here\n')
         ..insert('Three')
         ..insert('\n');
-      final actual = rule.apply(doc, 17, EmbeddableObject('hr'));
+      final actual = rule.apply(doc, 17, BlockEmbed.horizontalRule);
       final expected = Delta()
         ..retain(17)
         ..insert('\n')
-        ..insert(EmbeddableObject('hr'))
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n');
       expect(actual, isNotNull);
       expect(actual, expected);

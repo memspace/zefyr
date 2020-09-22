@@ -1,6 +1,6 @@
 name: notus
 description: Platform-agnostic rich text document model based on Delta format and used in Zefyr editor.
-version: 0.1.5
+version: 1.0.0-dev.1.0
 author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 homepage: https://github.com/memspace/zefyr
 
@@ -10,9 +10,7 @@ environment:
 dependencies:
   collection: ^1.14.6
   meta: ^1.1.0
-  quill_delta:
-    git:
-      url: git@github.com:pulyaevskiy/quill-delta-dart.git
+  quill_delta: ^2.0.0
   quiver_hashcode: ^2.0.0
 
 dev_dependencies:

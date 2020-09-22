@@ -120,17 +120,17 @@ void main() {
 
   group('EmbeddableObject', () {
     test('equality', () {
-      final embed1 = EmbeddableObject('hr');
-      final embed2 = EmbeddableObject('hr');
-      final embed3 = EmbeddableObject('image');
+      final embed1 = EmbeddableObject('hr', inline: false);
+      final embed2 = EmbeddableObject('hr', inline: false);
+      final embed3 = EmbeddableObject('image', inline: false);
       expect(embed1, embed2);
       expect(embed1, isNot(equals(embed3)));
     });
 
     test('hashCode', () {
-      final embed1 = EmbeddableObject('hr');
-      final embed2 = EmbeddableObject('hr');
-      final embed3 = EmbeddableObject('image');
+      final embed1 = EmbeddableObject('hr', inline: false);
+      final embed2 = EmbeddableObject('hr', inline: false);
+      final embed3 = EmbeddableObject('image', inline: false);
       final set = <EmbeddableObject>{};
       set.addAll([embed1, embed2, embed3]);
       expect(set, hasLength(2));
@@ -140,9 +140,9 @@ void main() {
     });
 
     test('json serialization', () {
-      final embed = EmbeddableObject('hr');
+      final embed = EmbeddableObject('hr', inline: false);
       final json = jsonEncode(embed);
-      expect(json, '{"type":"hr"}');
+      expect(json, '{"_type":"hr","_inline":false}');
       expect(EmbeddableObject.fromJson(jsonDecode(json)), embed);
     });
   });
@@ -153,7 +153,7 @@ void main() {
 
     setUp(() {
       line = LineNode();
-      line.insert(0, EmbeddableObject('hr'), null);
+      line.insert(0, EmbeddableObject('hr', inline: false), null);
       node = line.children.first;
     });
 
@@ -166,7 +166,8 @@ void main() {
     });
 
     test('toDelta', () {
-      expect(node.toDelta(), Delta()..insert(EmbeddableObject('hr')));
+      expect(node.toDelta(),
+          Delta()..insert(EmbeddableObject('hr', inline: false)));
     });
 
     test('splitAt', () {
@@ -176,7 +177,7 @@ void main() {
 
     test('cutAt', () {
       expect(node.cutAt(0), node);
-      line.insert(0, EmbeddableObject('hr'), null);
+      line.insert(0, EmbeddableObject('hr', inline: false), null);
       node = line.children.first;
       expect(node.cutAt(1), isNull);
     });
@@ -188,7 +189,7 @@ void main() {
 
   group('LeafNode', () {
     test('factory constructor', () {
-      final embed = LeafNode(EmbeddableObject('hr'));
+      final embed = LeafNode(EmbeddableObject('hr', inline: false));
       final text = LeafNode('Text');
       expect(embed, isA<EmbedNode>());
       expect(text, isA<TextNode>());

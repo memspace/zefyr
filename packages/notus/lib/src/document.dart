@@ -219,7 +219,7 @@ class NotusDocument {
     return block.lookup(result.offset, inclusive: true);
   }
 
-  /// Composes [change] into this document.
+  /// Composes [change] Delta into this document.
   ///
   /// Use this method with caution as it does not apply heuristic rules to the
   /// [change].
@@ -237,25 +237,39 @@ class NotusDocument {
     var offset = 0;
     final before = toDelta();
     change = _migrateDelta(change);
+    final normalized = Delta();
     for (final op in change.toList()) {
       final attributes =
           op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
       if (op.isInsert) {
-        _root.insert(offset, op.data, attributes);
+        // Provided change Delta may have not been created with data decoder
+        // which ensures that our embeddable objects are properly decoded,
+        // so we take care of it here.
+        final data = op.data is String
+            ? op.data
+            : op.data is EmbeddableObject
+                ? op.data
+                : EmbeddableObject.fromJson(op.data);
+        _root.insert(offset, data, attributes);
+        normalized.insert(data, op.attributes);
       } else if (op.isDelete) {
         _root.delete(offset, op.length);
+        normalized.delete(op.length);
       } else if (op.attributes != null) {
         _root.retain(offset, op.length, attributes);
+        normalized.retain(op.length, op.attributes);
+      } else {
+        normalized.retain(op.length);
       }
       if (!op.isDelete) offset += op.length;
     }
-    _delta = _delta.compose(change);
+    _delta = _delta.compose(normalized);
 
     if (_delta != _root.toDelta()) {
       throw StateError('Compose produced inconsistent results. '
-          'This is likely due to a bug in the library. Tried to compose change $change from $source.');
+          'This is likely due to a bug in the library. Tried to compose change $normalized from $source.');
     }
-    _controller.add(NotusChange(before, change, source));
+    _controller.add(NotusChange(before, normalized, source));
   }
 
   //
@@ -285,7 +299,11 @@ class NotusDocument {
       if (op.hasAttribute(_kEmbedAttributeKey)) {
         // Convert legacy embed style attribute into the embed insert operation.
         final attrs = Map<String, dynamic>.from(op.attributes);
-        final embed = EmbeddableObject.fromJson(attrs[_kEmbedAttributeKey]);
+        final data = Map<String, dynamic>.from(attrs[_kEmbedAttributeKey]);
+        data[EmbeddableObject.kTypeKey] = data['type'];
+        data[EmbeddableObject.kInlineKey] = false;
+        data.remove('type');
+        final embed = EmbeddableObject.fromJson(data);
         attrs.remove(_kEmbedAttributeKey);
         result.push(Operation.insert(embed, attrs.isNotEmpty ? attrs : null));
       } else {

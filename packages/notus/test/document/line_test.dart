@@ -30,7 +30,7 @@ void main() {
     test('hasEmbed', () {
       final node = LineNode();
       expect(node.hasEmbed, isFalse);
-      node.add(EmbedNode(EmbeddableObject('hr')));
+      node.add(EmbedNode(BlockEmbed.horizontalRule));
       expect(node.hasEmbed, isTrue);
     });
 
@@ -267,7 +267,7 @@ void main() {
 
     test('collectStyle with embed nodes', () {
       root.insert(0, 'Hello world\n\nMore text.\n', null);
-      root.insert(12, EmbeddableObject('hr'), null);
+      root.insert(12, BlockEmbed.horizontalRule, null);
 
       var lookup = root.lookup(0);
       LineNode line = lookup.node;
