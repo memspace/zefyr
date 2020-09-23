@@ -653,6 +653,7 @@ class RawEditorState extends EditorState
           selectionColor: widget.selectionColor,
           enableInteractiveSelection: widget.enableInteractiveSelection,
           body: TextLine(node: node, textDirection: _textDirection),
+          hasFocus: _hasFocus,
           devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         ));
       } else if (node is BlockNode) {
@@ -665,6 +666,7 @@ class RawEditorState extends EditorState
           selection: widget.controller.selection,
           selectionColor: widget.selectionColor,
           enableInteractiveSelection: widget.enableInteractiveSelection,
+          hasFocus: _hasFocus,
           contentPadding: (block == NotusAttribute.block.code)
               ? EdgeInsets.all(16.0)
               : null,

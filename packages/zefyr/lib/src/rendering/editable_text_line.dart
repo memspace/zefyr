@@ -28,6 +28,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     @required TextSelection selection,
     @required Color selectionColor,
     @required bool enableInteractiveSelection,
+    @required bool hasFocus,
     double devicePixelRatio = 1.0,
     // Not implemented fields are below:
     ui.BoxHeightStyle selectionHeightStyle = ui.BoxHeightStyle.tight,
@@ -41,6 +42,7 @@ class RenderEditableTextLine extends RenderEditableBox {
         assert(padding.isNonNegative),
         assert(cursorController != null),
         assert(devicePixelRatio != null),
+        assert(hasFocus != null),
         _textDirection = textDirection,
         _padding = padding,
         _node = node,
@@ -48,7 +50,8 @@ class RenderEditableTextLine extends RenderEditableBox {
         _selection = selection,
         _selectionColor = selectionColor,
         _enableInteractiveSelection = enableInteractiveSelection,
-        _devicePixelRatio = devicePixelRatio;
+        _devicePixelRatio = devicePixelRatio,
+        _hasFocus = hasFocus;
 
   //
 
@@ -128,6 +131,17 @@ class RenderEditableTextLine extends RenderEditableBox {
   // End selection implementation
 
   //
+
+  /// Whether the editor is currently focused.
+  bool get hasFocus => _hasFocus;
+  bool _hasFocus = false;
+  set hasFocus(bool value) {
+    assert(value != null);
+    if (_hasFocus == value) {
+      return;
+    }
+    _hasFocus = value;
+  }
 
   /// The pixel ratio of the current device.
   ///
@@ -637,7 +651,8 @@ class RenderEditableTextLine extends RenderEditableBox {
         _paintSelection(context, effectiveOffset);
       }
 
-      if (_cursorController.showCursor.value &&
+      if (hasFocus &&
+          _cursorController.showCursor.value &&
           containsCursor &&
           !_cursorController.style.paintAboveText) {
         _paintCursor(context, effectiveOffset);
@@ -645,7 +660,8 @@ class RenderEditableTextLine extends RenderEditableBox {
 
       context.paintChild(body, effectiveOffset);
 
-      if (_cursorController.showCursor.value &&
+      if (hasFocus &&
+          _cursorController.showCursor.value &&
           containsCursor &&
           _cursorController.style.paintAboveText) {
         _paintCursor(context, effectiveOffset);

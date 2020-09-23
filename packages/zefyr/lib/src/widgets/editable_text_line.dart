@@ -30,6 +30,7 @@ class EditableTextLine extends RenderObjectWidget {
   final TextSelection selection;
   final Color selectionColor;
   final bool enableInteractiveSelection;
+  final bool hasFocus;
   final double devicePixelRatio;
 
   /// Creates an editable line of text.
@@ -45,6 +46,7 @@ class EditableTextLine extends RenderObjectWidget {
     @required this.selection,
     @required this.selectionColor,
     @required this.enableInteractiveSelection,
+    @required this.hasFocus,
     @required this.devicePixelRatio,
   })  : assert(node != null),
         assert(indentWidth != null),
@@ -52,6 +54,7 @@ class EditableTextLine extends RenderObjectWidget {
         assert(selection != null),
         assert(selectionColor != null),
         assert(enableInteractiveSelection != null),
+        assert(hasFocus != null),
         super(key: key);
 
   EdgeInsetsGeometry get _padding => EdgeInsetsDirectional.only(
@@ -73,6 +76,7 @@ class EditableTextLine extends RenderObjectWidget {
       selection: selection,
       selectionColor: selectionColor,
       enableInteractiveSelection: enableInteractiveSelection,
+      hasFocus: hasFocus,
       devicePixelRatio: devicePixelRatio,
     );
   }
@@ -87,6 +91,7 @@ class EditableTextLine extends RenderObjectWidget {
     renderObject.selection = selection;
     renderObject.selectionColor = selectionColor;
     renderObject.enableInteractiveSelection = enableInteractiveSelection;
+    renderObject.hasFocus = hasFocus;
     renderObject.devicePixelRatio = devicePixelRatio;
   }
 }

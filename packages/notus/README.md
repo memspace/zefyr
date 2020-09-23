@@ -1,6 +1,6 @@
 **Notus** is a rich text document model for [Zefyr][] project.
 
-##Important! 
+## Important! 
 
 This is one of the dev releases for the upcoming 1.0 
 release of both Notus and Zefyr packages. The work just started 

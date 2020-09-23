@@ -15,6 +15,7 @@ class EditableTextBlock extends StatelessWidget {
   final TextSelection selection;
   final Color selectionColor;
   final bool enableInteractiveSelection;
+  final bool hasFocus;
   final EdgeInsets contentPadding;
 
   const EditableTextBlock({
@@ -26,8 +27,10 @@ class EditableTextBlock extends StatelessWidget {
     @required this.selection,
     @required this.selectionColor,
     @required this.enableInteractiveSelection,
+    @required this.hasFocus,
     this.contentPadding,
-  }) : super(key: key);
+  })  : assert(hasFocus != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +69,7 @@ class EditableTextBlock extends StatelessWidget {
         selection: selection,
         selectionColor: selectionColor,
         enableInteractiveSelection: enableInteractiveSelection,
+        hasFocus: hasFocus,
       ));
     }
     return children.toList(growable: false);

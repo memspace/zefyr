@@ -29,27 +29,28 @@ class InsertEmbedButton extends StatelessWidget {
       onPressed: () {
         final index = controller.selection.baseOffset;
         final length = controller.selection.extentOffset - index;
-        controller.replaceText(index, length, EmbeddableObject('hr'));
+        controller.replaceText(index, length, BlockEmbed.horizontalRule);
       },
     );
   }
 }
 
-class LinkButton extends StatefulWidget {
+/// Toolbar button for formatting text as a link.
+class LinkStyleButton extends StatefulWidget {
   final ZefyrController controller;
   final IconData icon;
 
-  const LinkButton({
+  const LinkStyleButton({
     Key key,
     @required this.controller,
     this.icon,
   }) : super(key: key);
 
   @override
-  _LinkButtonState createState() => _LinkButtonState();
+  _LinkStyleButtonState createState() => _LinkStyleButtonState();
 }
 
-class _LinkButtonState extends State<LinkButton> {
+class _LinkStyleButtonState extends State<LinkStyleButton> {
   void _didChangeSelection() {
     setState(() {});
   }
@@ -61,7 +62,7 @@ class _LinkButtonState extends State<LinkButton> {
   }
 
   @override
-  void didUpdateWidget(covariant LinkButton oldWidget) {
+  void didUpdateWidget(covariant LinkStyleButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_didChangeSelection);
@@ -98,7 +99,7 @@ class _LinkButtonState extends State<LinkButton> {
     showDialog<String>(
       context: context,
       builder: (ctx) {
-        return LinkDialog();
+        return _LinkDialog();
       },
     ).then(_linkSubmitted);
   }
@@ -109,13 +110,13 @@ class _LinkButtonState extends State<LinkButton> {
   }
 }
 
-class LinkDialog extends StatefulWidget {
-  const LinkDialog({Key key}) : super(key: key);
+class _LinkDialog extends StatefulWidget {
+  const _LinkDialog({Key key}) : super(key: key);
   @override
   _LinkDialogState createState() => _LinkDialogState();
 }
 
-class _LinkDialogState extends State<LinkDialog> {
+class _LinkDialogState extends State<_LinkDialog> {
   String _link = '';
 
   @override
@@ -123,6 +124,7 @@ class _LinkDialogState extends State<LinkDialog> {
     return AlertDialog(
       content: TextField(
         decoration: InputDecoration(labelText: 'Paste a link'),
+        autofocus: true,
         onChanged: _linkChanged,
       ),
       actions: [
@@ -145,52 +147,63 @@ class _LinkDialogState extends State<LinkDialog> {
   }
 }
 
-enum ToggleAttribute { bold, italic, bulletList, numberList, code, quote }
+/// Builder for toolbar buttons handling toggleable style attributes.
+///
+/// See [defaultToggleStyleButtonBuilder] as a reference implementation.
+typedef ToggleStyleButtonBuilder = Widget Function(
+  BuildContext context,
+  NotusAttribute attribute,
+  IconData icon,
+  bool isToggled,
+  VoidCallback onPressed,
+);
 
-typedef ToggleButtonBuilder = Widget Function(BuildContext context,
-    ToggleAttribute attribute, bool isToggled, VoidCallback onPressed);
-
+/// Toolbar button which allows to toggle a style attribute on or off.
 class ToggleStyleButton extends StatefulWidget {
-  final ToggleAttribute attribute;
-  final ZefyrController controller;
-  final ToggleButtonBuilder childBuilder;
+  /// The style attribute controlled by this button.
+  final NotusAttribute attribute;
 
-  const ToggleStyleButton({
+  /// The icon representing the style [attribute].
+  final IconData icon;
+
+  /// Controller attached to a Zefyr editor.
+  final ZefyrController controller;
+
+  /// Builder function to customize visual representation of this button.
+  final ToggleStyleButtonBuilder childBuilder;
+
+  ToggleStyleButton({
     Key key,
     @required this.attribute,
+    @required this.icon,
     @required this.controller,
-    @required this.childBuilder,
-  }) : super(key: key);
+    this.childBuilder = defaultToggleStyleButtonBuilder,
+  })  : assert(!attribute.isUnset),
+        assert(icon != null),
+        assert(controller != null),
+        assert(childBuilder != null),
+        super(key: key);
 
   @override
   _ToggleStyleButtonState createState() => _ToggleStyleButtonState();
 }
 
-final Map<ToggleAttribute, NotusAttribute> _toggleAttributeMap = {
-  ToggleAttribute.bold: NotusAttribute.bold,
-  ToggleAttribute.italic: NotusAttribute.italic,
-  ToggleAttribute.numberList: NotusAttribute.block.numberList,
-  ToggleAttribute.bulletList: NotusAttribute.block.bulletList,
-  ToggleAttribute.quote: NotusAttribute.block.quote,
-  ToggleAttribute.code: NotusAttribute.block.code,
-};
-
 class _ToggleStyleButtonState extends State<ToggleStyleButton> {
   bool _isToggled;
 
-  NotusAttribute get _attribute => _toggleAttributeMap[widget.attribute];
+  NotusStyle get _selectionStyle => widget.controller.getSelectionStyle();
 
   void _didChangeEditingValue() {
     setState(() {
       _isToggled =
-          widget.controller.getSelectionStyle().containsSame(_attribute);
+          widget.controller.getSelectionStyle().containsSame(widget.attribute);
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _isToggled = widget.controller.getSelectionStyle().containsSame(_attribute);
+    _isToggled = _selectionStyle.containsSame(widget.attribute);
     widget.controller.addListener(_didChangeEditingValue);
   }
 
@@ -200,8 +213,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_didChangeEditingValue);
       widget.controller.addListener(_didChangeEditingValue);
-      _isToggled =
-          widget.controller.getSelectionStyle().containsSame(_attribute);
+      _isToggled = _selectionStyle.containsSame(widget.attribute);
     }
   }
 
@@ -213,76 +225,78 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.childBuilder(
-        context, widget.attribute, _isToggled, _toggleAttribute);
+    // If the cursor is currently inside a code block we disable all
+    // toggle style buttons (except the code block button itself) since there
+    // is no point in applying styles to a unformatted block of text.
+    // TODO: Add code block checks to heading and embed buttons as well.
+    final isInCodeBlock =
+        _selectionStyle.containsSame(NotusAttribute.block.code);
+    final isEnabled =
+        !isInCodeBlock || widget.attribute == NotusAttribute.block.code;
+    return widget.childBuilder(context, widget.attribute, widget.icon,
+        _isToggled, isEnabled ? _toggleAttribute : null);
   }
 
   void _toggleAttribute() {
     if (_isToggled) {
-      widget.controller.formatSelection(_attribute.unset);
+      widget.controller.formatSelection(widget.attribute.unset);
     } else {
-      widget.controller.formatSelection(_attribute);
+      widget.controller.formatSelection(widget.attribute);
     }
   }
 }
 
-Widget _defaultToggleButtonBuilder(BuildContext context,
-    ToggleAttribute attribute, bool isToggled, VoidCallback onPressed) {
+/// Default builder for toggle style buttons.
+Widget defaultToggleStyleButtonBuilder(
+  BuildContext context,
+  NotusAttribute attribute,
+  IconData icon,
+  bool isToggled,
+  VoidCallback onPressed,
+) {
+  final theme = Theme.of(context);
+  final isEnabled = onPressed != null;
+  final iconColor = isEnabled
+      ? isToggled
+          ? theme.primaryIconTheme.color
+          : theme.iconTheme.color
+      : theme.disabledColor;
+  final fillColor = isToggled ? theme.toggleableActiveColor : theme.canvasColor;
   return ZIconButton(
     highlightElevation: 0,
     hoverElevation: 0,
     size: 32,
-    icon: Icon(
-      _defaultToggleIcons[attribute],
-      size: 18,
-      color: isToggled
-          ? Theme.of(context).primaryIconTheme.color
-          : Theme.of(context).iconTheme.color,
-    ),
-    fillColor: isToggled
-        ? Theme.of(context).toggleableActiveColor
-        : Theme.of(context).canvasColor,
+    icon: Icon(icon, size: 18, color: iconColor),
+    fillColor: fillColor,
     onPressed: onPressed,
   );
 }
 
-final Map<ToggleAttribute, IconData> _defaultToggleIcons = {
-  ToggleAttribute.bold: Icons.format_bold,
-  ToggleAttribute.italic: Icons.format_italic,
-  ToggleAttribute.numberList: Icons.format_list_numbered,
-  ToggleAttribute.bulletList: Icons.format_list_bulleted,
-  ToggleAttribute.quote: Icons.format_quote,
-  ToggleAttribute.code: Icons.code,
-};
-
-typedef DropdownButtonBuilder = Widget Function(
-  BuildContext context,
-  NotusAttribute value,
-  ValueChanged<NotusAttribute> onSelected,
-);
-
-class SelectStyleButton extends StatefulWidget {
+/// Toolbar button which allows to apply heading style to a line of text in
+/// Zefyr editor.
+///
+/// Works as a dropdown menu button.
+// TODO: Add "dense" parameter which if set to true changes the button to use an icon instead of text (useful for mobile layouts)
+class SelectHeadingStyleButton extends StatefulWidget {
   final ZefyrController controller;
-  final DropdownButtonBuilder childBuilder;
 
-  const SelectStyleButton({
-    Key key,
-    @required this.controller,
-    @required this.childBuilder,
-  }) : super(key: key);
+  const SelectHeadingStyleButton({Key key, @required this.controller})
+      : super(key: key);
 
   @override
-  _SelectStyleButtonState createState() => _SelectStyleButtonState();
+  _SelectHeadingStyleButtonState createState() =>
+      _SelectHeadingStyleButtonState();
 }
 
-class _SelectStyleButtonState extends State<SelectStyleButton> {
+class _SelectHeadingStyleButtonState extends State<SelectHeadingStyleButton> {
   NotusAttribute _value;
+
+  NotusStyle get _selectionStyle => widget.controller.getSelectionStyle();
 
   void _didChangeEditingValue() {
     setState(() {
-      _value =
-          widget.controller.getSelectionStyle().get(NotusAttribute.heading) ??
-              NotusAttribute.heading.unset;
+      _value = _selectionStyle.get(NotusAttribute.heading) ??
+          NotusAttribute.heading.unset;
     });
   }
 
@@ -293,21 +307,19 @@ class _SelectStyleButtonState extends State<SelectStyleButton> {
   @override
   void initState() {
     super.initState();
-    _value =
-        widget.controller.getSelectionStyle().get(NotusAttribute.heading) ??
-            NotusAttribute.heading.unset;
+    _value = _selectionStyle.get(NotusAttribute.heading) ??
+        NotusAttribute.heading.unset;
     widget.controller.addListener(_didChangeEditingValue);
   }
 
   @override
-  void didUpdateWidget(covariant SelectStyleButton oldWidget) {
+  void didUpdateWidget(covariant SelectHeadingStyleButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_didChangeEditingValue);
       widget.controller.addListener(_didChangeEditingValue);
-      _value =
-          widget.controller.getSelectionStyle().get(NotusAttribute.heading) ??
-              NotusAttribute.heading.unset;
+      _value = _selectionStyle.get(NotusAttribute.heading) ??
+          NotusAttribute.heading.unset;
     }
   }
 
@@ -319,7 +331,7 @@ class _SelectStyleButtonState extends State<SelectStyleButton> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.childBuilder(context, _value, _selectAttribute);
+    return _selectHeadingStyleButtonBuilder(context, _value, _selectAttribute);
   }
 }
 
@@ -374,52 +386,45 @@ class EditorToolbar extends StatefulWidget implements PreferredSizeWidget {
 
   const EditorToolbar({Key key, @required this.children}) : super(key: key);
 
-  factory EditorToolbar.basic({
-    Key key,
-    @required ZefyrController controller,
-    @required FocusNode editorFocusNode,
-  }) {
+  factory EditorToolbar.basic({Key key, @required ZefyrController controller}) {
     return EditorToolbar(key: key, children: [
       ToggleStyleButton(
-        attribute: ToggleAttribute.bold,
+        attribute: NotusAttribute.bold,
+        icon: Icons.format_bold,
         controller: controller,
-        childBuilder: _defaultToggleButtonBuilder,
       ),
       SizedBox(width: 1),
       ToggleStyleButton(
-        attribute: ToggleAttribute.italic,
+        attribute: NotusAttribute.italic,
+        icon: Icons.format_italic,
         controller: controller,
-        childBuilder: _defaultToggleButtonBuilder,
       ),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
-      SelectStyleButton(
-        controller: controller,
-        childBuilder: _selectHeadingStyleButtonBuilder,
-      ),
+      SelectHeadingStyleButton(controller: controller),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       ToggleStyleButton(
-        attribute: ToggleAttribute.numberList,
+        attribute: NotusAttribute.block.numberList,
         controller: controller,
-        childBuilder: _defaultToggleButtonBuilder,
+        icon: Icons.format_list_numbered,
       ),
       ToggleStyleButton(
-        attribute: ToggleAttribute.bulletList,
+        attribute: NotusAttribute.block.bulletList,
         controller: controller,
-        childBuilder: _defaultToggleButtonBuilder,
+        icon: Icons.format_list_bulleted,
       ),
       ToggleStyleButton(
-        attribute: ToggleAttribute.code,
+        attribute: NotusAttribute.block.code,
         controller: controller,
-        childBuilder: _defaultToggleButtonBuilder,
+        icon: Icons.code,
       ),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       ToggleStyleButton(
-        attribute: ToggleAttribute.quote,
+        attribute: NotusAttribute.block.quote,
         controller: controller,
-        childBuilder: _defaultToggleButtonBuilder,
+        icon: Icons.format_quote,
       ),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
-      LinkButton(controller: controller),
+      LinkStyleButton(controller: controller),
       InsertEmbedButton(
         controller: controller,
         icon: Icons.image_outlined,
@@ -543,7 +548,6 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
     final position = RelativeRect.fromRect(
       Rect.fromPoints(
         button.localToGlobal(Offset.zero, ancestor: overlay),
-        // button.localToGlobal(widget.offset, ancestor: overlay),
         button.localToGlobal(button.size.bottomLeft(Offset.zero),
             ancestor: overlay),
       ),
