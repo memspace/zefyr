@@ -131,7 +131,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   }
 
   TextSelectionControls defaultSelectionControls(BuildContext context) {
-    TargetPlatform platform = Theme.of(context).platform;
+    final platform = Theme.of(context).platform;
     if (platform == TargetPlatform.iOS) {
       return cupertinoTextSelectionControls;
     }

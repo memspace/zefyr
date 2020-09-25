@@ -180,7 +180,7 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
 
     final scaffold = ZefyrScaffold.of(context);
     if (_scaffold != scaffold) {
-      bool didHaveToolbar = hasToolbar;
+      final didHaveToolbar = hasToolbar;
       hideToolbar();
       _scaffold = scaffold;
       if (didHaveToolbar) showToolbar();
@@ -197,8 +197,8 @@ class _ZefyrEditorState extends State<ZefyrEditor> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData themeData = Theme.of(context);
-    final Brightness keyboardAppearance =
+    final themeData = Theme.of(context);
+    final keyboardAppearance =
         widget.keyboardAppearance ?? themeData.primaryColorBrightness;
 
     Widget editable = ZefyrEditableText(

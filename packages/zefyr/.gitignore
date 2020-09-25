@@ -13,6 +13,7 @@ ios/Flutter/Generated.xcconfig
 .flutter-plugins-dependencies
 example/ios/.symlinks
 example/ios/Flutter/Generated.xcconfig
+example/ios/Flutter/flutter_export_environment.sh
 doc/api/
 build/
 
