@@ -231,7 +231,7 @@ class RenderEditableContainerBox extends RenderBox
       }
       targetChild = childAfter(targetChild);
     }
-    assert(targetChild != null);
+    assert(targetChild != null, 'No child at position $position');
     return targetChild;
   }
 

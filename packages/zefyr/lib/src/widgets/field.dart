@@ -1,273 +1,206 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:notus/notus.dart';
 
 import 'controller.dart';
-import 'cursor.dart';
 import 'editor.dart';
-import 'text_selection.dart';
-
-class _TextFieldSelectionGestureDetectorBuilder
-    extends EditorTextSelectionGestureDetectorBuilder {
-  _TextFieldSelectionGestureDetectorBuilder({
-    @required _ZefyrFieldState state,
-  })  : _state = state,
-        super(delegate: state);
-
-  final _ZefyrFieldState _state;
-
-  @override
-  void onForcePressStart(ForcePressDetails details) {
-    super.onForcePressStart(details);
-    if (delegate.selectionEnabled && shouldShowSelectionToolbar) {
-      editor.showToolbar();
-    }
-  }
-
-  @override
-  void onForcePressEnd(ForcePressDetails details) {
-    // Not required.
-  }
-
-  @override
-  void onSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details) {
-    if (delegate.selectionEnabled) {
-      switch (Theme.of(_state.context).platform) {
-        case TargetPlatform.iOS:
-        case TargetPlatform.macOS:
-          renderEditor.selectPositionAt(
-            from: details.globalPosition,
-            cause: SelectionChangedCause.longPress,
-          );
-          break;
-        case TargetPlatform.android:
-        case TargetPlatform.fuchsia:
-        case TargetPlatform.linux:
-        case TargetPlatform.windows:
-          renderEditor.selectWordsInRange(
-            from: details.globalPosition - details.offsetFromOrigin,
-            to: details.globalPosition,
-            cause: SelectionChangedCause.longPress,
-          );
-          break;
-      }
-    }
-  }
-
-  void _launchUrlIfNeeded(TapUpDetails details) {
-    final pos = renderEditor.getPositionForOffset(details.globalPosition);
-    final result = editor.widget.controller.document.lookupLine(pos.offset);
-    if (result.node == null) return;
-    final line = result.node as LineNode;
-    final segmentResult = line.lookup(result.offset);
-    if (segmentResult.node == null) return;
-    final segment = segmentResult.node as LeafNode;
-    if (segment.style.contains(NotusAttribute.link) &&
-        editor.widget.onLaunchUrl != null) {
-      if (editor.widget.readOnly) {
-        editor.widget.onLaunchUrl(segment.style.get(NotusAttribute.link).value);
-      } else {
-        // TODO: Implement a toolbar to display the URL and allow to launch it.
-        // editor.showToolbar();
-      }
-    }
-  }
-
-  @override
-  void onSingleTapUp(TapUpDetails details) {
-    editor.hideToolbar();
-
-    _launchUrlIfNeeded(details);
-
-    if (delegate.selectionEnabled) {
-      switch (Theme.of(_state.context).platform) {
-        case TargetPlatform.iOS:
-        case TargetPlatform.macOS:
-          switch (details.kind) {
-            case PointerDeviceKind.mouse:
-            case PointerDeviceKind.stylus:
-            case PointerDeviceKind.invertedStylus:
-              // Precise devices should place the cursor at a precise position.
-              renderEditor.selectPosition(cause: SelectionChangedCause.tap);
-              break;
-            case PointerDeviceKind.touch:
-            case PointerDeviceKind.unknown:
-              // On macOS/iOS/iPadOS a touch tap places the cursor at the edge
-              // of the word.
-              renderEditor.selectWordEdge(cause: SelectionChangedCause.tap);
-              break;
-          }
-          break;
-        case TargetPlatform.android:
-        case TargetPlatform.fuchsia:
-        case TargetPlatform.linux:
-        case TargetPlatform.windows:
-          renderEditor.selectPosition(cause: SelectionChangedCause.tap);
-          break;
-      }
-    }
-    // _state._requestKeyboard();
-    // if (_state.widget.onTap != null)
-    //   _state.widget.onTap();
-  }
-
-  @override
-  void onSingleLongTapStart(LongPressStartDetails details) {
-    if (delegate.selectionEnabled) {
-      switch (Theme.of(_state.context).platform) {
-        case TargetPlatform.iOS:
-        case TargetPlatform.macOS:
-          renderEditor.selectPositionAt(
-            from: details.globalPosition,
-            cause: SelectionChangedCause.longPress,
-          );
-          break;
-        case TargetPlatform.android:
-        case TargetPlatform.fuchsia:
-        case TargetPlatform.linux:
-        case TargetPlatform.windows:
-          renderEditor.selectWord(cause: SelectionChangedCause.longPress);
-          Feedback.forLongPress(_state.context);
-          break;
-      }
-    }
-  }
-}
 
 class ZefyrField extends StatefulWidget {
+  /// Controller object which establishes a link between a rich text document
+  /// and this editor.
+  ///
+  /// Must not be null.
   final ZefyrController controller;
+
+  /// Controls whether this editor has keyboard focus.
+  ///
+  /// Can be `null` in which case this editor creates its own instance to
+  /// control keyboard focus.
   final FocusNode focusNode;
+
+  /// The [ScrollController] to use when vertically scrolling the contents.
+  ///
+  /// If `null` then this editor instantiates a new ScrollController.
+  ///
+  /// Scroll controller must not be `null` if [scrollable] is set to `false`.
+  final ScrollController scrollController;
+
+  /// Whether this editor should create a scrollable container for its content.
+  ///
+  /// When set to `true` the editor's height can be controlled by [minHeight],
+  /// [maxHeight] and [expands] properties.
+  ///
+  /// When set to `false` the editor always expands to fit the entire content
+  /// of the document and should normally be placed as a child of another
+  /// scrollable widget, otherwise the content may be clipped.
+  ///
+  /// The [scrollController] property must not be `null` when this is set to
+  /// `false`.
+  ///
+  /// Set to `true` by default.
+  final bool scrollable;
+
+  /// Additional space around the content of this editor.
   final EdgeInsetsGeometry padding;
-  final bool readOnly;
-  final bool showCursor;
+
+  /// Whether this editor should focus itself if nothing else is already
+  /// focused.
+  ///
+  /// If true, the keyboard will open as soon as this editor obtains focus.
+  /// Otherwise, the keyboard is only shown after the user taps the editor.
+  ///
+  /// Defaults to `false`. Cannot be `null`.
   final bool autofocus;
+
+  /// Whether to show cursor.
+  ///
+  /// The cursor refers to the blinking caret when the editor is focused.
+  final bool showCursor;
+
+  /// Whether the text can be changed.
+  ///
+  /// When this is set to `true`, the text cannot be modified
+  /// by any shortcut or keyboard operation. The text is still selectable.
+  ///
+  /// Defaults to `false`. Must not be `null`.
+  final bool readOnly;
+
+  /// Whether to enable user interface affordances for changing the
+  /// text selection.
+  ///
+  /// For example, setting this to true will enable features such as
+  /// long-pressing the editor to select text and show the
+  /// cut/copy/paste menu, and tapping to move the text cursor.
+  ///
+  /// When this is false, the text selection cannot be adjusted by
+  /// the user, text cannot be copied, and the user cannot paste into
+  /// the text field from the clipboard.
+  final bool enableInteractiveSelection;
+
+  /// The minimum height to be occupied by this editor.
+  ///
+  /// This only has effect if [scrollable] is set to `true` and [expands] is
+  /// set to `false`.
+  final double minHeight;
+
+  /// The maximum height to be occupied by this editor.
+  ///
+  /// This only has effect if [scrollable] is set to `true` and [expands] is
+  /// set to `false`.
+  final double maxHeight;
+
+  /// Whether this editor's height will be sized to fill its parent.
+  ///
+  /// This only has effect if [scrollable] is set to `true`.
+  ///
+  /// If expands is set to true and wrapped in a parent widget like [Expanded]
+  /// or [SizedBox], the editor will expand to fill the parent.
+  ///
+  /// [maxHeight] and [minHeight] must both be `null` when this is set to
+  /// `true`.
+  ///
+  /// Defaults to `false`.
+  final bool expands;
+
+  /// Configures how the platform keyboard will select an uppercase or
+  /// lowercase keyboard.
+  ///
+  /// Only supports text keyboards, other keyboard types will ignore this
+  /// configuration. Capitalization is locale-aware.
+  ///
+  /// Defaults to [TextCapitalization.sentences]. Must not be `null`.
+  final TextCapitalization textCapitalization;
+
+  /// The appearance of the keyboard.
+  ///
+  /// This setting is only honored on iOS devices.
+  ///
+  /// Defaults to [Brightness.light].
+  final Brightness keyboardAppearance;
+
+  /// The [ScrollPhysics] to use when vertically scrolling the input.
+  ///
+  /// This only has effect if [scrollable] is set to `true`.
+  ///
+  /// If not specified, it will behave according to the current platform.
+  ///
+  /// See [Scrollable.physics].
+  final ScrollPhysics scrollPhysics;
+
+  /// Callback to invoke when user wants to launch a URL.
   final ValueChanged<String> onLaunchUrl;
+
+  final InputDecoration decoration;
 
   const ZefyrField({
     Key key,
     @required this.controller,
-    @required this.focusNode,
+    this.focusNode,
+    this.scrollController,
+    this.scrollable = true,
     this.padding = EdgeInsets.zero,
-    this.readOnly = false,
     this.autofocus = false,
-    this.showCursor,
+    this.showCursor = true,
+    this.readOnly = false,
+    this.enableInteractiveSelection = true,
+    this.minHeight,
+    this.maxHeight,
+    this.expands = false,
+    this.textCapitalization = TextCapitalization.sentences,
+    this.keyboardAppearance = Brightness.light,
+    this.scrollPhysics,
     this.onLaunchUrl,
+    this.decoration,
   }) : super(key: key);
 
   @override
   _ZefyrFieldState createState() => _ZefyrFieldState();
 }
 
-class _ZefyrFieldState extends State<ZefyrField>
-    implements EditorTextSelectionGestureDetectorBuilderDelegate {
-  final GlobalKey<EditorState> _editorKey = GlobalKey<EditorState>();
-
-  EditorTextSelectionGestureDetectorBuilder _selectionGestureDetectorBuilder;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectionGestureDetectorBuilder =
-        _TextFieldSelectionGestureDetectorBuilder(state: this);
-  }
-
+class _ZefyrFieldState extends State<ZefyrField> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final selectionTheme = TextSelectionTheme.of(context);
-
-    TextSelectionControls textSelectionControls;
-    bool paintCursorAboveText;
-    bool cursorOpacityAnimates;
-    Offset cursorOffset;
-    Color cursorColor;
-    Color selectionColor;
-    Color autocorrectionTextRectColor;
-    Radius cursorRadius;
-
-    switch (theme.platform) {
-      case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
-        // forcePressEnabled = true;
-        textSelectionControls = cupertinoTextSelectionControls;
-        paintCursorAboveText = true;
-        cursorOpacityAnimates = true;
-        if (theme.useTextSelectionTheme) {
-          cursorColor ??= selectionTheme.cursorColor ??
-              CupertinoTheme.of(context).primaryColor;
-          selectionColor = selectionTheme.selectionColor ??
-              _defaultSelectionColor(
-                  context, CupertinoTheme.of(context).primaryColor);
-        } else {
-          cursorColor ??= CupertinoTheme.of(context).primaryColor;
-          selectionColor = theme.textSelectionColor;
-        }
-        cursorRadius ??= const Radius.circular(2.0);
-        cursorOffset = Offset(
-            iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
-        autocorrectionTextRectColor = selectionColor;
-        break;
-
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.linux:
-      case TargetPlatform.windows:
-        // forcePressEnabled = false;
-        textSelectionControls = materialTextSelectionControls;
-        paintCursorAboveText = false;
-        cursorOpacityAnimates = false;
-        if (theme.useTextSelectionTheme) {
-          cursorColor ??=
-              selectionTheme.cursorColor ?? theme.colorScheme.primary;
-          selectionColor = selectionTheme.selectionColor ??
-              _defaultSelectionColor(context, theme.colorScheme.primary);
-        } else {
-          cursorColor ??= theme.cursorColor;
-          selectionColor = theme.textSelectionColor;
-        }
-        break;
-    }
-
-    Widget child = RawEditor(
-      key: _editorKey,
+    final child = ZefyrEditor(
       controller: widget.controller,
       focusNode: widget.focusNode,
+      scrollController: widget.scrollController,
+      scrollable: widget.scrollable,
       padding: widget.padding,
-      readOnly: widget.readOnly,
-      showCursor: widget.showCursor,
-      cursorStyle: CursorStyle(
-        color: cursorColor,
-        backgroundColor: Colors.grey,
-        width: 2.0,
-        radius: Radius.circular(1),
-        opacityAnimates: true,
-      ),
-      onLaunchUrl: widget.onLaunchUrl,
       autofocus: widget.autofocus,
-      selectionColor: selectionColor,
-      showSelectionHandles: false,
-      selectionControls: cupertinoTextSelectionControls,
+      showCursor: widget.showCursor,
+      readOnly: widget.readOnly,
+      enableInteractiveSelection: widget.enableInteractiveSelection,
+      minHeight: widget.minHeight,
+      maxHeight: widget.maxHeight,
+      expands: widget.expands,
+      textCapitalization: widget.textCapitalization,
+      keyboardAppearance: widget.keyboardAppearance,
+      scrollPhysics: widget.scrollPhysics,
+      onLaunchUrl: widget.onLaunchUrl,
     );
 
-    return _selectionGestureDetectorBuilder.buildGestureDetector(
-      behavior: HitTestBehavior.translucent,
+    return AnimatedBuilder(
+      animation:
+          Listenable.merge(<Listenable>[widget.focusNode, widget.controller]),
+      builder: (BuildContext context, Widget child) {
+        return InputDecorator(
+          decoration: _getEffectiveDecoration(),
+          isFocused: widget.focusNode.hasFocus,
+          isEmpty: widget.controller.document.length == 1,
+          child: child,
+        );
+      },
       child: child,
     );
   }
 
-  @override
-  GlobalKey<EditorState> get editableTextKey => _editorKey;
+  InputDecoration _getEffectiveDecoration() {
+    final effectiveDecoration = (widget.decoration ?? const InputDecoration())
+        .applyDefaults(Theme.of(context).inputDecorationTheme)
+        .copyWith(
+          enabled: !widget.readOnly,
+          hintMaxLines: widget.decoration?.hintMaxLines,
+        );
 
-  @override
-  bool get forcePressEnabled => false;
-
-  @override
-  bool get selectionEnabled => true;
-
-  Color _defaultSelectionColor(BuildContext context, Color primary) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return primary.withOpacity(isDark ? 0.40 : 0.12);
+    return effectiveDecoration;
   }
 }

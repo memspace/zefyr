@@ -190,6 +190,7 @@ class RenderEditor extends RenderEditableContainerBox
   /// visible on the screen.
   ValueListenable<bool> get selectionStartInViewport =>
       _selectionStartInViewport;
+  // TODO: implement selectionStartInViewport
   final ValueNotifier<bool> _selectionStartInViewport =
       ValueNotifier<bool>(true);
 
@@ -203,14 +204,24 @@ class RenderEditor extends RenderEditableContainerBox
   /// This bool indicates whether the text is scrolled so that the handle is
   /// inside the text field viewport, as opposed to whether it is actually
   /// visible on the screen.
+  // TODO: implement selectionEndInViewport
   ValueListenable<bool> get selectionEndInViewport => _selectionEndInViewport;
   final ValueNotifier<bool> _selectionEndInViewport = ValueNotifier<bool>(true);
 
   /// Finds the closest scroll offset that fully reveals the editing cursor.
   ///
+  /// The `scrollOffset` parameter represents current scroll offset in the
+  /// parent viewport.
+  ///
+  /// The `offsetInViewport` parameter represents the editor's vertical offset
+  /// in the parent viewport. This value should normally be 0.0 if this editor
+  /// is the only child of the viewport or if it's the topmost child. Otherwise
+  /// it should be a positive value equal to total height of all siblings of
+  /// this editor from above it.
+  ///
   /// Returns `null` if the cursor is currently visible.
   double /*?*/ getOffsetToRevealCursor(
-      double viewportHeight, double scrollOffset) {
+      double viewportHeight, double scrollOffset, double offsetInViewport) {
     const kMargin = 8.0;
     // Endpoints coordinates represents lower left or lower right corner of
     // the selection. If we want to scroll up to reveal the caret we need to
@@ -224,15 +235,19 @@ class RenderEditor extends RenderEditableContainerBox
           TextPosition(offset: selection.extentOffset - child.node.offset);
       final caretTop = endpoints.single.point.dy -
           child.preferredLineHeight(childPosition) -
-          kMargin;
-      final caretBottom = endpoints.single.point.dy + kMargin;
+          kMargin +
+          offsetInViewport;
+      final caretBottom =
+          endpoints.single.point.dy + kMargin + offsetInViewport;
       double dy;
       if (caretTop < scrollOffset) {
         dy = caretTop;
       } else if (caretBottom > scrollOffset + viewportHeight) {
         dy = caretBottom - viewportHeight;
       }
-      return dy;
+      if (dy == null) return null;
+      // Clamping to 0.0 so that the content does not jump unnecessarily.
+      return math.max(dy, 0.0);
     }
     // TODO: Implement for non-collapsed selection.
     return null;

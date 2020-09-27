@@ -25,6 +25,10 @@ dependencies:
   cupertino_icons: ^0.1.2
   image_picker: ^0.6.1
   url_launcher: ^5.6.0
+  adaptive_breakpoints: ^0.0.3
+  google_fonts: ^1.1.0
+  file: ^5.2.1
+  path_provider: ^1.6.18
   zefyr:
     path: ../
 
@@ -50,6 +54,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/
     - images/breeze.jpg
   # assets:
   #   - images/a_dot_burr.jpeg
