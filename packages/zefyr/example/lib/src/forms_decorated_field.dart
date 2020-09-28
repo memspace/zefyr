@@ -34,7 +34,8 @@ class _DecoratedFieldDemoState extends State<DecoratedFieldDemo> {
               labelText: 'Description',
               hintText: 'Detailed description, but not too detailed',
             ),
-            minHeight: 150.0,
+            minHeight: 80.0,
+            maxHeight: 160.0,
           ),
           TextField(
             decoration: InputDecoration(labelText: 'Final thoughts'),

@@ -83,9 +83,6 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
   }
 
   @override
-  double get cursorMargin => firstChild.cursorMargin;
-
-  @override
   TextRange getLineBoundary(TextPosition position) {
     final child = childAtPosition(position);
     final positionInChild = TextPosition(
@@ -294,8 +291,8 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
 
     // We want the decoration to align with the text so we adjust left padding
     // by cursorMargin.
-    final decorationOffset = offset.translate(
-        decorationPadding.left + cursorMargin, decorationPadding.top);
+    final decorationOffset =
+        offset.translate(decorationPadding.left, decorationPadding.top);
     _painter.paint(context.canvas, decorationOffset, filledConfiguration);
     assert(() {
       if (debugSaveCount != context.canvas.getSaveCount()) {

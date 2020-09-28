@@ -12,7 +12,6 @@ import '../widgets/selection_utils.dart';
 import 'cursor_painter.dart';
 import 'editable_box.dart';
 
-const double _kCursorGap = 1.0; // pixels
 const double _kCursorHeightOffset = 2.0; // pixels
 
 enum TextLineSlot { leading, body }
@@ -385,9 +384,6 @@ class RenderEditableTextLine extends RenderEditableBox {
       return;
     }
     _resolvedPadding = padding.resolve(textDirection);
-    _resolvedPadding =
-        _resolvedPadding.copyWith(left: _resolvedPadding.left + cursorMargin);
-
     assert(_resolvedPadding.isNonNegative);
   }
 
@@ -413,8 +409,6 @@ class RenderEditableTextLine extends RenderEditableBox {
     markNeedsLayout();
   }
 
-  @override
-  double get cursorMargin => _kCursorGap + cursorWidth;
   double get cursorWidth => _cursorController.style.width;
   double get cursorHeight =>
       _cursorController.style.height ??
@@ -681,12 +675,11 @@ class RenderEditableTextLine extends RenderEditableBox {
   }
 
   void _paintCursor(PaintingContext context, Offset effectiveOffset) {
-    final cursorOffset = effectiveOffset.translate(-_kCursorGap, 0);
     final position = TextPosition(
       offset: selection.extentOffset - node.documentOffset,
       affinity: selection.base.affinity,
     );
-    _cursorPainter.paint(context.canvas, cursorOffset, position);
+    _cursorPainter.paint(context.canvas, effectiveOffset, position);
   }
 
 // End render box overrides

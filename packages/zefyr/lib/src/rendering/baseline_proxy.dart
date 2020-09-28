@@ -7,9 +7,10 @@ class RenderBaselineProxy extends RenderProxyBox {
     @required TextStyle textStyle,
     @required EdgeInsets padding,
   })  : _prototypePainter = TextPainter(
-          text: TextSpan(text: ' ', style: textStyle),
-          textDirection: TextDirection.ltr,
-        ),
+            text: TextSpan(text: ' ', style: textStyle),
+            textDirection: TextDirection.ltr,
+            strutStyle:
+                StrutStyle.fromTextStyle(textStyle, forceStrutHeight: true)),
         super(child);
 
   final TextPainter _prototypePainter;
@@ -31,6 +32,10 @@ class RenderBaselineProxy extends RenderProxyBox {
 
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
+    // This doesn't seem to produce pixel perfect result when used by
+    // InputDecorator and its hintText. The hint seems to be painted very
+    // slightly above the actual text when user starts typing.
+    // TODO: Investigate the discrepancy with input decorator hintText.
     final top = _padding?.top ?? 0.0;
     return _prototypePainter.computeDistanceToActualBaseline(baseline) + top;
   }

@@ -223,15 +223,15 @@ class _ZefyrEditorState extends State<ZefyrEditor>
     switch (theme.platform) {
       case TargetPlatform.iOS:
       case TargetPlatform.macOS:
+        final cupertinoTheme = CupertinoTheme.of(context);
         textSelectionControls = cupertinoTextSelectionControls;
         paintCursorAboveText = true;
         cursorOpacityAnimates = true;
         if (theme.useTextSelectionTheme) {
-          cursorColor ??= selectionTheme.cursorColor ??
-              CupertinoTheme.of(context).primaryColor;
+          cursorColor ??=
+              selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
           selectionColor = selectionTheme.selectionColor ??
-              _defaultSelectionColor(
-                  context, CupertinoTheme.of(context).primaryColor);
+              cupertinoTheme.primaryColor.withOpacity(0.40);
         } else {
           cursorColor ??= CupertinoTheme.of(context).primaryColor;
           selectionColor = theme.textSelectionColor;
@@ -252,7 +252,7 @@ class _ZefyrEditorState extends State<ZefyrEditor>
           cursorColor ??=
               selectionTheme.cursorColor ?? theme.colorScheme.primary;
           selectionColor = selectionTheme.selectionColor ??
-              _defaultSelectionColor(context, theme.colorScheme.primary);
+              theme.colorScheme.primary.withOpacity(0.40);
         } else {
           cursorColor ??= theme.cursorColor;
           selectionColor = theme.textSelectionColor;
@@ -297,11 +297,6 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       behavior: HitTestBehavior.translucent,
       child: child,
     );
-  }
-
-  Color _defaultSelectionColor(BuildContext context, Color primary) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return primary.withOpacity(isDark ? 0.40 : 0.12);
   }
 }
 
@@ -1041,6 +1036,12 @@ class RawEditorState extends EditorState
     );
 
     if (widget.scrollable) {
+      /// Since [SingleChildScrollView] does not implement
+      /// `computeDistanceToActualBaseline` it prevents the editor from
+      /// providing its baseline metrics. To address this issue we wrap
+      /// the scroll view with [BaselineProxy] which mimics the editor's
+      /// baseline.
+      // TODO: check the first line's style for being a heading and use heading theme instead
       final baselinePadding =
           EdgeInsets.only(top: _themeData.paragraph.spacing.top);
       child = BaselineProxy(

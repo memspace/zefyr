@@ -187,10 +187,8 @@ mixin RawEditorStateKeyboardMixin on EditorState {
         // If control/command is pressed, we will decide which way to expand to
         // the beginning/end of the line based on which arrow is pressed.
         if (leftArrow) {
-          // When going left, we want to skip over any whitespace before the line,
-          // so we go back to the first non-whitespace before asking for the line
-          // bounds, since selectLineAtPosition finds the line boundaries without
-          // including whitespace (like the newline).
+          // When going left.
+          // This is not the optimal approach, see comment below for details.
           final int startPoint =
               previousCharacter(newSelection.extentOffset, plainText, false);
           final TextSelection textSelection = renderEditor
@@ -198,16 +196,22 @@ mixin RawEditorStateKeyboardMixin on EditorState {
           newSelection =
               newSelection.copyWith(extentOffset: textSelection.baseOffset);
         } else {
-          // When going right, we want to skip over any whitespace after the line,
-          // so we go forward to the first non-whitespace character before asking
-          // for the line bounds, since _selectLineAtOffset finds the line
-          // boundaries without including whitespace (like the newline).
-          final int startPoint =
-              nextCharacter(newSelection.extentOffset, plainText, false);
-          final TextSelection textSelection = renderEditor
-              .selectLineAtPosition(TextPosition(offset: startPoint));
-          newSelection =
-              newSelection.copyWith(extentOffset: textSelection.extentOffset);
+          // When going right, look to the right from current position until
+          // we find the end of the line.
+          // A better solution would be to take into account word wrapping and
+          // only jump to the end of text before wrapping occurs.
+          // TODO: Handle soft-wrapping
+          // This can be implemented by getting vertical offset at the start
+          // point, then getting selection boxes for this line, filtering to
+          // only include boxes with the same vertical offset and getting the
+          // largest right edge of all the remaining boxes.
+          final int startPoint = newSelection.extentOffset;
+          if (startPoint < plainText.length) {
+            final TextSelection textSelection = renderEditor
+                .selectLineAtPosition(TextPosition(offset: startPoint));
+            newSelection =
+                newSelection.copyWith(extentOffset: textSelection.extentOffset);
+          }
         }
       } else {
         if (rightArrow && newSelection.extentOffset < plainText.length) {

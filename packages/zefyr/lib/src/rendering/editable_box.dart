@@ -41,9 +41,6 @@ abstract class RenderEditableBox extends RenderBox {
   /// The document node represented by this render box.
   ContainerNode get node;
 
-  /// Horizontal margin taken by the cursor.
-  double get cursorMargin;
-
   /// Returns preferred line height at specified `position` in text.
   ///
   /// The `position` parameter must be relative to the [node]'s content.

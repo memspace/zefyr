@@ -36,6 +36,15 @@ class CursorPainter {
     Rect caretRect = cursorPrototype.shift(caretOffset);
     if (style.offset != null) caretRect = caretRect.shift(style.offset);
 
+    if (caretRect.left < 0.0) {
+      // For iOS the cursor may get clipped by the scroll view when
+      // it's located at a beginning of a line. We ensure that this
+      // does not happen here. This may result in the cursor being painted
+      // closer to the character on the right, but it's arguably better
+      // then painting clipped cursor (or even cursor completely hidden).
+      caretRect = caretRect.shift(Offset(-caretRect.left, 0.0));
+    }
+
     final double caretHeight = editable.getFullHeightForCaret(textPosition);
     if (caretHeight != null) {
       switch (defaultTargetPlatform) {
