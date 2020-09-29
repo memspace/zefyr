@@ -1041,7 +1041,7 @@ class RawEditorState extends EditorState
       /// providing its baseline metrics. To address this issue we wrap
       /// the scroll view with [BaselineProxy] which mimics the editor's
       /// baseline.
-      // TODO: check the first line's style for being a heading and use heading theme instead
+      // This implies that the first line has no styles applied to it.
       final baselinePadding =
           EdgeInsets.only(top: _themeData.paragraph.spacing.top);
       child = BaselineProxy(

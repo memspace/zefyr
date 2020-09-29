@@ -131,7 +131,9 @@ class ZefyrField extends StatefulWidget {
 
   final InputDecoration decoration;
 
-  const ZefyrField({
+  final Widget toolbar;
+
+  ZefyrField({
     Key key,
     @required this.controller,
     this.focusNode,
@@ -150,6 +152,7 @@ class ZefyrField extends StatefulWidget {
     this.scrollPhysics,
     this.onLaunchUrl,
     this.decoration,
+    this.toolbar,
   }) : super(key: key);
 
   @override
@@ -157,9 +160,33 @@ class ZefyrField extends StatefulWidget {
 }
 
 class _ZefyrFieldState extends State<ZefyrField> {
+  bool _focused;
+  void _editorFocusChanged() {
+    setState(() {
+      _focused = widget.focusNode.hasFocus;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _focused = widget.focusNode.hasFocus;
+    widget.focusNode.addListener(_editorFocusChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant ZefyrField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.focusNode != oldWidget.focusNode) {
+      oldWidget.focusNode.removeListener(_editorFocusChanged);
+      widget.focusNode.addListener(_editorFocusChanged);
+      _focused = widget.focusNode.hasFocus;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final child = ZefyrEditor(
+    Widget child = ZefyrEditor(
       controller: widget.controller,
       focusNode: widget.focusNode,
       scrollController: widget.scrollController,
@@ -178,6 +205,21 @@ class _ZefyrFieldState extends State<ZefyrField> {
       onLaunchUrl: widget.onLaunchUrl,
     );
 
+    if (widget.toolbar != null) {
+      child = Column(
+        children: [
+          child,
+          Visibility(
+            child: widget.toolbar,
+            visible: _focused,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+          ),
+        ],
+      );
+    }
+
     return AnimatedBuilder(
       animation:
           Listenable.merge(<Listenable>[widget.focusNode, widget.controller]),
@@ -185,6 +227,7 @@ class _ZefyrFieldState extends State<ZefyrField> {
         return InputDecorator(
           decoration: _getEffectiveDecoration(),
           isFocused: widget.focusNode.hasFocus,
+          // TODO: Document should be considered empty of it has single empty line with no styles applied
           isEmpty: widget.controller.document.length == 1,
           child: child,
         );

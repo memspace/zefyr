@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:file/local.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart' as pp;
 
@@ -14,6 +15,10 @@ class Settings {
   Settings({this.assetsPath});
 
   static Future<Settings> load() async {
+    if (kIsWeb) {
+      return Settings(assetsPath: '');
+    }
+
     final fs = LocalFileSystem();
     final dir = await pp.getApplicationSupportDirectory();
     final file = fs.directory(dir.path).childFile('settings.json');
@@ -32,6 +37,9 @@ class Settings {
   }
 
   Future<void> save() async {
+    if (kIsWeb) {
+      return;
+    }
     final fs = LocalFileSystem();
     final dir = await pp.getApplicationSupportDirectory();
     final file = fs.directory(dir.path).childFile('settings.json');

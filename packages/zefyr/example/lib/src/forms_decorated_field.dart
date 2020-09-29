@@ -31,11 +31,13 @@ class _DecoratedFieldDemoState extends State<DecoratedFieldDemo> {
             controller: controller,
             focusNode: _focusNode,
             decoration: InputDecoration(
+              contentPadding: EdgeInsets.only(top: 8.0),
               labelText: 'Description',
               hintText: 'Detailed description, but not too detailed',
             ),
-            minHeight: 80.0,
-            maxHeight: 160.0,
+            toolbar: EditorToolbar.basic(controller: controller),
+            // minHeight: 80.0,
+            // maxHeight: 160.0,
           ),
           TextField(
             decoration: InputDecoration(labelText: 'Final thoughts'),
