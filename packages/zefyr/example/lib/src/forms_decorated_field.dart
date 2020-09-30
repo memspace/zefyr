@@ -16,6 +16,7 @@ class _DecoratedFieldDemoState extends State<DecoratedFieldDemo> {
     return DemoScaffold(
       documentFilename: 'decorated_field.note',
       builder: _buildContent,
+      showToolbar: false,
     );
   }
 
