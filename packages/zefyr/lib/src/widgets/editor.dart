@@ -834,6 +834,13 @@ class RawEditorState extends EditorState
     }
   }
 
+  bool _shouldShowSelectionHandles() {
+    if (widget.readOnly && widget.controller.selection.isCollapsed) {
+      return false;
+    }
+    return widget.showSelectionHandles;
+  }
+
   @override
   void didUpdateWidget(RawEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -866,8 +873,8 @@ class RawEditorState extends EditorState
     if (widget.controller.selection != oldWidget.controller.selection) {
       _selectionOverlay?.update(textEditingValue);
     }
-    _selectionOverlay?.handlesVisible = widget.showSelectionHandles;
 
+    _selectionOverlay?.handlesVisible = _shouldShowSelectionHandles();
     if (!shouldCreateInputConnection) {
       closeConnectionIfNeeded();
     } else {
@@ -933,6 +940,8 @@ class RawEditorState extends EditorState
   void _handleSelectionChanged(
       TextSelection selection, SelectionChangedCause cause) {
     widget.controller.updateSelection(selection, source: ChangeSource.local);
+
+    _selectionOverlay?.handlesVisible = _shouldShowSelectionHandles();
 
     // This will show the keyboard for all selection changes on the
     // editor, not just changes triggered by user gestures.
