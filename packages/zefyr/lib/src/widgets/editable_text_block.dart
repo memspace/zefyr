@@ -4,6 +4,7 @@ import 'package:notus/notus.dart';
 import '../rendering/editable_text_block.dart';
 import 'cursor.dart';
 import 'editable_text_line.dart';
+import 'editor.dart';
 import 'text_line.dart';
 import 'theme.dart';
 
@@ -17,8 +18,9 @@ class EditableTextBlock extends StatelessWidget {
   final bool enableInteractiveSelection;
   final bool hasFocus;
   final EdgeInsets contentPadding;
+  final ZefyrEmbedBuilder embedBuilder;
 
-  const EditableTextBlock({
+  EditableTextBlock({
     Key key,
     @required this.node,
     @required this.textDirection,
@@ -29,7 +31,9 @@ class EditableTextBlock extends StatelessWidget {
     @required this.enableInteractiveSelection,
     @required this.hasFocus,
     this.contentPadding,
+    @required this.embedBuilder,
   })  : assert(hasFocus != null),
+        assert(embedBuilder != null),
         super(key: key);
 
   @override
@@ -64,6 +68,7 @@ class EditableTextBlock extends StatelessWidget {
         body: TextLine(
           node: line,
           textDirection: textDirection,
+          embedBuilder: embedBuilder,
         ),
         cursorController: cursorController,
         selection: selection,

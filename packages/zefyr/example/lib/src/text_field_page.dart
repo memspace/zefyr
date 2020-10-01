@@ -48,7 +48,7 @@ class _TextFieldScreenState extends State<TextFieldScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: EditorToolbar.basic(controller: _controller),
+      appBar: ZefyrToolbar.basic(controller: _controller),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
         child: Container(

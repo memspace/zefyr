@@ -133,6 +133,11 @@ class ZefyrField extends StatefulWidget {
 
   final Widget toolbar;
 
+  /// Builder function for embeddable objects.
+  ///
+  /// Defaults to [defaultZefyrEmbedBuilder].
+  final ZefyrEmbedBuilder embedBuilder;
+
   ZefyrField({
     Key key,
     @required this.controller,
@@ -153,6 +158,7 @@ class ZefyrField extends StatefulWidget {
     this.onLaunchUrl,
     this.decoration,
     this.toolbar,
+    this.embedBuilder = defaultZefyrEmbedBuilder,
   }) : super(key: key);
 
   @override
@@ -203,6 +209,7 @@ class _ZefyrFieldState extends State<ZefyrField> {
       keyboardAppearance: widget.keyboardAppearance,
       scrollPhysics: widget.scrollPhysics,
       onLaunchUrl: widget.onLaunchUrl,
+      embedBuilder: widget.embedBuilder,
     );
 
     if (widget.toolbar != null) {

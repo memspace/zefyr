@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
 import 'editable_text_line.dart';
+import 'editor.dart';
 import 'embed_proxy.dart';
 import 'rich_text_proxy.dart';
 import 'theme.dart';
@@ -14,26 +15,24 @@ class TextLine extends StatelessWidget {
   /// Line of text represented by this widget.
   final LineNode node;
   final TextDirection textDirection;
+  final ZefyrEmbedBuilder embedBuilder;
 
   const TextLine({
     Key key,
     @required this.node,
     this.textDirection,
-  }) : super(key: key);
+    @required this.embedBuilder,
+  })  : assert(node != null),
+        assert(embedBuilder != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
 
     if (node.hasEmbed) {
-      // TODO: actually embed correct object type, hardcoded HR now for testing
-      return EmbedProxy(
-        child: Divider(
-          height: 16 * 1.3,
-          thickness: 2,
-          color: Colors.grey.shade200,
-        ),
-      );
+      final embed = node.children.single as EmbedNode;
+      return EmbedProxy(child: embedBuilder(context, embed));
     }
     final text = buildText(context, node);
     final strutStyle =

@@ -22,6 +22,29 @@ import 'text_line.dart';
 import 'text_selection.dart';
 import 'theme.dart';
 
+/// Builder function for embeddable objects in [ZefyrEditor].
+typedef ZefyrEmbedBuilder = Widget Function(
+    BuildContext context, EmbedNode node);
+
+/// Default implementation of a builder function for embeddable objects in
+/// Zefyr.
+///
+/// Only supports "horizontal rule" embeds.
+Widget defaultZefyrEmbedBuilder(BuildContext context, EmbedNode node) {
+  if (node.value.type == 'hr') {
+    final theme = ZefyrTheme.of(context);
+    return Divider(
+      height: theme.paragraph.style.fontSize * theme.paragraph.style.height,
+      thickness: 2,
+      color: Colors.grey.shade200,
+    );
+  }
+  throw UnimplementedError(
+      'Embeddable type "${node.value.type}" is not supported by default embed '
+      'builder of ZefyrEditor. You must pass your own builder function to '
+      'embedBuilder property of ZefyrEditor or ZefyrField widgets.');
+}
+
 /// Widget for editing rich text documents.
 class ZefyrEditor extends StatefulWidget {
   /// Controller object which establishes a link between a rich text document
@@ -148,6 +171,11 @@ class ZefyrEditor extends StatefulWidget {
   /// Callback to invoke when user wants to launch a URL.
   final ValueChanged<String> onLaunchUrl;
 
+  /// Builder function for embeddable objects.
+  ///
+  /// Defaults to [defaultZefyrEmbedBuilder].
+  final ZefyrEmbedBuilder embedBuilder;
+
   const ZefyrEditor({
     Key key,
     @required this.controller,
@@ -166,6 +194,7 @@ class ZefyrEditor extends StatefulWidget {
     this.keyboardAppearance = Brightness.light,
     this.scrollPhysics,
     this.onLaunchUrl,
+    this.embedBuilder = defaultZefyrEmbedBuilder,
   })  : assert(controller != null),
         super(key: key);
 
@@ -278,6 +307,7 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       keyboardAppearance: widget.keyboardAppearance,
       scrollPhysics: widget.scrollPhysics,
       onLaunchUrl: widget.onLaunchUrl,
+      embedBuilder: widget.embedBuilder,
       // encapsulated fields below
       cursorStyle: CursorStyle(
         color: cursorColor,
@@ -457,6 +487,7 @@ class RawEditor extends StatefulWidget {
     this.cursorStyle,
     this.showSelectionHandles = false,
     this.selectionControls,
+    this.embedBuilder = defaultZefyrEmbedBuilder,
   })  : assert(controller != null),
         assert(focusNode != null),
         assert(scrollable || scrollController != null),
@@ -474,6 +505,7 @@ class RawEditor extends StatefulWidget {
         ),
         assert(autofocus != null),
         assert(toolbarOptions != null),
+        assert(embedBuilder != null),
         // keyboardType = keyboardType ?? TextInputType.multiline,
         showCursor = showCursor ?? !readOnly,
         super(key: key);
@@ -604,6 +636,11 @@ class RawEditor extends StatefulWidget {
   ///
   /// See [Scrollable.physics].
   final ScrollPhysics scrollPhysics;
+
+  /// Builder function for embeddable objects.
+  ///
+  /// Defaults to [defaultZefyrEmbedBuilder].
+  final ZefyrEmbedBuilder embedBuilder;
 
   bool get selectionEnabled => enableInteractiveSelection;
 
@@ -1086,7 +1123,11 @@ class RawEditorState extends EditorState
           selection: widget.controller.selection,
           selectionColor: widget.selectionColor,
           enableInteractiveSelection: widget.enableInteractiveSelection,
-          body: TextLine(node: node, textDirection: _textDirection),
+          body: TextLine(
+            node: node,
+            textDirection: _textDirection,
+            embedBuilder: widget.embedBuilder,
+          ),
           hasFocus: _hasFocus,
           devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         ));
@@ -1104,6 +1145,7 @@ class RawEditorState extends EditorState
           contentPadding: (block == NotusAttribute.block.code)
               ? EdgeInsets.all(16.0)
               : null,
+          embedBuilder: widget.embedBuilder,
         ));
       } else {
         throw StateError('Unreachable.');

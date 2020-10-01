@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildWelcomeEditor(BuildContext context) {
     return Column(
       children: [
-        EditorToolbar.basic(controller: _controller),
+        ZefyrToolbar.basic(controller: _controller),
         Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
         Expanded(
           child: Container(

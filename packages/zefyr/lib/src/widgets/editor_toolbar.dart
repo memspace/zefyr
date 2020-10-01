@@ -381,13 +381,13 @@ Widget _selectHeadingStyleButtonBuilder(BuildContext context,
   );
 }
 
-class EditorToolbar extends StatefulWidget implements PreferredSizeWidget {
+class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
   final List<Widget> children;
 
-  const EditorToolbar({Key key, @required this.children}) : super(key: key);
+  const ZefyrToolbar({Key key, @required this.children}) : super(key: key);
 
-  factory EditorToolbar.basic({Key key, @required ZefyrController controller}) {
-    return EditorToolbar(key: key, children: [
+  factory ZefyrToolbar.basic({Key key, @required ZefyrController controller}) {
+    return ZefyrToolbar(key: key, children: [
       ToggleStyleButton(
         attribute: NotusAttribute.bold,
         icon: Icons.format_bold,
@@ -427,23 +427,19 @@ class EditorToolbar extends StatefulWidget implements PreferredSizeWidget {
       LinkStyleButton(controller: controller),
       InsertEmbedButton(
         controller: controller,
-        icon: Icons.image_outlined,
-      ),
-      InsertEmbedButton(
-        controller: controller,
         icon: Icons.horizontal_rule,
       ),
     ]);
   }
 
   @override
-  _EditorToolbarState createState() => _EditorToolbarState();
+  _ZefyrToolbarState createState() => _ZefyrToolbarState();
 
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }
 
-class _EditorToolbarState extends State<EditorToolbar> {
+class _ZefyrToolbarState extends State<ZefyrToolbar> {
   @override
   Widget build(BuildContext context) {
     return Container(

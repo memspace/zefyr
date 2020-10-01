@@ -134,7 +134,7 @@ class _DemoScaffoldState extends State<DemoScaffold> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: _loading ? null : EditorToolbar.basic(controller: _controller),
+        title: _loading ? null : ZefyrToolbar.basic(controller: _controller),
         actions: actions,
       ),
       body: _loading
