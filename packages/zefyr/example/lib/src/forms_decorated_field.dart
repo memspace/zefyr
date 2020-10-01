@@ -35,7 +35,7 @@ class _DecoratedFieldDemoState extends State<DecoratedFieldDemo> {
               labelText: 'Description',
               hintText: 'Detailed description, but not too detailed',
             ),
-            toolbar: EditorToolbar.basic(controller: controller),
+            toolbar: ZefyrToolbar.basic(controller: controller),
             // minHeight: 80.0,
             // maxHeight: 160.0,
           ),
