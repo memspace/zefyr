@@ -6,6 +6,40 @@ import 'package:notus/notus.dart';
 import 'package:notus/src/document/embeds.dart';
 import 'package:quill_delta/quill_delta.dart';
 
+/// The result of [_findNextNewline] function.
+class _FindResult {
+  /// The operation containing a newline character, can be null.
+  final Operation op;
+
+  /// Total length of skipped characters before [op].
+  final int skippedLength;
+
+  _FindResult(this.op, this.skippedLength);
+
+  /// If true then no operation containing newline was found.
+  bool get isEmpty => op == null;
+
+  /// If false then no operation containing newline was found.
+  bool get isNotEmpty => op != null;
+}
+
+/// Finds closest operation containing a newline character from current
+/// position of [iterator].
+_FindResult _findNextNewline(DeltaIterator iterator) {
+  var skipped = 0;
+  while (iterator.hasNext) {
+    final op = iterator.next();
+    final opText = op.data is String ? op.data as String : '';
+    final lf = opText.indexOf('\n');
+    if (lf >= 0) {
+      return _FindResult(op, skipped);
+    } else {
+      skipped += op.length;
+    }
+  }
+  return _FindResult(null, null);
+}
+
 /// A heuristic rule for insert operations.
 abstract class InsertRule {
   /// Constant constructor allows subclasses to declare constant constructors.
@@ -69,17 +103,8 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
       return result;
     }
     // Continue looking for a newline.
-    Map<String, dynamic> attributes;
-    while (iter.hasNext) {
-      final op = iter.next();
-      if (op.data is! String) continue; // not interested in embeds.
-      final opText = op.data as String;
-      final lf = opText.indexOf('\n');
-      if (lf != -1) {
-        attributes = op.attributes;
-        break;
-      }
-    }
+    final nextNewline = _findNextNewline(iter);
+    final attributes = nextNewline?.op?.attributes;
 
     return result..insert('\n', attributes);
   }
@@ -127,7 +152,10 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
 
 /// Heuristic rule to exit current block when user inserts two consecutive
 /// newlines.
-// TODO: update this rule to handle code blocks differently, at least allow 3 consecutive newlines before exiting.
+///
+/// This rule is only applied when the cursor is on the last line of a block.
+/// When the cursor is in the middle of a block we allow adding empty lines
+/// and preserving the block's style.
 class AutoExitBlockRule extends InsertRule {
   const AutoExitBlockRule();
 
@@ -150,20 +178,42 @@ class AutoExitBlockRule extends InsertRule {
     final target = iter.next();
     final isInBlock = target.isNotPlain &&
         target.attributes.containsKey(NotusAttribute.block.key);
-    if (isEmptyLine(previous, target) && isInBlock) {
-      // We reset block style even if this line is not the last one in it's
-      // block which effectively splits the block into two.
-      // TODO: For code blocks this should not split the block but allow inserting as many lines as needed.
-      var attributes;
-      if (target.attributes != null) {
-        attributes = target.attributes;
-      } else {
-        attributes = <String, dynamic>{};
-      }
-      attributes.addAll(NotusAttribute.block.unset.toJson());
-      return Delta()..retain(index)..retain(1, attributes);
+
+    // We are not in a block, ignore.
+    if (!isInBlock) return null;
+    // We are not on an empty line, ignore.
+    if (!isEmptyLine(previous, target)) return null;
+
+    final blockStyle = target.attributes[NotusAttribute.block.key];
+
+    // We are on an empty line. Now we need to determine if we are on the
+    // last line of a block.
+    // First check if `target` length is greater than 1, this would indicate
+    // that it contains multiple newline characters which share the same style.
+    // This would mean we are not on the last line yet.
+    final targetText = target.value
+        as String; // this is safe since we already called isEmptyLine and know it contains a newline
+
+    if (targetText.length > 1) {
+      // We are not on the last line of this block, ignore.
+      return null;
     }
-    return null;
+
+    // Keep looking for the next newline character to see if it shares the same
+    // block style as `target`.
+    final nextNewline = _findNextNewline(iter);
+    if (nextNewline.isNotEmpty &&
+        nextNewline.op.attributes != null &&
+        nextNewline.op.attributes[NotusAttribute.block.key] == blockStyle) {
+      // We are not at the end of this block, ignore.
+      return null;
+    }
+
+    // Here we now know that the line after `target` is not in the same block
+    // therefore we can exit this block.
+    final attributes = target.attributes ?? <String, dynamic>{};
+    attributes.addAll(NotusAttribute.block.unset.toJson());
+    return Delta()..retain(index)..retain(1, attributes);
   }
 }
 
@@ -307,10 +357,16 @@ class ForceNewlineForInsertsAroundEmbedRule extends InsertRule {
   }
 }
 
-/// Preserves block style when user pastes text containing newlines.
+/// Preserves block style when user inserts text containing newlines.
+///
+/// This rule handles:
+///
+///   * inserting a new line in a block
+///   * pasting text containing multiple lines of text in a block
+///
 /// This rule may also be activated for changes triggered by auto-correct.
-class PreserveBlockStyleOnPasteRule extends InsertRule {
-  const PreserveBlockStyleOnPasteRule();
+class PreserveBlockStyleOnInsertRule extends InsertRule {
+  const PreserveBlockStyleOnInsertRule();
 
   bool isEdgeLineSplit(Operation before, Operation after) {
     if (before == null) return true; // split at the beginning of a doc
@@ -325,41 +381,34 @@ class PreserveBlockStyleOnPasteRule extends InsertRule {
     if (data is! String) return null;
 
     final text = data as String;
-    if (!text.contains('\n') || text.length == 1) {
-      // Only interested in text containing at least one newline and at least
-      // one more character.
+    if (!text.contains('\n')) {
+      // Only interested in text containing at least one newline character.
       return null;
     }
 
     final iter = DeltaIterator(document);
     iter.skip(index);
 
-    // Look for next newline.
-    Map<String, dynamic> lineStyle;
-    while (iter.hasNext) {
-      final op = iter.next();
-      final opText = op.data is String ? op.data as String : '';
-      final lf = opText.indexOf('\n');
-      if (lf >= 0) {
-        lineStyle = op.attributes;
-        break;
-      }
-    }
+    // Look for the next newline.
+    final nextNewline = _findNextNewline(iter);
+    final lineStyle = nextNewline.op?.attributes ?? <String, dynamic>{};
+
+    // Are we currently in a block? If not then ignore.
+    if (!lineStyle.containsKey(NotusAttribute.block.key)) return null;
+
+    final blockStyle = <String, dynamic>{
+      NotusAttribute.block.key: lineStyle[NotusAttribute.block.key]
+    };
 
     Map<String, dynamic> resetStyle;
-    Map<String, dynamic> blockStyle;
-    if (lineStyle != null) {
-      if (lineStyle.containsKey(NotusAttribute.heading.key)) {
-        resetStyle = NotusAttribute.heading.unset.toJson();
-      }
-
-      if (lineStyle.containsKey(NotusAttribute.block.key)) {
-        blockStyle = <String, dynamic>{
-          NotusAttribute.block.key: lineStyle[NotusAttribute.block.key]
-        };
-      }
+    // If current line had heading style applied to it we'll need to move this
+    // style to the newly inserted line before it and reset style of the
+    // original line.
+    if (lineStyle.containsKey(NotusAttribute.heading.key)) {
+      resetStyle = NotusAttribute.heading.unset.toJson();
     }
 
+    // Go over each inserted line and ensure block style is applied.
     final lines = text.split('\n');
     final result = Delta()..retain(index);
     for (var i = 0; i < lines.length; i++) {
@@ -368,12 +417,20 @@ class PreserveBlockStyleOnPasteRule extends InsertRule {
         result.insert(line);
       }
       if (i == 0) {
+        // The first line should inherit the lineStyle entirely.
         result.insert('\n', lineStyle);
-      } else if (i == lines.length - 1) {
-        if (resetStyle != null) result.retain(1, resetStyle);
-      } else {
+      } else if (i < lines.length - 1) {
+        // we don't want to insert a newline after the last chunk of text, so -1
         result.insert('\n', blockStyle);
       }
+    }
+
+    // Reset style of the original newline character if needed.
+    if (resetStyle != null) {
+      result.retain(nextNewline.skippedLength);
+      final opText = nextNewline.op.data as String;
+      final lf = opText.indexOf('\n');
+      result..retain(lf)..retain(1, resetStyle);
     }
 
     return result;

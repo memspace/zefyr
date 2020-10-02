@@ -256,15 +256,10 @@ class _ZefyrEditorState extends State<ZefyrEditor>
         textSelectionControls = cupertinoTextSelectionControls;
         paintCursorAboveText = true;
         cursorOpacityAnimates = true;
-        if (theme.useTextSelectionTheme) {
-          cursorColor ??=
-              selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
-          selectionColor = selectionTheme.selectionColor ??
-              cupertinoTheme.primaryColor.withOpacity(0.40);
-        } else {
-          cursorColor ??= CupertinoTheme.of(context).primaryColor;
-          selectionColor = theme.textSelectionColor;
-        }
+        cursorColor ??=
+            selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
+        selectionColor = selectionTheme.selectionColor ??
+            cupertinoTheme.primaryColor.withOpacity(0.40);
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
             iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
@@ -277,15 +272,9 @@ class _ZefyrEditorState extends State<ZefyrEditor>
         textSelectionControls = materialTextSelectionControls;
         paintCursorAboveText = false;
         cursorOpacityAnimates = false;
-        if (theme.useTextSelectionTheme) {
-          cursorColor ??=
-              selectionTheme.cursorColor ?? theme.colorScheme.primary;
-          selectionColor = selectionTheme.selectionColor ??
-              theme.colorScheme.primary.withOpacity(0.40);
-        } else {
-          cursorColor ??= theme.cursorColor;
-          selectionColor = theme.textSelectionColor;
-        }
+        cursorColor ??= selectionTheme.cursorColor ?? theme.colorScheme.primary;
+        selectionColor = selectionTheme.selectionColor ??
+            theme.colorScheme.primary.withOpacity(0.40);
         break;
     }
 
