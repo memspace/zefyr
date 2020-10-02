@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:example/src/read_only_view.dart';
 import 'package:file/local.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -113,6 +114,17 @@ class _HomePageState extends State<HomePage> {
     return ListView(
       children: [
         ListTile(
+          title: Text('BASIC EXAMPLES', style: headerStyle),
+          // dense: true,
+          visualDensity: VisualDensity.compact,
+        ),
+        ListTile(
+          title: Text('¶   Read only view', style: itemStyle),
+          dense: true,
+          visualDensity: VisualDensity.compact,
+          onTap: _readOnlyView,
+        ),
+        ListTile(
           title: Text('LAYOUT EXAMPLES', style: headerStyle),
           // dense: true,
           visualDensity: VisualDensity.compact,
@@ -181,6 +193,18 @@ class _HomePageState extends State<HomePage> {
         builder: (BuildContext context) => SettingsProvider(
           settings: _settings,
           child: ExpandedLayout(),
+        ),
+      ),
+    );
+  }
+
+  void _readOnlyView() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => SettingsProvider(
+          settings: _settings,
+          child: ReadOnlyView(),
         ),
       ),
     );
