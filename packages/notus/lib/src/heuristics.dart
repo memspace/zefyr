@@ -24,14 +24,19 @@ class NotusHeuristics {
       // attributes.
     ],
     insertRules: [
+      // Embeds
       InsertEmbedsRule(),
-      PreserveBlockStyleOnPasteRule(),
       ForceNewlineForInsertsAroundEmbedRule(),
+      // Blocks
+      AutoExitBlockRule(), // must go first
+      PreserveBlockStyleOnInsertRule(),
+      // Lines
       PreserveLineStyleOnSplitRule(),
-      AutoExitBlockRule(),
       ResetLineFormatOnNewLineRule(),
+      // Inlines
       AutoFormatLinksRule(),
       PreserveInlineStylesRule(),
+      // Catch-all
       CatchAllInsertRule(),
     ],
     deleteRules: [

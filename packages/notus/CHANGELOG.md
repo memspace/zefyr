@@ -1,3 +1,7 @@
+## 1.0.0-dev.2.0
+
+* Improved block-level heuristics to not exit when adding empty lines in the middle of a block.
+
 ## 1.0.0-dev.1.0
 
 This is the first dev version of the notus package for the upcoming 1.0.0 release.
