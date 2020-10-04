@@ -78,6 +78,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.embed.key: NotusAttribute.embed,
+    NotusAttribute.custom.key: NotusAttribute.custom,
   };
 
   // Inline attributes
@@ -126,6 +127,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Embed style attribute.
   // ignore: const_eval_throws_exception
   static const embed = EmbedAttributeBuilder._();
+
+  /// Custom attribute.
+  static final custom =  CustomAttributeBuilder._();
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
@@ -460,3 +464,16 @@ class EmbedAttribute extends NotusAttribute<Map<String, dynamic>> {
     return hashObjects(objects);
   }
 }
+
+/// Builder for custom attributes that do not necessarily need styling.
+/// 
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.custom] instead.
+class CustomAttributeBuilder extends NotusAttributeBuilder<String> {
+  static const _kCustom = 'custom';
+  
+  const CustomAttributeBuilder._() : super._(_kCustom, NotusAttributeScope.inline);
+
+  NotusAttribute<String> withValue(String value) => NotusAttribute<String>._(key, scope, value);  
+}
+

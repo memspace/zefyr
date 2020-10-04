@@ -19,7 +19,8 @@ attribute can be either *inline-scoped* or *line-scoped*, but not both.
 A good example of an inline-scoped attribute is "bold" attribute. Bold
 style can be applied to any character within a line, but not to the
 line itself. Similarly "heading" style is line-scoped and has effect
-only on the line as a whole.
+only on the line as a whole.  A custom *inline-scoped* attributes can be
+added for tracking of non-UI based attributes.
 
 Below table summarizes information about all currently supported
 attributes in Zefyr:
@@ -32,6 +33,7 @@ attributes in Zefyr:
 | Heading | `heading` | `line`   | `int`    | `1`, `2` and `3`                       |
 | Block   | `block`   | `line`   | `String` | `"ul"`, `"ol"`, `"code"` and `"quote"` |
 | Embed   | `embed`   | `inline` | `Map`    | `"hr"`, `"image"`                      |
+| Custom  | `custom`  | `inline` | `String` | Non-empty string                       |
 
 Removing a specific style is as simple as setting corresponding
 attribute to `null`.
@@ -68,6 +70,9 @@ void makeItPretty(NotusDocument document) {
   // Remove heading style from the first line. All attributes
   // have `unset` property which can be used the same way.
   document.format(0, 0, NotusAttribute.heading.unset);
+
+  // Add a custom attribute that does not reflect in the UI
+  document.format(15, 23, NotusAttribute.custom.withValue('customAttribute'));
 }
 ```
 
