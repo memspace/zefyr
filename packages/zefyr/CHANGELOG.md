@@ -1,3 +1,49 @@
+## 1.0.0-dev.1.0
+
+This is the first development release of the upcoming 1.0.0 version of zefyr package.
+
+Compared to 0.x versions of this package it's an almost complete rewrite and contains many breaking
+changes, but also comes with many improvements and new features.
+
+**This is an early dev release and it is not recommended to use in production environment. There
+are still many incomplete features as well as known issues that need to be addressed.**
+
+**Breaking changes:**
+
+* `ZefyrScaffold` was removed. It is no longer required to wrap `ZefyrEditor` with it.
+* `ZefyrMode` was removed. Zefyr now follows the contract of standard Flutter TextField and
+  provides separate fields like `showCursor`, `enableInteractiveSelection`, `readOnly` to control
+  editing features.
+* `ZefyrImageDelegate` was removed as well as the `imageDelegate` field. There is now new
+  `embedBuilder` field which allows to customize embedded objects. By default it is set to
+  `defaultZefyrEmbedBuilder` which only supports embeds of type "horizontal rule". To support
+  image embeds this field needs to be supplied with a function which can handle images.
+* `ZefyrView` was removed. It is now possible to use `ZefyrEditor` with `readOnly` set to true to
+  achieve view-only exprience.
+* `ZefyrScope` was removed. There is no replacement for this class, it's just not needed anymore.
+* `ZefyrToolbarDelegate` was removed together with `ZefyrToolbar.delegate` field. The toolbar can
+  now be placed anywhere and does not require a scaffold. Users are required to handle visibility
+  of the toolbar though (which was previously handled by `ZefyrScaffold`).
+* `ZefyrTheme` has been rewritten to simplify theme data. See implementation for more details.
+
+The above is not a comprehensive list but it should highlight all the major changes and help with
+migration.
+
+**What's new:**
+
+* Desktop support, including handling of mouse and keyboard inputs, including some keyboard shortcut
+  as well as, hiding selection handles,
+* Web support, partial. There is still limitations on the Flutter side, particularly around
+  rendering rich-text and providing text metrics for rich-text.
+* Better cursor handling and painting. It now matches the built-in Flutter behavior and style.
+* Better selection handling.
+* Code blocks now have line numbers (also planned - syntax highlighting)
+* `ZefyrEditor.expands` field controls whether the editor expands to fill its parent.
+* `ZefyrEditor.minHeight` and `ZefyrEditor.maxHeight` allow to control the height of the editor.
+* `ZefyrEditor.scrollable` if set to `false` allows to embed the editor into a custom scrollable
+  layout, e.g. a `ListView`.
+* `ZefyrEditr.onLaunchUrl` callback is invoked when the user wants to open a link.
+
 ## 0.11.0
 
 * Updated to support Flutter 1.17.0

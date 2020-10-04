@@ -5,7 +5,7 @@ author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 homepage: https://github.com/memspace/zefyr
 
 environment:
-  sdk: '>=2.10.0-136.0.dev <3.0.0'
+  sdk: '>=2.10.0 <3.0.0'
 
 dependencies:
   flutter:
