@@ -279,8 +279,10 @@ Widget defaultToggleStyleButtonBuilder(
 // TODO: Add "dense" parameter which if set to true changes the button to use an icon instead of text (useful for mobile layouts)
 class SelectHeadingStyleButton extends StatefulWidget {
   final ZefyrController controller;
+  final void Function(bool) onShowMenu;
 
-  const SelectHeadingStyleButton({Key key, @required this.controller})
+  const SelectHeadingStyleButton(
+      {Key key, @required this.controller, this.onShowMenu})
       : super(key: key);
 
   @override
@@ -329,56 +331,58 @@ class _SelectHeadingStyleButtonState extends State<SelectHeadingStyleButton> {
     super.dispose();
   }
 
+  Widget _selectHeadingStyleButtonBuilder(
+    BuildContext context,
+  ) {
+    final style = TextStyle(fontSize: 12);
+
+    final valueToText = {
+      NotusAttribute.heading.unset: 'Normal text',
+      NotusAttribute.heading.level1: 'Heading 1',
+      NotusAttribute.heading.level2: 'Heading 2',
+      NotusAttribute.heading.level3: 'Heading 3',
+    };
+
+    return ZDropdownButton<NotusAttribute>(
+      highlightElevation: 0,
+      hoverElevation: 0,
+      height: 32,
+      onShowMenu: widget.onShowMenu,
+      child: Text(
+        valueToText[_value],
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+      ),
+      initialValue: _value,
+      items: [
+        PopupMenuItem(
+          child: Text(valueToText[NotusAttribute.heading.unset], style: style),
+          value: NotusAttribute.heading.unset,
+          height: 32,
+        ),
+        PopupMenuItem(
+          child: Text(valueToText[NotusAttribute.heading.level1], style: style),
+          value: NotusAttribute.heading.level1,
+          height: 32,
+        ),
+        PopupMenuItem(
+          child: Text(valueToText[NotusAttribute.heading.level2], style: style),
+          value: NotusAttribute.heading.level2,
+          height: 32,
+        ),
+        PopupMenuItem(
+          child: Text(valueToText[NotusAttribute.heading.level3], style: style),
+          value: NotusAttribute.heading.level3,
+          height: 32,
+        ),
+      ],
+      onSelected: _selectAttribute,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return _selectHeadingStyleButtonBuilder(context, _value, _selectAttribute);
+    return _selectHeadingStyleButtonBuilder(context);
   }
-}
-
-Widget _selectHeadingStyleButtonBuilder(BuildContext context,
-    NotusAttribute value, ValueChanged<NotusAttribute> onSelected) {
-  final style = TextStyle(fontSize: 12);
-
-  final valueToText = {
-    NotusAttribute.heading.unset: 'Normal text',
-    NotusAttribute.heading.level1: 'Heading 1',
-    NotusAttribute.heading.level2: 'Heading 2',
-    NotusAttribute.heading.level3: 'Heading 3',
-  };
-
-  return ZDropdownButton<NotusAttribute>(
-    highlightElevation: 0,
-    hoverElevation: 0,
-    height: 32,
-    child: Text(
-      valueToText[value],
-      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-    ),
-    initialValue: value,
-    items: [
-      PopupMenuItem(
-        child: Text(valueToText[NotusAttribute.heading.unset], style: style),
-        value: NotusAttribute.heading.unset,
-        height: 32,
-      ),
-      PopupMenuItem(
-        child: Text(valueToText[NotusAttribute.heading.level1], style: style),
-        value: NotusAttribute.heading.level1,
-        height: 32,
-      ),
-      PopupMenuItem(
-        child: Text(valueToText[NotusAttribute.heading.level2], style: style),
-        value: NotusAttribute.heading.level2,
-        height: 32,
-      ),
-      PopupMenuItem(
-        child: Text(valueToText[NotusAttribute.heading.level3], style: style),
-        value: NotusAttribute.heading.level3,
-        height: 32,
-      ),
-    ],
-    onSelected: onSelected,
-  );
 }
 
 class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
@@ -386,7 +390,10 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
 
   const ZefyrToolbar({Key key, @required this.children}) : super(key: key);
 
-  factory ZefyrToolbar.basic({Key key, @required ZefyrController controller}) {
+  factory ZefyrToolbar.basic(
+      {Key key,
+      @required ZefyrController controller,
+      void Function(bool) onShowMenu}) {
     return ZefyrToolbar(key: key, children: [
       ToggleStyleButton(
         attribute: NotusAttribute.bold,
@@ -400,7 +407,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
         controller: controller,
       ),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
-      SelectHeadingStyleButton(controller: controller),
+      SelectHeadingStyleButton(controller: controller, onShowMenu: onShowMenu),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       ToggleStyleButton(
         attribute: NotusAttribute.block.numberList,
@@ -501,6 +508,7 @@ class ZDropdownButton<T> extends StatefulWidget {
   final T initialValue;
   final List<PopupMenuEntry<T>> items;
   final ValueChanged<T> onSelected;
+  final void Function(bool) onShowMenu;
 
   const ZDropdownButton({
     Key key,
@@ -512,6 +520,7 @@ class ZDropdownButton<T> extends StatefulWidget {
     @required this.initialValue,
     @required this.items,
     @required this.onSelected,
+    this.onShowMenu,
   }) : super(key: key);
 
   @override
@@ -549,6 +558,7 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
       ),
       Offset.zero & overlay.size,
     );
+    if (widget.onShowMenu != null) widget.onShowMenu(true);
     showMenu<T>(
       context: context,
       elevation: 4, // widget.elevation ?? popupMenuTheme.elevation,
@@ -559,6 +569,7 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
       color: popupMenuTheme.color, // widget.color ?? popupMenuTheme.color,
       // captureInheritedThemes: widget.captureInheritedThemes,
     ).then((T newValue) {
+      if (widget.onShowMenu != null) widget.onShowMenu(false);
       if (!mounted) return null;
       if (newValue == null) {
         // if (widget.onCanceled != null) widget.onCanceled();
