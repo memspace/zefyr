@@ -569,7 +569,6 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
       color: popupMenuTheme.color, // widget.color ?? popupMenuTheme.color,
       // captureInheritedThemes: widget.captureInheritedThemes,
     ).then((T newValue) {
-      if (widget.onShowMenu != null) widget.onShowMenu(false);
       if (!mounted) return null;
       if (newValue == null) {
         // if (widget.onCanceled != null) widget.onCanceled();
@@ -578,6 +577,7 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
       if (widget.onSelected != null) {
         widget.onSelected(newValue);
       }
+      if (widget.onShowMenu != null) widget.onShowMenu(false);
     });
   }
 
