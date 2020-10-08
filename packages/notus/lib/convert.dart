@@ -6,8 +6,11 @@
 library notus.convert;
 
 import 'src/convert/markdown.dart';
+import 'src/convert/quill.dart';
 
 export 'src/convert/markdown.dart';
+export 'src/convert/quill.dart';
 
 /// Markdown codec for Notus documents.
 const NotusMarkdownCodec notusMarkdown = NotusMarkdownCodec();
+const NotusQuillCodec notusQuill = NotusQuillCodec();
