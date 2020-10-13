@@ -2,9 +2,9 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:notus/notus.dart';
-import 'package:notus/src/document/embeds.dart';
 import 'package:quill_delta/quill_delta.dart';
+
+import '../document/attributes.dart';
 
 /// The result of [_findNextNewline] function.
 class _FindResult {
@@ -79,6 +79,7 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
   @override
   Delta apply(Delta document, int index, Object data) {
     if (data is! String) return null;
+
     final text = data as String;
     if (text != '\n') return null;
 
@@ -88,7 +89,7 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
     if (isEdgeLineSplit(before, after)) return null;
 
     // This is not an edge line split, meaning that the cursor is somewhere in
-    // the middle of the line's text. Which in turn means there is no embeds
+    // the middle of the lines' text. Which in turn means there is no embeds
     // around the cursor and it is safe to assume we have only text.
     final textAfter = after.data as String;
 
@@ -444,7 +445,7 @@ class InsertEmbedsRule extends InsertRule {
   @override
   Delta apply(Delta document, int index, Object data) {
     // We are only interested in embeddable objects.
-    if (data is! EmbeddableObject) return null;
+    if (data is String) return null;
 
     final result = Delta()..retain(index);
     final iter = DeltaIterator(document);

@@ -167,7 +167,7 @@ void main() {
 
     test('toDelta', () {
       expect(node.toDelta(),
-          Delta()..insert(EmbeddableObject('hr', inline: false)));
+          Delta()..insert(EmbeddableObject('hr', inline: false).toJson()));
     });
 
     test('splitAt', () {

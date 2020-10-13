@@ -35,11 +35,6 @@ class NotusChange {
   final ChangeSource source;
 }
 
-Object _deltaDataDecoder(Object data) {
-  if (data is String) return data;
-  return EmbeddableObject.fromJson(data);
-}
-
 /// A rich text document.
 class NotusDocument {
   /// Creates new empty Notus document.
@@ -49,15 +44,14 @@ class NotusDocument {
     _loadDocument(_delta);
   }
 
+  /// Creates new NotusDocument from provided JSON `data`.
   NotusDocument.fromJson(List data)
       : _heuristics = NotusHeuristics.fallback,
-        _delta = _migrateDelta(
-            Delta.fromJson(data, dataDecoder: _deltaDataDecoder)) {
+        _delta = _migrateDelta(Delta.fromJson(data)) {
     _loadDocument(_delta);
   }
 
-  @Deprecated(
-      'Use "fromJson" constructor instead. This constructor will be removed in 1.0.')
+  /// Creates new NotusDocument from provided `delta`.
   NotusDocument.fromDelta(Delta delta)
       : assert(delta != null),
         _heuristics = NotusHeuristics.fallback,
@@ -117,6 +111,7 @@ class NotusDocument {
       if (data.isEmpty) return Delta();
     } else {
       assert(data is EmbeddableObject);
+      data = (data as EmbeddableObject).toJson();
     }
 
     final change = _heuristics.applyInsertRules(this, index, data);
@@ -237,39 +232,28 @@ class NotusDocument {
     var offset = 0;
     final before = toDelta();
     change = _migrateDelta(change);
-    final normalized = Delta();
     for (final op in change.toList()) {
       final attributes =
           op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
       if (op.isInsert) {
-        // Provided change Delta may have not been created with data decoder
-        // which ensures that our embeddable objects are properly decoded,
-        // so we take care of it here.
-        final data = op.data is String
-            ? op.data
-            : op.data is EmbeddableObject
-                ? op.data
-                : EmbeddableObject.fromJson(op.data);
+        // Must normalize data before inserting into the document, makes sure
+        // that any embedded objects are converted into EmbeddableObject type.
+        final data = _normalizeData(op.data);
         _root.insert(offset, data, attributes);
-        normalized.insert(data, op.attributes);
       } else if (op.isDelete) {
         _root.delete(offset, op.length);
-        normalized.delete(op.length);
       } else if (op.attributes != null) {
         _root.retain(offset, op.length, attributes);
-        normalized.retain(op.length, op.attributes);
-      } else {
-        normalized.retain(op.length);
       }
       if (!op.isDelete) offset += op.length;
     }
-    _delta = _delta.compose(normalized);
+    _delta = _delta.compose(change);
 
     if (_delta != _root.toDelta()) {
       throw StateError('Compose produced inconsistent results. '
-          'This is likely due to a bug in the library. Tried to compose change $normalized from $source.');
+          'This is likely due to a bug in the library. Tried to compose change $change from $source.');
     }
-    _controller.add(NotusChange(before, normalized, source));
+    _controller.add(NotusChange(before, change, source));
   }
 
   //
@@ -313,6 +297,12 @@ class NotusDocument {
     return result;
   }
 
+  Object _normalizeData(Object data) {
+    return data is String
+        ? data
+        : data is EmbeddableObject ? data : EmbeddableObject.fromJson(data);
+  }
+
   /// Loads [document] delta into this document.
   void _loadDocument(Delta doc) {
     assert((doc.last.data as String).endsWith('\n'),
@@ -322,7 +312,8 @@ class NotusDocument {
       final style =
           op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
       if (op.isInsert) {
-        _root.insert(offset, op.data, style);
+        final data = _normalizeData(op.data);
+        _root.insert(offset, data, style);
       } else {
         throw ArgumentError.value(doc,
             'Document Delta can only contain insert operations but ${op.key} found.');

@@ -134,7 +134,10 @@ abstract class LeafNode extends Node
 
   @override
   Delta toDelta() {
-    return Delta()..insert(_value, style.toJson());
+    final data = _value is EmbeddableObject
+        ? (_value as EmbeddableObject).toJson()
+        : _value;
+    return Delta()..insert(data, style.toJson());
   }
 
   @override

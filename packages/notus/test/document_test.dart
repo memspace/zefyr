@@ -17,7 +17,7 @@ NotusDocument dartconfDoc() {
 NotusDocument dartconfEmbedDoc() {
   final delta = Delta()
     ..insert('DartConf\n')
-    ..insert(BlockEmbed.horizontalRule)
+    ..insert(BlockEmbed.horizontalRule.toJson())
     ..insert('\n')
     ..insert('Los Angeles');
   return NotusDocument()..compose(delta, ChangeSource.local);
@@ -208,21 +208,16 @@ void main() {
     test('compose normalizes change delta containing embeds', () async {
       final doc = dartconfDoc();
       final firstChangeFuture = doc.changes.first;
-      final embed = BlockEmbed.horizontalRule;
+      final embed = BlockEmbed.horizontalRule.toJson();
       final change = Delta()
-        ..retain(5)
-        ..insert('\n')
-        ..insert(embed.toJson())
-        ..insert('\n');
-      doc.compose(change, ChangeSource.local);
-      final firstChange = await firstChangeFuture;
-      final expected = Delta()
         ..retain(5)
         ..insert('\n')
         ..insert(embed)
         ..insert('\n');
-      expect(firstChange.change, equals(expected));
-      expect(firstChange.change.toList()[2].data, isA<EmbeddableObject>());
+      doc.compose(change, ChangeSource.local);
+      final firstChange = await firstChangeFuture;
+      expect(firstChange.change, equals(change));
+      expect(firstChange.change.toList()[2].data, isA<Map>());
     });
 
     test('replace applies heuristic rules', () {

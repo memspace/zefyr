@@ -1,3 +1,9 @@
+## 1.0.0-dev.3.0
+
+* Encapsulated handling of EmbeddableObjects in Deltas.Deltas produced by Notus documents will now
+  always have embeds stored as Maps, instead of instances of `EmbeddableObject`.
+* `NotusDocument.fromDelta` constructor is no longer deprecated. 
+
 ## 1.0.0-dev.2.0
 
 * Improved block-level heuristics to not exit when adding empty lines in the middle of a block.
