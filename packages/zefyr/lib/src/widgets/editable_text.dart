@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
 
 import 'code.dart';
@@ -176,6 +177,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     super.initState();
     _focusAttachment = _focusNode.attach(context);
     _input = InputConnectionController(_handleRemoteValueChange);
+    _scrollController.addListener(_handleScrollChange);
     _updateSubscriptions();
   }
 
@@ -227,6 +229,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
   //
 
   final ScrollController _scrollController = ScrollController();
+  double _scrollOffset = 0.0;
   ZefyrRenderContext _renderContext;
   CursorTimer _cursorTimer;
   InputConnectionController _input;
@@ -288,6 +291,7 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     _renderContext.removeListener(_handleRenderContextChange);
     widget.controller.removeListener(_handleLocalValueChange);
     _focusNode.removeListener(_handleFocusChange);
+    _scrollController.removeListener(_handleScrollChange);
     _input.closeConnection();
     _cursorTimer.stop();
   }
@@ -323,5 +327,18 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
     setState(() {
       // nothing to update internally.
     });
+  }
+
+  void _handleScrollChange() {
+    ScrollDirection scrollDirection = _scrollController.position.userScrollDirection;
+    if (scrollDirection == ScrollDirection.idle && widget.controller.selection.isCollapsed) {
+      if (widget.controller.document.length - 1 == widget.controller.selection.end) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      } else {
+        _scrollController.jumpTo(_scrollOffset);
+      }
+    } else {
+      _scrollOffset = _scrollController.offset;
+    }
   }
 }
