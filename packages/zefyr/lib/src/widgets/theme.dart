@@ -210,6 +210,8 @@ class ZefyrThemeData {
   ZefyrThemeData copyWith({
     TextStyle bold,
     TextStyle italic,
+    TextStyle underline,
+    TextStyle strike,
     TextStyle link,
     TextBlockTheme paragraph,
     TextBlockTheme heading1,
@@ -222,6 +224,8 @@ class ZefyrThemeData {
     return ZefyrThemeData(
       bold: bold ?? this.bold,
       italic: italic ?? this.italic,
+      underline: underline ?? this.underline,
+      strike: strike ?? this.strike,
       link: link ?? this.link,
       paragraph: paragraph ?? this.paragraph,
       heading1: heading1 ?? this.heading1,
@@ -237,6 +241,8 @@ class ZefyrThemeData {
     return copyWith(
       bold: other.bold,
       italic: other.italic,
+      underline: other.underline,
+      strike: other.strike,
       link: other.link,
       paragraph: other.paragraph,
       heading1: other.heading1,
