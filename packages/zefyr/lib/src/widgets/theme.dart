@@ -68,6 +68,12 @@ class ZefyrThemeData {
   /// Style of italic text.
   final TextStyle italic;
 
+  /// Style of underline text.
+  final TextStyle underline;
+
+  /// Style of strikethrough text.
+  final TextStyle strike;
+
   /// Style of links in text.
   final TextStyle link;
 
@@ -94,6 +100,8 @@ class ZefyrThemeData {
   ZefyrThemeData({
     this.bold,
     this.italic,
+    this.underline,
+    this.strike,
     this.link,
     this.paragraph,
     this.heading1,
@@ -130,6 +138,8 @@ class ZefyrThemeData {
     return ZefyrThemeData(
       bold: TextStyle(fontWeight: FontWeight.bold),
       italic: TextStyle(fontStyle: FontStyle.italic),
+      underline: TextStyle(decoration: TextDecoration.underline),
+      strike: TextStyle(decoration: TextDecoration.lineThrough),
       link: TextStyle(
         color: themeData.accentColor,
         decoration: TextDecoration.underline,

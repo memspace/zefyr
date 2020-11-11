@@ -13,7 +13,9 @@ dependencies:
   collection: ^1.14.6
   url_launcher: ^5.0.0
   quill_delta: ^2.0.0
-  notus: ^1.0.0-dev
+#  notus: ^1.0.0-dev
+  notus:
+    path: ../notus
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
   characters: ^1.0.0

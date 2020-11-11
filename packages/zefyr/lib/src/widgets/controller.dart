@@ -102,9 +102,7 @@ class ZefyrController extends ChangeNotifier {
     // _lastChangeSource = ChangeSource.local;
     final source = ChangeSource.local;
 
-    if (length == 0 &&
-        (attribute.key == NotusAttribute.bold.key ||
-            attribute.key == NotusAttribute.italic.key)) {
+    if (length == 0 && _insertionToggleableStyleKeys.contains(attribute.key)) {
       // Add the attribute to our toggledStyle. It will be used later upon insertion.
       _toggledStyles = toggledStyles.put(attribute);
     }
@@ -172,6 +170,14 @@ class ZefyrController extends ChangeNotifier {
     document.close();
     super.dispose();
   }
+
+  /// List of style keys which can be toggled for insertion
+  List<String> get _insertionToggleableStyleKeys => [
+        NotusAttribute.bold.key,
+        NotusAttribute.italic.key,
+        NotusAttribute.underline.key,
+        NotusAttribute.strike.key,
+      ];
 
   /// Updates selection without triggering notifications to listeners.
   void _updateSelectionSilent(TextSelection value,
