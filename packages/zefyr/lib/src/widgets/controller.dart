@@ -5,6 +5,14 @@ import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/util.dart';
 
+/// List of style keys which can be toggled for insertion
+List<String> get _insertionToggleableStyleKeys => [
+  NotusAttribute.bold.key,
+  NotusAttribute.italic.key,
+  NotusAttribute.underline.key,
+  NotusAttribute.strike.key,
+];
+
 class ZefyrController extends ChangeNotifier {
   ZefyrController([NotusDocument document])
       : document = document ?? NotusDocument(),
@@ -170,14 +178,6 @@ class ZefyrController extends ChangeNotifier {
     document.close();
     super.dispose();
   }
-
-  /// List of style keys which can be toggled for insertion
-  List<String> get _insertionToggleableStyleKeys => [
-        NotusAttribute.bold.key,
-        NotusAttribute.italic.key,
-        NotusAttribute.underline.key,
-        NotusAttribute.strike.key,
-      ];
 
   /// Updates selection without triggering notifications to listeners.
   void _updateSelectionSilent(TextSelection value,
