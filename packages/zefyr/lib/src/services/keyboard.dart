@@ -18,6 +18,7 @@ typedef CursorMovementCallback = void Function(LogicalKeyboardKey key,
 enum InputShortcut { cut, copy, paste, selectAll }
 
 typedef InputShortcutCallback = void Function(InputShortcut shortcut);
+typedef OnDeleteCallback = void Function(bool forward);
 
 final Set<LogicalKeyboardKey> _movementKeys = <LogicalKeyboardKey>{
   LogicalKeyboardKey.arrowRight,
@@ -32,6 +33,7 @@ final Set<LogicalKeyboardKey> _shortcutKeys = <LogicalKeyboardKey>{
   LogicalKeyboardKey.keyV,
   LogicalKeyboardKey.keyX,
   LogicalKeyboardKey.delete,
+  LogicalKeyboardKey.backspace,
 };
 
 final Set<LogicalKeyboardKey> _nonModifierKeys = <LogicalKeyboardKey>{
@@ -61,7 +63,7 @@ final Set<LogicalKeyboardKey> _interestingKeys = <LogicalKeyboardKey>{
 class KeyboardListener {
   final CursorMovementCallback onCursorMovement;
   final InputShortcutCallback onShortcut;
-  final VoidCallback onDelete;
+  final OnDeleteCallback onDelete;
 
   KeyboardListener({
     @required this.onCursorMovement,
@@ -116,7 +118,9 @@ class KeyboardListener {
       };
       onShortcut(_keyToShortcut[key]);
     } else if (key == LogicalKeyboardKey.delete) {
-      onDelete();
+      onDelete(true);
+    } else if (key == LogicalKeyboardKey.backspace) {
+      onDelete(false);
     } else {
       return false;
     }
