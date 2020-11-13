@@ -6,7 +6,7 @@ import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/util.dart';
 
 /// List of style keys which can be toggled for insertion
-List<String> get _insertionToggleableStyleKeys => [
+List<String> _insertionToggleableStyleKeys = [
   NotusAttribute.bold.key,
   NotusAttribute.italic.key,
   NotusAttribute.underline.key,
