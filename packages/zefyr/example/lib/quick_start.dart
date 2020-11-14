@@ -16,7 +16,7 @@ class QuickStartApp extends StatelessWidget {
       title: 'Quick Start',
       home: HomePage(),
       routes: {
-        "/editor": (context) => EditorPage(),
+        '/editor': (context) => EditorPage(),
       },
     );
   }
@@ -27,11 +27,11 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final navigator = Navigator.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text("Quick Start")),
+      appBar: AppBar(title: Text('Quick Start')),
       body: Center(
         child: FlatButton(
-          child: Text("Open editor"),
-          onPressed: () => navigator.pushNamed("/editor"),
+          child: Text('Open editor'),
+          onPressed: () => navigator.pushNamed('/editor'),
         ),
       ),
     );

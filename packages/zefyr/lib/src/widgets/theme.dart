@@ -32,8 +32,7 @@ class ZefyrTheme extends InheritedWidget {
   /// and [nullOk] is set to `true`. If [nullOk] is set to `false` (default)
   /// then this method asserts.
   static ZefyrThemeData of(BuildContext context, {bool nullOk = false}) {
-    final ZefyrTheme widget =
-        context.dependOnInheritedWidgetOfExactType<ZefyrTheme>();
+    final widget = context.dependOnInheritedWidgetOfExactType<ZefyrTheme>();
     if (widget == null && nullOk) return null;
     assert(widget != null,
         '$ZefyrTheme.of() called with a context that does not contain a ZefyrEditor.');
@@ -163,7 +162,7 @@ class LineTheme {
   final EdgeInsets padding;
 
   /// Creates a [LineTheme] given a set of exact values.
-  LineTheme({this.textStyle, this.padding})
+  LineTheme({@required this.textStyle, @required this.padding})
       : assert(textStyle != null),
         assert(padding != null);
 
@@ -344,6 +343,7 @@ class AttributeTheme {
     String monospaceFontFamily;
     switch (theme.platform) {
       case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
         monospaceFontFamily = 'Menlo';
         break;
       case TargetPlatform.android:
@@ -351,7 +351,7 @@ class AttributeTheme {
         monospaceFontFamily = 'Roboto Mono';
         break;
       default:
-        throw UnimplementedError("Platform ${theme.platform} not implemented.");
+        throw UnimplementedError('Platform ${theme.platform} not implemented.');
     }
 
     return AttributeTheme(

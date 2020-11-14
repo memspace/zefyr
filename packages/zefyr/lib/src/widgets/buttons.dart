@@ -431,7 +431,7 @@ class _LinkButtonState extends State<LinkButton> {
     final toolbar = ZefyrToolbar.of(context);
     final style = toolbar.editor.selectionStyle;
 
-    String value = 'Tap to edit link';
+    var value = 'Tap to edit link';
     if (style.contains(NotusAttribute.link)) {
       value = style.value(NotusAttribute.link);
     }

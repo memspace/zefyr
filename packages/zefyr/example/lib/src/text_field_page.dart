@@ -37,7 +37,7 @@ class _TextFieldScreenState extends State<TextFieldScreen> {
               padding: const EdgeInsets.all(8.0),
               child: TextField(
                 controller: _singleTextFieldcontroller,
-                maxLines: 1000,
+                maxLines: 10,
               ),
             ),
           ],
