@@ -990,7 +990,7 @@ class RawEditorState extends EditorState
           dragStartBehavior: DragStartBehavior.start,
           // onSelectionHandleTapped: widget.onSelectionHandleTapped,
         );
-        _selectionOverlay.handlesVisible = widget.showSelectionHandles;
+        _selectionOverlay.handlesVisible = _shouldShowSelectionHandles();
         _selectionOverlay.showHandles();
         // if (widget.onSelectionChanged != null)
         //   widget.onSelectionChanged(selection, cause);
