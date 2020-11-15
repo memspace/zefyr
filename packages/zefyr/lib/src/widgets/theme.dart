@@ -72,7 +72,7 @@ class ZefyrThemeData {
   final TextStyle underline;
 
   /// Style of strikethrough text.
-  final TextStyle strike;
+  final TextStyle strikethrough;
 
   /// Style of links in text.
   final TextStyle link;
@@ -101,7 +101,7 @@ class ZefyrThemeData {
     this.bold,
     this.italic,
     this.underline,
-    this.strike,
+    this.strikethrough,
     this.link,
     this.paragraph,
     this.heading1,
@@ -139,7 +139,7 @@ class ZefyrThemeData {
       bold: TextStyle(fontWeight: FontWeight.bold),
       italic: TextStyle(fontStyle: FontStyle.italic),
       underline: TextStyle(decoration: TextDecoration.underline),
-      strike: TextStyle(decoration: TextDecoration.lineThrough),
+      strikethrough: TextStyle(decoration: TextDecoration.lineThrough),
       link: TextStyle(
         color: themeData.accentColor,
         decoration: TextDecoration.underline,
@@ -211,7 +211,7 @@ class ZefyrThemeData {
     TextStyle bold,
     TextStyle italic,
     TextStyle underline,
-    TextStyle strike,
+    TextStyle strikethrough,
     TextStyle link,
     TextBlockTheme paragraph,
     TextBlockTheme heading1,
@@ -225,7 +225,7 @@ class ZefyrThemeData {
       bold: bold ?? this.bold,
       italic: italic ?? this.italic,
       underline: underline ?? this.underline,
-      strike: strike ?? this.strike,
+      strikethrough: strikethrough ?? this.strikethrough,
       link: link ?? this.link,
       paragraph: paragraph ?? this.paragraph,
       heading1: heading1 ?? this.heading1,
@@ -242,7 +242,7 @@ class ZefyrThemeData {
       bold: other.bold,
       italic: other.italic,
       underline: other.underline,
-      strike: other.strike,
+      strikethrough: other.strikethrough,
       link: other.link,
       paragraph: other.paragraph,
       heading1: other.heading1,

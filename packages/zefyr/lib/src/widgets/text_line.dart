@@ -113,7 +113,7 @@ class TextLine extends StatelessWidget {
       result = _mergeTextStyleWithDecoration(result, theme.underline);
     }
     if (style.contains(NotusAttribute.strikethrough)) {
-      result = _mergeTextStyleWithDecoration(result, theme.strike);
+      result = _mergeTextStyleWithDecoration(result, theme.strikethrough);
     }
     return result;
   }
