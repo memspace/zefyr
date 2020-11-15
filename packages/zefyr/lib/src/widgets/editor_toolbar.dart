@@ -407,7 +407,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       SizedBox(width: 1),
       ToggleStyleButton(
-        attribute: NotusAttribute.strike,
+        attribute: NotusAttribute.strikethrough,
         icon: Icons.format_strikethrough,
         controller: controller,
       ),
