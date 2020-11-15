@@ -68,6 +68,12 @@ class ZefyrThemeData {
   /// Style of italic text.
   final TextStyle italic;
 
+  /// Style of underline text.
+  final TextStyle underline;
+
+  /// Style of strikethrough text.
+  final TextStyle strikethrough;
+
   /// Style of links in text.
   final TextStyle link;
 
@@ -94,6 +100,8 @@ class ZefyrThemeData {
   ZefyrThemeData({
     this.bold,
     this.italic,
+    this.underline,
+    this.strikethrough,
     this.link,
     this.paragraph,
     this.heading1,
@@ -130,6 +138,8 @@ class ZefyrThemeData {
     return ZefyrThemeData(
       bold: TextStyle(fontWeight: FontWeight.bold),
       italic: TextStyle(fontStyle: FontStyle.italic),
+      underline: TextStyle(decoration: TextDecoration.underline),
+      strikethrough: TextStyle(decoration: TextDecoration.lineThrough),
       link: TextStyle(
         color: themeData.accentColor,
         decoration: TextDecoration.underline,
@@ -200,6 +210,8 @@ class ZefyrThemeData {
   ZefyrThemeData copyWith({
     TextStyle bold,
     TextStyle italic,
+    TextStyle underline,
+    TextStyle strikethrough,
     TextStyle link,
     TextBlockTheme paragraph,
     TextBlockTheme heading1,
@@ -212,6 +224,8 @@ class ZefyrThemeData {
     return ZefyrThemeData(
       bold: bold ?? this.bold,
       italic: italic ?? this.italic,
+      underline: underline ?? this.underline,
+      strikethrough: strikethrough ?? this.strikethrough,
       link: link ?? this.link,
       paragraph: paragraph ?? this.paragraph,
       heading1: heading1 ?? this.heading1,
@@ -227,6 +241,8 @@ class ZefyrThemeData {
     return copyWith(
       bold: other.bold,
       italic: other.italic,
+      underline: other.underline,
+      strikethrough: other.strikethrough,
       link: other.link,
       paragraph: other.paragraph,
       heading1: other.heading1,

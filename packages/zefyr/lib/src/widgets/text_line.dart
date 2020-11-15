@@ -101,14 +101,31 @@ class TextLine extends StatelessWidget {
   TextStyle _getInlineTextStyle(NotusStyle style, ZefyrThemeData theme) {
     var result = TextStyle();
     if (style.containsSame(NotusAttribute.bold)) {
-      result = result.merge(theme.bold);
+      result = _mergeTextStyleWithDecoration(result, theme.bold);
     }
     if (style.containsSame(NotusAttribute.italic)) {
-      result = result.merge(theme.italic);
+      result = _mergeTextStyleWithDecoration(result, theme.italic);
     }
     if (style.contains(NotusAttribute.link)) {
-      result = result.merge(theme.link);
+      result = _mergeTextStyleWithDecoration(result, theme.link);
+    }
+    if (style.contains(NotusAttribute.underline)) {
+      result = _mergeTextStyleWithDecoration(result, theme.underline);
+    }
+    if (style.contains(NotusAttribute.strikethrough)) {
+      result = _mergeTextStyleWithDecoration(result, theme.strikethrough);
     }
     return result;
+  }
+
+  TextStyle _mergeTextStyleWithDecoration(TextStyle a, TextStyle b) {
+    var decorations = <TextDecoration>[];
+    if (a.decoration != null) {
+      decorations.add(a.decoration);
+    }
+    if (b.decoration != null) {
+      decorations.add(b.decoration);
+    }
+    return a.merge(b).apply(decoration: TextDecoration.combine(decorations));
   }
 }
