@@ -1,6 +1,6 @@
 name: notus
 description: Platform-agnostic rich text document model based on Delta format and used in Zefyr editor.
-version: 1.0.0-dev.3.0
+version: 1.0.0-dev.4.0
 author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 homepage: https://github.com/memspace/zefyr
 

@@ -1,8 +1,12 @@
+## 1.0.0-dev.4.0
+
+* Added support for underline and strikethrough inline styles (#429).
+
 ## 1.0.0-dev.3.0
 
 * Encapsulated handling of EmbeddableObjects in Deltas.Deltas produced by Notus documents will now
   always have embeds stored as Maps, instead of instances of `EmbeddableObject`.
-* `NotusDocument.fromDelta` constructor is no longer deprecated. 
+* `NotusDocument.fromDelta` constructor is no longer deprecated.
 
 ## 1.0.0-dev.2.0
 
@@ -16,7 +20,7 @@ Each such change will be documented in this changelog as well as in the upgradin
 This release introduces the first breaking change described below, but there is at least one
 more breaking change planned in one of upcoming `1.0.0-dev.x.y` releases.
 
-**Breaking change**: Handling of embeds changed from using a style attribute 
+**Breaking change**: Handling of embeds changed from using a style attribute
 `NotusAttribute.embed` to actually placing embedded objects as data payload of insert operations.
 This functionality relies on the `2.0.0` version of `quill_delta` package.
 
@@ -42,7 +46,7 @@ Non-breaking API changes:
 
 * `NotusDocument.insert`, `NotusDocument.replace` as well as `Node.insert` changed the inserted
   data type from `String` to `Object` in order to support insertion of embeds.
-  
+
 Deprecated APIs:
 
 * `NotusDocument.fromDelta` is deprecated and will be removed prior to stable `1.0.0` release.
@@ -50,7 +54,7 @@ Deprecated APIs:
 
 **Backward compatibility for existing documents**
 
-Existing documents which use `NotusAttribute.embed` will automatically get converted to the new 
+Existing documents which use `NotusAttribute.embed` will automatically get converted to the new
 format upon loading into a `NotusDocument` instance, so no extra work is necessary to migrate your
 existing data. The same applies to composing old-style change Deltas using `NotusDocument.compose`.
 
