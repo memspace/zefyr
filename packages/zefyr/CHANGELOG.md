@@ -1,3 +1,9 @@
+## 1.0.0-dev.2.0
+
+* Fixed: Hide selection handle when the current selection is collapsed on Android (#435).
+* Added: Support for text deletion using keyboards Backspace or Delete keys (#431).
+* Fixed: Toolbar overflow by wrapping it in SingleChildScrollView (#423).
+
 ## 1.0.0-dev.1.0
 
 This is the first development release of the upcoming 1.0.0 version of zefyr package.
@@ -53,7 +59,7 @@ migration.
 This release contains breaking changes.
 The entire theming layer of ZefyrEditor has been rewritten. Most notable changes include:
 
-* Removed `selectionColor` and `cursorColor` from `ZefyrThemeData`. Relying on the Flutter 
+* Removed `selectionColor` and `cursorColor` from `ZefyrThemeData`. Relying on the Flutter
   `ThemeData.textSelectionColor` and `ThemeData.cursorColor` instead.
 * All attribute styles moved to the new `AttributeTheme` class.
 * `indentSize` renamed to `indentWidth`
