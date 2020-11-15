@@ -14,6 +14,7 @@ class InsertEmbedButton extends StatelessWidget {
     @required this.controller,
     @required this.icon,
   }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return ZIconButton(
@@ -112,6 +113,7 @@ class _LinkStyleButtonState extends State<LinkStyleButton> {
 
 class _LinkDialog extends StatefulWidget {
   const _LinkDialog({Key key}) : super(key: key);
+
   @override
   _LinkDialogState createState() => _LinkDialogState();
 }
@@ -412,6 +414,30 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
         controller: controller,
       ),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
+      ToggleStyleButton(
+        attribute: NotusAttribute.leftAlignment,
+        icon: Icons.format_align_left,
+        controller: controller,
+      ),
+      SizedBox(width: 1),
+      ToggleStyleButton(
+        attribute: NotusAttribute.centerAlignment,
+        icon: Icons.format_align_center,
+        controller: controller,
+      ),
+      SizedBox(width: 1),
+      ToggleStyleButton(
+        attribute: NotusAttribute.rightAlignment,
+        icon: Icons.format_align_right,
+        controller: controller,
+      ),
+      SizedBox(width: 1),
+      ToggleStyleButton(
+        attribute: NotusAttribute.justifyAlignment,
+        icon: Icons.format_align_justify,
+        controller: controller,
+      ),
+      VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       SelectHeadingStyleButton(controller: controller),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       ToggleStyleButton(
@@ -566,11 +592,13 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
     );
     showMenu<T>(
       context: context,
-      elevation: 4, // widget.elevation ?? popupMenuTheme.elevation,
+      elevation: 4,
+      // widget.elevation ?? popupMenuTheme.elevation,
       initialValue: widget.initialValue,
       items: widget.items,
       position: position,
-      shape: popupMenuTheme.shape, // widget.shape ?? popupMenuTheme.shape,
+      shape: popupMenuTheme.shape,
+      // widget.shape ?? popupMenuTheme.shape,
       color: popupMenuTheme.color, // widget.color ?? popupMenuTheme.color,
       // captureInheritedThemes: widget.captureInheritedThemes,
     ).then((T newValue) {

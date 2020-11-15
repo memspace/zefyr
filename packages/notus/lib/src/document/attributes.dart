@@ -41,7 +41,9 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
   @override
   final String key;
   final NotusAttributeScope scope;
+
   NotusAttribute<T> get unset => NotusAttribute<T>._(key, scope, null);
+
   NotusAttribute<T> withValue(T value) =>
       NotusAttribute<T>._(key, scope, value);
 }
@@ -72,6 +74,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 ///   * [NotusAttribute.link]
 ///   * [NotusAttribute.heading]
 ///   * [NotusAttribute.block]
+///   * [NotusAttribute.alignment]
 class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static final Map<String, NotusAttributeBuilder> _registry = {
     NotusAttribute.bold.key: NotusAttribute.bold,
@@ -81,6 +84,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
+    NotusAttribute.alignment.key: NotusAttribute.alignment,
   };
 
   // Inline attributes
@@ -131,6 +135,21 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.block.code].
   static NotusAttribute<String> get code => block.code;
+
+  /// Alignment attribute
+  static const alignment = AlignmentAttributeBuilder._();
+
+  /// Alias for [NotusAttribute.alignment.right]
+  static NotusAttribute<String> get rightAlignment => alignment.right;
+
+  /// Alias for [NotusAttribute.alignment.left]
+  static NotusAttribute<String> get leftAlignment => alignment.left;
+
+  /// Alias for [NotusAttribute.alignment.center]
+  static NotusAttribute<String> get centerAlignment => alignment.center;
+
+  /// Alias for [NotusAttribute.alignment.justify]
+  static NotusAttribute<String> get justifyAlignment => alignment.justify;
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
@@ -353,6 +372,7 @@ class _StrikethroughAttribute extends NotusAttribute<bool> {
 /// [NotusAttribute.link] instead.
 class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kLink = 'a';
+
   const LinkAttributeBuilder._() : super._(_kLink, NotusAttributeScope.inline);
 
   /// Creates a link attribute with specified link [value].
@@ -366,6 +386,7 @@ class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
 /// [NotusAttribute.heading] instead.
 class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
   static const _kHeading = 'heading';
+
   const HeadingAttributeBuilder._()
       : super._(_kHeading, NotusAttributeScope.line);
 
@@ -385,6 +406,7 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
 /// [NotusAttribute.block] instead.
 class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kBlock = 'block';
+
   const BlockAttributeBuilder._() : super._(_kBlock, NotusAttributeScope.line);
 
   /// Formats a block of lines as a bullet list.
@@ -402,4 +424,28 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a block of lines as a quote.
   NotusAttribute<String> get quote =>
       NotusAttribute<String>._(key, scope, 'quote');
+}
+
+class AlignmentAttributeBuilder extends NotusAttributeBuilder<String> {
+  static const _kKey = 'alignment';
+
+  const AlignmentAttributeBuilder._()
+      : super._(_kKey, NotusAttributeScope.line);
+
+  NotusAttribute<String> get right =>
+      NotusAttribute<String>._(key, scope, 'right');
+
+  NotusAttribute<String> get left =>
+      NotusAttribute<String>._(key, scope, 'left');
+
+  NotusAttribute<String> get center =>
+      NotusAttribute<String>._(key, scope, 'center');
+
+  NotusAttribute<String> get justify =>
+      NotusAttribute<String>._(key, scope, 'justify');
+}
+
+/// Applies italic style to a text segment.
+class _RTLDirectionAttribute extends NotusAttribute<bool> {
+  const _RTLDirectionAttribute() : super._('rtl', NotusAttributeScope.line, true);
 }

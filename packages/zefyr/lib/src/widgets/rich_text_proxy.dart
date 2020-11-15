@@ -8,6 +8,7 @@ class RichTextProxy extends SingleChildRenderObjectWidget {
     @required RichText child,
     @required this.textStyle,
     @required this.textDirection,
+    @required this.textAlign,
     this.textScaleFactor = 1.0,
     @required this.locale,
     @required this.strutStyle,
@@ -16,6 +17,7 @@ class RichTextProxy extends SingleChildRenderObjectWidget {
   }) : super(child: child);
 
   final TextStyle textStyle;
+  final TextAlign textAlign;
   final TextDirection textDirection;
   final double textScaleFactor;
   final Locale locale;
@@ -28,6 +30,7 @@ class RichTextProxy extends SingleChildRenderObjectWidget {
     return RenderParagraphProxy(
       textStyle: textStyle,
       textDirection: textDirection,
+      textAlign: textAlign,
       textScaleFactor: textScaleFactor,
       locale: locale,
       strutStyle: strutStyle,
@@ -41,6 +44,7 @@ class RichTextProxy extends SingleChildRenderObjectWidget {
       BuildContext context, covariant RenderParagraphProxy renderObject) {
     renderObject.textStyle = textStyle;
     renderObject.textDirection = textDirection;
+    renderObject.textAlign = textAlign;
     renderObject.textScaleFactor = textScaleFactor;
     renderObject.locale = locale;
     renderObject.strutStyle = strutStyle;

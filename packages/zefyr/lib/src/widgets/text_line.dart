@@ -35,20 +35,37 @@ class TextLine extends StatelessWidget {
       return EmbedProxy(child: embedBuilder(context, embed));
     }
     final text = buildText(context, node);
+    final textAlign = getTextAlign(node);
     final strutStyle =
         StrutStyle.fromTextStyle(text.style, forceStrutHeight: true);
     return RichTextProxy(
       textStyle: text.style,
+      textAlign: textAlign,
       textDirection: textDirection,
       strutStyle: strutStyle,
       locale: Localizations.localeOf(context, nullOk: true),
       child: RichText(
-        text: buildText(context, node),
+        text: text,
+        textAlign: textAlign,
         textDirection: textDirection,
         strutStyle: strutStyle,
         textScaleFactor: MediaQuery.textScaleFactorOf(context),
       ),
     );
+  }
+
+  TextAlign getTextAlign(LineNode node) {
+    final alignment = node.style.get(NotusAttribute.alignment);
+    if (alignment == NotusAttribute.alignment.left) {
+      return TextAlign.left;
+    } else if (alignment == NotusAttribute.alignment.center) {
+      return TextAlign.center;
+    } else if (alignment == NotusAttribute.alignment.right) {
+      return TextAlign.right;
+    } else if (alignment == NotusAttribute.alignment.justify) {
+      return TextAlign.justify;
+    }
+    return TextAlign.start;
   }
 
   TextSpan buildText(BuildContext context, LineNode node) {
