@@ -382,23 +382,35 @@ mixin RawEditorStateKeyboardMixin on EditorState {
     }
   }
 
-  void handleDelete() {
+  void handleDelete(bool forward) {
     final selection = widget.controller.selection;
     final plainText = textEditingValue.text;
     assert(selection != null);
-    final String textAfter = selection.textAfter(plainText);
-    if (textAfter.isNotEmpty) {
-      final int deleteCount = nextCharacter(0, textAfter);
-      textEditingValue = TextEditingValue(
-        text: selection.textBefore(plainText) +
-            selection.textAfter(plainText).substring(deleteCount),
-        selection: TextSelection.collapsed(offset: selection.start),
-      );
-    } else {
-      textEditingValue = TextEditingValue(
-        text: selection.textBefore(plainText),
-        selection: TextSelection.collapsed(offset: selection.start),
-      );
+    int cursorPosition = selection.start;
+    String textBefore = selection.textBefore(plainText);
+    String textAfter = selection.textAfter(plainText);
+    // If not deleting a selection, delete the next/previous character.
+    if (selection.isCollapsed) {
+      if (!forward && textBefore.isNotEmpty) {
+        final int characterBoundary =
+            previousCharacter(textBefore.length, textBefore);
+        textBefore = textBefore.substring(0, characterBoundary);
+        cursorPosition = characterBoundary;
+      }
+      // we don't want to remove the last new line
+      if (forward && textAfter.isNotEmpty && textAfter != '\n') {
+        final int deleteCount = nextCharacter(0, textAfter);
+        textAfter = textAfter.substring(deleteCount);
+      }
     }
+    var newSelection = TextSelection.collapsed(offset: cursorPosition);
+    var newText = textBefore + textAfter;
+    var size = plainText.length - newText.length;
+    widget.controller.replaceText(
+      cursorPosition,
+      size,
+      '',
+      selection: newSelection,
+    );
   }
 }
