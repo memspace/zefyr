@@ -665,11 +665,17 @@ class RawEditor extends StatefulWidget {
 ///
 abstract class EditorState extends State<RawEditor> {
   TextEditingValue get textEditingValue;
+
   set textEditingValue(TextEditingValue value);
+
   RenderEditor get renderEditor;
+
   EditorTextSelectionOverlay get selectionOverlay;
+
   bool showToolbar();
+
   void hideToolbar();
+
   void requestKeyboard();
 }
 
@@ -709,6 +715,7 @@ class RawEditorState extends EditorState
 
   bool _didAutoFocus = false;
   FocusAttachment _focusAttachment;
+
   bool get _hasFocus => widget.focusNode.hasFocus;
 
   @override
@@ -921,7 +928,9 @@ class RawEditorState extends EditorState
         (Duration _) => _updateOrDisposeSelectionOverlayIfNeeded());
 //    _textChangedSinceLastCaretUpdate = true;
 
-    setState(() {/* We use widget.controller.value in build(). */});
+    setState(() {
+      /* We use widget.controller.value in build(). */
+    });
   }
 
   void _handleSelectionChanged(
@@ -1113,7 +1122,7 @@ class RawEditorState extends EditorState
         result.add(EditableTextLine(
           node: node,
           textDirection: _textDirection,
-          indentWidth: 0,
+          indentWidth: _getIndentForLine(node, _themeData),
           spacing: _getSpacingForLine(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,
@@ -1148,6 +1157,18 @@ class RawEditorState extends EditorState
       }
     }
     return result;
+  }
+
+  double _getIndentForLine(LineNode node, ZefyrThemeData theme) {
+    final style = node.style.get(NotusAttribute.indent);
+    if (style == NotusAttribute.indent.level1) {
+      return 16;
+    } else if (style == NotusAttribute.indent.level2) {
+      return 32;
+    } else if (style == NotusAttribute.indent.level3) {
+      return 48;
+    }
+    return 0;
   }
 
   VerticalSpacing _getSpacingForLine(LineNode node, ZefyrThemeData theme) {

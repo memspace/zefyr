@@ -14,6 +14,7 @@ class InsertEmbedButton extends StatelessWidget {
     @required this.controller,
     @required this.icon,
   }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return ZIconButton(
@@ -112,6 +113,7 @@ class _LinkStyleButtonState extends State<LinkStyleButton> {
 
 class _LinkDialog extends StatefulWidget {
   const _LinkDialog({Key key}) : super(key: key);
+
   @override
   _LinkDialogState createState() => _LinkDialogState();
 }
@@ -381,6 +383,56 @@ Widget _selectHeadingStyleButtonBuilder(BuildContext context,
   );
 }
 
+class IndentationButton extends StatelessWidget {
+  final bool increase;
+  final ZefyrController controller;
+
+  const IndentationButton(
+      {Key key, this.increase = true, @required this.controller})
+      : super(key: key);
+
+  NotusStyle get _selectionStyle => controller.getSelectionStyle();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final fillColor = theme.canvasColor;
+    return ZIconButton(
+      highlightElevation: 0,
+      hoverElevation: 0,
+      size: 32,
+      icon: Icon(
+          increase
+              ? Icons.format_indent_increase
+              : Icons.format_indent_decrease,
+          size: 18,
+          color: theme.iconTheme.color),
+      fillColor: fillColor,
+      onPressed: () {
+        final indentLevel = _selectionStyle.get(NotusAttribute.indent);
+        if (indentLevel == null) {
+          if (increase) {
+            controller.formatSelection(NotusAttribute.indentLevel1);
+          }
+          return;
+        }
+        if (indentLevel.value == 1 && !increase) {
+          controller.formatSelection(NotusAttribute.indent.unset);
+          return;
+        }
+        if (increase) {
+          controller.formatSelection(
+              NotusAttribute.getIndentAttributeForLevel(indentLevel.value + 1));
+          return;
+        }
+        controller.formatSelection(
+            NotusAttribute.getIndentAttributeForLevel(indentLevel.value - 1));
+      },
+    );
+    ;
+  }
+}
+
 class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
   final List<Widget> children;
 
@@ -409,6 +461,15 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ToggleStyleButton(
         attribute: NotusAttribute.strikethrough,
         icon: Icons.format_strikethrough,
+        controller: controller,
+      ),
+      VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
+      IndentationButton(
+        increase: false,
+        controller: controller,
+      ),
+      SizedBox(width: 1),
+      IndentationButton(
         controller: controller,
       ),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
@@ -566,11 +627,13 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
     );
     showMenu<T>(
       context: context,
-      elevation: 4, // widget.elevation ?? popupMenuTheme.elevation,
+      elevation: 4,
+      // widget.elevation ?? popupMenuTheme.elevation,
       initialValue: widget.initialValue,
       items: widget.items,
       position: position,
-      shape: popupMenuTheme.shape, // widget.shape ?? popupMenuTheme.shape,
+      shape: popupMenuTheme.shape,
+      // widget.shape ?? popupMenuTheme.shape,
       color: popupMenuTheme.color, // widget.color ?? popupMenuTheme.color,
       // captureInheritedThemes: widget.captureInheritedThemes,
     ).then((T newValue) {

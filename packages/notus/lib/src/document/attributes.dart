@@ -41,7 +41,9 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
   @override
   final String key;
   final NotusAttributeScope scope;
+
   NotusAttribute<T> get unset => NotusAttribute<T>._(key, scope, null);
+
   NotusAttribute<T> withValue(T value) =>
       NotusAttribute<T>._(key, scope, value);
 }
@@ -81,6 +83,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
+    NotusAttribute.indent.key: NotusAttribute.indent,
   };
 
   // Inline attributes
@@ -115,6 +118,27 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.heading.level3].
   static NotusAttribute<int> get h3 => heading.level3;
+
+  static const indent = IndentAttributeBuilder._();
+
+  /// Alias for [NotusAttribute.indent.level1].
+  static NotusAttribute<int> get indentLevel1 => indent.level1;
+
+  /// Alias for [NotusAttribute.indent.level2].
+  static NotusAttribute<int> get indentLevel2 => indent.level2;
+
+  /// Alias for [NotusAttribute.indent.level3].
+  static NotusAttribute<int> get indentLevel3 => indent.level3;
+
+  static NotusAttribute<int> getIndentAttributeForLevel(int level) {
+    if (level == 1) {
+      return indentLevel1;
+    }
+    if (level == 2) {
+      return indentLevel2;
+    }
+    return indentLevel3;
+  }
 
   /// Block attribute
   // ignore: const_eval_throws_exception
@@ -344,7 +368,8 @@ class _UnderlineAttribute extends NotusAttribute<bool> {
 
 /// Applies strikethrough style to a text segment.
 class _StrikethroughAttribute extends NotusAttribute<bool> {
-  const _StrikethroughAttribute() : super._('s', NotusAttributeScope.inline, true);
+  const _StrikethroughAttribute()
+      : super._('s', NotusAttributeScope.inline, true);
 }
 
 /// Builder for link attribute values.
@@ -353,6 +378,7 @@ class _StrikethroughAttribute extends NotusAttribute<bool> {
 /// [NotusAttribute.link] instead.
 class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kLink = 'a';
+
   const LinkAttributeBuilder._() : super._(_kLink, NotusAttributeScope.inline);
 
   /// Creates a link attribute with specified link [value].
@@ -366,6 +392,7 @@ class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
 /// [NotusAttribute.heading] instead.
 class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
   static const _kHeading = 'heading';
+
   const HeadingAttributeBuilder._()
       : super._(_kHeading, NotusAttributeScope.line);
 
@@ -385,6 +412,7 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
 /// [NotusAttribute.block] instead.
 class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kBlock = 'block';
+
   const BlockAttributeBuilder._() : super._(_kBlock, NotusAttributeScope.line);
 
   /// Formats a block of lines as a bullet list.
@@ -402,4 +430,17 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a block of lines as a quote.
   NotusAttribute<String> get quote =>
       NotusAttribute<String>._(key, scope, 'quote');
+}
+
+class IndentAttributeBuilder extends NotusAttributeBuilder<int> {
+  static const _kIndent = 'indent';
+
+  const IndentAttributeBuilder._()
+      : super._(_kIndent, NotusAttributeScope.line);
+
+  NotusAttribute<int> get level1 => NotusAttribute<int>._(key, scope, 1);
+
+  NotusAttribute<int> get level2 => NotusAttribute<int>._(key, scope, 2);
+
+  NotusAttribute<int> get level3 => NotusAttribute<int>._(key, scope, 3);
 }
