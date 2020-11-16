@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:example/src/autohide_toolbar_view.dart';
 import 'package:example/src/read_only_view.dart';
 import 'package:file/local.dart';
 import 'package:flutter/material.dart';
@@ -125,6 +126,12 @@ class _HomePageState extends State<HomePage> {
           onTap: _readOnlyView,
         ),
         ListTile(
+          title: Text('¶   Autohide toolbar', style: itemStyle),
+          dense: true,
+          visualDensity: VisualDensity.compact,
+          onTap: _autoHideToolbarView,
+        ),
+        ListTile(
           title: Text('LAYOUT EXAMPLES', style: headerStyle),
           // dense: true,
           visualDensity: VisualDensity.compact,
@@ -205,6 +212,18 @@ class _HomePageState extends State<HomePage> {
         builder: (BuildContext context) => SettingsProvider(
           settings: _settings,
           child: ReadOnlyView(),
+        ),
+      ),
+    );
+  }
+
+  void _autoHideToolbarView() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => SettingsProvider(
+          settings: _settings,
+          child: AutoHideToolbarView(),
         ),
       ),
     );

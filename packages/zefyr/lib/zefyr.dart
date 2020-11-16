@@ -17,3 +17,4 @@ export 'src/widgets/editor_toolbar.dart';
 export 'src/widgets/field.dart';
 export 'src/widgets/text_line.dart';
 export 'src/widgets/theme.dart';
+export 'src/widgets/autohide_toolbar.dart';
