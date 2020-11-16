@@ -14,13 +14,11 @@ import 'theme.dart';
 class TextLine extends StatelessWidget {
   /// Line of text represented by this widget.
   final LineNode node;
-  final TextDirection textDirection;
   final ZefyrEmbedBuilder embedBuilder;
 
   const TextLine({
     Key key,
     @required this.node,
-    this.textDirection,
     @required this.embedBuilder,
   })  : assert(node != null),
         assert(embedBuilder != null),
@@ -29,6 +27,8 @@ class TextLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
+
+    final textDirection = Directionality.of(context);
 
     if (node.hasEmbed) {
       final embed = node.children.single as EmbedNode;

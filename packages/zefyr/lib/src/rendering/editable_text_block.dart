@@ -18,7 +18,7 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
     @required TextDirection textDirection,
     @required EdgeInsetsGeometry padding,
     @required Decoration decoration,
-    ImageConfiguration configuration = ImageConfiguration.empty,
+    ImageConfiguration configuration,
     EdgeInsets contentPadding = EdgeInsets.zero,
   })  : assert(node != null),
         assert(textDirection != null),
@@ -26,7 +26,7 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
         assert(padding != null),
         assert(contentPadding != null),
         _decoration = decoration,
-        _configuration = configuration,
+        _configuration = ImageConfiguration(textDirection: textDirection),
         _savedPadding = padding,
         _contentPadding = contentPadding,
         super(

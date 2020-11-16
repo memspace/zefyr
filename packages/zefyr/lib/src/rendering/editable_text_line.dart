@@ -607,7 +607,8 @@ class RenderEditableTextLine extends RenderEditableBox {
           maxHeight: body.size.height);
       leading.layout(leadingConstraints, parentUsesSize: true);
       final parentData = leading.parentData as BoxParentData;
-      parentData.offset = Offset(0.0, _resolvedPadding.top);
+      final dxOffset = textDirection == TextDirection.rtl ? body.size.width : 0.0;
+      parentData.offset = Offset(dxOffset, _resolvedPadding.top);
     }
 
     size = constraints.constrain(Size(

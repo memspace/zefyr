@@ -1106,26 +1106,39 @@ class RawEditorState extends EditorState
     );
   }
 
+  TextDirection getTextDirectionForLine(LineNode node){
+    final preferredDirection = node.style.get(NotusAttribute.direction);
+    if(preferredDirection == NotusAttribute.rtlDirection){
+      return TextDirection.rtl;
+    }else if(preferredDirection == NotusAttribute.ltrDirection){
+      return TextDirection.ltr;
+    }
+    return _textDirection;
+  }
+
   List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
     for (final node in widget.controller.document.root.children) {
       if (node is LineNode) {
-        result.add(EditableTextLine(
-          node: node,
-          textDirection: _textDirection,
-          indentWidth: 0,
-          spacing: _getSpacingForLine(node, _themeData),
-          cursorController: _cursorController,
-          selection: widget.controller.selection,
-          selectionColor: widget.selectionColor,
-          enableInteractiveSelection: widget.enableInteractiveSelection,
-          body: TextLine(
+        final nodeTextDirection =  getTextDirectionForLine(node);
+        result.add(Directionality(
+          textDirection: nodeTextDirection,
+          child: EditableTextLine(
             node: node,
-            textDirection: _textDirection,
-            embedBuilder: widget.embedBuilder,
+            textDirection: nodeTextDirection,
+            indentWidth: 0,
+            spacing: _getSpacingForLine(node, _themeData),
+            cursorController: _cursorController,
+            selection: widget.controller.selection,
+            selectionColor: widget.selectionColor,
+            enableInteractiveSelection: widget.enableInteractiveSelection,
+            body: TextLine(
+              node: node,
+              embedBuilder: widget.embedBuilder,
+            ),
+            hasFocus: _hasFocus,
+            devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
           ),
-          hasFocus: _hasFocus,
-          devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         ));
       } else if (node is BlockNode) {
         final block = node.style.get(NotusAttribute.block);

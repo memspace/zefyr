@@ -51,6 +51,16 @@ class EditableTextBlock extends StatelessWidget {
     );
   }
 
+  TextDirection getTextDirectionForNode(BuildContext context, StyledNode node) {
+    final preferredDirection = node.style.get(NotusAttribute.direction);
+    if (preferredDirection == NotusAttribute.rtlDirection) {
+      return TextDirection.rtl;
+    } else if (preferredDirection == NotusAttribute.ltrDirection) {
+      return TextDirection.ltr;
+    }
+    return Directionality.of(context);
+  }
+
   List<Widget> _buildChildren(BuildContext context) {
     final theme = ZefyrTheme.of(context);
     final count = node.children.length;
@@ -58,23 +68,26 @@ class EditableTextBlock extends StatelessWidget {
     var index = 0;
     for (final line in node.children) {
       index++;
-      children.add(EditableTextLine(
-        node: line,
-        textDirection: textDirection,
-        spacing: _getSpacingForLine(line, index, count, theme),
-        leading: _buildLeading(context, line, index, count),
-        indentWidth: _getIndentWidth(),
-        devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
-        body: TextLine(
+      final nodeTextDirection = getTextDirectionForNode(context, line);
+      children.add(Directionality(
+        textDirection: nodeTextDirection,
+        child: EditableTextLine(
           node: line,
-          textDirection: textDirection,
-          embedBuilder: embedBuilder,
+          textDirection: nodeTextDirection,
+          spacing: _getSpacingForLine(line, index, count, theme),
+          leading: _buildLeading(context, line, index, count),
+          indentWidth: _getIndentWidth(),
+          devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
+          body: TextLine(
+            node: line,
+            embedBuilder: embedBuilder,
+          ),
+          cursorController: cursorController,
+          selection: selection,
+          selectionColor: selectionColor,
+          enableInteractiveSelection: enableInteractiveSelection,
+          hasFocus: hasFocus,
         ),
-        cursorController: cursorController,
-        selection: selection,
-        selectionColor: selectionColor,
-        enableInteractiveSelection: enableInteractiveSelection,
-        hasFocus: hasFocus,
       ));
     }
     return children.toList(growable: false);
@@ -241,6 +254,7 @@ class _NumberPoint extends StatelessWidget {
     this.withDot = true,
     this.padding = 0.0,
   }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -261,6 +275,7 @@ class _BulletPoint extends StatelessWidget {
     @required this.style,
     @required this.width,
   }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(

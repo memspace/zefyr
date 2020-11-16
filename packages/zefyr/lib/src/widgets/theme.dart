@@ -186,8 +186,8 @@ class ZefyrThemeData {
         spacing: baseSpacing,
         lineSpacing: VerticalSpacing(top: 6, bottom: 2),
         decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(width: 4, color: Colors.grey.shade300),
+          border: BorderDirectional(
+            start: BorderSide(width: 4, color: Colors.grey.shade300),
           ),
         ),
       ),
