@@ -386,60 +386,89 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
 
   const ZefyrToolbar({Key key, @required this.children}) : super(key: key);
 
-  factory ZefyrToolbar.basic({Key key, @required ZefyrController controller}) {
+  factory ZefyrToolbar.basic({Key key, @required ZefyrController controller, bool hideBoldButton=false, bool hideItalicButton=false, bool hideUnderLineButton=false, bool hideStrikeThrough=false, bool hideHeadingStyle=false, bool hideListNumbers=false, bool hideListBullets=false, bool hideCodeBlock=false, bool hideQuote=false, bool hideLink=false, bool hideHorizontalRule=false}) {
     return ZefyrToolbar(key: key, children: [
-      ToggleStyleButton(
-        attribute: NotusAttribute.bold,
-        icon: Icons.format_bold,
-        controller: controller,
+      Visibility(
+        visible: hideBoldButton,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.bold,
+          icon: Icons.format_bold,
+          controller: controller,
+        ),
       ),
       SizedBox(width: 1),
-      ToggleStyleButton(
-        attribute: NotusAttribute.italic,
-        icon: Icons.format_italic,
-        controller: controller,
+      Visibility(
+        visible: hideItalicButton,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.italic,
+          icon: Icons.format_italic,
+          controller: controller,
+        ),
       ),
       SizedBox(width: 1),
-      ToggleStyleButton(
-        attribute: NotusAttribute.underline,
-        icon: Icons.format_underline,
-        controller: controller,
+      Visibility(
+        visible: hideUnderLineButton,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.underline,
+          icon: Icons.format_underline,
+          controller: controller,
+        ),
       ),
       SizedBox(width: 1),
-      ToggleStyleButton(
-        attribute: NotusAttribute.strikethrough,
-        icon: Icons.format_strikethrough,
-        controller: controller,
+      Visibility(
+        visible: hideStrikeThrough,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.strikethrough,
+          icon: Icons.format_strikethrough,
+          controller: controller,
+        ),
       ),
+      Visibility(visible: hideHeadingStyle, child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+      Visibility(visible: hideHeadingStyle, child: SelectHeadingStyleButton(controller: controller)),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
-      SelectHeadingStyleButton(controller: controller),
-      VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
-      ToggleStyleButton(
-        attribute: NotusAttribute.block.numberList,
-        controller: controller,
-        icon: Icons.format_list_numbered,
+      Visibility(
+        visible: hideListNumbers,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.block.numberList,
+          controller: controller,
+          icon: Icons.format_list_numbered,
+        ),
       ),
-      ToggleStyleButton(
-        attribute: NotusAttribute.block.bulletList,
-        controller: controller,
-        icon: Icons.format_list_bulleted,
+      Visibility(
+        visible: hideListBullets,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.block.bulletList,
+          controller: controller,
+          icon: Icons.format_list_bulleted,
+        ),
       ),
-      ToggleStyleButton(
-        attribute: NotusAttribute.block.code,
-        controller: controller,
-        icon: Icons.code,
+      Visibility(
+        visible: hideCodeBlock,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.block.code,
+          controller: controller,
+          icon: Icons.code,
+        ),
       ),
-      VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
-      ToggleStyleButton(
-        attribute: NotusAttribute.block.quote,
-        controller: controller,
-        icon: Icons.format_quote,
+      Visibility(
+          visible: !hideListNumbers && !hideListBullets && !hideCodeBlock,
+          child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+      Visibility(
+        visible: hideQuote,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.block.quote,
+          controller: controller,
+          icon: Icons.format_quote,
+        ),
       ),
-      VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
-      LinkStyleButton(controller: controller),
-      InsertEmbedButton(
-        controller: controller,
-        icon: Icons.horizontal_rule,
+      Visibility(visible: hideQuote, child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+      Visibility(visible: hideLink, child: LinkStyleButton(controller: controller)),
+      Visibility(
+        visible: hideHorizontalRule,
+        child: InsertEmbedButton(
+          controller: controller,
+          icon: Icons.horizontal_rule,
+        ),
       ),
     ]);
   }
