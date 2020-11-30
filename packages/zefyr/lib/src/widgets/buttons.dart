@@ -185,6 +185,7 @@ class RawZefyrButton extends StatelessWidget {
       child: RawMaterialButton(
         shape: RoundedRectangleBorder(borderRadius: radius),
         elevation: 0.0,
+        highlightElevation: 0.0,
         fillColor: color,
         constraints: constraints,
         onPressed: onPressed,
