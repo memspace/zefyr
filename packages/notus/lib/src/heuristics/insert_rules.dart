@@ -242,9 +242,10 @@ class PreserveInlineStylesRule extends InsertRule {
     if (previousText.contains('\n')) return null;
 
     final attributes = previous.attributes;
-    final hasLink =
-        (attributes != null && attributes.containsKey(NotusAttribute.link.key));
-    if (!hasLink) {
+    final hasLinkOrMention = (attributes != null &&
+        (attributes.containsKey(NotusAttribute.link.key) ||
+            attributes.containsKey(NotusAttribute.mention.key)));
+    if (!hasLinkOrMention) {
       return Delta()
         ..retain(index)
         ..insert(text, attributes);
@@ -252,20 +253,36 @@ class PreserveInlineStylesRule extends InsertRule {
     // Special handling needed for inserts inside fragments with link attribute.
     // Link style should only be preserved if insert occurs inside the fragment.
     // Link style should NOT be preserved on the boundaries.
-    var noLinkAttributes = previous.attributes;
-    noLinkAttributes.remove(NotusAttribute.link.key);
-    final noLinkResult = Delta()
+    // Mention style should be removed if there is insert inside or after it.
+    var noLinkAndMentionAttributes = previous.attributes;
+    noLinkAndMentionAttributes.remove(NotusAttribute.link.key);
+    noLinkAndMentionAttributes.remove(NotusAttribute.mention.key);
+    final noLinkAndMentionResult = Delta()
       ..retain(index)
-      ..insert(text, noLinkAttributes.isEmpty ? null : noLinkAttributes);
+      ..insert(
+          text,
+          noLinkAndMentionAttributes.isEmpty
+              ? null
+              : noLinkAndMentionAttributes);
     final next = iter.next();
     if (next == null) {
       // Nothing after us, we are not inside link-styled fragment.
-      return noLinkResult;
+      return noLinkAndMentionResult;
     }
     final nextAttributes = next.attributes ?? const <String, dynamic>{};
-    if (!nextAttributes.containsKey(NotusAttribute.link.key)) {
+    if (!(nextAttributes.containsKey(NotusAttribute.link.key) ||
+        nextAttributes.containsKey(NotusAttribute.mention.key))) {
       // Next fragment is not styled as link.
-      return noLinkResult;
+      return noLinkAndMentionResult;
+    }
+    if (nextAttributes.containsKey(NotusAttribute.mention.key)) {
+      return Delta()
+        ..retain(index - previousText.length)
+        ..delete(previousText.length)
+        ..insert(previousText)
+        ..insert(text, attributes.remove(NotusAttribute.mention))
+        ..delete(next.length)
+        ..insert(next.data);
     }
     // We must make sure links are identical in previous and next operations.
     if (attributes[NotusAttribute.link.key] ==
@@ -274,7 +291,7 @@ class PreserveInlineStylesRule extends InsertRule {
         ..retain(index)
         ..insert(text, attributes);
     } else {
-      return noLinkResult;
+      return noLinkAndMentionResult;
     }
   }
 }

@@ -15,7 +15,7 @@ class FormEmbeddedScreen extends StatefulWidget {
 }
 
 class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
-  final ZefyrController _controller = ZefyrController(NotusDocument());
+  final ZefyrController _controller = ZefyrController(document: NotusDocument());
   final FocusNode _focusNode = FocusNode();
 
   bool _darkTheme = false;

@@ -14,9 +14,15 @@ List<String> _insertionToggleableStyleKeys = [
 ];
 
 class ZefyrController extends ChangeNotifier {
-  ZefyrController([NotusDocument document])
+  final List<String> _mentionTriggers;
+  bool isInMentioningMode = false;
+  String mentionedText;
+  String mentionTrigger;
+
+  ZefyrController({NotusDocument document, List<String> mentionTriggers})
       : document = document ?? NotusDocument(),
-        _selection = TextSelection.collapsed(offset: 0);
+        _selection = TextSelection.collapsed(offset: 0),
+        _mentionTriggers = mentionTriggers ?? [];
 
   /// Document managed by this controller.
   final NotusDocument document;
@@ -125,6 +131,7 @@ class ZefyrController extends ChangeNotifier {
     if (_selection != adjustedSelection) {
       _updateSelectionSilent(adjustedSelection, source: source);
     }
+    _checkForMentionTriggers();
     notifyListeners();
   }
 
@@ -186,6 +193,46 @@ class ZefyrController extends ChangeNotifier {
     _selection = value;
 //    _lastChangeSource = source;
     _ensureSelectionBeforeLastBreak();
+    _checkForMentionTriggers();
+  }
+
+  /// Checks if collapsed cursor is after a mention trigger
+  /// which isn't submitted yet
+  void _checkForMentionTriggers() {
+    isInMentioningMode = false;
+    mentionedText = null;
+    mentionTrigger = null;
+
+    if (_mentionTriggers.isEmpty || !selection.isCollapsed) {
+      return;
+    }
+
+    final plainText = document.toPlainText();
+    final indexOfLastMentionTrigger = plainText
+        .substring(0, selection.end)
+        .lastIndexOf(RegExp(_mentionTriggers.join('|')));
+
+    if (indexOfLastMentionTrigger < 0) {
+      return;
+    }
+
+    if (plainText
+        .substring(indexOfLastMentionTrigger, selection.end)
+        .contains(RegExp(r'\n'))) {
+      return;
+    }
+
+    final isMentionSubmitted =
+        document.collectStyle(indexOfLastMentionTrigger, 0);
+    if (isMentionSubmitted.contains(NotusAttribute.mention)) {
+      return;
+    }
+
+    isInMentioningMode = true;
+    mentionedText =
+        plainText.substring(indexOfLastMentionTrigger + 1, selection.end);
+    mentionTrigger = plainText.substring(
+        indexOfLastMentionTrigger, indexOfLastMentionTrigger + 1);
   }
 
   // Ensures that selection does not include last line break which

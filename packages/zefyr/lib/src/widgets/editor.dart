@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 import 'package:zefyr/src/widgets/baseline_proxy.dart';
+import 'package:zefyr/src/widgets/mention_selection.dart';
+import 'package:zefyr/zefyr.dart';
 
 import '../rendering/editor.dart';
 import '../services/keyboard.dart';
@@ -21,6 +23,10 @@ import 'editor_selection_delegate_mixin.dart';
 import 'text_line.dart';
 import 'text_selection.dart';
 import 'theme.dart';
+
+/// Builder function for mention suggestions for user.
+typedef MentionSuggestionListBuilder = Map<int, String> Function(
+    String trigger, String value);
 
 /// Builder function for embeddable objects in [ZefyrEditor].
 typedef ZefyrEmbedBuilder = Widget Function(
@@ -171,10 +177,16 @@ class ZefyrEditor extends StatefulWidget {
   /// Callback to invoke when user wants to launch a URL.
   final ValueChanged<String> onLaunchUrl;
 
+  /// Callback to invoke when user clicks on a mention.
+  final Function(int, String) onMentionClicked;
+
   /// Builder function for embeddable objects.
   ///
   /// Defaults to [defaultZefyrEmbedBuilder].
   final ZefyrEmbedBuilder embedBuilder;
+
+  /// Builder function for mention suggestions.
+  final MentionSuggestionListBuilder mentionSuggestionListBuilder;
 
   const ZefyrEditor({
     Key key,
@@ -194,7 +206,9 @@ class ZefyrEditor extends StatefulWidget {
     this.keyboardAppearance = Brightness.light,
     this.scrollPhysics,
     this.onLaunchUrl,
+    this.onMentionClicked,
     this.embedBuilder = defaultZefyrEmbedBuilder,
+    this.mentionSuggestionListBuilder,
   })  : assert(controller != null),
         super(key: key);
 
@@ -296,7 +310,9 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       keyboardAppearance: widget.keyboardAppearance,
       scrollPhysics: widget.scrollPhysics,
       onLaunchUrl: widget.onLaunchUrl,
+      onMentionClicked: widget.onMentionClicked,
       embedBuilder: widget.embedBuilder,
+      mentionSuggestionListBuilder: widget.mentionSuggestionListBuilder,
       // encapsulated fields below
       cursorStyle: CursorStyle(
         color: cursorColor,
@@ -366,7 +382,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     }
   }
 
-  void _launchUrlIfNeeded(TapUpDetails details) {
+  void _handleTextSegmentClick(TapUpDetails details) {
     final pos = renderEditor.getPositionForOffset(details.globalPosition);
     final result = editor.widget.controller.document.lookupLine(pos.offset);
     if (result.node == null) return;
@@ -382,6 +398,12 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
         // TODO: Implement a toolbar to display the URL and allow to launch it.
         // editor.showToolbar();
       }
+    } else if (segment.style.contains(NotusAttribute.mention)) {
+      if (editor.widget.readOnly) {
+        editor.widget.onMentionClicked?.call(
+            segment.style.get(NotusAttribute.mention).value,
+            segment.toPlainText());
+      }
     }
   }
 
@@ -390,7 +412,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     editor.hideToolbar();
 
     // TODO: Explore if we can forward tap up events to the TextSpan gesture detector
-    _launchUrlIfNeeded(details);
+    _handleTextSegmentClick(details);
 
     if (delegate.selectionEnabled) {
       switch (Theme.of(_state.context).platform) {
@@ -465,6 +487,7 @@ class RawEditor extends StatefulWidget {
     this.textCapitalization = TextCapitalization.none,
     this.keyboardAppearance = Brightness.light,
     this.onLaunchUrl,
+    this.onMentionClicked,
     @required this.selectionColor,
     this.scrollPhysics,
     this.toolbarOptions = const ToolbarOptions(
@@ -477,6 +500,7 @@ class RawEditor extends StatefulWidget {
     this.showSelectionHandles = false,
     this.selectionControls,
     this.embedBuilder = defaultZefyrEmbedBuilder,
+    this.mentionSuggestionListBuilder,
   })  : assert(controller != null),
         assert(focusNode != null),
         assert(scrollable || scrollController != null),
@@ -523,6 +547,9 @@ class RawEditor extends StatefulWidget {
   /// Callback which is triggered when the user wants to open a URL from
   /// a link in the document.
   final ValueChanged<String> onLaunchUrl;
+
+  /// Callback which is triggered when the user clicks on a segment with mention attribute.
+  final Function(int, String) onMentionClicked;
 
   /// Configuration of toolbar options.
   ///
@@ -631,6 +658,9 @@ class RawEditor extends StatefulWidget {
   /// Defaults to [defaultZefyrEmbedBuilder].
   final ZefyrEmbedBuilder embedBuilder;
 
+  /// Builder function for mention suggestions.
+  final MentionSuggestionListBuilder mentionSuggestionListBuilder;
+
   bool get selectionEnabled => enableInteractiveSelection;
 
   @override
@@ -665,11 +695,17 @@ class RawEditor extends StatefulWidget {
 ///
 abstract class EditorState extends State<RawEditor> {
   TextEditingValue get textEditingValue;
+
   set textEditingValue(TextEditingValue value);
+
   RenderEditor get renderEditor;
+
   EditorTextSelectionOverlay get selectionOverlay;
+
   bool showToolbar();
+
   void hideToolbar();
+
   void requestKeyboard();
 }
 
@@ -699,6 +735,8 @@ class RawEditorState extends EditorState
   EditorTextSelectionOverlay get selectionOverlay => _selectionOverlay;
   EditorTextSelectionOverlay _selectionOverlay;
 
+  MentionSuggestionOverlay _suggestionOverlay;
+
   ScrollController _scrollController;
 
   final ClipboardStatusNotifier _clipboardStatus =
@@ -709,6 +747,7 @@ class RawEditorState extends EditorState
 
   bool _didAutoFocus = false;
   FocusAttachment _focusAttachment;
+
   bool get _hasFocus => widget.focusNode.hasFocus;
 
   @override
@@ -767,6 +806,7 @@ class RawEditorState extends EditorState
 
   void _updateSelectionOverlayForScroll() {
     _selectionOverlay?.updateForScroll();
+    _suggestionOverlay?.updateForScroll();
   }
 
   // State lifecycle:
@@ -911,17 +951,64 @@ class RawEditorState extends EditorState
       _cursorController.startCursorTimer();
     }
 
-    // Refresh selection overlay after the build step had a chance to
+    // Refresh selection and suggestion overlay after the build step had a chance to
     // update and register all children of RenderEditor. Otherwise this will
     // fail in situations where a new line of text is entered, which adds
-    // a new RenderEditableBox child. If we try to update selection overlay
+    // a new RenderEditableBox child. If we try to update overlay
     // immediately it'll not be able to find the new child since it hasn't been
     // built yet.
-    SchedulerBinding.instance.addPostFrameCallback(
-        (Duration _) => _updateOrDisposeSelectionOverlayIfNeeded());
+    SchedulerBinding.instance.addPostFrameCallback((Duration _) {
+      _updateOrDisposeSelectionOverlayIfNeeded();
+      _updateOrDisposeSuggestionOverlayIfNeeded();
+    });
+
 //    _textChangedSinceLastCaretUpdate = true;
 
-    setState(() {/* We use widget.controller.value in build(). */});
+    setState(() {
+      /* We use widget.controller.value in build(). */
+    });
+  }
+
+  void _updateOrDisposeSuggestionOverlayIfNeeded() {
+    if (widget.controller.isInMentioningMode) {
+      SchedulerBinding.instance.addPostFrameCallback((Duration _) {
+        if (_suggestionOverlay != null) {
+          _suggestionOverlay.overlayEntry.remove();
+        }
+        _suggestionOverlay = MentionSuggestionOverlay(
+            context: context,
+            textEditingValue: textEditingValue,
+            renderObject: renderEditor,
+            debugRequiredFor: widget,
+            suggestions: widget.mentionSuggestionListBuilder(
+                widget.controller.mentionTrigger,
+                widget.controller.mentionedText),
+            suggestionSelected: _handleMentionSuggestionSelected);
+        _suggestionOverlay.showSuggestions();
+      });
+    } else {
+      if (_suggestionOverlay != null) {
+        SchedulerBinding.instance.addPostFrameCallback((Duration _) {
+          _suggestionOverlay?.hide();
+          _suggestionOverlay = null;
+        });
+      }
+    }
+  }
+
+  void _handleMentionSuggestionSelected(int key, String value) {
+    final controller = widget.controller;
+    final mentionStartIndex =
+        controller.selection.end - controller.mentionedText.length - 1;
+    final mentionedTextLength = controller.mentionedText.length + 1;
+    final replacementText = controller.mentionTrigger + value + ' ';
+
+    controller.replaceText(
+        mentionStartIndex, mentionedTextLength, replacementText,
+        selection: TextSelection.collapsed(
+            offset: mentionStartIndex + replacementText.length));
+    controller.formatText(mentionStartIndex, replacementText.length - 1,
+        NotusAttribute.mention.fromString(key));
   }
 
   void _handleSelectionChanged(

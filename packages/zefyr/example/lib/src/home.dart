@@ -14,6 +14,19 @@ import 'layout_expanded.dart';
 import 'layout_scrollable.dart';
 import 'settings.dart';
 
+const _mentionTriggers = ['@'];
+
+const Map<int, String> _usersList = {
+  1: 'Amelia',
+  2: 'Oliver',
+  3: 'Olivia',
+  4: 'Jack',
+  5: 'Isla',
+  6: 'Harry',
+  7: 'Emily',
+  8: 'Jacob',
+};
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -43,12 +56,14 @@ class _HomePageState extends State<HomePage> {
       final result = await rootBundle.loadString('assets/welcome.note');
       final doc = NotusDocument.fromJson(jsonDecode(result));
       setState(() {
-        _controller = ZefyrController(doc);
+        _controller =
+            ZefyrController(document: doc, mentionTriggers: _mentionTriggers);
       });
     } catch (error) {
       final doc = NotusDocument()..insert(0, 'Empty asset');
       setState(() {
-        _controller = ZefyrController(doc);
+        _controller =
+            ZefyrController(document: doc, mentionTriggers: _mentionTriggers);
       });
     }
   }
@@ -172,11 +187,27 @@ class _HomePageState extends State<HomePage> {
               // readOnly: true,
               // padding: EdgeInsets.only(left: 16, right: 16),
               onLaunchUrl: _launchUrl,
+              onMentionClicked: _mentionClicked,
+              mentionSuggestionListBuilder: _mentionSuggestionBuilder,
             ),
           ),
         ),
       ],
     );
+  }
+
+  Map<int, String> _mentionSuggestionBuilder(String trigger, String value) {
+    var suggestions = <int, String>{};
+    _usersList.forEach((id, name) {
+      if (name.startsWith(value)) {
+        suggestions.putIfAbsent(id, () => name);
+      }
+    });
+    return suggestions;
+  }
+
+  void _mentionClicked(int id, String value){
+    print('$value clicked with id of $id');
   }
 
   void _launchUrl(String url) async {

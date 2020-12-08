@@ -12,7 +12,7 @@ void main() {
 
     setUp(() {
       var doc = NotusDocument();
-      controller = ZefyrController(doc);
+      controller = ZefyrController(document: doc);
     });
 
     test('dispose', () {

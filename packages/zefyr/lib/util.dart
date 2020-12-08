@@ -32,6 +32,9 @@ int getPositionDelta(Delta user, Delta actual) {
         // rule inserts a new line we should keep cursor on it's original position.
         continue;
       }
+      if (opText.startsWith('@')) {
+        break;
+      }
       diff += actualOp.length;
     } else {
       // TODO: this likely needs to cover more edge cases.

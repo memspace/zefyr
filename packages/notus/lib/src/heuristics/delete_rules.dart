@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:notus/src/document/attributes.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 /// A heuristic rule for delete operations.
@@ -24,6 +25,46 @@ class CatchAllDeleteRule extends DeleteRule {
     return Delta()
       ..retain(index)
       ..delete(length);
+  }
+}
+
+/// Removes mention attribute if deleted segment overlaps a
+/// text segment with mention attribute
+class HandleMentionDeleteRule extends DeleteRule {
+  const HandleMentionDeleteRule();
+
+  @override
+  Delta apply(Delta document, int index, int length) {
+    final iter = DeltaIterator(document);
+
+    final previous = iter.skip(index);
+    final previousAttributes = previous.attributes ?? const <String, dynamic>{};
+    final previousText = previous.data is String ? previous.data as String : '';
+
+    final next = (iter..skip(length)).next();
+    final nextAttributes = next.attributes ?? const <String, dynamic>{};
+    final nextText = next.data is String ? next.data as String : '';
+
+    var delta = Delta();
+
+    if (previousAttributes.containsKey(NotusAttribute.mention.key)) {
+      delta = delta
+        ..retain(index - previousText.length)
+        ..delete(previousText.length)
+        ..insert(previousText);
+    } else {
+      delta..retain(index);
+    }
+
+    delta = delta..delete(length);
+
+    if (nextAttributes.containsKey(NotusAttribute.mention.key)) {
+      delta = delta
+        ..delete(nextText.length)
+        ..insert(nextText);
+    }
+
+    return delta;
   }
 }
 

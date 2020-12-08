@@ -25,7 +25,7 @@ class EditorSandBox {
   }) {
     focusNode ??= FocusNode();
     document ??= NotusDocument.fromDelta(delta);
-    var controller = ZefyrController(document);
+    var controller = ZefyrController(document: document);
 
     Widget widget = _ZefyrSandbox(
       controller: controller,
