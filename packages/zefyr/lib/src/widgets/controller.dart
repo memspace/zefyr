@@ -82,7 +82,7 @@ class ZefyrController extends ChangeNotifier {
     _toggledStyles = NotusStyle();
 
     if (selection != null) {
-      if (delta == null) {
+      if (delta == null || delta.isEmpty) {
         _updateSelectionSilent(selection, source: ChangeSource.local);
       } else {
         // need to transform selection position in case actual delta
