@@ -63,11 +63,13 @@ class NotusHeuristics {
 
   /// Applies heuristic rules to specified insert operation based on current
   /// state of Notus [document].
-  Delta applyInsertRules(NotusDocument document, int index, Object data) {
+  Delta applyInsertRules(NotusDocument document, int index, int replaceLength, Object data, ) {
     final delta = document.toDelta();
     for (var rule in insertRules) {
-      final result = rule.apply(delta, index, data);
-      if (result != null) return result..trim();
+      final result = rule.apply(delta, index, replaceLength, data);
+      if (result != null) {
+        return result..trim();
+      }
     }
     throw StateError('Failed to apply insert heuristic rules: none applied.');
   }
