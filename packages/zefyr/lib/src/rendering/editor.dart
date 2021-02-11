@@ -311,6 +311,10 @@ class RenderEditor extends RenderEditableContainerBox
 
   Offset /*?*/ _lastTapDownPosition;
 
+  void resetTapDownStatus() {
+    _lastTapDownPosition = null;
+  }
+  
   @override
   void handleTapDown(TapDownDetails details) {
     _lastTapDownPosition = details.globalPosition;
@@ -416,11 +420,17 @@ class RenderEditor extends RenderEditableContainerBox
 
   @override
   void selectWord({@required SelectionChangedCause cause}) {
+    if (_lastTapDownPosition == null) {
+      return;
+    }
     selectWordsInRange(from: _lastTapDownPosition, cause: cause);
   }
 
   @override
   void selectPosition({@required SelectionChangedCause cause}) {
+    if (_lastTapDownPosition == null) {
+      return;
+    }
     selectPositionAt(from: _lastTapDownPosition, cause: cause);
   }
 
