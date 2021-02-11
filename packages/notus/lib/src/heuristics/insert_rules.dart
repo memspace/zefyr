@@ -47,7 +47,7 @@ abstract class InsertRule {
 
   /// Applies heuristic rule to an insert operation on a [document] and returns
   /// resulting [Delta].
-  Delta apply(Delta document, int index, Object data);
+  Delta apply(Delta document, int index, int replaceLength, Object data);
 }
 
 /// Fallback rule which simply inserts text as-is without any special handling.
@@ -55,9 +55,9 @@ class CatchAllInsertRule extends InsertRule {
   const CatchAllInsertRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta apply(Delta document, int index, int replaceLength, Object data) {
     return Delta()
-      ..retain(index)
+      ..retain(index + replaceLength)
       ..insert(data);
   }
 }
@@ -77,7 +77,7 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
   }
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta apply(Delta document, int index, int replaceLength, Object data);
     if (data is! String) return null;
 
     final text = data as String;
@@ -120,7 +120,7 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
   const ResetLineFormatOnNewLineRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta apply(Delta document, int index, int replaceLength, Object data);
     if (data is! String) return null;
 
     final text = data as String;
@@ -142,7 +142,7 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
         resetStyle = NotusAttribute.heading.unset.toJson();
       }
       return Delta()
-        ..retain(index)
+        ..retain(index + replaceLength)
         ..insert('\n', target.attributes)
         ..retain(1, resetStyle)
         ..trim();
@@ -168,7 +168,7 @@ class AutoExitBlockRule extends InsertRule {
   }
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta apply(Delta document, int index, int replaceLength, Object data) {
     if (data is! String) return null;
 
     final text = data as String;
@@ -214,7 +214,7 @@ class AutoExitBlockRule extends InsertRule {
     // therefore we can exit this block.
     final attributes = target.attributes ?? <String, dynamic>{};
     attributes.addAll(NotusAttribute.block.unset.toJson());
-    return Delta()..retain(index)..retain(1, attributes);
+    return Delta()..retain(index + replaceLength)..retain(1, attributes);
   }
 }
 
@@ -223,7 +223,7 @@ class PreserveInlineStylesRule extends InsertRule {
   const PreserveInlineStylesRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta apply(Delta document, int index, int replaceLength, Object data) {
     // There is no other text around embeds so no inline styles to preserve.
     if (data is! String) return null;
 
@@ -246,7 +246,7 @@ class PreserveInlineStylesRule extends InsertRule {
         (attributes != null && attributes.containsKey(NotusAttribute.link.key));
     if (!hasLink) {
       return Delta()
-        ..retain(index)
+        ..retain(index + replaceLength)
         ..insert(text, attributes);
     }
     // Special handling needed for inserts inside fragments with link attribute.
@@ -255,7 +255,7 @@ class PreserveInlineStylesRule extends InsertRule {
     var noLinkAttributes = previous.attributes;
     noLinkAttributes.remove(NotusAttribute.link.key);
     final noLinkResult = Delta()
-      ..retain(index)
+      ..retain(index + replaceLength)
       ..insert(text, noLinkAttributes.isEmpty ? null : noLinkAttributes);
     final next = iter.next();
     if (next == null) {
@@ -271,7 +271,7 @@ class PreserveInlineStylesRule extends InsertRule {
     if (attributes[NotusAttribute.link.key] ==
         nextAttributes[NotusAttribute.link.key]) {
       return Delta()
-        ..retain(index)
+        ..retain(index + replaceLength)
         ..insert(text, attributes);
     } else {
       return noLinkResult;
@@ -285,7 +285,7 @@ class AutoFormatLinksRule extends InsertRule {
   const AutoFormatLinksRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta apply(Delta document, int index, int replaceLength, Object data) {
     if (data is! String) return null;
 
     // This rule applies to a space inserted after a link, so we can ignore
@@ -316,7 +316,7 @@ class AutoFormatLinksRule extends InsertRule {
       attributes
           .addAll(NotusAttribute.link.fromString(link.toString()).toJson());
       return Delta()
-        ..retain(index - candidate.length)
+        ..retain(index + replaceLength - candidate.length)
         ..retain(candidate.length, attributes)
         ..insert(text, previous.attributes);
     } on FormatException {
@@ -333,7 +333,7 @@ class ForceNewlineForInsertsAroundEmbedRule extends InsertRule {
   const ForceNewlineForInsertsAroundEmbedRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta apply(Delta document, int index, int replaceLength, Object data) {
     if (data is! String) return null;
 
     final text = data as String;
@@ -345,7 +345,7 @@ class ForceNewlineForInsertsAroundEmbedRule extends InsertRule {
     final cursorAfterEmbed = previous != null && previous.data is! String;
 
     if (cursorBeforeEmbed || cursorAfterEmbed) {
-      final delta = Delta()..retain(index);
+      final delta = Delta()..retain(index + replaceLength);
       if (cursorBeforeEmbed && !text.endsWith('\n')) {
         return delta..insert(text)..insert('\n');
       }
@@ -377,7 +377,7 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
   }
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta apply(Delta document, int index, int replaceLength, Object data) {
     // Embeds are handled by a different rule.
     if (data is! String) return null;
 
@@ -411,7 +411,7 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
 
     // Go over each inserted line and ensure block style is applied.
     final lines = text.split('\n');
-    final result = Delta()..retain(index);
+    final result = Delta()..retain(index + replaceLength);
     for (var i = 0; i < lines.length; i++) {
       final line = lines[i];
       if (line.isNotEmpty) {
@@ -443,11 +443,11 @@ class InsertEmbedsRule extends InsertRule {
   const InsertEmbedsRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta apply(Delta document, int index, int replaceLength, Object data) {
     // We are only interested in embeddable objects.
     if (data is String) return null;
 
-    final result = Delta()..retain(index);
+    final result = Delta()..retain(index + replaceLength);
     final iter = DeltaIterator(document);
     final previous = iter.skip(index);
     final target = iter.next();
