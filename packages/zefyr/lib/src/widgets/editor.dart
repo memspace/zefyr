@@ -176,6 +176,12 @@ class ZefyrEditor extends StatefulWidget {
   /// Defaults to [defaultZefyrEmbedBuilder].
   final ZefyrEmbedBuilder embedBuilder;
 
+  final bool Function(TapDownDetails details, TextPosition textPosition) onTapDown;
+  final bool Function(TapUpDetails details, TextPosition textPosition) onTapUp;
+  final bool Function(LongPressStartDetails details, TextPosition textPosition) onSingleLongTapStart;
+  final bool Function(LongPressMoveUpdateDetails details, TextPosition textPosition) onSingleLongTapMoveUpdate;
+  final bool Function(LongPressEndDetails details, TextPosition textPosition) onSingleLongTapEnd;
+
   const ZefyrEditor({
     Key key,
     @required this.controller,
@@ -195,6 +201,11 @@ class ZefyrEditor extends StatefulWidget {
     this.scrollPhysics,
     this.onLaunchUrl,
     this.embedBuilder = defaultZefyrEmbedBuilder,
+    this.onTapDown,
+    this.onTapUp,
+    this.onSingleLongTapStart,
+    this.onSingleLongTapMoveUpdate,
+    this.onSingleLongTapEnd,
   })  : assert(controller != null),
         super(key: key);
 
@@ -215,6 +226,46 @@ class _ZefyrEditorState extends State<ZefyrEditor>
 
   @override
   bool get selectionEnabled => widget.enableInteractiveSelection;
+
+   @override
+  bool overrideHandleTapDown(TapDownDetails details, TextPosition textPosition) {
+    if (widget.onTapDown == null) {
+      return false;
+    }
+    return widget.onTapDown(details, textPosition);
+  }
+
+  @override
+  bool overrideHandleTapUp(TapUpDetails details, TextPosition textPosition) {
+    if (widget.onTapUp == null) {
+      return false;
+    }
+    return widget.onTapUp(details, textPosition);
+  }
+
+  @override
+  bool overrideSingleLongTapStart(LongPressStartDetails details, TextPosition textPosition) {
+    if (widget.onSingleLongTapStart == null) {
+      return false;
+    }
+    return widget.onSingleLongTapStart(details, textPosition);
+  }
+
+  @override
+  bool overrideSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details, TextPosition textPosition) {
+    if (widget.onSingleLongTapMoveUpdate == null) {
+      return false;
+    }
+    return widget.onSingleLongTapMoveUpdate(details, textPosition);
+  }
+
+  @override
+  bool overrideSingleLongTapEnd(LongPressEndDetails details, TextPosition textPosition) {
+    if (widget.onSingleLongTapEnd == null) {
+      return false;
+    }
+    return widget.onSingleLongTapEnd(details, textPosition);
+  }
 
   EditorTextSelectionGestureDetectorBuilder _selectionGestureDetectorBuilder;
 
@@ -343,6 +394,11 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
 
   @override
   void onSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details) {
+    if (_state.widget.onSingleLongTapMoveUpdate != null) {
+      if (_state.widget.onSingleLongTapMoveUpdate(details, renderEditor.getPositionForOffset(details.globalPosition))) {
+        return;
+      }
+    }
     if (delegate.selectionEnabled) {
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
@@ -387,6 +443,11 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
 
   @override
   void onSingleTapUp(TapUpDetails details) {
+    if (_state.widget.onTapUp != null) {
+      if (_state.widget.onTapUp(details, renderEditor.getPositionForOffset(details.globalPosition))) {
+        return;
+      }
+    }
     editor.hideToolbar();
 
     // TODO: Explore if we can forward tap up events to the TextSpan gesture detector
@@ -426,6 +487,11 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
 
   @override
   void onSingleLongTapStart(LongPressStartDetails details) {
+    if (_state.widget.onSingleLongTapStart != null) {
+      if (_state.widget.onSingleLongTapStart(details, renderEditor.getPositionForOffset(details.globalPosition))) {
+        return;
+      }
+    }
     if (delegate.selectionEnabled) {
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
