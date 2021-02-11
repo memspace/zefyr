@@ -208,7 +208,9 @@ abstract class ContainerNode<T extends Node> extends Node {
   /// which points at the same character position in the document as the
   /// original [offset].
   LookupResult lookup(int offset, {bool inclusive = false}) {
-    assert(offset >= 0 && offset <= length);
+    if (offset < 0 || offset > length) {
+      return LookupResult(null, 0);
+    }
 
     for (final node in children) {
       final length = node.length;
