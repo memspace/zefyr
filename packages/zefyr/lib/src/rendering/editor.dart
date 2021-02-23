@@ -314,7 +314,7 @@ class RenderEditor extends RenderEditableContainerBox
   void resetTapDownStatus() {
     _lastTapDownPosition = null;
   }
-  
+
   @override
   void handleTapDown(TapDownDetails details) {
     _lastTapDownPosition = details.globalPosition;

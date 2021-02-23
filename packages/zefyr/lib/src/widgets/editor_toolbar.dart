@@ -7,11 +7,13 @@ const double kToolbarHeight = 56.0;
 
 class InsertEmbedButton extends StatelessWidget {
   final ZefyrController controller;
+  final Color fillColor;
   final IconData icon;
 
   const InsertEmbedButton({
     Key key,
     @required this.controller,
+    this.fillColor,
     @required this.icon,
   }) : super(key: key);
   @override
@@ -25,7 +27,7 @@ class InsertEmbedButton extends StatelessWidget {
         size: 18,
         color: Theme.of(context).iconTheme.color,
       ),
-      fillColor: Theme.of(context).canvasColor,
+      fillColor: fillColor,
       onPressed: () {
         final index = controller.selection.baseOffset;
         final length = controller.selection.extentOffset - index;
@@ -153,6 +155,7 @@ class _LinkDialogState extends State<_LinkDialog> {
 typedef ToggleStyleButtonBuilder = Widget Function(
   BuildContext context,
   NotusAttribute attribute,
+  Color fillColor,
   IconData icon,
   bool isToggled,
   VoidCallback onPressed,
@@ -162,6 +165,9 @@ typedef ToggleStyleButtonBuilder = Widget Function(
 class ToggleStyleButton extends StatefulWidget {
   /// The style attribute controlled by this button.
   final NotusAttribute attribute;
+
+  /// The fill color of the button
+  final Color fillColor;
 
   /// The icon representing the style [attribute].
   final IconData icon;
@@ -175,6 +181,7 @@ class ToggleStyleButton extends StatefulWidget {
   ToggleStyleButton({
     Key key,
     @required this.attribute,
+    this.fillColor,
     @required this.icon,
     @required this.controller,
     this.childBuilder = defaultToggleStyleButtonBuilder,
@@ -233,7 +240,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
         _selectionStyle.containsSame(NotusAttribute.block.code);
     final isEnabled =
         !isInCodeBlock || widget.attribute == NotusAttribute.block.code;
-    return widget.childBuilder(context, widget.attribute, widget.icon,
+    return widget.childBuilder(context, widget.attribute, widget.fillColor, widget.icon,
         _isToggled, isEnabled ? _toggleAttribute : null);
   }
 
@@ -250,6 +257,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
 Widget defaultToggleStyleButtonBuilder(
   BuildContext context,
   NotusAttribute attribute,
+  Color fillColor,
   IconData icon,
   bool isToggled,
   VoidCallback onPressed,
@@ -261,12 +269,12 @@ Widget defaultToggleStyleButtonBuilder(
           ? theme.primaryIconTheme.color
           : theme.iconTheme.color
       : theme.disabledColor;
-  final fillColor = isToggled ? theme.toggleableActiveColor : theme.canvasColor;
+  fillColor = isToggled ? theme.toggleableActiveColor : fillColor;
   return ZIconButton(
     highlightElevation: 0,
     hoverElevation: 0,
-    size: 32,
-    icon: Icon(icon, size: 18, color: iconColor),
+    size: 36,
+    icon: Icon(icon, size: 22, color: iconColor),
     fillColor: fillColor,
     onPressed: onPressed,
   );

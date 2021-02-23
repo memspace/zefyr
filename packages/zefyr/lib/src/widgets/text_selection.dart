@@ -644,7 +644,7 @@ abstract class EditorTextSelectionGestureDetectorBuilderDelegate {
 
   /// Whether the user may select text in the textfield.
   bool get selectionEnabled;
-  
+
   bool overrideHandleTapDown(TapDownDetails details, TextPosition textPosition);
   bool overrideHandleTapUp(TapUpDetails details, TextPosition textPosition);
   bool overrideSingleLongTapStart(LongPressStartDetails details, TextPosition textPosition);

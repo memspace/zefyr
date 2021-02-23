@@ -227,7 +227,7 @@ class _ZefyrEditorState extends State<ZefyrEditor>
   @override
   bool get selectionEnabled => widget.enableInteractiveSelection;
 
-   @override
+  @override
   bool overrideHandleTapDown(TapDownDetails details, TextPosition textPosition) {
     if (widget.onTapDown == null) {
       return false;
