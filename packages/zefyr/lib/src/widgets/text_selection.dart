@@ -134,6 +134,7 @@ class EditorTextSelectionOverlay {
   static const Duration fadeDuration = Duration(milliseconds: 150);
 
   AnimationController _toolbarController;
+
   Animation<double> get _toolbarOpacity => _toolbarController.view;
 
   /// Retrieve current value.
@@ -167,6 +168,7 @@ class EditorTextSelectionOverlay {
   /// Defaults to false.
   bool get handlesVisible => _handlesVisible;
   bool _handlesVisible = false;
+
   set handlesVisible(bool visible) {
     assert(visible != null);
     if (_handlesVisible == visible) return;
@@ -422,6 +424,7 @@ class _TextSelectionHandleOverlayState
   Offset _dragPosition;
 
   AnimationController _controller;
+
   Animation<double> get _opacity => _controller.view;
 
   @override
@@ -470,7 +473,7 @@ class _TextSelectionHandleOverlayState
   void _handleDragUpdate(DragUpdateDetails details) {
     _dragPosition += details.delta;
     final TextPosition position =
-        widget.renderObject.getPositionForOffset(details.globalPosition);
+        widget.renderObject.getPositionForOffset(_dragPosition);
     if (widget.selection.isCollapsed) {
       widget.onSelectionHandleChanged(TextSelection.fromPosition(position));
       return;
@@ -1042,6 +1045,7 @@ class _EditorTextSelectionGestureDetectorState
   // Counts down for a short duration after a previous tap. Null otherwise.
   Timer _doubleTapTimer;
   Offset _lastTapOffset;
+
   // True if a second tap down of a double tap is detected. Used to discard
   // subsequent tap up / tap hold of the same tap.
   bool _isDoubleTap = false;
