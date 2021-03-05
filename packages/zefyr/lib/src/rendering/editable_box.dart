@@ -146,6 +146,7 @@ class RenderEditableContainerBox extends RenderBox
     List<RenderEditableBox> children,
     @required ContainerNode node,
     @required TextDirection textDirection,
+    @required double scrollBottomInset,
     @required EdgeInsetsGeometry padding,
   })  : assert(node != null),
         assert(textDirection != null),
@@ -153,6 +154,7 @@ class RenderEditableContainerBox extends RenderBox
         assert(padding.isNonNegative),
         _node = node,
         _textDirection = textDirection,
+        _scrollBottomInset = scrollBottomInset,
         _padding = padding {
     addAll(children);
   }
@@ -173,6 +175,16 @@ class RenderEditableContainerBox extends RenderBox
       return;
     }
     _textDirection = value;
+  }
+
+  double get scrollBottomInset => _scrollBottomInset;
+  double _scrollBottomInset;
+  set scrollBottomInset(double value) {
+    assert(value != null);
+    if (_scrollBottomInset == value) {
+      return;
+    }
+    _scrollBottomInset = value;
   }
 
   // Start padding implementation

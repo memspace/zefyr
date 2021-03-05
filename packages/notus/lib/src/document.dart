@@ -105,7 +105,7 @@ class NotusDocument {
   /// produces a change event with its source set to [ChangeSource.local].
   ///
   /// Returns an instance of [Delta] actually composed into this document.
-  Delta insert(int index, Object data) {
+  Delta insert(int index, Object data, {int replaceLength = 0}) {
     assert(index >= 0);
     if (data is String) {
       if (data.isEmpty) return Delta();
@@ -114,7 +114,7 @@ class NotusDocument {
       data = (data as EmbeddableObject).toJson();
     }
 
-    final change = _heuristics.applyInsertRules(this, index, data);
+    final change = _heuristics.applyInsertRules(this, index, replaceLength, data);
     compose(change, ChangeSource.local);
     return change;
   }
@@ -155,7 +155,7 @@ class NotusDocument {
     // We have to insert before applying delete rules
     // Otherwise delete would be operating on stale document snapshot.
     if (dataIsNotEmpty) {
-      delta = insert(index + length, data);
+      delta = insert(index, data, replaceLength: length);
     }
 
     if (length > 0) {

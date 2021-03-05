@@ -23,7 +23,7 @@ void main() {
       );
 
       expect(() {
-        heuristics.applyInsertRules(doc, 0, 'a');
+        heuristics.applyInsertRules(doc, 0, 0, 'a');
       }, throwsStateError);
 
       expect(() {

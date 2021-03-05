@@ -11,6 +11,7 @@ List<String> _insertionToggleableStyleKeys = [
   NotusAttribute.italic.key,
   NotusAttribute.underline.key,
   NotusAttribute.strikethrough.key,
+  NotusAttribute.mark.key,
 ];
 
 class ZefyrController extends ChangeNotifier {
@@ -82,7 +83,7 @@ class ZefyrController extends ChangeNotifier {
     _toggledStyles = NotusStyle();
 
     if (selection != null) {
-      if (delta == null) {
+      if (delta == null || delta.isEmpty) {
         _updateSelectionSilent(selection, source: ChangeSource.local);
       } else {
         // need to transform selection position in case actual delta
