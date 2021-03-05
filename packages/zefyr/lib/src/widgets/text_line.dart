@@ -41,7 +41,7 @@ class TextLine extends StatelessWidget {
       textStyle: text.style,
       textDirection: textDirection,
       strutStyle: strutStyle,
-      locale: Localizations.localeOf(context, nullOk: true),
+      locale: Localizations.localeOf(context),
       child: RichText(
         text: buildText(context, node),
         textDirection: textDirection,

@@ -81,6 +81,9 @@ class ZefyrEditor extends StatefulWidget {
   /// Set to `true` by default.
   final bool scrollable;
 
+  /// Additional inset to show cursor properly.
+  final double scrollBottomInset;
+
   /// Additional space around the content of this editor.
   final EdgeInsetsGeometry padding;
 
@@ -188,6 +191,7 @@ class ZefyrEditor extends StatefulWidget {
     this.focusNode,
     this.scrollController,
     this.scrollable = true,
+    this.scrollBottomInset = 0,
     this.padding = EdgeInsets.zero,
     this.autofocus = false,
     this.showCursor = true,
@@ -335,6 +339,7 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       focusNode: widget.focusNode,
       scrollController: widget.scrollController,
       scrollable: widget.scrollable,
+      scrollBottomInset: widget.scrollBottomInset,
       padding: widget.padding,
       autofocus: widget.autofocus,
       showCursor: widget.showCursor,
@@ -520,6 +525,7 @@ class RawEditor extends StatefulWidget {
     @required this.focusNode,
     this.scrollController,
     this.scrollable = true,
+    this.scrollBottomInset = 0,
     this.padding = EdgeInsets.zero,
     this.autofocus = false,
     bool showCursor,
@@ -574,6 +580,9 @@ class RawEditor extends StatefulWidget {
   final ScrollController scrollController;
 
   final bool scrollable;
+
+  /// Additional inset to show cursor properly.
+  final double scrollBottomInset;
 
   /// Additional space around the editor contents.
   final EdgeInsetsGeometry padding;
@@ -1129,6 +1138,7 @@ class RawEditorState extends EditorState
           startHandleLayerLink: _startHandleLayerLink,
           endHandleLayerLink: _endHandleLayerLink,
           onSelectionChanged: _handleSelectionChanged,
+          scrollBottomInset: widget.scrollBottomInset,
           padding: widget.padding,
         ),
       ),
@@ -1252,6 +1262,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     @required this.startHandleLayerLink,
     @required this.endHandleLayerLink,
     @required this.onSelectionChanged,
+    this.scrollBottomInset = 0,
     this.padding = EdgeInsets.zero,
   }) : super(key: key, children: children);
 
@@ -1262,6 +1273,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
   final TextSelectionChangedHandler onSelectionChanged;
+  final double scrollBottomInset;
   final EdgeInsetsGeometry padding;
 
   @override
@@ -1274,6 +1286,7 @@ class _Editor extends MultiChildRenderObjectWidget {
       startHandleLayerLink: startHandleLayerLink,
       endHandleLayerLink: endHandleLayerLink,
       onSelectionChanged: onSelectionChanged,
+      scrollBottomInset: scrollBottomInset,
       padding: padding,
     );
   }
@@ -1289,6 +1302,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     renderObject.startHandleLayerLink = startHandleLayerLink;
     renderObject.endHandleLayerLink = endHandleLayerLink;
     renderObject.onSelectionChanged = onSelectionChanged;
+    renderObject.scrollBottomInset = scrollBottomInset;
     renderObject.padding = padding;
   }
 

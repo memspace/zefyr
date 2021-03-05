@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:notus/notus.dart';
 
 import 'editor.dart';
 
