@@ -47,9 +47,9 @@ class NotusHeuristics {
   );
 
   const NotusHeuristics({
-    this.formatRules,
-    this.insertRules,
-    this.deleteRules,
+    this.formatRules = const [],
+    this.insertRules = const [],
+    this.deleteRules = const [],
   });
 
   /// List of format rules in this registry.

@@ -79,11 +79,11 @@ void main() {
 
       expect(doc.toPlainText(),
           'DartConf\n${EmbedNode.kObjectReplacementCharacter}\nLos Angeles\n');
-      final LineNode line = doc.root.children.toList()[1];
-      final LeafNode node = line.children.single;
+      final line = doc.root.children.toList()[1] as LineNode;
+      final node = line.children.single as LeafNode;
       expect(node, isA<EmbedNode>());
       expect(node.value, isA<BlockEmbed>());
-      final BlockEmbed embed = node.value;
+      final embed = node.value as BlockEmbed;
       expect(embed.type, equals('hr'));
     });
 
@@ -101,9 +101,9 @@ void main() {
       var line2 = doc.lookupLine(13);
 
       expect(line1.node, const TypeMatcher<LineNode>());
-      expect(line1.node.toPlainText(), 'DartConf\n');
+      expect(line1.node?.toPlainText(), 'DartConf\n');
       expect(line2.node, const TypeMatcher<LineNode>());
-      expect(line2.node.toPlainText(), 'Los Angeles\n');
+      expect(line2.node?.toPlainText(), 'Los Angeles\n');
     });
 
     test('format applies heuristics', () {
@@ -225,7 +225,7 @@ void main() {
       doc.format(0, 0, NotusAttribute.h1);
       doc.replace(8, 1, ' ');
       expect(doc.root.children, hasLength(1));
-      LineNode line = doc.root.children.first;
+      final line = doc.root.children.first as LineNode;
       expect(line.style.get(NotusAttribute.heading), NotusAttribute.h1);
       expect(line.toPlainText(), 'DartConf Los Angeles\n');
     });
@@ -235,7 +235,7 @@ void main() {
       doc.format(0, 0, NotusAttribute.h1);
       doc.delete(8, 1);
       expect(doc.root.children, hasLength(1));
-      LineNode line = doc.root.children.first;
+      final line = doc.root.children.first as LineNode;
       expect(line.style.get(NotusAttribute.heading), NotusAttribute.h1);
     });
 
@@ -277,12 +277,12 @@ void main() {
       final doc = dartconfDoc();
       doc.insert(9, BlockEmbed.horizontalRule);
       expect(doc.root.children, hasLength(3));
-      expect(doc.root.first.toPlainText(), 'DartConf\n');
-      expect(doc.root.last.toPlainText(), 'Los Angeles\n');
-      LineNode line = doc.root.children.elementAt(1);
+      expect(doc.root.first!.toPlainText(), 'DartConf\n');
+      expect(doc.root.last!.toPlainText(), 'Los Angeles\n');
+      final line = doc.root.children.elementAt(1) as LineNode;
       expect(line.toPlainText(), '${EmbedNode.kObjectReplacementCharacter}\n');
       expect(line.first, isA<EmbedNode>());
-      EmbedNode embed = line.first;
+      final embed = line.first as EmbedNode;
       expect(embed.value.type, 'hr');
     });
 
@@ -290,12 +290,12 @@ void main() {
       final doc = dartconfDoc();
       doc.insert(8, BlockEmbed.horizontalRule);
       expect(doc.root.children, hasLength(3));
-      expect(doc.root.first.toPlainText(), 'DartConf\n');
-      expect(doc.root.last.toPlainText(), 'Los Angeles\n');
-      LineNode line = doc.root.children.elementAt(1);
+      expect(doc.root.first?.toPlainText(), 'DartConf\n');
+      expect(doc.root.last?.toPlainText(), 'Los Angeles\n');
+      final line = doc.root.children.elementAt(1) as LineNode;
       expect(line.toPlainText(), '${EmbedNode.kObjectReplacementCharacter}\n');
       expect(line.first, isA<EmbedNode>());
-      EmbedNode embed = line.first;
+      final embed = line.first as EmbedNode;
       expect(embed.value.type, 'hr');
     });
 
@@ -308,8 +308,8 @@ void main() {
           '${EmbedNode.kObjectReplacementCharacter}\n');
       expect(doc.root.children.elementAt(2).toPlainText(), 'Conf\n');
       expect(doc.root.children.elementAt(3).toPlainText(), 'Los Angeles\n');
-      LineNode line = doc.root.children.elementAt(1);
-      EmbedNode embed = line.first;
+      final line = doc.root.children.elementAt(1) as LineNode;
+      final embed = line.first as EmbedNode;
       expect(embed.value.type, 'hr');
     });
 
@@ -319,7 +319,7 @@ void main() {
       expect(doc.root.children, hasLength(3));
       doc.delete(9, 1);
       expect(doc.root.children, hasLength(3));
-      LineNode line = doc.root.children.elementAt(1);
+      final line = doc.root.children.elementAt(1) as LineNode;
       expect(line, isEmpty);
     });
 
