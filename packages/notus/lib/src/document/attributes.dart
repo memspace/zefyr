@@ -246,11 +246,11 @@ class NotusStyle {
   }
 
   /// Returns value of specified attribute [key] in this set.
-  T? value<T>(NotusAttributeKey<T> key) => get(key).value;
+  T? value<T>(NotusAttributeKey<T> key) => get(key)?.value;
 
   /// Returns [NotusAttribute] from this set by specified [key].
-  NotusAttribute<T> get<T>(NotusAttributeKey<T> key) =>
-      _data[key.key] as NotusAttribute<T>;
+  NotusAttribute<T>? get<T>(NotusAttributeKey<T> key) =>
+      _data[key.key] as NotusAttribute<T>?;
 
   /// Returns collection of all attribute keys in this set.
   Iterable<String> get keys => _data.keys;

@@ -79,8 +79,8 @@ class LineNode extends ContainerNode<LeafNode>
     // Implies LookupResult.node is necessarily a LeafNode
     final child = splitNode as LeafNode;
     final cutResult = child.cutAt(split.offset);
-    if (cutResult != null) return line;
-    line.addFirst(cutResult!);
+    if (cutResult == null) return line;
+    line.addFirst(cutResult);
     return line;
   }
 
@@ -319,7 +319,7 @@ class LineNode extends ContainerNode<LeafNode>
       return;
     } // no block-level changes
 
-    final blockStyle = newStyle.get(NotusAttribute.block);
+    final blockStyle = newStyle.get(NotusAttribute.block)!;
     if (parent is BlockNode) {
       final parentStyle = (parent as BlockNode).style.get(NotusAttribute.block);
       if (blockStyle == NotusAttribute.block.unset) {

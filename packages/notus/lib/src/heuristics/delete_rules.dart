@@ -108,8 +108,8 @@ class EnsureEmbedLineRule extends DeleteRule {
       }
     } else {
       // If op is `null` it's beginning of the doc, e.g. implicit line break.
-      final opText = op?.data as String;
-      hasLineBreakBefore = op == null || opText.endsWith('\n');
+      final opText = op?.data as String?;
+      hasLineBreakBefore = op == null || opText!.endsWith('\n');
     }
 
     // Second, check if newline deleted before an embed.

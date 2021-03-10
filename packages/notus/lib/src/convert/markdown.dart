@@ -115,7 +115,7 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
   String _writeLine(String text, NotusStyle style) {
     var buffer = StringBuffer();
     if (style.contains(NotusAttribute.heading)) {
-      _writeAttribute(buffer, style.get<int>(NotusAttribute.heading));
+      _writeAttribute(buffer, style.get<int>(NotusAttribute.heading)!);
     }
 
     // Write the text itself
