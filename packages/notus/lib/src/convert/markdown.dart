@@ -32,11 +32,11 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
     final iterator = DeltaIterator(input);
     final buffer = StringBuffer();
     final lineBuffer = StringBuffer();
-    NotusAttribute<String> currentBlockStyle;
+    NotusAttribute<String>? currentBlockStyle;
     var currentInlineStyle = NotusStyle();
     var currentBlockLines = [];
 
-    void _handleBlock(NotusAttribute<String> blockStyle) {
+    void _handleBlock(NotusAttribute<String>? blockStyle) {
       if (currentBlockLines.isEmpty) {
         return; // Empty block
       }
@@ -59,13 +59,13 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
       buffer.writeln();
     }
 
-    void _handleSpan(String text, Map<String, dynamic> attributes) {
+    void _handleSpan(String text, Map<String, dynamic>? attributes) {
       final style = NotusStyle.fromJson(attributes);
       currentInlineStyle =
           _writeInline(lineBuffer, text, style, currentInlineStyle);
     }
 
-    void _handleLine(Map<String, dynamic> attributes) {
+    void _handleLine(Map<String, dynamic>? attributes) {
       final style = NotusStyle.fromJson(attributes);
       final lineBlock = style.get(NotusAttribute.block);
       if (lineBlock == currentBlockStyle) {
@@ -85,7 +85,7 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
       final opText = op.data is String ? op.data as String : '';
       final lf = opText.indexOf('\n');
       if (lf == -1) {
-        _handleSpan(op.data, op.attributes);
+        _handleSpan(opText, op.attributes);
       } else {
         var span = StringBuffer();
         for (var i = 0; i < opText.length; i++) {
@@ -192,7 +192,8 @@ class _NotusMarkdownEncoder extends Converter<Delta, String> {
   }
 
   void _writeHeadingTag(StringBuffer buffer, NotusAttribute<int> heading) {
-    var level = heading.value;
+    // TODO: Maybe worth strongly typing heading Notus attributes
+    var level = heading.value!;
     buffer.write('#' * level + ' ');
   }
 

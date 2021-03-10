@@ -5,13 +5,16 @@ author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 homepage: https://github.com/memspace/zefyr
 
 environment:
-  sdk: '>=2.9.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   collection: ^1.14.6
   meta: ^1.1.0
-  quill_delta: ^2.0.0
-  quiver_hashcode: ^2.0.0
+  quill_delta:
+    git:
+      url: https://github.com/miDeb/quill-delta-dart.git
+      ref: nnbd
+  quiver: ^3.0.0
 
 dev_dependencies:
   pedantic: ^1.0.0
