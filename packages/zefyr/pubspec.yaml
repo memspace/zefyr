@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.14.6
-  url_launcher: ^5.0.0
+  url_launcher: ^6.0.2
   quill_delta:
     git:
       url: https://github.com/miDeb/quill-delta-dart.git
