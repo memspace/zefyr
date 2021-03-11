@@ -5,23 +5,23 @@ import '../rendering/paragraph_proxy.dart';
 class RichTextProxy extends SingleChildRenderObjectWidget {
   /// Child argument should be an instance of RichText widget.
   RichTextProxy({
-    @required RichText child,
-    @required this.textStyle,
-    @required this.textDirection,
+    required RichText child,
+    this.textStyle,
+    this.textDirection,
     this.textScaleFactor = 1.0,
-    @required this.locale,
-    @required this.strutStyle,
+    this.locale,
+    this.strutStyle,
     this.textWidthBasis = TextWidthBasis.parent,
     this.textHeightBehavior,
   }) : super(child: child);
 
-  final TextStyle textStyle;
-  final TextDirection textDirection;
+  final TextStyle? textStyle;
+  final TextDirection? textDirection;
   final double textScaleFactor;
-  final Locale locale;
-  final StrutStyle strutStyle;
+  final Locale? locale;
+  final StrutStyle? strutStyle;
   final TextWidthBasis textWidthBasis;
-  final TextHeightBehavior textHeightBehavior;
+  final TextHeightBehavior? textHeightBehavior;
 
   @override
   RenderParagraphProxy createRenderObject(BuildContext context) {
