@@ -12,8 +12,15 @@ dependencies:
     sdk: flutter
   collection: ^1.14.6
   url_launcher: ^5.0.0
-  quill_delta: ^2.0.0
-  notus: ^1.0.0-dev
+  quill_delta:
+    git:
+      url: https://github.com/miDeb/quill-delta-dart.git
+      ref: nnbd
+  notus:
+    git:
+      url: https://github.com/amantoux/zefyr.git
+      path: packages/notus
+      ref: notus-null-safety
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
   characters: ^1.0.0
