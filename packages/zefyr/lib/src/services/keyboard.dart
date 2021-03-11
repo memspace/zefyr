@@ -13,7 +13,9 @@ enum CursorMovement { left, right, up, down }
 /// [LogicalKeyboardKey.arrowRight], [LogicalKeyboardKey.arrowUp] or
 /// [LogicalKeyboardKey.arrowDown].
 typedef CursorMovementCallback = void Function(LogicalKeyboardKey key,
-    {bool wordModifier, bool lineModifier, bool shift});
+    {required bool wordModifier,
+    required bool lineModifier,
+    required bool shift});
 
 enum InputShortcut { cut, copy, paste, selectAll }
 
@@ -66,12 +68,10 @@ class KeyboardListener {
   final OnDeleteCallback onDelete;
 
   KeyboardListener({
-    @required this.onCursorMovement,
-    @required this.onShortcut,
-    @required this.onDelete,
-  })  : assert(onCursorMovement != null),
-        assert(onShortcut != null),
-        assert(onDelete != null);
+    required this.onCursorMovement,
+    required this.onShortcut,
+    required this.onDelete,
+  });
 
   bool handleKeyEvent(RawKeyEvent keyEvent) {
     if (kIsWeb) {
@@ -116,7 +116,7 @@ class KeyboardListener {
         LogicalKeyboardKey.keyV: InputShortcut.paste,
         LogicalKeyboardKey.keyA: InputShortcut.selectAll,
       };
-      onShortcut(_keyToShortcut[key]);
+      onShortcut(_keyToShortcut[key]!);
     } else if (key == LogicalKeyboardKey.delete) {
       onDelete(true);
     } else if (key == LogicalKeyboardKey.backspace) {

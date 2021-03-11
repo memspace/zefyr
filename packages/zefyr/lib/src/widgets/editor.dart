@@ -32,9 +32,10 @@ typedef ZefyrEmbedBuilder = Widget Function(
 /// Only supports "horizontal rule" embeds.
 Widget defaultZefyrEmbedBuilder(BuildContext context, EmbedNode node) {
   if (node.value.type == 'hr') {
-    final theme = ZefyrTheme.of(context);
+    final theme = ZefyrTheme.of(context)!;
+    assert(theme.paragraph != null, 'Paragraph theme must be set');
     return Divider(
-      height: theme.paragraph.style.fontSize * theme.paragraph.style.height,
+      height: theme.paragraph!.style.fontSize! * theme.paragraph!.style.height!,
       thickness: 2,
       color: Colors.grey.shade200,
     );
@@ -64,7 +65,7 @@ class ZefyrEditor extends StatefulWidget {
   /// If `null` then this editor instantiates a new ScrollController.
   ///
   /// Scroll controller must not be `null` if [scrollable] is set to `false`.
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
 
   /// Whether this editor should create a scrollable container for its content.
   ///
@@ -122,13 +123,13 @@ class ZefyrEditor extends StatefulWidget {
   ///
   /// This only has effect if [scrollable] is set to `true` and [expands] is
   /// set to `false`.
-  final double minHeight;
+  final double? minHeight;
 
   /// The maximum height to be occupied by this editor.
   ///
   /// This only has effect if [scrollable] is set to `true` and [expands] is
   /// set to `false`.
-  final double maxHeight;
+  final double? maxHeight;
 
   /// Whether this editor's height will be sized to fill its parent.
   ///
@@ -166,10 +167,10 @@ class ZefyrEditor extends StatefulWidget {
   /// If not specified, it will behave according to the current platform.
   ///
   /// See [Scrollable.physics].
-  final ScrollPhysics scrollPhysics;
+  final ScrollPhysics? scrollPhysics;
 
   /// Callback to invoke when user wants to launch a URL.
-  final ValueChanged<String> onLaunchUrl;
+  final ValueChanged<String>? onLaunchUrl;
 
   /// Builder function for embeddable objects.
   ///
@@ -177,9 +178,9 @@ class ZefyrEditor extends StatefulWidget {
   final ZefyrEmbedBuilder embedBuilder;
 
   const ZefyrEditor({
-    Key key,
-    @required this.controller,
-    this.focusNode,
+    Key? key,
+    required this.controller,
+    required this.focusNode,
     this.scrollController,
     this.scrollable = true,
     this.padding = EdgeInsets.zero,
@@ -195,8 +196,7 @@ class ZefyrEditor extends StatefulWidget {
     this.scrollPhysics,
     this.onLaunchUrl,
     this.embedBuilder = defaultZefyrEmbedBuilder,
-  })  : assert(controller != null),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   _ZefyrEditorState createState() => _ZefyrEditorState();
@@ -216,10 +216,11 @@ class _ZefyrEditorState extends State<ZefyrEditor>
   @override
   bool get selectionEnabled => widget.enableInteractiveSelection;
 
-  EditorTextSelectionGestureDetectorBuilder _selectionGestureDetectorBuilder;
+  late EditorTextSelectionGestureDetectorBuilder
+      _selectionGestureDetectorBuilder;
 
   void _requestKeyboard() {
-    _editorKey.currentState.requestKeyboard();
+    _editorKey.currentState?.requestKeyboard();
   }
 
   @override
@@ -242,10 +243,10 @@ class _ZefyrEditorState extends State<ZefyrEditor>
     TextSelectionControls textSelectionControls;
     bool paintCursorAboveText;
     bool cursorOpacityAnimates;
-    Offset cursorOffset;
-    Color cursorColor;
-    Color selectionColor;
-    Radius cursorRadius;
+    Offset? cursorOffset;
+    Color? cursorColor;
+    Color? selectionColor;
+    Radius? cursorRadius;
 
     final showSelectionHandles = _mobilePlatforms.contains(theme.platform);
 
@@ -322,8 +323,8 @@ class _ZefyrEditorState extends State<ZefyrEditor>
 class _ZefyrEditorSelectionGestureDetectorBuilder
     extends EditorTextSelectionGestureDetectorBuilder {
   _ZefyrEditorSelectionGestureDetectorBuilder({
-    @required _ZefyrEditorState state,
-  })  : _state = state,
+    required _ZefyrEditorState state,
+  })   : _state = state,
         super(delegate: state);
 
   final _ZefyrEditorState _state;
@@ -332,7 +333,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
   void onForcePressStart(ForcePressDetails details) {
     super.onForcePressStart(details);
     if (delegate.selectionEnabled && shouldShowSelectionToolbar) {
-      editor.showToolbar();
+      editor?.showToolbar();
     }
   }
 
@@ -347,7 +348,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
         case TargetPlatform.macOS:
-          renderEditor.selectPositionAt(
+        renderEditor?.selectPositionAt(
             from: details.globalPosition,
             cause: SelectionChangedCause.longPress,
           );
@@ -356,7 +357,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-          renderEditor.selectWordsInRange(
+        renderEditor?.selectWordsInRange(
             from: details.globalPosition - details.offsetFromOrigin,
             to: details.globalPosition,
             cause: SelectionChangedCause.longPress,
@@ -367,17 +368,18 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
   }
 
   void _launchUrlIfNeeded(TapUpDetails details) {
-    final pos = renderEditor.getPositionForOffset(details.globalPosition);
-    final result = editor.widget.controller.document.lookupLine(pos.offset);
-    if (result.node == null) return;
-    final line = result.node as LineNode;
+    final pos = renderEditor?.getPositionForOffset(details.globalPosition);
+    final result = editor?.widget.controller.document.lookupLine(pos!.offset);
+    if (result?.node == null) return;
+    final line = result!.node as LineNode;
     final segmentResult = line.lookup(result.offset);
     if (segmentResult.node == null) return;
     final segment = segmentResult.node as LeafNode;
     if (segment.style.contains(NotusAttribute.link) &&
-        editor.widget.onLaunchUrl != null) {
-      if (editor.widget.readOnly) {
-        editor.widget.onLaunchUrl(segment.style.get(NotusAttribute.link).value);
+        editor?.widget.onLaunchUrl != null) {
+      if (editor!.widget.readOnly) {
+        editor!.widget
+            .onLaunchUrl!(segment.style.get(NotusAttribute.link)!.value!);
       } else {
         // TODO: Implement a toolbar to display the URL and allow to launch it.
         // editor.showToolbar();
@@ -387,7 +389,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
 
   @override
   void onSingleTapUp(TapUpDetails details) {
-    editor.hideToolbar();
+    editor?.hideToolbar();
 
     // TODO: Explore if we can forward tap up events to the TextSpan gesture detector
     _launchUrlIfNeeded(details);
@@ -401,13 +403,13 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
             case PointerDeviceKind.stylus:
             case PointerDeviceKind.invertedStylus:
               // Precise devices should place the cursor at a precise position.
-              renderEditor.selectPosition(cause: SelectionChangedCause.tap);
+              renderEditor?.selectPosition(cause: SelectionChangedCause.tap);
               break;
             case PointerDeviceKind.touch:
             case PointerDeviceKind.unknown:
               // On macOS/iOS/iPadOS a touch tap places the cursor at the edge
               // of the word.
-              renderEditor.selectWordEdge(cause: SelectionChangedCause.tap);
+              renderEditor?.selectWordEdge(cause: SelectionChangedCause.tap);
               break;
           }
           break;
@@ -415,7 +417,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-          renderEditor.selectPosition(cause: SelectionChangedCause.tap);
+        renderEditor?.selectPosition(cause: SelectionChangedCause.tap);
           break;
       }
     }
@@ -430,7 +432,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
         case TargetPlatform.macOS:
-          renderEditor.selectPositionAt(
+        renderEditor?.selectPositionAt(
             from: details.globalPosition,
             cause: SelectionChangedCause.longPress,
           );
@@ -439,7 +441,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-          renderEditor.selectWord(cause: SelectionChangedCause.longPress);
+        renderEditor?.selectWord(cause: SelectionChangedCause.longPress);
           Feedback.forLongPress(_state.context);
           break;
       }
@@ -449,14 +451,14 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
 
 class RawEditor extends StatefulWidget {
   RawEditor({
-    Key key,
-    @required this.controller,
-    @required this.focusNode,
+    Key? key,
+    required this.controller,
+    required this.focusNode,
     this.scrollController,
     this.scrollable = true,
     this.padding = EdgeInsets.zero,
     this.autofocus = false,
-    bool showCursor,
+    bool? showCursor,
     this.readOnly = false,
     this.enableInteractiveSelection = true,
     this.minHeight,
@@ -465,7 +467,7 @@ class RawEditor extends StatefulWidget {
     this.textCapitalization = TextCapitalization.none,
     this.keyboardAppearance = Brightness.light,
     this.onLaunchUrl,
-    @required this.selectionColor,
+    required this.selectionColor,
     this.scrollPhysics,
     this.toolbarOptions = const ToolbarOptions(
       copy: true,
@@ -477,14 +479,7 @@ class RawEditor extends StatefulWidget {
     this.showSelectionHandles = false,
     this.selectionControls,
     this.embedBuilder = defaultZefyrEmbedBuilder,
-  })  : assert(controller != null),
-        assert(focusNode != null),
-        assert(scrollable || scrollController != null),
-        assert(selectionColor != null),
-        assert(enableInteractiveSelection != null),
-        assert(showSelectionHandles != null),
-        assert(readOnly != null),
-        assert(maxHeight == null || maxHeight > 0),
+  })  : assert(maxHeight == null || maxHeight > 0),
         assert(minHeight == null || minHeight >= 0),
         assert(
           (maxHeight == null) ||
@@ -492,9 +487,6 @@ class RawEditor extends StatefulWidget {
               (maxHeight >= minHeight),
           'minHeight can\'t be greater than maxHeight',
         ),
-        assert(autofocus != null),
-        assert(toolbarOptions != null),
-        assert(embedBuilder != null),
         // keyboardType = keyboardType ?? TextInputType.multiline,
         showCursor = showCursor ?? !readOnly,
         super(key: key);
@@ -505,7 +497,7 @@ class RawEditor extends StatefulWidget {
   /// Controls whether this editor has keyboard focus.
   final FocusNode focusNode;
 
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
 
   final bool scrollable;
 
@@ -522,7 +514,7 @@ class RawEditor extends StatefulWidget {
 
   /// Callback which is triggered when the user wants to open a URL from
   /// a link in the document.
-  final ValueChanged<String> onLaunchUrl;
+  final ValueChanged<String>? onLaunchUrl;
 
   /// Configuration of toolbar options.
   ///
@@ -553,7 +545,7 @@ class RawEditor extends StatefulWidget {
   final bool showCursor;
 
   /// The style to be used for the editing cursor.
-  final CursorStyle cursorStyle;
+  final CursorStyle? cursorStyle;
 
   /// Configures how the platform keyboard will select an uppercase or
   /// lowercase keyboard.
@@ -572,10 +564,10 @@ class RawEditor extends StatefulWidget {
   ///
   /// If this is null then there is no limit to the editor's height and it will
   /// expand to fill its parent.
-  final double maxHeight;
+  final double? maxHeight;
 
   /// The minimum height this editor can have.
-  final double minHeight;
+  final double? minHeight;
 
   /// Whether this widget's height will be sized to fill its parent.
   ///
@@ -601,7 +593,7 @@ class RawEditor extends StatefulWidget {
   /// The [RawEditor] widget used on its own will not trigger the display
   /// of the selection toolbar by itself. The toolbar is shown by calling
   /// [RawEditorState.showToolbar] in response to an appropriate user event.
-  final TextSelectionControls selectionControls;
+  final TextSelectionControls? selectionControls;
 
   /// The appearance of the keyboard.
   ///
@@ -624,7 +616,7 @@ class RawEditor extends StatefulWidget {
   /// If not specified, it will behave according to the current platform.
   ///
   /// See [Scrollable.physics].
-  final ScrollPhysics scrollPhysics;
+  final ScrollPhysics? scrollPhysics;
 
   /// Builder function for embeddable objects.
   ///
@@ -665,11 +657,17 @@ class RawEditor extends StatefulWidget {
 ///
 abstract class EditorState extends State<RawEditor> {
   TextEditingValue get textEditingValue;
+
   set textEditingValue(TextEditingValue value);
+
   RenderEditor get renderEditor;
-  EditorTextSelectionOverlay get selectionOverlay;
+
+  EditorTextSelectionOverlay? get selectionOverlay;
+
   bool showToolbar();
+
   void hideToolbar();
+
   void requestKeyboard();
 }
 
@@ -685,47 +683,46 @@ class RawEditorState extends EditorState
   final GlobalKey _editorKey = GlobalKey();
 
   // Theme
-  ZefyrThemeData _themeData;
+  late ZefyrThemeData _themeData;
 
   // Cursors
-  CursorController _cursorController;
-  FloatingCursorController _floatingCursorController;
+  late CursorController _cursorController;
+  late FloatingCursorController _floatingCursorController;
 
   // Keyboard
-  KeyboardListener _keyboardListener;
+  late KeyboardListener _keyboardListener;
 
   // Selection overlay
   @override
-  EditorTextSelectionOverlay get selectionOverlay => _selectionOverlay;
-  EditorTextSelectionOverlay _selectionOverlay;
+  EditorTextSelectionOverlay? get selectionOverlay => _selectionOverlay;
+  EditorTextSelectionOverlay? _selectionOverlay;
 
-  ScrollController _scrollController;
+  late ScrollController _scrollController;
 
-  final ClipboardStatusNotifier _clipboardStatus =
+  final ClipboardStatusNotifier? _clipboardStatus =
       kIsWeb ? null : ClipboardStatusNotifier();
   final LayerLink _toolbarLayerLink = LayerLink();
   final LayerLink _startHandleLayerLink = LayerLink();
   final LayerLink _endHandleLayerLink = LayerLink();
 
   bool _didAutoFocus = false;
-  FocusAttachment _focusAttachment;
+  late FocusAttachment _focusAttachment;
+
   bool get _hasFocus => widget.focusNode.hasFocus;
 
   @override
   bool get wantKeepAlive => widget.focusNode.hasFocus;
 
   TextDirection get _textDirection {
-    final result = Directionality.of(context);
-    assert(result != null,
-        '$runtimeType created without a textDirection and with no ambient Directionality.');
-    return result;
+    return Directionality.of(context);
   }
 
   /// The renderer for this widget's editor descendant.
   ///
   /// This property is typically used to notify the renderer of input gestures.
   @override
-  RenderEditor get renderEditor => _editorKey.currentContext.findRenderObject();
+  RenderEditor get renderEditor =>
+      _editorKey.currentContext?.findRenderObject() as RenderEditor;
 
   /// Express interest in interacting with the keyboard.
   ///
@@ -757,11 +754,11 @@ class RawEditorState extends EditorState
       return false;
     }
 
-    if (_selectionOverlay == null || _selectionOverlay.toolbarIsVisible) {
+    if (_selectionOverlay == null || _selectionOverlay!.toolbarIsVisible) {
       return false;
     }
 
-    _selectionOverlay.showToolbar();
+    _selectionOverlay!.showToolbar();
     return true;
   }
 
@@ -784,7 +781,7 @@ class RawEditorState extends EditorState
 
     // Cursor
     _cursorController = CursorController(
-      showCursor: ValueNotifier<bool>(widget.showCursor ?? false),
+      showCursor: ValueNotifier<bool>(widget.showCursor),
       style: widget.cursorStyle ??
           CursorStyle(
             // TODO: fallback to current theme's accent color
@@ -833,7 +830,13 @@ class RawEditorState extends EditorState
     super.didUpdateWidget(oldWidget);
 
     _cursorController.showCursor.value = widget.showCursor;
-    _cursorController.style = widget.cursorStyle;
+    _cursorController.style = widget.cursorStyle ??
+        CursorStyle(
+          // TODO: fallback to current theme's accent color
+          color: Colors.blueAccent,
+          backgroundColor: Colors.grey,
+          width: 2.0,
+        );
 
     if (widget.controller != oldWidget.controller) {
       oldWidget.controller.removeListener(_didChangeTextEditingValue);
@@ -844,13 +847,13 @@ class RawEditorState extends EditorState
     if (widget.scrollController != null &&
         widget.scrollController != _scrollController) {
       _scrollController.removeListener(_updateSelectionOverlayForScroll);
-      _scrollController = widget.scrollController;
+      _scrollController = widget.scrollController!;
       _scrollController.addListener(_updateSelectionOverlayForScroll);
     }
 
     if (widget.focusNode != oldWidget.focusNode) {
       oldWidget.focusNode.removeListener(_handleFocusChanged);
-      _focusAttachment?.detach();
+      _focusAttachment.detach();
       _focusAttachment = widget.focusNode.attach(context,
           onKey: (node, event) => _keyboardListener.handleKeyEvent(event));
       widget.focusNode.addListener(_handleFocusChanged);
@@ -917,11 +920,13 @@ class RawEditorState extends EditorState
     // a new RenderEditableBox child. If we try to update selection overlay
     // immediately it'll not be able to find the new child since it hasn't been
     // built yet.
-    SchedulerBinding.instance.addPostFrameCallback(
+    SchedulerBinding.instance!.addPostFrameCallback(
         (Duration _) => _updateOrDisposeSelectionOverlayIfNeeded());
 //    _textChangedSinceLastCaretUpdate = true;
 
-    setState(() {/* We use widget.controller.value in build(). */});
+    setState(() {
+      /* We use widget.controller.value in build(). */
+    });
   }
 
   void _handleSelectionChanged(
@@ -942,7 +947,7 @@ class RawEditorState extends EditorState
     _updateOrDisposeSelectionOverlayIfNeeded();
     if (_hasFocus) {
       // Listen for changing viewInsets, which indicates keyboard showing up.
-      WidgetsBinding.instance.addObserver(this);
+      WidgetsBinding.instance!.addObserver(this);
       _showCaretOnScreen();
 //      _lastBottomViewInset = WidgetsBinding.instance.window.viewInsets.bottom;
 //      if (!_value.selection.isValid) {
@@ -950,7 +955,7 @@ class RawEditorState extends EditorState
 //        _handleSelectionChanged(TextSelection.collapsed(offset: _value.text.length), renderEditable, null);
 //      }
     } else {
-      WidgetsBinding.instance.removeObserver(this);
+      WidgetsBinding.instance!.removeObserver(this);
       // TODO: teach editor about state of the toolbar and whether the user is in the middle of applying styles.
       //       this is needed because some buttons in toolbar can steal focus from the editor
       //       but we want to preserve the selection, maybe adjusting its style slightly.
@@ -966,9 +971,9 @@ class RawEditorState extends EditorState
   void _updateOrDisposeSelectionOverlayIfNeeded() {
     if (_selectionOverlay != null) {
       if (_hasFocus) {
-        _selectionOverlay.update(textEditingValue);
+        _selectionOverlay!.update(textEditingValue);
       } else {
-        _selectionOverlay.dispose();
+        _selectionOverlay!.dispose();
         _selectionOverlay = null;
       }
     } else if (_hasFocus) {
@@ -985,13 +990,13 @@ class RawEditorState extends EditorState
           startHandleLayerLink: _startHandleLayerLink,
           endHandleLayerLink: _endHandleLayerLink,
           renderObject: renderEditor,
-          selectionControls: widget.selectionControls,
+          selectionControls: widget.selectionControls!,
           selectionDelegate: this,
           dragStartBehavior: DragStartBehavior.start,
           // onSelectionHandleTapped: widget.onSelectionHandleTapped,
         );
-        _selectionOverlay.handlesVisible = _shouldShowSelectionHandles();
-        _selectionOverlay.showHandles();
+        _selectionOverlay!.handlesVisible = _shouldShowSelectionHandles();
+        _selectionOverlay!.showHandles();
         // if (widget.onSelectionChanged != null)
         //   widget.onSelectionChanged(selection, cause);
       }
@@ -1010,7 +1015,7 @@ class RawEditorState extends EditorState
     }
 
     _showCaretOnScreenScheduled = true;
-    SchedulerBinding.instance.addPostFrameCallback((Duration _) {
+    SchedulerBinding.instance!.addPostFrameCallback((Duration _) {
       _showCaretOnScreenScheduled = false;
 
       final viewport = RenderAbstractViewport.of(renderEditor);
@@ -1076,9 +1081,9 @@ class RawEditorState extends EditorState
       /// baseline.
       // This implies that the first line has no styles applied to it.
       final baselinePadding =
-          EdgeInsets.only(top: _themeData.paragraph.spacing.top);
+          EdgeInsets.only(top: _themeData.paragraph?.spacing.top ?? 0);
       child = BaselineProxy(
-        textStyle: _themeData.paragraph.style,
+        textStyle: _themeData.paragraph?.style,
         padding: baselinePadding,
         child: SingleChildScrollView(
           controller: _scrollController,
@@ -1150,42 +1155,46 @@ class RawEditorState extends EditorState
     return result;
   }
 
+  // TODO: If no theme return VerticalSpacing.zero() instead of asserting
   VerticalSpacing _getSpacingForLine(LineNode node, ZefyrThemeData theme) {
     final style = node.style.get(NotusAttribute.heading);
     if (style == NotusAttribute.heading.level1) {
-      return theme.heading1.spacing;
+      assert(theme.heading1 != null, 'Heading1 theme must be set');
+      return theme.heading1!.spacing;
     } else if (style == NotusAttribute.heading.level2) {
-      return theme.heading2.spacing;
+      assert(theme.heading2 != null, 'Heading2 theme must be set');
+      return theme.heading2!.spacing;
     } else if (style == NotusAttribute.heading.level3) {
-      return theme.heading3.spacing;
+      assert(theme.heading3 != null, 'Heading3 theme must be set');
+      return theme.heading3!.spacing;
     }
 
-    return theme.paragraph.spacing;
+    return theme.paragraph?.spacing ?? VerticalSpacing.zero();
   }
 
   VerticalSpacing _getSpacingForBlock(BlockNode node, ZefyrThemeData theme) {
     final style = node.style.get(NotusAttribute.block);
     if (style == NotusAttribute.block.code) {
-      return theme.code.spacing;
+      return theme.code?.spacing ?? VerticalSpacing.zero();
     } else if (style == NotusAttribute.block.quote) {
-      return theme.quote.spacing;
+      return theme.quote?.spacing ?? VerticalSpacing.zero();
     } else {
-      return theme.lists.spacing;
+      return theme.lists?.spacing ?? VerticalSpacing.zero();
     }
   }
 }
 
 class _Editor extends MultiChildRenderObjectWidget {
   _Editor({
-    @required Key key,
-    @required List<Widget> children,
-    @required this.document,
-    @required this.textDirection,
-    @required this.hasFocus,
-    @required this.selection,
-    @required this.startHandleLayerLink,
-    @required this.endHandleLayerLink,
-    @required this.onSelectionChanged,
+    required Key key,
+    required List<Widget> children,
+    required this.document,
+    required this.textDirection,
+    required this.hasFocus,
+    required this.selection,
+    required this.startHandleLayerLink,
+    required this.endHandleLayerLink,
+    required this.onSelectionChanged,
     this.padding = EdgeInsets.zero,
   }) : super(key: key, children: children);
 

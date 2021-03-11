@@ -1,5 +1,4 @@
 import 'package:flutter/rendering.dart';
-import 'package:meta/meta.dart';
 
 import 'editable_box.dart';
 
@@ -8,14 +7,14 @@ import 'editable_box.dart';
 class RenderParagraphProxy extends RenderProxyBox
     implements RenderContentProxyBox {
   RenderParagraphProxy({
-    RenderParagraph child,
-    @required TextStyle textStyle,
-    @required TextDirection textDirection,
-    @required double textScaleFactor,
-    @required StrutStyle strutStyle,
-    @required Locale locale,
-    @required TextWidthBasis textWidthBasis,
-    @required TextHeightBehavior textHeightBehavior,
+    RenderParagraph? child,
+    TextStyle? textStyle,
+    TextDirection? textDirection,
+    required double textScaleFactor,
+    StrutStyle? strutStyle,
+    Locale? locale,
+    required TextWidthBasis textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
   })  : _prototypePainter = TextPainter(
             text: TextSpan(text: ' ', style: textStyle),
             textAlign: TextAlign.left,
@@ -29,55 +28,51 @@ class RenderParagraphProxy extends RenderProxyBox
 
   final TextPainter _prototypePainter;
 
-  set textStyle(TextStyle value) {
-    assert(value != null);
-    if (_prototypePainter.text.style == value) return;
+  set textStyle(TextStyle? value) {
+    if (_prototypePainter.text!.style == value) return;
     _prototypePainter.text = TextSpan(text: ' ', style: value);
     markNeedsLayout();
   }
 
-  set textDirection(TextDirection value) {
-    assert(value != null);
+  set textDirection(TextDirection? value) {
     if (_prototypePainter.textDirection == value) return;
     _prototypePainter.textDirection = value;
     markNeedsLayout();
   }
 
   set textScaleFactor(double value) {
-    assert(value != null);
     if (_prototypePainter.textScaleFactor == value) return;
     _prototypePainter.textScaleFactor = value;
     markNeedsLayout();
   }
 
-  set strutStyle(StrutStyle value) {
-    assert(value != null);
+  set strutStyle(StrutStyle? value) {
     if (_prototypePainter.strutStyle == value) return;
     _prototypePainter.strutStyle = value;
     markNeedsLayout();
   }
 
-  set locale(Locale value) {
+  set locale(Locale? value) {
     if (_prototypePainter.locale == value) return;
     _prototypePainter.locale = value;
     markNeedsLayout();
   }
 
   set textWidthBasis(TextWidthBasis value) {
-    assert(value != null);
     if (_prototypePainter.textWidthBasis == value) return;
     _prototypePainter.textWidthBasis = value;
     markNeedsLayout();
   }
 
-  set textHeightBehavior(TextHeightBehavior value) {
+  set textHeightBehavior(TextHeightBehavior? value) {
     if (_prototypePainter.textHeightBehavior == value) return;
     _prototypePainter.textHeightBehavior = value;
     markNeedsLayout();
   }
 
   @override
-  RenderParagraph get child => super.child;
+  RenderParagraph get child =>
+      super.child as RenderParagraph /* will be the text painter */;
 
   @override
   double get preferredLineHeight => _prototypePainter.preferredLineHeight;
@@ -93,7 +88,7 @@ class RenderParagraphProxy extends RenderProxyBox
   }
 
   @override
-  double getFullHeightForCaret(TextPosition position) {
+  double? getFullHeightForCaret(TextPosition position) {
     return child.getFullHeightForCaret(position);
   }
 

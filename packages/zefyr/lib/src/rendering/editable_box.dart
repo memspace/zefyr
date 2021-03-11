@@ -17,8 +17,10 @@ abstract class RenderContentProxyBox implements RenderBox {
   double get preferredLineHeight;
 
   Offset getOffsetForCaret(TextPosition position, Rect caretPrototype);
+
   TextPosition getPositionForOffset(Offset offset);
-  double /*?*/ getFullHeightForCaret(TextPosition position);
+
+  double? getFullHeightForCaret(TextPosition position);
 
   TextRange getWordBoundary(TextPosition position);
 
@@ -69,7 +71,7 @@ abstract class RenderEditableBox extends RenderBox {
   ///
   /// Can return `null` which indicates that the `position` is at the topmost
   /// line in the text already.
-  TextPosition getPositionAbove(TextPosition position);
+  TextPosition? getPositionAbove(TextPosition position);
 
   /// Returns the position within the text which is on the line below the given
   /// `position`.
@@ -80,7 +82,7 @@ abstract class RenderEditableBox extends RenderBox {
   ///
   /// Can return `null` which indicates that the `position` is at the bottommost
   /// line in the text already.
-  TextPosition getPositionBelow(TextPosition position);
+  TextPosition? getPositionBelow(TextPosition position);
 
   /// Returns the text range of the word at the given offset. Characters not
   /// part of a word, such as spaces, symbols, and punctuation, have word breaks
@@ -143,14 +145,11 @@ class RenderEditableContainerBox extends RenderBox
         RenderBoxContainerDefaultsMixin<RenderEditableBox,
             EditableContainerParentData> {
   RenderEditableContainerBox({
-    List<RenderEditableBox> children,
-    @required ContainerNode node,
-    @required TextDirection textDirection,
-    @required EdgeInsetsGeometry padding,
-  })  : assert(node != null),
-        assert(textDirection != null),
-        assert(padding != null),
-        assert(padding.isNonNegative),
+    List<RenderEditableBox>? children,
+    required ContainerNode node,
+    required TextDirection textDirection,
+    required EdgeInsetsGeometry padding,
+  })   : assert(padding.isNonNegative),
         _node = node,
         _textDirection = textDirection,
         _padding = padding {
@@ -159,8 +158,8 @@ class RenderEditableContainerBox extends RenderBox
 
   ContainerNode get node => _node;
   ContainerNode _node;
+
   set node(ContainerNode value) {
-    assert(value != null);
     if (_node == value) return;
     _node = value;
     markNeedsLayout();
@@ -168,6 +167,7 @@ class RenderEditableContainerBox extends RenderBox
 
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
+
   set textDirection(TextDirection value) {
     if (_textDirection == value) {
       return;
@@ -183,8 +183,8 @@ class RenderEditableContainerBox extends RenderBox
   /// must not be null.
   EdgeInsetsGeometry get padding => _padding;
   EdgeInsetsGeometry _padding;
+
   set padding(EdgeInsetsGeometry value) {
-    assert(value != null);
     assert(value.isNonNegative);
     if (_padding == value) {
       return;
@@ -193,23 +193,24 @@ class RenderEditableContainerBox extends RenderBox
     _markNeedsPaddingResolution();
   }
 
-  EdgeInsets get resolvedPadding => _resolvedPadding;
-  EdgeInsets _resolvedPadding;
+  EdgeInsets? get resolvedPadding => _resolvedPadding;
+  EdgeInsets? _resolvedPadding;
 
   void _resolvePadding() {
     if (_resolvedPadding != null) {
       return;
     }
     _resolvedPadding = padding.resolve(textDirection);
-    _resolvedPadding = _resolvedPadding.copyWith(left: _resolvedPadding.left);
+    _resolvedPadding = _resolvedPadding!.copyWith(left: _resolvedPadding!.left);
 
-    assert(_resolvedPadding.isNonNegative);
+    assert(_resolvedPadding!.isNonNegative);
   }
 
   void _markNeedsPaddingResolution() {
     _resolvedPadding = null;
     markNeedsLayout();
   }
+
   // End padding implementation
 
   /// Returns child of this container at specified `position` in text.
@@ -229,7 +230,7 @@ class RenderEditableContainerBox extends RenderBox
       targetChild = childAfter(targetChild);
     }
     assert(targetChild != null, 'No child at position $position');
-    return targetChild;
+    return targetChild!;
   }
 
   /// Returns child of this container located at the specified local `offset`.
@@ -241,11 +242,11 @@ class RenderEditableContainerBox extends RenderBox
     assert(firstChild != null);
     _resolvePadding();
 
-    if (offset.dy <= _resolvedPadding.top) return firstChild;
-    if (offset.dy >= size.height - _resolvedPadding.bottom) return lastChild;
+    if (offset.dy <= _resolvedPadding!.top) return firstChild!;
+    if (offset.dy >= size.height - _resolvedPadding!.bottom) return lastChild!;
 
     var child = firstChild;
-    var dy = _resolvedPadding.top;
+    var dy = _resolvedPadding!.top;
     var dx = -offset.dx;
     while (child != null) {
       if (child.size.contains(offset.translate(dx, -dy))) {
@@ -295,22 +296,21 @@ class RenderEditableContainerBox extends RenderBox
     }());
 
     _resolvePadding();
-    assert(_resolvedPadding != null);
 
-    var mainAxisExtent = _resolvedPadding.top;
+    var mainAxisExtent = _resolvedPadding!.top;
     var child = firstChild;
     final innerConstraints =
         BoxConstraints.tightFor(width: constraints.maxWidth)
-            .deflate(_resolvedPadding);
+            .deflate(_resolvedPadding!);
     while (child != null) {
       child.layout(innerConstraints, parentUsesSize: true);
-      final EditableContainerParentData childParentData = child.parentData;
-      childParentData.offset = Offset(_resolvedPadding.left, mainAxisExtent);
+      final childParentData = child.parentData as EditableContainerParentData;
+      childParentData.offset = Offset(_resolvedPadding!.left, mainAxisExtent);
       mainAxisExtent += child.size.height;
       assert(child.parentData == childParentData);
       child = childParentData.nextSibling;
     }
-    mainAxisExtent += _resolvedPadding.bottom;
+    mainAxisExtent += _resolvedPadding!.bottom;
     size = constraints.constrain(Size(constraints.maxWidth, mainAxisExtent));
 
     assert(size.isFinite);
@@ -327,7 +327,7 @@ class RenderEditableContainerBox extends RenderBox
     var child = firstChild;
     while (child != null) {
       extent = math.max(extent, childSize(child));
-      final EditableContainerParentData childParentData = child.parentData;
+      final childParentData = child.parentData as EditableContainerParentData;
       child = childParentData.nextSibling;
     }
     return extent;
@@ -338,7 +338,7 @@ class RenderEditableContainerBox extends RenderBox
     var child = firstChild;
     while (child != null) {
       extent += childSize(child);
-      final EditableContainerParentData childParentData = child.parentData;
+      final childParentData = child.parentData as EditableContainerParentData;
       child = childParentData.nextSibling;
     }
     return extent;
@@ -347,8 +347,8 @@ class RenderEditableContainerBox extends RenderBox
   @override
   double computeMinIntrinsicWidth(double height) {
     _resolvePadding();
-    final horizontalPadding = _resolvedPadding.left + _resolvedPadding.right;
-    final verticalPadding = _resolvedPadding.top + _resolvedPadding.bottom;
+    final horizontalPadding = _resolvedPadding!.left + _resolvedPadding!.right;
+    final verticalPadding = _resolvedPadding!.top + _resolvedPadding!.bottom;
     return _getIntrinsicCrossAxis((RenderBox child) {
       final childHeight = math.max(0.0, height - verticalPadding);
       return child.getMinIntrinsicWidth(childHeight) + horizontalPadding;
@@ -358,8 +358,8 @@ class RenderEditableContainerBox extends RenderBox
   @override
   double computeMaxIntrinsicWidth(double height) {
     _resolvePadding();
-    final horizontalPadding = _resolvedPadding.left + _resolvedPadding.right;
-    final verticalPadding = _resolvedPadding.top + _resolvedPadding.bottom;
+    final horizontalPadding = _resolvedPadding!.left + _resolvedPadding!.right;
+    final verticalPadding = _resolvedPadding!.top + _resolvedPadding!.bottom;
     return _getIntrinsicCrossAxis((RenderBox child) {
       final childHeight = math.max(0.0, height - verticalPadding);
       return child.getMaxIntrinsicWidth(childHeight) + horizontalPadding;
@@ -369,8 +369,8 @@ class RenderEditableContainerBox extends RenderBox
   @override
   double computeMinIntrinsicHeight(double width) {
     _resolvePadding();
-    final horizontalPadding = _resolvedPadding.left + _resolvedPadding.right;
-    final verticalPadding = _resolvedPadding.top + _resolvedPadding.bottom;
+    final horizontalPadding = _resolvedPadding!.left + _resolvedPadding!.right;
+    final verticalPadding = _resolvedPadding!.top + _resolvedPadding!.bottom;
     return _getIntrinsicMainAxis((RenderBox child) {
       final childWidth = math.max(0.0, width - horizontalPadding);
       return child.getMinIntrinsicHeight(childWidth) + verticalPadding;
@@ -380,8 +380,8 @@ class RenderEditableContainerBox extends RenderBox
   @override
   double computeMaxIntrinsicHeight(double width) {
     _resolvePadding();
-    final horizontalPadding = _resolvedPadding.left + _resolvedPadding.right;
-    final verticalPadding = _resolvedPadding.top + _resolvedPadding.bottom;
+    final horizontalPadding = _resolvedPadding!.left + _resolvedPadding!.right;
+    final verticalPadding = _resolvedPadding!.top + _resolvedPadding!.bottom;
     return _getIntrinsicMainAxis((RenderBox child) {
       final childWidth = math.max(0.0, width - horizontalPadding);
       return child.getMaxIntrinsicHeight(childWidth) + verticalPadding;
@@ -389,9 +389,11 @@ class RenderEditableContainerBox extends RenderBox
   }
 
   @override
-  double computeDistanceToActualBaseline(TextBaseline baseline) {
+  double? computeDistanceToActualBaseline(TextBaseline baseline) {
     _resolvePadding();
-    return defaultComputeDistanceToFirstActualBaseline(baseline) +
-        _resolvedPadding.top;
+    final defaultDistance =
+        defaultComputeDistanceToFirstActualBaseline(baseline);
+    if (defaultDistance == null) return null;
+    return defaultDistance + _resolvedPadding!.top;
   }
 }

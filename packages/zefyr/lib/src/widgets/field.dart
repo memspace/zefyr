@@ -22,7 +22,7 @@ class ZefyrField extends StatefulWidget {
   /// If `null` then this editor instantiates a new ScrollController.
   ///
   /// Scroll controller must not be `null` if [scrollable] is set to `false`.
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
 
   /// Whether this editor should create a scrollable container for its content.
   ///
@@ -80,13 +80,13 @@ class ZefyrField extends StatefulWidget {
   ///
   /// This only has effect if [scrollable] is set to `true` and [expands] is
   /// set to `false`.
-  final double minHeight;
+  final double? minHeight;
 
   /// The maximum height to be occupied by this editor.
   ///
   /// This only has effect if [scrollable] is set to `true` and [expands] is
   /// set to `false`.
-  final double maxHeight;
+  final double? maxHeight;
 
   /// Whether this editor's height will be sized to fill its parent.
   ///
@@ -124,14 +124,14 @@ class ZefyrField extends StatefulWidget {
   /// If not specified, it will behave according to the current platform.
   ///
   /// See [Scrollable.physics].
-  final ScrollPhysics scrollPhysics;
+  final ScrollPhysics? scrollPhysics;
 
   /// Callback to invoke when user wants to launch a URL.
-  final ValueChanged<String> onLaunchUrl;
+  final ValueChanged<String>? onLaunchUrl;
 
-  final InputDecoration decoration;
+  final InputDecoration? decoration;
 
-  final Widget toolbar;
+  final Widget? toolbar;
 
   /// Builder function for embeddable objects.
   ///
@@ -139,9 +139,9 @@ class ZefyrField extends StatefulWidget {
   final ZefyrEmbedBuilder embedBuilder;
 
   ZefyrField({
-    Key key,
-    @required this.controller,
-    this.focusNode,
+    Key? key,
+    required this.controller,
+    required this.focusNode,
     this.scrollController,
     this.scrollable = true,
     this.padding = EdgeInsets.zero,
@@ -166,7 +166,8 @@ class ZefyrField extends StatefulWidget {
 }
 
 class _ZefyrFieldState extends State<ZefyrField> {
-  bool _focused;
+  late bool _focused;
+
   void _editorFocusChanged() {
     setState(() {
       _focused = widget.focusNode.hasFocus;
@@ -217,7 +218,7 @@ class _ZefyrFieldState extends State<ZefyrField> {
         children: [
           child,
           Visibility(
-            child: widget.toolbar,
+            child: widget.toolbar!,
             visible: _focused,
             maintainSize: true,
             maintainAnimation: true,
@@ -230,7 +231,7 @@ class _ZefyrFieldState extends State<ZefyrField> {
     return AnimatedBuilder(
       animation:
           Listenable.merge(<Listenable>[widget.focusNode, widget.controller]),
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return InputDecorator(
           decoration: _getEffectiveDecoration(),
           isFocused: widget.focusNode.hasFocus,

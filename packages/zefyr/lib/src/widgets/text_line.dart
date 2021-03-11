@@ -14,17 +14,15 @@ import 'theme.dart';
 class TextLine extends StatelessWidget {
   /// Line of text represented by this widget.
   final LineNode node;
-  final TextDirection textDirection;
+  final TextDirection? textDirection;
   final ZefyrEmbedBuilder embedBuilder;
 
   const TextLine({
-    Key key,
-    @required this.node,
+    Key? key,
+    required this.node,
     this.textDirection,
-    @required this.embedBuilder,
-  })  : assert(node != null),
-        assert(embedBuilder != null),
-        super(key: key);
+    required this.embedBuilder,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +33,9 @@ class TextLine extends StatelessWidget {
       return EmbedProxy(child: embedBuilder(context, embed));
     }
     final text = buildText(context, node);
-    final strutStyle =
-        StrutStyle.fromTextStyle(text.style, forceStrutHeight: true);
+    final strutStyle = text.style != null
+        ? StrutStyle.fromTextStyle(text.style!, forceStrutHeight: true)
+        : null;
     return RichTextProxy(
       textStyle: text.style,
       textDirection: textDirection,
@@ -52,7 +51,7 @@ class TextLine extends StatelessWidget {
   }
 
   TextSpan buildText(BuildContext context, LineNode node) {
-    final theme = ZefyrTheme.of(context);
+    final theme = ZefyrTheme.of(context)!;
     final children = node.children
         .map((node) => _segmentToTextSpan(node, theme))
         .toList(growable: false);
@@ -63,7 +62,7 @@ class TextLine extends StatelessWidget {
   }
 
   TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme) {
-    final TextNode segment = node;
+    final segment = node as TextNode;
     final attrs = segment.style;
 
     return TextSpan(
@@ -76,23 +75,23 @@ class TextLine extends StatelessWidget {
     var textStyle = TextStyle();
     final heading = node.style.get(NotusAttribute.heading);
     if (heading == NotusAttribute.heading.level1) {
-      textStyle = textStyle.merge(theme.heading1.style);
+      textStyle = textStyle.merge(theme.heading1?.style);
     } else if (heading == NotusAttribute.heading.level2) {
-      textStyle = textStyle.merge(theme.heading2.style);
+      textStyle = textStyle.merge(theme.heading2?.style);
     } else if (heading == NotusAttribute.heading.level3) {
-      textStyle = textStyle.merge(theme.heading3.style);
+      textStyle = textStyle.merge(theme.heading3?.style);
     } else {
-      textStyle = textStyle.merge(theme.paragraph.style);
+      textStyle = textStyle.merge(theme.paragraph?.style);
     }
 
     final block = style.get(NotusAttribute.block);
     if (block == NotusAttribute.block.quote) {
-      textStyle = textStyle.merge(theme.quote.style);
+      textStyle = textStyle.merge(theme.quote?.style);
     } else if (block == NotusAttribute.block.code) {
-      textStyle = textStyle.merge(theme.code.style);
+      textStyle = textStyle.merge(theme.code?.style);
     } else if (block != null) {
       // lists
-      textStyle = textStyle.merge(theme.lists.style);
+      textStyle = textStyle.merge(theme.lists?.style);
     }
 
     return textStyle;
@@ -118,13 +117,16 @@ class TextLine extends StatelessWidget {
     return result;
   }
 
-  TextStyle _mergeTextStyleWithDecoration(TextStyle a, TextStyle b) {
+  TextStyle _mergeTextStyleWithDecoration(TextStyle? a, TextStyle? b) {
+    assert(a != null || b != null);
+    if (a == null) return b!;
+    if (b == null) return a;
     var decorations = <TextDecoration>[];
     if (a.decoration != null) {
-      decorations.add(a.decoration);
+      decorations.add(a.decoration!);
     }
     if (b.decoration != null) {
-      decorations.add(b.decoration);
+      decorations.add(b.decoration!);
     }
     return a.merge(b).apply(decoration: TextDecoration.combine(decorations));
   }

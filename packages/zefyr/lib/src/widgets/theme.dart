@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:meta/meta.dart';
 
 /// Applies a Zefyr editor theme to descendant widgets.
 ///
@@ -23,12 +22,10 @@ class ZefyrTheme extends InheritedWidget {
   ///
   /// The [data] and [child] arguments must not be null.
   ZefyrTheme({
-    Key key,
-    @required this.data,
-    @required Widget child,
-  })  : assert(data != null),
-        assert(child != null),
-        super(key: key, child: child);
+    Key? key,
+    required this.data,
+    required Widget child,
+  }) : super(key: key, child: child);
 
   @override
   bool updateShouldNotify(ZefyrTheme oldWidget) {
@@ -41,12 +38,12 @@ class ZefyrTheme extends InheritedWidget {
   /// Returns `null` if there is no [ZefyrTheme] in the given build context
   /// and [nullOk] is set to `true`. If [nullOk] is set to `false` (default)
   /// then this method asserts.
-  static ZefyrThemeData of(BuildContext context, {bool nullOk = false}) {
+  static ZefyrThemeData? of(BuildContext context, {bool nullOk = false}) {
     final widget = context.dependOnInheritedWidgetOfExactType<ZefyrTheme>();
     if (widget == null && nullOk) return null;
     assert(widget != null,
         '$ZefyrTheme.of() called with a context that does not contain a ZefyrEditor.');
-    return widget.data;
+    return widget!.data;
   }
 }
 
@@ -63,39 +60,39 @@ class VerticalSpacing {
 
 class ZefyrThemeData {
   /// Style of bold text.
-  final TextStyle bold;
+  final TextStyle? bold;
 
   /// Style of italic text.
-  final TextStyle italic;
+  final TextStyle? italic;
 
   /// Style of underline text.
-  final TextStyle underline;
+  final TextStyle? underline;
 
   /// Style of strikethrough text.
-  final TextStyle strikethrough;
+  final TextStyle? strikethrough;
 
   /// Style of links in text.
-  final TextStyle link;
+  final TextStyle? link;
 
   /// Default style theme for regular paragraphs of text.
-  final TextBlockTheme paragraph; // spacing: top: 6, bottom: 10
+  final TextBlockTheme? paragraph; // spacing: top: 6, bottom: 10
   /// Style theme for level 1 headings.
-  final TextBlockTheme heading1;
+  final TextBlockTheme? heading1;
 
   /// Style theme for level 2 headings.
-  final TextBlockTheme heading2;
+  final TextBlockTheme? heading2;
 
   /// Style theme for level 3 headings.
-  final TextBlockTheme heading3;
+  final TextBlockTheme? heading3;
 
   /// Style theme for bullet and number lists.
-  final TextBlockTheme lists;
+  final TextBlockTheme? lists;
 
   /// Style theme for quote blocks.
-  final TextBlockTheme quote;
+  final TextBlockTheme? quote;
 
   /// Style theme for code blocks.
-  final TextBlockTheme code;
+  final TextBlockTheme? code;
 
   ZefyrThemeData({
     this.bold,
@@ -152,7 +149,7 @@ class ZefyrThemeData {
       heading1: TextBlockTheme(
         style: defaultStyle.style.copyWith(
           fontSize: 34.0,
-          color: defaultStyle.style.color.withOpacity(0.70),
+          color: defaultStyle.style.color?.withOpacity(0.70),
           height: 1.15,
           fontWeight: FontWeight.w300,
         ),
@@ -161,7 +158,7 @@ class ZefyrThemeData {
       heading2: TextBlockTheme(
         style: TextStyle(
           fontSize: 24.0,
-          color: defaultStyle.style.color.withOpacity(0.70),
+          color: defaultStyle.style.color?.withOpacity(0.70),
           height: 1.15,
           fontWeight: FontWeight.normal,
         ),
@@ -170,7 +167,7 @@ class ZefyrThemeData {
       heading3: TextBlockTheme(
         style: TextStyle(
           fontSize: 20.0,
-          color: defaultStyle.style.color.withOpacity(0.70),
+          color: defaultStyle.style.color?.withOpacity(0.70),
           height: 1.25,
           fontWeight: FontWeight.w500,
         ),
@@ -182,7 +179,7 @@ class ZefyrThemeData {
         lineSpacing: VerticalSpacing(bottom: 6),
       ),
       quote: TextBlockTheme(
-        style: TextStyle(color: baseStyle.color.withOpacity(0.6)),
+        style: TextStyle(color: baseStyle.color?.withOpacity(0.6)),
         spacing: baseSpacing,
         lineSpacing: VerticalSpacing(top: 6, bottom: 2),
         decoration: BoxDecoration(
@@ -208,18 +205,18 @@ class ZefyrThemeData {
   }
 
   ZefyrThemeData copyWith({
-    TextStyle bold,
-    TextStyle italic,
-    TextStyle underline,
-    TextStyle strikethrough,
-    TextStyle link,
-    TextBlockTheme paragraph,
-    TextBlockTheme heading1,
-    TextBlockTheme heading2,
-    TextBlockTheme heading3,
-    TextBlockTheme lists,
-    TextBlockTheme quote,
-    TextBlockTheme code,
+    TextStyle? bold,
+    TextStyle? italic,
+    TextStyle? underline,
+    TextStyle? strikethrough,
+    TextStyle? link,
+    TextBlockTheme? paragraph,
+    TextBlockTheme? heading1,
+    TextBlockTheme? heading2,
+    TextBlockTheme? heading3,
+    TextBlockTheme? lists,
+    TextBlockTheme? quote,
+    TextBlockTheme? code,
   }) {
     return ZefyrThemeData(
       bold: bold ?? this.bold,
@@ -272,11 +269,11 @@ class TextBlockTheme {
   ///
   /// Decoration, if present, is painted in the content area, excluding
   /// any [spacing].
-  final BoxDecoration decoration;
+  final BoxDecoration? decoration;
 
   TextBlockTheme({
-    @required this.style,
-    @required this.spacing,
+    required this.style,
+    required this.spacing,
     this.lineSpacing = const VerticalSpacing.zero(),
     this.decoration,
   });

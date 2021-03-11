@@ -18,23 +18,22 @@ class CursorPainter {
   final double devicePixelRatio;
 
   CursorPainter({
-    @required this.editable,
-    @required this.style,
-    @required this.cursorPrototype,
-    @required this.effectiveColor,
-    @required this.devicePixelRatio,
+    required this.editable,
+    required this.style,
+    required this.cursorPrototype,
+    required this.effectiveColor,
+    required this.devicePixelRatio,
   });
 
   /// Paints cursor on [canvas] at specified [textPosition].
   void paint(Canvas canvas, Offset effectiveOffset, TextPosition textPosition) {
-    assert(cursorPrototype != null);
 
     final paint = Paint()..color = effectiveColor;
     final Offset caretOffset =
         editable.getOffsetForCaret(textPosition, cursorPrototype) +
             effectiveOffset;
     Rect caretRect = cursorPrototype.shift(caretOffset);
-    if (style.offset != null) caretRect = caretRect.shift(style.offset);
+    if (style.offset != null) caretRect = caretRect.shift(style.offset!);
 
     if (caretRect.left < 0.0) {
       // For iOS the cursor may get clipped by the scroll view when
@@ -45,35 +44,34 @@ class CursorPainter {
       caretRect = caretRect.shift(Offset(-caretRect.left, 0.0));
     }
 
-    final double caretHeight = editable.getFullHeightForCaret(textPosition);
-    if (caretHeight != null) {
-      switch (defaultTargetPlatform) {
-        case TargetPlatform.iOS:
-        case TargetPlatform.macOS:
-          final double heightDiff = caretHeight - caretRect.height;
-          // Center the caret vertically along the text.
-          caretRect = Rect.fromLTWH(
-            caretRect.left,
-            caretRect.top + heightDiff / 2,
-            caretRect.width,
-            caretRect.height,
-          );
-          break;
-        case TargetPlatform.android:
-        case TargetPlatform.fuchsia:
-        case TargetPlatform.linux:
-        case TargetPlatform.windows:
-          // Override the height to take the full height of the glyph at the TextPosition
-          // when not on iOS. iOS has special handling that creates a taller caret.
-          // TODO(garyq): See the TODO for _computeCaretPrototype().
-          caretRect = Rect.fromLTWH(
-            caretRect.left,
-            caretRect.top - _kCaretHeightOffset,
-            caretRect.width,
-            caretHeight,
-          );
-          break;
-      }
+    // Force caret height here
+    final caretHeight = editable.getFullHeightForCaret(textPosition) as double;
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+        final double heightDiff = caretHeight - caretRect.height;
+        // Center the caret vertically along the text.
+        caretRect = Rect.fromLTWH(
+          caretRect.left,
+          caretRect.top + heightDiff / 2,
+          caretRect.width,
+          caretRect.height,
+        );
+        break;
+      case TargetPlatform.android:
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
+        // Override the height to take the full height of the glyph at the TextPosition
+        // when not on iOS. iOS has special handling that creates a taller caret.
+        // TODO(garyq): See the TODO for _computeCaretPrototype().
+        caretRect = Rect.fromLTWH(
+          caretRect.left,
+          caretRect.top - _kCaretHeightOffset,
+          caretRect.width,
+          caretHeight,
+        );
+        break;
     }
 
     caretRect = caretRect.shift(
@@ -82,7 +80,8 @@ class CursorPainter {
     if (style.radius == null) {
       canvas.drawRect(caretRect, paint);
     } else {
-      final RRect caretRRect = RRect.fromRectAndRadius(caretRect, style.radius);
+      final RRect caretRRect =
+          RRect.fromRectAndRadius(caretRect, style.radius!);
       canvas.drawRRect(caretRRect, paint);
     }
   }
