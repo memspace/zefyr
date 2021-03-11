@@ -19,6 +19,7 @@ void main() {
     testWidgets('autofocus', (tester) async {
       final editor = EditorSandBox(tester: tester, autofocus: true);
       await editor.pump();
+      await tester.pumpAndSettle();
       expect(editor.focusNode.hasFocus, isTrue);
     });
 
@@ -38,6 +39,6 @@ Future<Null> enterText(WidgetTester tester, String text) async {
         selection: TextSelection.collapsed(offset: 6),
       ),
     );
-    await tester.idle();
+    await tester.pumpAndSettle();
   });
 }
