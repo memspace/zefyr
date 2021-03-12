@@ -22,13 +22,13 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
-  image_picker: ^0.6.1
+  cupertino_icons: ^1.0.2
+  image_picker: ^0.7.2+1
   url_launcher: ^6.0.2
-  adaptive_breakpoints: ^0.0.3
-  google_fonts: ^1.1.0
-  file: ^5.2.1
-  path_provider: ^1.6.18
+  adaptive_breakpoints: ^0.0.4
+  google_fonts: ^2.0.0
+  file: ^6.1.0
+  path_provider: ^2.0.1
   zefyr:
     path: ../
 
