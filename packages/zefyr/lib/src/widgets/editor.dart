@@ -417,7 +417,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-        renderEditor?.selectPosition(cause: SelectionChangedCause.tap);
+          renderEditor?.selectPosition(cause: SelectionChangedCause.tap);
           break;
       }
     }
@@ -432,7 +432,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
         case TargetPlatform.macOS:
-        renderEditor?.selectPositionAt(
+          renderEditor?.selectPositionAt(
             from: details.globalPosition,
             cause: SelectionChangedCause.longPress,
           );
@@ -441,7 +441,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-        renderEditor?.selectWord(cause: SelectionChangedCause.longPress);
+          renderEditor?.selectWord(cause: SelectionChangedCause.longPress);
           Feedback.forLongPress(_state.context);
           break;
       }
@@ -687,7 +687,7 @@ class RawEditorState extends EditorState
 
   // Cursors
   late CursorController _cursorController;
-  late FloatingCursorController _floatingCursorController;
+  // late FloatingCursorController _floatingCursorController;
 
   // Keyboard
   late KeyboardListener _keyboardListener;
@@ -1060,7 +1060,6 @@ class RawEditorState extends EditorState
 //            onPaste: _semanticsOnPaste(controls),
         child: _Editor(
           key: _editorKey,
-          children: _buildChildren(context),
           document: widget.controller.document,
           selection: widget.controller.selection,
           hasFocus: _hasFocus,
@@ -1069,6 +1068,7 @@ class RawEditorState extends EditorState
           endHandleLayerLink: _endHandleLayerLink,
           onSelectionChanged: _handleSelectionChanged,
           padding: widget.padding,
+          children: _buildChildren(context),
         ),
       ),
     );

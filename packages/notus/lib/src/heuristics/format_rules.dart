@@ -48,7 +48,7 @@ class ResolveLineFormatRule extends FormatRule {
       final opText = op.data is String ? op.data as String : '';
       final lf = opText.indexOf('\n');
       if (lf == -1) {
-        result..retain(op.length);
+        result.retain(op.length);
         continue;
       }
       result..retain(lf)..retain(1, attribute.toJson());

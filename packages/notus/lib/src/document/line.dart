@@ -62,7 +62,7 @@ class LineNode extends ContainerNode<LeafNode>
   /// This is an equivalent of inserting a line-break character at [index].
   LineNode splitAt(int index) {
     assert(index == 0 || (index > 0 && index < length),
-        'Index is out of bounds. Index: $index. Actual node length: ${length}.');
+        'Index is out of bounds. Index: $index. Actual node length: $length.');
 
     final line = clone();
     insertAfter(line);

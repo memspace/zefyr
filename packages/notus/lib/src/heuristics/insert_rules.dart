@@ -100,7 +100,7 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
       // The only scenario we get such operation is when the text is plain.
       assert(after.isPlain);
       // No attributes to apply so we simply create a new line.
-      result..insert('\n');
+      result.insert('\n');
       return result;
     }
     // Continue looking for a newline.
@@ -467,11 +467,11 @@ class InsertEmbedsRule extends InsertRule {
     // and insert our embed.
     final lineStyle = _getLineStyle(iter, target);
     if (!isNewlineBefore) {
-      result..insert('\n', lineStyle);
+      result.insert('\n', lineStyle);
     }
-    result..insert(data);
+    result.insert(data);
     if (!isNewlineAfter) {
-      result..insert('\n');
+      result.insert('\n');
     }
     return result;
   }

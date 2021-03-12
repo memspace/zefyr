@@ -107,7 +107,7 @@ class _DemoScaffoldState extends State<DemoScaffold> {
         .childFile('${widget.documentFilename}');
     final data = jsonEncode(_controller.document);
     await file.writeAsString(data);
-    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('Saved.')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Saved.')));
   }
 
   @override

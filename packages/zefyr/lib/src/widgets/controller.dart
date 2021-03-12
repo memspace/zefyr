@@ -181,7 +181,6 @@ class ZefyrController extends ChangeNotifier {
   /// Updates selection without triggering notifications to listeners.
   void _updateSelectionSilent(TextSelection value,
       {ChangeSource source = ChangeSource.remote}) {
-    assert(value != null && source != null);
     _selection = value;
 //    _lastChangeSource = source;
     _ensureSelectionBeforeLastBreak();

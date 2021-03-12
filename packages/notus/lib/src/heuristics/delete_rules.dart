@@ -54,7 +54,7 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
       final opText = op.data is String ? op.data as String : '';
       final lf = opText.indexOf('\n');
       if (lf == -1) {
-        result..retain(op.length);
+        result.retain(op.length);
         continue;
       }
       var attributes = _unsetAttributes(op.attributes);

@@ -354,6 +354,7 @@ mixin RawEditorStateKeyboardMixin on EditorState {
     if (shortcut == InputShortcut.paste && !widget.readOnly) {
       // Snapshot the input before using `await`.
       // See https://github.com/flutter/flutter/issues/11427
+      // ignore: unused_local_variable
       final TextEditingValue value = textEditingValue;
       final data = await Clipboard.getData(Clipboard.kTextPlain);
       if (data != null && data.text != null) {

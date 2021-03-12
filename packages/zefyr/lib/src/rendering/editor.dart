@@ -117,7 +117,6 @@ class RenderEditor extends RenderEditableContainerBox
 
   NotusDocument _document;
   set document(NotusDocument value) {
-    assert(value != null);
     if (_document == value) {
       return;
     }
@@ -129,7 +128,6 @@ class RenderEditor extends RenderEditableContainerBox
   bool get hasFocus => _hasFocus;
   bool _hasFocus = false;
   set hasFocus(bool value) {
-    assert(value != null);
     if (_hasFocus == value) {
       return;
     }
@@ -323,8 +321,6 @@ class RenderEditor extends RenderEditableContainerBox
     Offset? to,
     required SelectionChangedCause cause,
   }) {
-    assert(cause != null);
-    assert(from != null);
     // _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
     if (onSelectionChanged == null) {
       return;
@@ -384,8 +380,6 @@ class RenderEditor extends RenderEditableContainerBox
     Offset? to,
     required SelectionChangedCause cause,
   }) {
-    assert(cause != null);
-    assert(from != null);
     // _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
     if (onSelectionChanged == null) {
       return;
