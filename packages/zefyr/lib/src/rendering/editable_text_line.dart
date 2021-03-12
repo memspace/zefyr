@@ -628,7 +628,7 @@ class RenderEditableTextLine extends RenderEditableBox {
   }
 
   CursorPainter get _cursorPainter => CursorPainter(
-    editable: body!,
+        editable: body!,
         style: _cursorController.style,
         cursorPrototype: _caretPrototype,
         effectiveColor: _cursorController.cursorColor.value,

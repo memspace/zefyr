@@ -27,7 +27,6 @@ class CursorPainter {
 
   /// Paints cursor on [canvas] at specified [textPosition].
   void paint(Canvas canvas, Offset effectiveOffset, TextPosition textPosition) {
-
     final paint = Paint()..color = effectiveColor;
     final Offset caretOffset =
         editable.getOffsetForCaret(textPosition, cursorPrototype) +

@@ -348,7 +348,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
         case TargetPlatform.macOS:
-        renderEditor?.selectPositionAt(
+          renderEditor?.selectPositionAt(
             from: details.globalPosition,
             cause: SelectionChangedCause.longPress,
           );
@@ -357,7 +357,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-        renderEditor?.selectWordsInRange(
+          renderEditor?.selectWordsInRange(
             from: details.globalPosition - details.offsetFromOrigin,
             to: details.globalPosition,
             cause: SelectionChangedCause.longPress,
