@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  collection: ^1.14.6
   url_launcher: ^6.0.2
   quill_delta:
     git:
@@ -21,8 +20,6 @@ dependencies:
       url: https://github.com/amantoux/zefyr.git
       path: packages/notus
       ref: notus-null-safety
-  meta: ^1.1.0
-  quiver_hashcode: ^2.0.0
   characters: ^1.0.0
 
 dev_dependencies:
