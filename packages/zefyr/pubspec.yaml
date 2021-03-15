@@ -15,7 +15,7 @@ dependencies:
   quill_delta: ^1.0.0
   notus: ^0.1.0
   meta: ^1.1.0
-  quiver_hashcode: ^2.0.0
+  quiver: ^2.0.0
 
 dev_dependencies:
   flutter_test:
