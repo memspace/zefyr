@@ -130,7 +130,7 @@ class _LinkDialogState extends State<_LinkDialog> {
         onChanged: _linkChanged,
       ),
       actions: [
-        FlatButton(
+        TextButton(
           onPressed: _link.isNotEmpty ? _applyLink : null,
           child: Text('Apply'),
         ),
@@ -349,34 +349,34 @@ Widget _selectHeadingStyleButtonBuilder(BuildContext context,
     highlightElevation: 0,
     hoverElevation: 0,
     height: 32,
+    initialValue: value,
+    items: [
+      PopupMenuItem(
+        value: NotusAttribute.heading.unset,
+        height: 32,
+        child: Text(valueToText[NotusAttribute.heading.unset]!, style: style),
+      ),
+      PopupMenuItem(
+        value: NotusAttribute.heading.level1,
+        height: 32,
+        child: Text(valueToText[NotusAttribute.heading.level1]!, style: style),
+      ),
+      PopupMenuItem(
+        value: NotusAttribute.heading.level2,
+        height: 32,
+        child: Text(valueToText[NotusAttribute.heading.level2]!, style: style),
+      ),
+      PopupMenuItem(
+        value: NotusAttribute.heading.level3,
+        height: 32,
+        child: Text(valueToText[NotusAttribute.heading.level3]!, style: style),
+      ),
+    ],
+    onSelected: onSelected,
     child: Text(
       valueToText[value]!,
       style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
     ),
-    initialValue: value,
-    items: [
-      PopupMenuItem(
-        child: Text(valueToText[NotusAttribute.heading.unset]!, style: style),
-        value: NotusAttribute.heading.unset,
-        height: 32,
-      ),
-      PopupMenuItem(
-        child: Text(valueToText[NotusAttribute.heading.level1]!, style: style),
-        value: NotusAttribute.heading.level1,
-        height: 32,
-      ),
-      PopupMenuItem(
-        child: Text(valueToText[NotusAttribute.heading.level2]!, style: style),
-        value: NotusAttribute.heading.level2,
-        height: 32,
-      ),
-      PopupMenuItem(
-        child: Text(valueToText[NotusAttribute.heading.level3]!, style: style),
-        value: NotusAttribute.heading.level3,
-        height: 32,
-      ),
-    ],
-    onSelected: onSelected,
   );
 }
 
@@ -472,7 +472,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           child: VerticalDivider(
               indent: 16, endIndent: 16, color: Colors.grey.shade400)),
       Visibility(
-        visible: hideQuote,
+        visible: !hideQuote,
         child: ToggleStyleButton(
           attribute: NotusAttribute.block.quote,
           controller: controller,
@@ -544,7 +544,6 @@ class ZIconButton extends StatelessWidget {
     return ConstrainedBox(
       constraints: BoxConstraints.tightFor(width: size, height: size),
       child: RawMaterialButton(
-        child: icon,
         visualDensity: VisualDensity.compact,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
         padding: EdgeInsets.zero,
@@ -553,6 +552,7 @@ class ZIconButton extends StatelessWidget {
         hoverElevation: hoverElevation,
         highlightElevation: hoverElevation,
         onPressed: onPressed,
+        child: icon,
       ),
     );
   }
@@ -590,7 +590,6 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
     return ConstrainedBox(
       constraints: BoxConstraints.tightFor(height: widget.height),
       child: RawMaterialButton(
-        child: _buildContent(context),
         visualDensity: VisualDensity.compact,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
         padding: EdgeInsets.zero,
@@ -599,6 +598,7 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
         hoverElevation: widget.hoverElevation,
         highlightElevation: widget.hoverElevation,
         onPressed: _showMenu,
+        child: _buildContent(context),
       ),
     );
   }
