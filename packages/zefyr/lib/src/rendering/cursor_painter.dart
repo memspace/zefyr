@@ -45,33 +45,35 @@ class CursorPainter {
     }
 
     // Force caret height here
-    final caretHeight = editable.getFullHeightForCaret(textPosition) as double;
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
-        final double heightDiff = caretHeight - caretRect.height;
-        // Center the caret vertically along the text.
-        caretRect = Rect.fromLTWH(
-          caretRect.left,
-          caretRect.top + heightDiff / 2,
-          caretRect.width,
-          caretRect.height,
-        );
-        break;
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.linux:
-      case TargetPlatform.windows:
+    final double? caretHeight = editable.getFullHeightForCaret(textPosition);
+    if (caretHeight != null) {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+        case TargetPlatform.macOS:
+          final double heightDiff = caretHeight - caretRect.height;
+          // Center the caret vertically along the text.
+          caretRect = Rect.fromLTWH(
+            caretRect.left,
+            caretRect.top + heightDiff / 2,
+            caretRect.width,
+            caretRect.height,
+          );
+          break;
+        case TargetPlatform.android:
+        case TargetPlatform.fuchsia:
+        case TargetPlatform.linux:
+        case TargetPlatform.windows:
         // Override the height to take the full height of the glyph at the TextPosition
         // when not on iOS. iOS has special handling that creates a taller caret.
         // TODO(garyq): See the TODO for _computeCaretPrototype().
-        caretRect = Rect.fromLTWH(
-          caretRect.left,
-          caretRect.top - _kCaretHeightOffset,
-          caretRect.width,
-          caretHeight,
-        );
-        break;
+          caretRect = Rect.fromLTWH(
+            caretRect.left,
+            caretRect.top - _kCaretHeightOffset,
+            caretRect.width,
+            caretHeight,
+          );
+          break;
+      }
     }
 
     caretRect = caretRect.shift(
