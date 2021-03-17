@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/rendering/cursor_painter.dart';
 
 import '../widgets/selection_utils.dart';
 import 'editable_box.dart';
@@ -91,6 +92,11 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
   }
 
   @override
+  CursorPainter? get cursorPainter {
+    return null;
+  }
+
+  @override
   Offset getOffsetForCaret(TextPosition position) {
     final child = childAtPosition(position);
     final localPosition = TextPosition(
@@ -99,6 +105,27 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
     );
     final parentData = child.parentData as BoxParentData;
     return child.getOffsetForCaret(localPosition) + parentData.offset;
+  }
+
+  @override
+  Rect getLocalRectForCaret(TextPosition position) {
+    final child = childAtPosition(position);
+    final localPosition = TextPosition(
+      offset: position.offset - child.node.offset,
+      affinity: position.affinity,
+    );
+    final parentData = child.parentData as BoxParentData;
+    return child.getLocalRectForCaret(localPosition).shift(parentData.offset);
+  }
+
+  @override
+  TextPosition? globalToLocalPosition(TextPosition position) {
+    if (position.offset < node.documentOffset ||
+        position.offset > node.documentOffset + node.length) return null;
+    return TextPosition(
+      offset: position.offset - node.documentOffset,
+      affinity: position.affinity,
+    );
   }
 
   /// This method unlike [RenderEditor.getPositionForOffset] expects the

@@ -233,8 +233,8 @@ class RenderEditor extends RenderEditableContainerBox
     if (endpoints.length == 1) {
       // Collapsed selection => caret
       final child = childAtPosition(selection.extent);
-      final childPosition =
-          TextPosition(offset: selection.extentOffset - child.node.offset);
+      final childPosition = TextPosition(
+          offset: selection.extentOffset - child.node.documentOffset);
       final caretTop = endpoints.single.point.dy -
           child.preferredLineHeight(childPosition) -
           kMargin +
@@ -563,5 +563,19 @@ class RenderEditor extends RenderEditableContainerBox
       offset: localPosition.offset + child.node.offset,
       affinity: localPosition.affinity,
     );
+  }
+
+  Rect getLocalRectForCaret(TextPosition position) {
+    final targetChild = childAtPosition(position);
+    final localPosition = targetChild.globalToLocalPosition(position);
+
+    assert(localPosition != null);
+    final childLocalRect = targetChild.getLocalRectForCaret(localPosition!);
+
+    final boxParentData = targetChild.parentData as BoxParentData;
+    final rect = childLocalRect.shift(Offset(0, boxParentData.offset.dy));
+    final perfectOffset =
+        targetChild.cursorPainter?.getPixelPerfectCursorOffset(rect);
+    return perfectOffset != null ? rect.shift(perfectOffset) : rect;
   }
 }
