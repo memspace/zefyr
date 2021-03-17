@@ -62,6 +62,10 @@ abstract class RenderEditableBox extends RenderBox {
   /// Valid only after [layout].
   TextPosition getPositionForOffset(Offset offset);
 
+  /// Returns the position relative to the [node] content
+  /// or `null` if the global position doesn't fall in this node
+  TextPosition? globalToLocalPosition(TextPosition position);
+
   /// Returns the position within the text which is on the line above the given
   /// `position`.
   ///

@@ -250,6 +250,27 @@ class RenderEditor extends RenderEditableContainerBox
     return null;
   }
 
+  /// Returns the [Rect] in local coordinates for the caret at the given text
+  /// position.
+  ///
+  /// See also:
+  ///
+  ///  * [getPositionForPoint], which is the reverse operation, taking
+  ///    an [Offset] in global coordinates and returning a [TextPosition].
+  ///  * [getEndpointsForSelection], which is the equivalent but for
+  ///    a selection rather than a particular text position.
+  ///  * [TextPainter.getOffsetForCaret], the equivalent method for a
+  ///    [TextPainter] object.
+  Rect getLocalRectForCaret(TextPosition caretPosition, Rect caretPrototype) {
+    final caretOffset = getOffsetForPosition(caretPosition);
+    // TODO : add
+    final rect =
+        Rect.fromLTWH(0.0, 0.0, caretPrototype.width, caretPrototype.height)
+            .shift(caretOffset);
+    // Add additional cursor offset (generally only if on iOS).
+    return rect.shift(caretOffset);
+  }
+
   @override
   List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
     // _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
@@ -564,5 +585,14 @@ class RenderEditor extends RenderEditableContainerBox
       offset: localPosition.offset + child.node.offset,
       affinity: localPosition.affinity,
     );
+  }
+
+  @override
+  Offset getOffsetForPosition(TextPosition position) {
+    final targetEditableBox = childAtPosition(position);
+    final caretOffset = targetEditableBox.getOffsetForCaret(
+      targetEditableBox.globalToLocalPosition(position)!,
+    );
+    return targetEditableBox.localToGlobal(caretOffset);
   }
 }

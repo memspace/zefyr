@@ -238,6 +238,16 @@ class RenderEditableTextLine extends RenderEditableBox {
         parentData.offset;
   }
 
+  @override
+  TextPosition? globalToLocalPosition(TextPosition position) {
+    if (position.offset < node.documentOffset ||
+        position.offset > node.documentOffset + node.length) return null;
+    return TextPosition(
+      offset: position.offset - node.documentOffset,
+      affinity: position.affinity,
+    );
+  }
+
   /// The [offset] parameter is expected to be local coordinates of this render
   /// object.
   @override
@@ -628,7 +638,7 @@ class RenderEditableTextLine extends RenderEditableBox {
   }
 
   CursorPainter get _cursorPainter => CursorPainter(
-    editable: body!,
+        editable: body!,
         style: _cursorController.style,
         cursorPrototype: _caretPrototype,
         effectiveColor: _cursorController.cursorColor.value,
