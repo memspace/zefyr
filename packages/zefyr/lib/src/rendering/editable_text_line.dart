@@ -239,6 +239,17 @@ class RenderEditableTextLine extends RenderEditableBox {
   }
 
   @override
+  Rect getLocalRectForCaret(TextPosition position) {
+    final caretOffset = getOffsetForCaret(position);
+    var rect =
+        Rect.fromLTWH(0.0, 0.0, cursorWidth, cursorHeight).shift(caretOffset);
+    final cursorOffset = _cursorController.style.offset;
+    // Add additional cursor offset (generally only if on iOS).
+    if (cursorOffset != null) rect = rect.shift(cursorOffset);
+    return rect;
+  }
+
+  @override
   TextPosition? globalToLocalPosition(TextPosition position) {
     if (position.offset < node.documentOffset ||
         position.offset > node.documentOffset + node.length) return null;
@@ -637,7 +648,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     _computeCaretPrototype();
   }
 
-  CursorPainter get _cursorPainter => CursorPainter(
+  CursorPainter get cursorPainter => CursorPainter(
         editable: body!,
         style: _cursorController.style,
         cursorPrototype: _caretPrototype,
@@ -699,7 +710,7 @@ class RenderEditableTextLine extends RenderEditableBox {
       offset: selection!.extentOffset - node.documentOffset,
       affinity: selection!.base.affinity,
     );
-    _cursorPainter.paint(context.canvas, effectiveOffset, position);
+    cursorPainter.paint(context.canvas, effectiveOffset, position);
   }
 
 // End render box overrides

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
 
+import 'cursor_painter.dart';
+
 /// A common interface to render boxes which represent a piece of rich text
 /// content.
 ///
@@ -132,6 +134,12 @@ abstract class RenderEditableBox extends RenderBox {
   /// The `selection` parameter is expected to be in local offsets to this
   /// render object's [node].
   TextSelectionPoint getExtentEndpointForSelection(TextSelection selection);
+
+  /// Returns the [Rect] in local coordinates for the caret at the given text
+  /// position.
+  Rect getLocalRectForCaret(TextPosition globalToLocalPosition);
+
+  CursorPainter? get cursorPainter;
 }
 
 class EditableContainerParentData
@@ -260,6 +268,22 @@ class RenderEditableContainerBox extends RenderBox
       child = childAfter(child);
     }
     throw StateError('No child at offset $offset.');
+  }
+
+  /// Returns a child's top relative to the [RenderEditableContainerBox]
+  /// The offset is the top bound of the child
+  double getChildTop(RenderEditableBox child) {
+    _resolvePadding();
+    var candidate = firstChild;
+    var dy = resolvedPadding!.top;
+    print(dy);
+    while (candidate != null) {
+      if (candidate == child) return dy;
+      dy += candidate.size.height;
+      print(dy);
+      candidate = childAfter(candidate);
+    }
+    throw StateError('No such child $child');
   }
 
   // Start RenderBox overrides

@@ -77,7 +77,7 @@ class CursorPainter {
     }
 
     caretRect = caretRect.shift(
-        _getPixelPerfectCursorOffset(editable, caretRect, devicePixelRatio));
+        getPixelPerfectCursorOffset(caretRect));
 
     if (style.radius == null) {
       canvas.drawRect(caretRect, paint);
@@ -88,8 +88,7 @@ class CursorPainter {
     }
   }
 
-  Offset _getPixelPerfectCursorOffset(
-      RenderContentProxyBox editable, Rect caretRect, double devicePixelRatio) {
+  Offset getPixelPerfectCursorOffset(Rect caretRect) {
     final Offset caretPosition = editable.localToGlobal(caretRect.topLeft);
     final double pixelMultiple = 1.0 / devicePixelRatio;
     final double pixelPerfectOffsetX = caretPosition.dx.isFinite

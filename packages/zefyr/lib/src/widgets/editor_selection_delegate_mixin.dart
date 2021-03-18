@@ -29,10 +29,9 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
 
   @override
   void bringIntoView(TextPosition position) {
-    // TODO : move caretPrototype to this class and add to getOffsetForPosition
-    final rect = renderEditor.getLocalRectForCaret(position, Rect.zero);
-    final targetOffset = _getOffsetToRevealCaret(rect, position);
-    // print(targetOffset);
+    final localRect = renderEditor.getLocalRectForCaret(position);
+    final targetOffset = _getOffsetToRevealCaret(localRect, position);
+
     scrollController.jumpTo(targetOffset.offset);
     renderEditor.showOnScreen(rect: targetOffset.rect);
   }
