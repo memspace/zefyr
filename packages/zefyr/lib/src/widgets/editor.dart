@@ -7,6 +7,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/widgets/single-child-scroll-view.dart';
 import 'package:zefyr/src/widgets/baseline_proxy.dart';
 
 import '../rendering/editor.dart';
@@ -671,8 +672,6 @@ abstract class EditorState extends State<RawEditor> {
   void hideToolbar();
 
   void requestKeyboard();
-
-
 }
 
 class RawEditorState extends EditorState
@@ -767,7 +766,7 @@ class RawEditorState extends EditorState
     return true;
   }
 
-  void _updateSelectionOverlayForScroll() {
+  void _handleScroll() {
     _selectionOverlay?.updateForScroll();
   }
 
@@ -782,7 +781,7 @@ class RawEditorState extends EditorState
     widget.controller.addListener(_didChangeTextEditingValue);
 
     scrollController = widget.scrollController ?? ScrollController();
-    scrollController.addListener(_updateSelectionOverlayForScroll);
+    scrollController.addListener(_handleScroll);
 
     // Cursor
     _cursorController = CursorController(
@@ -851,9 +850,9 @@ class RawEditorState extends EditorState
 
     if (widget.scrollController != null &&
         widget.scrollController != scrollController) {
-      scrollController.removeListener(_updateSelectionOverlayForScroll);
+      scrollController.removeListener(_handleScroll);
       scrollController = widget.scrollController!;
-      scrollController.addListener(_updateSelectionOverlayForScroll);
+      scrollController.addListener(_handleScroll);
     }
 
     if (widget.focusNode != oldWidget.focusNode) {
@@ -1060,9 +1059,9 @@ class RawEditorState extends EditorState
     Widget child = CompositedTransformTarget(
       link: _toolbarLayerLink,
       child: Semantics(
-//            onCopy: _semanticsOnCopy(controls),
-//            onCut: _semanticsOnCut(controls),
-//            onPaste: _semanticsOnPaste(controls),
+        // onCopy: _semanticsOnCopy(controls),
+        // onCut: _semanticsOnCut(controls),
+        // onPaste: _semanticsOnPaste(controls),
         child: _Editor(
           key: _editorKey,
           document: widget.controller.document,
@@ -1090,10 +1089,25 @@ class RawEditorState extends EditorState
       child = BaselineProxy(
         textStyle: _themeData.paragraph?.style,
         padding: baselinePadding,
-        child: SingleChildScrollView(
+        child: ZefyrSingleChildScrollView(
           controller: scrollController,
           physics: widget.scrollPhysics,
-          child: child,
+          viewportBuilder: (_, offset) => CompositedTransformTarget(
+            link: _toolbarLayerLink,
+            child: _Editor(
+              key: _editorKey,
+              offset: offset,
+              document: widget.controller.document,
+              selection: widget.controller.selection,
+              hasFocus: _hasFocus,
+              textDirection: _textDirection,
+              startHandleLayerLink: _startHandleLayerLink,
+              endHandleLayerLink: _endHandleLayerLink,
+              onSelectionChanged: _handleSelectionChanged,
+              padding: widget.padding,
+              children: _buildChildren(context),
+            ),
+          ),
         ),
       );
     }
@@ -1160,7 +1174,6 @@ class RawEditorState extends EditorState
     return result;
   }
 
-  // TODO: If no theme return VerticalSpacing.zero() instead of asserting
   VerticalSpacing _getSpacingForLine(LineNode node, ZefyrThemeData theme) {
     final style = node.style.get(NotusAttribute.heading);
     if (style == NotusAttribute.heading.level1) {
@@ -1193,6 +1206,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   _Editor({
     required Key key,
     required List<Widget> children,
+    ViewportOffset? this.offset,
     required this.document,
     required this.textDirection,
     required this.hasFocus,
@@ -1203,6 +1217,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     this.padding = EdgeInsets.zero,
   }) : super(key: key, children: children);
 
+  final ViewportOffset? offset;
   final NotusDocument document;
   final TextDirection textDirection;
   final bool hasFocus;
@@ -1215,6 +1230,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   @override
   RenderEditor createRenderObject(BuildContext context) {
     return RenderEditor(
+      offset: offset,
       document: document,
       textDirection: textDirection,
       hasFocus: hasFocus,
@@ -1229,6 +1245,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, covariant RenderEditor renderObject) {
+    renderObject.offset = offset;
     renderObject.document = document;
     renderObject.node = document.root;
     renderObject.textDirection = textDirection;
