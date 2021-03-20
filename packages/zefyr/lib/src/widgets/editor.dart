@@ -7,6 +7,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/widgets/ZefyrSingleChildScrollView.dart';
 import 'package:zefyr/src/widgets/baseline_proxy.dart';
 
 import '../rendering/editor.dart';
@@ -348,7 +349,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
         case TargetPlatform.macOS:
-        renderEditor?.selectPositionAt(
+          renderEditor?.selectPositionAt(
             from: details.globalPosition,
             cause: SelectionChangedCause.longPress,
           );
@@ -357,7 +358,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-        renderEditor?.selectWordsInRange(
+          renderEditor?.selectWordsInRange(
             from: details.globalPosition - details.offsetFromOrigin,
             to: details.globalPosition,
             cause: SelectionChangedCause.longPress,
@@ -417,7 +418,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-        renderEditor?.selectPosition(cause: SelectionChangedCause.tap);
+          renderEditor?.selectPosition(cause: SelectionChangedCause.tap);
           break;
       }
     }
@@ -432,7 +433,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
         case TargetPlatform.macOS:
-        renderEditor?.selectPositionAt(
+          renderEditor?.selectPositionAt(
             from: details.globalPosition,
             cause: SelectionChangedCause.longPress,
           );
@@ -441,7 +442,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-        renderEditor?.selectWord(cause: SelectionChangedCause.longPress);
+          renderEditor?.selectWord(cause: SelectionChangedCause.longPress);
           Feedback.forLongPress(_state.context);
           break;
       }
@@ -656,6 +657,8 @@ class RawEditor extends StatefulWidget {
 ///   * [RawEditorStateSelectionDelegateMixin]
 ///
 abstract class EditorState extends State<RawEditor> {
+  ScrollController get scrollController;
+
   TextEditingValue get textEditingValue;
 
   set textEditingValue(TextEditingValue value);
@@ -697,7 +700,8 @@ class RawEditorState extends EditorState
   EditorTextSelectionOverlay? get selectionOverlay => _selectionOverlay;
   EditorTextSelectionOverlay? _selectionOverlay;
 
-  late ScrollController _scrollController;
+  @override
+  late ScrollController scrollController;
 
   final ClipboardStatusNotifier? _clipboardStatus =
       kIsWeb ? null : ClipboardStatusNotifier();
@@ -762,7 +766,7 @@ class RawEditorState extends EditorState
     return true;
   }
 
-  void _updateSelectionOverlayForScroll() {
+  void _handleScroll() {
     _selectionOverlay?.updateForScroll();
   }
 
@@ -776,8 +780,8 @@ class RawEditorState extends EditorState
 
     widget.controller.addListener(_didChangeTextEditingValue);
 
-    _scrollController = widget.scrollController ?? ScrollController();
-    _scrollController.addListener(_updateSelectionOverlayForScroll);
+    scrollController = widget.scrollController ?? ScrollController();
+    scrollController.addListener(_handleScroll);
 
     // Cursor
     _cursorController = CursorController(
@@ -845,10 +849,10 @@ class RawEditorState extends EditorState
     }
 
     if (widget.scrollController != null &&
-        widget.scrollController != _scrollController) {
-      _scrollController.removeListener(_updateSelectionOverlayForScroll);
-      _scrollController = widget.scrollController!;
-      _scrollController.addListener(_updateSelectionOverlayForScroll);
+        widget.scrollController != scrollController) {
+      scrollController.removeListener(_handleScroll);
+      scrollController = widget.scrollController!;
+      scrollController.addListener(_handleScroll);
     }
 
     if (widget.focusNode != oldWidget.focusNode) {
@@ -1022,16 +1026,16 @@ class RawEditorState extends EditorState
       assert(viewport != null);
       final editorOffset =
           renderEditor.localToGlobal(Offset(0.0, 0.0), ancestor: viewport);
-      final offsetInViewport = _scrollController.offset + editorOffset.dy;
+      final offsetInViewport = scrollController.offset + editorOffset.dy;
 
       final offset = renderEditor.getOffsetToRevealCursor(
-        _scrollController.position.viewportDimension,
-        _scrollController.offset,
+        scrollController.position.viewportDimension,
+        scrollController.offset,
         offsetInViewport,
       );
 
       if (offset != null) {
-        _scrollController.animateTo(
+        scrollController.animateTo(
           offset,
           duration: _caretAnimationDuration,
           curve: _caretAnimationCurve,
@@ -1055,12 +1059,11 @@ class RawEditorState extends EditorState
     Widget child = CompositedTransformTarget(
       link: _toolbarLayerLink,
       child: Semantics(
-//            onCopy: _semanticsOnCopy(controls),
-//            onCut: _semanticsOnCut(controls),
-//            onPaste: _semanticsOnPaste(controls),
+        // onCopy: _semanticsOnCopy(controls),
+        // onCut: _semanticsOnCut(controls),
+        // onPaste: _semanticsOnPaste(controls),
         child: _Editor(
           key: _editorKey,
-          children: _buildChildren(context),
           document: widget.controller.document,
           selection: widget.controller.selection,
           hasFocus: _hasFocus,
@@ -1069,6 +1072,7 @@ class RawEditorState extends EditorState
           endHandleLayerLink: _endHandleLayerLink,
           onSelectionChanged: _handleSelectionChanged,
           padding: widget.padding,
+          children: _buildChildren(context),
         ),
       ),
     );
@@ -1085,10 +1089,25 @@ class RawEditorState extends EditorState
       child = BaselineProxy(
         textStyle: _themeData.paragraph?.style,
         padding: baselinePadding,
-        child: SingleChildScrollView(
-          controller: _scrollController,
+        child: ZefyrSingleChildScrollView(
+          controller: scrollController,
           physics: widget.scrollPhysics,
-          child: child,
+          viewportBuilder: (_, offset) => CompositedTransformTarget(
+            link: _toolbarLayerLink,
+            child: _Editor(
+              key: _editorKey,
+              offset: offset,
+              document: widget.controller.document,
+              selection: widget.controller.selection,
+              hasFocus: _hasFocus,
+              textDirection: _textDirection,
+              startHandleLayerLink: _startHandleLayerLink,
+              endHandleLayerLink: _endHandleLayerLink,
+              onSelectionChanged: _handleSelectionChanged,
+              padding: widget.padding,
+              children: _buildChildren(context),
+            ),
+          ),
         ),
       );
     }
@@ -1155,7 +1174,6 @@ class RawEditorState extends EditorState
     return result;
   }
 
-  // TODO: If no theme return VerticalSpacing.zero() instead of asserting
   VerticalSpacing _getSpacingForLine(LineNode node, ZefyrThemeData theme) {
     final style = node.style.get(NotusAttribute.heading);
     if (style == NotusAttribute.heading.level1) {
@@ -1188,6 +1206,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   _Editor({
     required Key key,
     required List<Widget> children,
+    ViewportOffset? this.offset,
     required this.document,
     required this.textDirection,
     required this.hasFocus,
@@ -1198,6 +1217,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     this.padding = EdgeInsets.zero,
   }) : super(key: key, children: children);
 
+  final ViewportOffset? offset;
   final NotusDocument document;
   final TextDirection textDirection;
   final bool hasFocus;
@@ -1210,6 +1230,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   @override
   RenderEditor createRenderObject(BuildContext context) {
     return RenderEditor(
+      offset: offset,
       document: document,
       textDirection: textDirection,
       hasFocus: hasFocus,
@@ -1224,6 +1245,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, covariant RenderEditor renderObject) {
+    renderObject.offset = offset;
     renderObject.document = document;
     renderObject.node = document.root;
     renderObject.textDirection = textDirection;

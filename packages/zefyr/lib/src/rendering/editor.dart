@@ -18,6 +18,7 @@ typedef TextSelectionChangedHandler = void Function(
 /// Base interface for editable render objects.
 abstract class RenderAbstractEditor {
   TextSelection selectWordAtPosition(TextPosition position);
+
   TextSelection selectLineAtPosition(TextPosition position);
 
   /// Returns preferred line height at specified `position` in text.
@@ -91,6 +92,7 @@ abstract class RenderAbstractEditor {
 class RenderEditor extends RenderEditableContainerBox
     implements RenderAbstractEditor {
   RenderEditor({
+    ViewportOffset? offset,
     List<RenderEditableBox>? children,
     required NotusDocument document,
     required TextDirection textDirection,
@@ -116,8 +118,8 @@ class RenderEditor extends RenderEditableContainerBox
         );
 
   NotusDocument _document;
+
   set document(NotusDocument value) {
-    assert(value != null);
     if (_document == value) {
       return;
     }
@@ -128,13 +130,26 @@ class RenderEditor extends RenderEditableContainerBox
   /// Whether the editor is currently focused.
   bool get hasFocus => _hasFocus;
   bool _hasFocus = false;
+
   set hasFocus(bool value) {
-    assert(value != null);
     if (_hasFocus == value) {
       return;
     }
     _hasFocus = value;
     markNeedsSemanticsUpdate();
+  }
+
+  Offset get _paintOffset => Offset(0.0, -(offset?.pixels ?? 0.0));
+
+  ViewportOffset? get offset => _offset;
+  ViewportOffset? _offset;
+
+  set offset(ViewportOffset? value) {
+    if (_offset == value) return;
+    if (attached) _offset?.removeListener(markNeedsPaint);
+    _offset = value;
+    if (attached) _offset?.addListener(markNeedsPaint);
+    markNeedsLayout();
   }
 
   /// The region of text that is selected, if any.
@@ -145,6 +160,7 @@ class RenderEditor extends RenderEditableContainerBox
   /// manipulate the selection will throw.
   TextSelection get selection => _selection;
   TextSelection _selection;
+
   set selection(TextSelection value) {
     if (_selection == value) return;
     _selection = value;
@@ -157,6 +173,7 @@ class RenderEditor extends RenderEditableContainerBox
   /// [LayerLink], which will be used as [CompositedTransformTarget] of start handle.
   LayerLink get startHandleLayerLink => _startHandleLayerLink;
   LayerLink _startHandleLayerLink;
+
   set startHandleLayerLink(LayerLink value) {
     if (_startHandleLayerLink == value) return;
     _startHandleLayerLink = value;
@@ -169,6 +186,7 @@ class RenderEditor extends RenderEditableContainerBox
   /// [LayerLink], which will be used as [CompositedTransformTarget] of end handle.
   LayerLink get endHandleLayerLink => _endHandleLayerLink;
   LayerLink _endHandleLayerLink;
+
   set endHandleLayerLink(LayerLink value) {
     if (_endHandleLayerLink == value) return;
     _endHandleLayerLink = value;
@@ -187,7 +205,7 @@ class RenderEditor extends RenderEditableContainerBox
   /// visible on the screen.
   ValueListenable<bool> get selectionStartInViewport =>
       _selectionStartInViewport;
-  // TODO: implement selectionStartInViewport
+
   final ValueNotifier<bool> _selectionStartInViewport =
       ValueNotifier<bool>(true);
 
@@ -201,9 +219,42 @@ class RenderEditor extends RenderEditableContainerBox
   /// This bool indicates whether the text is scrolled so that the handle is
   /// inside the text field viewport, as opposed to whether it is actually
   /// visible on the screen.
-  // TODO: implement selectionEndInViewport
   ValueListenable<bool> get selectionEndInViewport => _selectionEndInViewport;
   final ValueNotifier<bool> _selectionEndInViewport = ValueNotifier<bool>(true);
+
+  void _updateSelectionExtentsVisibility(Offset effectiveOffset) {
+    final visibleRegion = Offset.zero & size;
+    final startPosition =
+        TextPosition(offset: selection.start, affinity: selection.affinity);
+    final startOffset = _getOffsetForCaret(startPosition);
+    // TODO(justinmc): https://github.com/flutter/flutter/issues/31495
+    // Check if the selection is visible with an approximation because a
+    // difference between rounded and unrounded values causes the caret to be
+    // reported as having a slightly (< 0.5) negative y offset. This rounding
+    // happens in paragraph.cc's layout and TextPainer's
+    // _applyFloatingPointHack. Ideally, the rounding mismatch will be fixed and
+    // this can be changed to be a strict check instead of an approximation.
+    const visibleRegionSlop = 0.5;
+    _selectionStartInViewport.value = visibleRegion
+        .inflate(visibleRegionSlop)
+        .contains(startOffset + effectiveOffset);
+
+    final endPosition =
+        TextPosition(offset: selection.end, affinity: selection.affinity);
+    final endOffset = _getOffsetForCaret(endPosition);
+    _selectionEndInViewport.value = visibleRegion
+        .inflate(visibleRegionSlop)
+        .contains(endOffset + effectiveOffset);
+  }
+
+  Offset _getOffsetForCaret(TextPosition position) {
+    final child = childAtPosition(position);
+    final childPosition = child.globalToLocalPosition(position);
+    assert(childPosition != null);
+    final boxParentData = child.parentData as BoxParentData;
+    final localOffsetForCaret = child.getOffsetForCaret(childPosition!);
+    return boxParentData.offset + localOffsetForCaret;
+  }
 
   /// Finds the closest scroll offset that fully reveals the editing cursor.
   ///
@@ -228,8 +279,8 @@ class RenderEditor extends RenderEditableContainerBox
     if (endpoints.length == 1) {
       // Collapsed selection => caret
       final child = childAtPosition(selection.extent);
-      final childPosition =
-          TextPosition(offset: selection.extentOffset - child.node.offset);
+      final childPosition = TextPosition(
+          offset: selection.extentOffset - child.node.documentOffset);
       final caretTop = endpoints.single.point.dy -
           child.preferredLineHeight(childPosition) -
           kMargin +
@@ -323,8 +374,6 @@ class RenderEditor extends RenderEditableContainerBox
     Offset? to,
     required SelectionChangedCause cause,
   }) {
-    assert(cause != null);
-    assert(from != null);
     // _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
     if (onSelectionChanged == null) {
       return;
@@ -384,8 +433,6 @@ class RenderEditor extends RenderEditableContainerBox
     Offset? to,
     required SelectionChangedCause cause,
   }) {
-    assert(cause != null);
-    assert(from != null);
     // _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
     if (onSelectionChanged == null) {
       return;
@@ -466,7 +513,7 @@ class RenderEditor extends RenderEditableContainerBox
     return TextSelection(baseOffset: line.start, extentOffset: line.end);
   }
 
-  // Call through to onSelectionChanged.
+// Call through to onSelectionChanged.
   void _handleSelectionChange(
     TextSelection nextSelection,
     SelectionChangedCause cause,
@@ -488,7 +535,7 @@ class RenderEditor extends RenderEditableContainerBox
     }
   }
 
-  // Start RenderBox implementation
+// Start RenderBox implementation
 
   @override
   void attach(PipelineOwner owner) {
@@ -509,6 +556,7 @@ class RenderEditor extends RenderEditableContainerBox
   @override
   void paint(PaintingContext context, Offset offset) {
     defaultPaint(context, offset);
+    _updateSelectionExtentsVisibility(offset + _paintOffset);
     _paintHandleLayers(context, getEndpointsForSelection(selection));
   }
 
@@ -564,5 +612,19 @@ class RenderEditor extends RenderEditableContainerBox
       offset: localPosition.offset + child.node.offset,
       affinity: localPosition.affinity,
     );
+  }
+
+  Rect getLocalRectForCaret(TextPosition position) {
+    final targetChild = childAtPosition(position);
+    final localPosition = targetChild.globalToLocalPosition(position);
+
+    assert(localPosition != null);
+    final childLocalRect = targetChild.getLocalRectForCaret(localPosition!);
+
+    final boxParentData = targetChild.parentData as BoxParentData;
+    final rect = childLocalRect.shift(Offset(0, boxParentData.offset.dy));
+    final perfectOffset =
+        targetChild.cursorPainter?.getPixelPerfectCursorOffset(rect);
+    return perfectOffset != null ? rect.shift(perfectOffset) : rect;
   }
 }
