@@ -427,6 +427,7 @@ class _TextSelectionHandleOverlayState
   }
 
   void _handleVisibilityChanged() {
+    print('Show handle ${widget._visibility.value}');
     if (widget._visibility.value) {
       _controller.forward();
     } else {
