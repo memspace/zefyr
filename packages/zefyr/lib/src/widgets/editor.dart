@@ -7,7 +7,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
-import 'package:zefyr/src/widgets/ZefyrSingleChildScrollView.dart';
 import 'package:zefyr/src/widgets/baseline_proxy.dart';
 
 import '../rendering/editor.dart';
@@ -19,6 +18,7 @@ import 'editable_text_line.dart';
 import 'editor_input_client_mixin.dart';
 import 'editor_keyboard_mixin.dart';
 import 'editor_selection_delegate_mixin.dart';
+import 'single-child-scroll-view.dart';
 import 'text_line.dart';
 import 'text_selection.dart';
 import 'theme.dart';

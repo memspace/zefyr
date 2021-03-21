@@ -27,7 +27,6 @@ class CursorPainter {
 
   /// Paints cursor on [canvas] at specified [textPosition].
   void paint(Canvas canvas, Offset effectiveOffset, TextPosition textPosition) {
-
     final paint = Paint()..color = effectiveColor;
     final Offset caretOffset =
         editable.getOffsetForCaret(textPosition, cursorPrototype) +
@@ -63,9 +62,9 @@ class CursorPainter {
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-        // Override the height to take the full height of the glyph at the TextPosition
-        // when not on iOS. iOS has special handling that creates a taller caret.
-        // TODO(garyq): See the TODO for _computeCaretPrototype().
+          // Override the height to take the full height of the glyph at the TextPosition
+          // when not on iOS. iOS has special handling that creates a taller caret.
+          // TODO(garyq): See the TODO for _computeCaretPrototype().
           caretRect = Rect.fromLTWH(
             caretRect.left,
             caretRect.top - _kCaretHeightOffset,
@@ -76,8 +75,7 @@ class CursorPainter {
       }
     }
 
-    caretRect = caretRect.shift(
-        getPixelPerfectCursorOffset(caretRect));
+    caretRect = caretRect.shift(getPixelPerfectCursorOffset(caretRect));
 
     if (style.radius == null) {
       canvas.drawRect(caretRect, paint);
