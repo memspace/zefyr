@@ -77,7 +77,7 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
   }
 
   @override
-  Delta apply(Delta document, int index, int replaceLength, Object data);
+  Delta apply(Delta document, int index, int replaceLength, Object data) {
     if (data is! String) return null;
 
     final text = data as String;
@@ -120,7 +120,7 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
   const ResetLineFormatOnNewLineRule();
 
   @override
-  Delta apply(Delta document, int index, int replaceLength, Object data);
+  Delta apply(Delta document, int index, int replaceLength, Object data) {
     if (data is! String) return null;
 
     final text = data as String;

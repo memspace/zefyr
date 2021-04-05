@@ -115,7 +115,7 @@ class TextLine extends StatelessWidget {
     if (style.contains(NotusAttribute.strikethrough)) {
       result = _mergeTextStyleWithDecoration(result, theme.strikethrough);
     }
-    if (style.contains(NotusAttribute.mark)) {
+    if (style.contains(NotusAttribute.code)) {
       result = _mergeTextStyleWithDecoration(result, theme.mark);
     }
     return result;
