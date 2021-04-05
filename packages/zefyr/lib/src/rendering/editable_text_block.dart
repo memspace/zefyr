@@ -16,6 +16,7 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
     List<RenderEditableBox> children,
     @required BlockNode node,
     @required TextDirection textDirection,
+    double scrollBottomInset,
     @required EdgeInsetsGeometry padding,
     @required Decoration decoration,
     ImageConfiguration configuration = ImageConfiguration.empty,
@@ -33,6 +34,7 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
           children: children,
           node: node,
           textDirection: textDirection,
+          scrollBottomInset: scrollBottomInset,
           padding: padding.add(contentPadding),
         );
 

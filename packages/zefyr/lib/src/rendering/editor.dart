@@ -98,6 +98,7 @@ class RenderEditor extends RenderEditableContainerBox
     @required TextSelection selection,
     @required LayerLink startHandleLayerLink,
     @required LayerLink endHandleLayerLink,
+    @required double scrollBottomInset,
     @required EdgeInsetsGeometry padding,
     TextSelectionChangedHandler onSelectionChanged,
     EdgeInsets floatingCursorAddedMargin =
@@ -115,6 +116,7 @@ class RenderEditor extends RenderEditableContainerBox
           children: children,
           node: document.root,
           textDirection: textDirection,
+          scrollBottomInset: scrollBottomInset,
           padding: padding,
         );
 
@@ -236,9 +238,10 @@ class RenderEditor extends RenderEditableContainerBox
       final caretTop = endpoints.single.point.dy -
           child.preferredLineHeight(childPosition) -
           kMargin +
-          offsetInViewport;
+          offsetInViewport +
+          scrollBottomInset;
       final caretBottom =
-          endpoints.single.point.dy + kMargin + offsetInViewport;
+          endpoints.single.point.dy + kMargin + offsetInViewport + scrollBottomInset;
       double dy;
       if (caretTop < scrollOffset) {
         dy = caretTop;
@@ -310,6 +313,10 @@ class RenderEditor extends RenderEditableContainerBox
   }
 
   Offset /*?*/ _lastTapDownPosition;
+
+  void resetTapDownStatus() {
+    _lastTapDownPosition = null;
+  }
 
   @override
   void handleTapDown(TapDownDetails details) {
@@ -416,11 +423,17 @@ class RenderEditor extends RenderEditableContainerBox
 
   @override
   void selectWord({@required SelectionChangedCause cause}) {
+    if (_lastTapDownPosition == null) {
+      return;
+    }
     selectWordsInRange(from: _lastTapDownPosition, cause: cause);
   }
 
   @override
   void selectPosition({@required SelectionChangedCause cause}) {
+    if (_lastTapDownPosition == null) {
+      return;
+    }
     selectPositionAt(from: _lastTapDownPosition, cause: cause);
   }
 
