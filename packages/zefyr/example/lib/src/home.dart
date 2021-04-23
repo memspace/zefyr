@@ -159,7 +159,31 @@ class _HomePageState extends State<HomePage> {
   Widget _buildWelcomeEditor(BuildContext context) {
     return Column(
       children: [
-        ZefyrToolbar.basic(controller: _controller),
+        ZefyrToolbar(children: [
+          ZIconButton(
+            highlightElevation: 0,
+            hoverElevation: 0,
+            size: 32,
+            icon: Icon(
+              Icons.image,
+              size: 18,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            fillColor: Theme.of(context).canvasColor,
+            onPressed: () {
+              final index = _controller.selection.baseOffset;
+              final length = _controller.selection.extentOffset - index;
+              _controller.replaceText(
+                  index,
+                  length,
+                  BlockEmbed.image(
+                      'https://firebasestorage.googleapis.com/v0/b/hokutoapp-jp.appspot.com/o/admin%2Fsample-notes%2Fintroduce%2F2.png?alt=media&token=5c054a6a-fb45-43ff-9a83-87f2dec7a568'));
+            },
+          ),
+          ...ZefyrToolbar.basic(
+            controller: _controller,
+          ).children
+        ]),
         Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
         Expanded(
           child: Container(
@@ -169,6 +193,35 @@ class _HomePageState extends State<HomePage> {
               controller: _controller,
               focusNode: _focusNode,
               autofocus: true,
+              embedBuilder: (context, node) {
+                if (node.value.type == 'hr') {
+                  final theme = ZefyrTheme.of(context);
+                  assert(
+                      theme.paragraph != null, 'Paragraph theme must be set');
+                  return Divider(
+                    height: theme.paragraph.style.fontSize *
+                        theme.paragraph.style.height,
+                    thickness: 2,
+                    color: Colors.grey.shade200,
+                  );
+                }
+                if (node.value.type == 'image') {
+                  return Image.network(
+                    node.value.data['source'] as String,
+                    fit: BoxFit.fitWidth,
+                    loadingBuilder: (context, widget, event) => event == null
+                        ? widget
+                        : SizedBox(
+                            width: 200,
+                            height: 200,
+                          ),
+                  );
+                }
+                throw UnimplementedError(
+                    'Embeddable type "${node.value.type}" is not supported by default embed '
+                    'builder of ZefyrEditor. You must pass your own builder function to '
+                    'embedBuilder property of ZefyrEditor or ZefyrField widgets.');
+              },
               // readOnly: true,
               // padding: EdgeInsets.only(left: 16, right: 16),
               onLaunchUrl: _launchUrl,

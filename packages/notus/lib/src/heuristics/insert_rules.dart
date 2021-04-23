@@ -444,6 +444,8 @@ class InsertEmbedsRule extends InsertRule {
 
   @override
   Delta apply(Delta document, int index, int replaceLength, Object data) {
+    // TODO: imageとか入れた時にここに入ってくる
+
     // We are only interested in embeddable objects.
     if (data is String) return null;
 
@@ -467,11 +469,11 @@ class InsertEmbedsRule extends InsertRule {
     // and insert our embed.
     final lineStyle = _getLineStyle(iter, target);
     if (!isNewlineBefore) {
-      result..insert('\n', lineStyle);
+      result.insert('\n', lineStyle);
     }
-    result..insert(data);
+    result.insert(data);
     if (!isNewlineAfter) {
-      result..insert('\n');
+      result.insert('\n');
     }
     return result;
   }
