@@ -41,7 +41,7 @@ class TextLine extends StatelessWidget {
       textStyle: text.style,
       textDirection: textDirection,
       strutStyle: strutStyle,
-      locale: Localizations.localeOf(context, nullOk: true),
+      locale: Localizations.localeOf(context),
       child: RichText(
         text: buildText(context, node),
         textDirection: textDirection,
@@ -114,6 +114,9 @@ class TextLine extends StatelessWidget {
     }
     if (style.contains(NotusAttribute.strikethrough)) {
       result = _mergeTextStyleWithDecoration(result, theme.strikethrough);
+    }
+    if (style.contains(NotusAttribute.code)) {
+      result = _mergeTextStyleWithDecoration(result, theme.mark);
     }
     return result;
   }

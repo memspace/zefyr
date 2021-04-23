@@ -7,11 +7,13 @@ const double kToolbarHeight = 56.0;
 
 class InsertEmbedButton extends StatelessWidget {
   final ZefyrController controller;
+  final Color fillColor;
   final IconData icon;
 
   const InsertEmbedButton({
     Key key,
     @required this.controller,
+    this.fillColor,
     @required this.icon,
   }) : super(key: key);
   @override
@@ -25,7 +27,7 @@ class InsertEmbedButton extends StatelessWidget {
         size: 18,
         color: Theme.of(context).iconTheme.color,
       ),
-      fillColor: Theme.of(context).canvasColor,
+      fillColor: fillColor,
       onPressed: () {
         final index = controller.selection.baseOffset;
         final length = controller.selection.extentOffset - index;
@@ -153,6 +155,7 @@ class _LinkDialogState extends State<_LinkDialog> {
 typedef ToggleStyleButtonBuilder = Widget Function(
   BuildContext context,
   NotusAttribute attribute,
+  Color fillColor,
   IconData icon,
   bool isToggled,
   VoidCallback onPressed,
@@ -162,6 +165,9 @@ typedef ToggleStyleButtonBuilder = Widget Function(
 class ToggleStyleButton extends StatefulWidget {
   /// The style attribute controlled by this button.
   final NotusAttribute attribute;
+
+  /// The fill color of the button
+  final Color fillColor;
 
   /// The icon representing the style [attribute].
   final IconData icon;
@@ -175,6 +181,7 @@ class ToggleStyleButton extends StatefulWidget {
   ToggleStyleButton({
     Key key,
     @required this.attribute,
+    this.fillColor,
     @required this.icon,
     @required this.controller,
     this.childBuilder = defaultToggleStyleButtonBuilder,
@@ -233,8 +240,8 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
         _selectionStyle.containsSame(NotusAttribute.block.code);
     final isEnabled =
         !isInCodeBlock || widget.attribute == NotusAttribute.block.code;
-    return widget.childBuilder(context, widget.attribute, widget.icon,
-        _isToggled, isEnabled ? _toggleAttribute : null);
+    return widget.childBuilder(context, widget.attribute, widget.fillColor,
+        widget.icon, _isToggled, isEnabled ? _toggleAttribute : null);
   }
 
   void _toggleAttribute() {
@@ -250,6 +257,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
 Widget defaultToggleStyleButtonBuilder(
   BuildContext context,
   NotusAttribute attribute,
+  Color fillColor,
   IconData icon,
   bool isToggled,
   VoidCallback onPressed,
@@ -261,12 +269,12 @@ Widget defaultToggleStyleButtonBuilder(
           ? theme.primaryIconTheme.color
           : theme.iconTheme.color
       : theme.disabledColor;
-  final fillColor = isToggled ? theme.toggleableActiveColor : theme.canvasColor;
+  fillColor = isToggled ? theme.toggleableActiveColor : fillColor;
   return ZIconButton(
     highlightElevation: 0,
     hoverElevation: 0,
-    size: 32,
-    icon: Icon(icon, size: 18, color: iconColor),
+    size: 36,
+    icon: Icon(icon, size: 22, color: iconColor),
     fillColor: fillColor,
     onPressed: onPressed,
   );
@@ -386,10 +394,23 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
 
   const ZefyrToolbar({Key key, @required this.children}) : super(key: key);
 
-  factory ZefyrToolbar.basic({Key key, @required ZefyrController controller, bool hideBoldButton=false, bool hideItalicButton=false, bool hideUnderLineButton=false, bool hideStrikeThrough=false, bool hideHeadingStyle=false, bool hideListNumbers=false, bool hideListBullets=false, bool hideCodeBlock=false, bool hideQuote=false, bool hideLink=false, bool hideHorizontalRule=false}) {
+  factory ZefyrToolbar.basic(
+      {Key key,
+      @required ZefyrController controller,
+      bool hideBoldButton = false,
+      bool hideItalicButton = false,
+      bool hideUnderLineButton = false,
+      bool hideStrikeThrough = false,
+      bool hideHeadingStyle = false,
+      bool hideListNumbers = false,
+      bool hideListBullets = false,
+      bool hideCodeBlock = false,
+      bool hideQuote = false,
+      bool hideLink = false,
+      bool hideHorizontalRule = false}) {
     return ZefyrToolbar(key: key, children: [
       Visibility(
-        visible: hideBoldButton,
+        visible: !hideBoldButton,
         child: ToggleStyleButton(
           attribute: NotusAttribute.bold,
           icon: Icons.format_bold,
@@ -398,7 +419,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       SizedBox(width: 1),
       Visibility(
-        visible: hideItalicButton,
+        visible: !hideItalicButton,
         child: ToggleStyleButton(
           attribute: NotusAttribute.italic,
           icon: Icons.format_italic,
@@ -407,7 +428,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       SizedBox(width: 1),
       Visibility(
-        visible: hideUnderLineButton,
+        visible: !hideUnderLineButton,
         child: ToggleStyleButton(
           attribute: NotusAttribute.underline,
           icon: Icons.format_underline,
@@ -416,18 +437,23 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       SizedBox(width: 1),
       Visibility(
-        visible: hideStrikeThrough,
+        visible: !hideStrikeThrough,
         child: ToggleStyleButton(
           attribute: NotusAttribute.strikethrough,
           icon: Icons.format_strikethrough,
           controller: controller,
         ),
       ),
-      Visibility(visible: hideHeadingStyle, child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
-      Visibility(visible: hideHeadingStyle, child: SelectHeadingStyleButton(controller: controller)),
+      Visibility(
+          visible: !hideHeadingStyle,
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+      Visibility(
+          visible: !hideHeadingStyle,
+          child: SelectHeadingStyleButton(controller: controller)),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       Visibility(
-        visible: hideListNumbers,
+        visible: !hideListNumbers,
         child: ToggleStyleButton(
           attribute: NotusAttribute.block.numberList,
           controller: controller,
@@ -435,7 +461,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
         ),
       ),
       Visibility(
-        visible: hideListBullets,
+        visible: !hideListBullets,
         child: ToggleStyleButton(
           attribute: NotusAttribute.block.bulletList,
           controller: controller,
@@ -443,7 +469,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
         ),
       ),
       Visibility(
-        visible: hideCodeBlock,
+        visible: !hideCodeBlock,
         child: ToggleStyleButton(
           attribute: NotusAttribute.block.code,
           controller: controller,
@@ -452,19 +478,24 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       Visibility(
           visible: !hideListNumbers && !hideListBullets && !hideCodeBlock,
-          child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
       Visibility(
-        visible: hideQuote,
+        visible: !hideQuote,
         child: ToggleStyleButton(
           attribute: NotusAttribute.block.quote,
           controller: controller,
           icon: Icons.format_quote,
         ),
       ),
-      Visibility(visible: hideQuote, child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
-      Visibility(visible: hideLink, child: LinkStyleButton(controller: controller)),
       Visibility(
-        visible: hideHorizontalRule,
+          visible: !hideQuote,
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+      Visibility(
+          visible: !hideLink, child: LinkStyleButton(controller: controller)),
+      Visibility(
+        visible: !hideHorizontalRule,
         child: InsertEmbedButton(
           controller: controller,
           icon: Icons.horizontal_rule,
