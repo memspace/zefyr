@@ -117,4 +117,12 @@ class BlockEmbed extends EmbeddableObject {
   static final BlockEmbed horizontalRule = BlockEmbed('hr');
   static BlockEmbed image(String source) =>
       BlockEmbed('image', data: {'source': source});
+
+  static BlockEmbed pdf(String source, int size) => BlockEmbed(
+        'pdf',
+        data: {
+          'source': source,
+          'size': size,
+        },
+      );
 }
