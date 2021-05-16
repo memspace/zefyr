@@ -95,7 +95,7 @@ class EditableTextBlock extends StatelessWidget {
     } else if (block == NotusAttribute.block.bulletList) {
       return _BulletPoint(
         style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
-        width: 32,
+        width: 16,
       );
     } else if (block == NotusAttribute.block.code) {
       return _NumberPoint(
@@ -119,7 +119,7 @@ class EditableTextBlock extends StatelessWidget {
     } else if (block == NotusAttribute.block.code) {
       return 32.0;
     } else {
-      return 32.0;
+      return 16.0;
     }
   }
 
@@ -245,9 +245,9 @@ class _NumberPoint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: AlignmentDirectional.topEnd,
-      child: Text(withDot ? '$index.' : '$index', style: style),
       width: width,
       padding: EdgeInsetsDirectional.only(end: padding),
+      child: Text(withDot ? '$index.' : '$index', style: style),
     );
   }
 }
@@ -264,10 +264,10 @@ class _BulletPoint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: AlignmentDirectional.topEnd,
-      child: Text('•', style: style),
+      color: Colors.grey,
+      alignment: AlignmentDirectional.center,
       width: width,
-      padding: EdgeInsetsDirectional.only(end: 13.0),
+      child: Text('•', style: style),
     );
   }
 }
