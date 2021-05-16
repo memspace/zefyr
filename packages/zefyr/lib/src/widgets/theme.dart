@@ -119,25 +119,6 @@ class ZefyrThemeData {
   factory ZefyrThemeData.fallback(BuildContext context) {
     final themeData = Theme.of(context);
     final defaultStyle = DefaultTextStyle.of(context);
-    final baseStyle = defaultStyle.style.copyWith(
-      fontSize: 16.0,
-      height: 1.3,
-    );
-    final baseSpacing = VerticalSpacing(top: 6.0, bottom: 10);
-
-    String fontFamily;
-    switch (themeData.platform) {
-      case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
-        fontFamily = 'Menlo';
-        break;
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.windows:
-      case TargetPlatform.linux:
-        fontFamily = 'Roboto Mono';
-        break;
-    }
 
     return ZefyrThemeData(
       bold: TextStyle(fontWeight: FontWeight.bold),
@@ -150,63 +131,83 @@ class ZefyrThemeData {
         decoration: TextDecoration.underline,
       ),
       paragraph: TextBlockTheme(
-        style: baseStyle,
-        spacing: baseSpacing,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.black,
+          height: 1.3,
+          fontWeight: FontWeight.w400,
+        ),
+        spacing: VerticalSpacing(top: 16.0, bottom: 0),
         // lineSpacing is not relevant for paragraphs since they consist of one line
       ),
       heading1: TextBlockTheme(
         style: defaultStyle.style.copyWith(
-          fontSize: 34.0,
-          color: defaultStyle.style.color.withOpacity(0.70),
+          fontSize: 24.0,
+          color: Colors.black,
           height: 1.15,
-          fontWeight: FontWeight.w300,
+          fontWeight: FontWeight.w700,
         ),
-        spacing: VerticalSpacing(top: 16.0, bottom: 0.0),
+        spacing: VerticalSpacing(top: 40.0, bottom: 0.0),
       ),
       heading2: TextBlockTheme(
         style: TextStyle(
-          fontSize: 24.0,
-          color: defaultStyle.style.color.withOpacity(0.70),
+          fontSize: 20.0,
+          color: Colors.black,
           height: 1.15,
-          fontWeight: FontWeight.normal,
+          fontWeight: FontWeight.w700,
         ),
-        spacing: VerticalSpacing(bottom: 0.0, top: 8.0),
+        spacing: VerticalSpacing(top: 32.0, bottom: 0.0),
       ),
       heading3: TextBlockTheme(
         style: TextStyle(
-          fontSize: 20.0,
-          color: defaultStyle.style.color.withOpacity(0.70),
+          fontSize: 18.0,
+          color: Colors.black,
           height: 1.25,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w700,
         ),
-        spacing: VerticalSpacing(bottom: 0.0, top: 8.0),
+        spacing: VerticalSpacing(top: 24.0, bottom: 0.0),
       ),
       lists: TextBlockTheme(
-        style: baseStyle,
-        spacing: baseSpacing,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.black,
+          height: 1.3,
+          fontWeight: FontWeight.w400,
+        ),
+        spacing: VerticalSpacing(top: 16.0, bottom: 0),
         lineSpacing: VerticalSpacing(bottom: 6),
       ),
       quote: TextBlockTheme(
-        style: TextStyle(color: baseStyle.color.withOpacity(0.6)),
-        spacing: baseSpacing,
+        style: TextStyle(
+          fontWeight: FontWeight.w400,
+          fontSize: 16.0,
+          color: Color(0xff999999),
+        ),
+        spacing: VerticalSpacing(top: 16.0, bottom: 0.0),
         lineSpacing: VerticalSpacing(top: 6, bottom: 2),
         decoration: BoxDecoration(
           border: Border(
-            left: BorderSide(width: 4, color: Colors.grey.shade300),
+            left: BorderSide(
+              width: 4,
+              color: Color(0xffCCCCCC),
+            ),
           ),
         ),
       ),
       code: TextBlockTheme(
         style: TextStyle(
-          color: Colors.blue.shade900.withOpacity(0.9),
-          fontFamily: fontFamily,
-          fontSize: 13.0,
+          color: Colors.black,
+          fontWeight: FontWeight.w400,
+          fontSize: 16.0,
           height: 1.15,
         ),
-        spacing: baseSpacing,
+        spacing: VerticalSpacing(top: 16, bottom: 0),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(2),
+          color: Color(0xffF1F1F1).withAlpha(50),
+          border: Border.all(
+            color: Color(0xffF1F1F1),
+            width: 1,
+          ),
         ),
       ),
     );
