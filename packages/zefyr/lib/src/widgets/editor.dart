@@ -179,11 +179,16 @@ class ZefyrEditor extends StatefulWidget {
   /// Defaults to [defaultZefyrEmbedBuilder].
   final ZefyrEmbedBuilder embedBuilder;
 
-  final bool Function(TapDownDetails details, TextPosition textPosition) onTapDown;
+  final bool Function(TapDownDetails details, TextPosition textPosition)
+      onTapDown;
   final bool Function(TapUpDetails details, TextPosition textPosition) onTapUp;
-  final bool Function(LongPressStartDetails details, TextPosition textPosition) onSingleLongTapStart;
-  final bool Function(LongPressMoveUpdateDetails details, TextPosition textPosition) onSingleLongTapMoveUpdate;
-  final bool Function(LongPressEndDetails details, TextPosition textPosition) onSingleLongTapEnd;
+  final bool Function(LongPressStartDetails details, TextPosition textPosition)
+      onSingleLongTapStart;
+  final bool Function(
+          LongPressMoveUpdateDetails details, TextPosition textPosition)
+      onSingleLongTapMoveUpdate;
+  final bool Function(LongPressEndDetails details, TextPosition textPosition)
+      onSingleLongTapEnd;
 
   const ZefyrEditor({
     Key key,
@@ -232,7 +237,8 @@ class _ZefyrEditorState extends State<ZefyrEditor>
   bool get selectionEnabled => widget.enableInteractiveSelection;
 
   @override
-  bool overrideHandleTapDown(TapDownDetails details, TextPosition textPosition) {
+  bool overrideHandleTapDown(
+      TapDownDetails details, TextPosition textPosition) {
     if (widget.onTapDown == null) {
       return false;
     }
@@ -248,7 +254,8 @@ class _ZefyrEditorState extends State<ZefyrEditor>
   }
 
   @override
-  bool overrideSingleLongTapStart(LongPressStartDetails details, TextPosition textPosition) {
+  bool overrideSingleLongTapStart(
+      LongPressStartDetails details, TextPosition textPosition) {
     if (widget.onSingleLongTapStart == null) {
       return false;
     }
@@ -256,7 +263,8 @@ class _ZefyrEditorState extends State<ZefyrEditor>
   }
 
   @override
-  bool overrideSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details, TextPosition textPosition) {
+  bool overrideSingleLongTapMoveUpdate(
+      LongPressMoveUpdateDetails details, TextPosition textPosition) {
     if (widget.onSingleLongTapMoveUpdate == null) {
       return false;
     }
@@ -264,7 +272,8 @@ class _ZefyrEditorState extends State<ZefyrEditor>
   }
 
   @override
-  bool overrideSingleLongTapEnd(LongPressEndDetails details, TextPosition textPosition) {
+  bool overrideSingleLongTapEnd(
+      LongPressEndDetails details, TextPosition textPosition) {
     if (widget.onSingleLongTapEnd == null) {
       return false;
     }
@@ -400,7 +409,8 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
   @override
   void onSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details) {
     if (_state.widget.onSingleLongTapMoveUpdate != null) {
-      if (_state.widget.onSingleLongTapMoveUpdate(details, renderEditor.getPositionForOffset(details.globalPosition))) {
+      if (_state.widget.onSingleLongTapMoveUpdate(
+          details, renderEditor.getPositionForOffset(details.globalPosition))) {
         return;
       }
     }
@@ -449,7 +459,8 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
   @override
   void onSingleTapUp(TapUpDetails details) {
     if (_state.widget.onTapUp != null) {
-      if (_state.widget.onTapUp(details, renderEditor.getPositionForOffset(details.globalPosition))) {
+      if (_state.widget.onTapUp(
+          details, renderEditor.getPositionForOffset(details.globalPosition))) {
         return;
       }
     }
@@ -493,7 +504,8 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
   @override
   void onSingleLongTapStart(LongPressStartDetails details) {
     if (_state.widget.onSingleLongTapStart != null) {
-      if (_state.widget.onSingleLongTapStart(details, renderEditor.getPositionForOffset(details.globalPosition))) {
+      if (_state.widget.onSingleLongTapStart(
+          details, renderEditor.getPositionForOffset(details.globalPosition))) {
         return;
       }
     }
@@ -1182,8 +1194,32 @@ class RawEditorState extends EditorState
     );
   }
 
+  LookupResult get _inputtingNodeLookup {
+    if (inputtingTextEditingValue == null) return null;
+    final length = inputtingTextEditingValue.composing.end -
+        inputtingTextEditingValue.composing.start;
+    if (length <= 0) return null;
+    final lookupResult = widget.controller.document
+        .lookupLine(inputtingTextEditingValue.composing.start);
+    return lookupResult;
+  }
+
+  TextRange Function(Node node) _inputtingTextRange(LookupResult lookup) {
+    return (Node node) {
+      if (lookup == null) return null;
+      if (node is LineNode && node == lookup.node) {
+        final textNode = node.lookup(lookup.offset);
+        final length = inputtingTextEditingValue.composing.end -
+            inputtingTextEditingValue.composing.start;
+        return TextRange(start: textNode.offset, end: textNode.offset + length);
+      }
+      return null;
+    };
+  }
+
   List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
+    final lookup = _inputtingNodeLookup;
     for (final node in widget.controller.document.root.children) {
       if (node is LineNode) {
         result.add(EditableTextLine(
@@ -1199,6 +1235,7 @@ class RawEditorState extends EditorState
             node: node,
             textDirection: _textDirection,
             embedBuilder: widget.embedBuilder,
+            inputtingTextRange: _inputtingTextRange(lookup)(node),
           ),
           hasFocus: _hasFocus,
           devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
@@ -1218,6 +1255,7 @@ class RawEditorState extends EditorState
               ? EdgeInsets.all(16.0)
               : null,
           embedBuilder: widget.embedBuilder,
+          inputtingTextRange: _inputtingTextRange(lookup),
         ));
       } else {
         throw StateError('Unreachable.');
