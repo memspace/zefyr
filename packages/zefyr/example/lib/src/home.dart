@@ -217,6 +217,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                   );
                 }
+                if (node.value.type == 'pdf') {
+                  return Text('pdf');
+                }
                 throw UnimplementedError(
                     'Embeddable type "${node.value.type}" is not supported by default embed '
                     'builder of ZefyrEditor. You must pass your own builder function to '
