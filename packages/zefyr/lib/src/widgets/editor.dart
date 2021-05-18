@@ -1228,7 +1228,7 @@ class RawEditorState extends EditorState
           enableInteractiveSelection: widget.enableInteractiveSelection,
           hasFocus: _hasFocus,
           contentPadding:
-              (block == NotusAttribute.block.code) ? EdgeInsets.all(16.0) : null,
+              (block == NotusAttribute.block.code) ? EdgeInsets.all(8.0) : null,
           embedBuilder: widget.embedBuilder,
         ));
       } else {
