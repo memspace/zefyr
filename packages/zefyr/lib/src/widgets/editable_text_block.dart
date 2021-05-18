@@ -89,13 +89,13 @@ class EditableTextBlock extends StatelessWidget {
         index: index,
         count: count,
         style: theme.paragraph.style,
-        width: 32.0,
+        width: 25.0,
         padding: 8.0,
       );
     } else if (block == NotusAttribute.block.bulletList) {
       return _BulletPoint(
         style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
-        width: 32,
+        width: 16,
       );
     } else if (block == NotusAttribute.block.code) {
       return _NumberPoint(
@@ -103,7 +103,7 @@ class EditableTextBlock extends StatelessWidget {
         count: count,
         style: theme.code.style
             .copyWith(color: theme.code.style.color.withOpacity(0.4)),
-        width: 32.0,
+        width: 25.0,
         padding: 16.0,
         withDot: false,
       );
@@ -118,8 +118,12 @@ class EditableTextBlock extends StatelessWidget {
       return 16.0;
     } else if (block == NotusAttribute.block.code) {
       return 32.0;
+    } else if (block == NotusAttribute.block.bulletList) {
+      return 16.0;
+    } else if (block == NotusAttribute.block.numberList) {
+      return 25.0;
     } else {
-      return 32.0;
+      return 16.0;
     }
   }
 
@@ -244,10 +248,12 @@ class _NumberPoint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: AlignmentDirectional.topEnd,
-      child: Text(withDot ? '$index.' : '$index', style: style),
       width: width,
-      padding: EdgeInsetsDirectional.only(end: padding),
+      child: Text(
+        withDot ? '$index.' : '$index',
+        style: style,
+        textAlign: TextAlign.left,
+      ),
     );
   }
 }
@@ -264,10 +270,9 @@ class _BulletPoint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: AlignmentDirectional.topEnd,
-      child: Text('•', style: style),
+      alignment: AlignmentDirectional.center,
       width: width,
-      padding: EdgeInsetsDirectional.only(end: 13.0),
+      child: Text('•', style: style),
     );
   }
 }
