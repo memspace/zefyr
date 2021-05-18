@@ -218,7 +218,12 @@ class _HomePageState extends State<HomePage> {
                   );
                 }
                 if (node.value.type == 'pdf') {
-                  return Text('pdf');
+                  final url = node.value.data['source'] as String;
+                  final fileName = node.value.data['name'] as String;
+                  final size = node.value.data['size'] as int;
+                  return Text(
+                    'pdf url: $url, fileName: $fileName, size: $size',
+                  );
                 }
                 throw UnimplementedError(
                     'Embeddable type "${node.value.type}" is not supported by default embed '
