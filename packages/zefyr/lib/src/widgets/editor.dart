@@ -23,7 +23,8 @@ import 'text_selection.dart';
 import 'theme.dart';
 
 /// Builder function for embeddable objects in [ZefyrEditor].
-typedef ZefyrEmbedBuilder = Widget Function(BuildContext context, EmbedNode node);
+typedef ZefyrEmbedBuilder = Widget Function(
+    BuildContext context, EmbedNode node);
 
 /// Default implementation of a builder function for embeddable objects in
 /// Zefyr.
@@ -180,11 +181,13 @@ class ZefyrEditor extends StatefulWidget {
   /// Defaults to [defaultZefyrEmbedBuilder].
   final ZefyrEmbedBuilder embedBuilder;
 
-  final bool Function(TapDownDetails details, TextPosition textPosition) onTapDown;
+  final bool Function(TapDownDetails details, TextPosition textPosition)
+      onTapDown;
   final bool Function(TapUpDetails details, TextPosition textPosition) onTapUp;
   final bool Function(LongPressStartDetails details, TextPosition textPosition)
       onSingleLongTapStart;
-  final bool Function(LongPressMoveUpdateDetails details, TextPosition textPosition)
+  final bool Function(
+          LongPressMoveUpdateDetails details, TextPosition textPosition)
       onSingleLongTapMoveUpdate;
   final bool Function(LongPressEndDetails details, TextPosition textPosition)
       onSingleLongTapEnd;
@@ -237,7 +240,8 @@ class _ZefyrEditorState extends State<ZefyrEditor>
   bool get selectionEnabled => widget.enableInteractiveSelection;
 
   @override
-  bool overrideHandleTapDown(TapDownDetails details, TextPosition textPosition) {
+  bool overrideHandleTapDown(
+      TapDownDetails details, TextPosition textPosition) {
     if (widget.onTapDown == null) {
       return false;
     }
@@ -319,12 +323,13 @@ class _ZefyrEditorState extends State<ZefyrEditor>
         textSelectionControls = cupertinoTextSelectionControls;
         paintCursorAboveText = true;
         cursorOpacityAnimates = true;
-        cursorColor ??= selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
+        cursorColor ??=
+            selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
         selectionColor = selectionTheme.selectionColor ??
             cupertinoTheme.primaryColor.withOpacity(0.40);
         cursorRadius ??= const Radius.circular(2.0);
-        cursorOffset =
-            Offset(iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
+        cursorOffset = Offset(
+            iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
         break;
 
       case TargetPlatform.android:
@@ -446,18 +451,11 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     final segment = segmentResult.node as LeafNode;
     if (segment.style.contains(NotusAttribute.link) &&
         editor.widget.onLaunchUrl != null) {
-      if (editor.widget.readOnly) {
-        editor.widget.onLaunchUrl(segment.style.get(NotusAttribute.link).value);
-      } else {
-        // TODO: Implement a toolbar to display the URL and allow to launch it.
-        // editor.showToolbar();
-      }
+      editor.widget.onLaunchUrl(segment.style.get(NotusAttribute.link).value);
     }
     if (line.hasEmbed) {
       final embed = line.children.single as EmbedNode;
-      if (editor.widget.readOnly) {
-        editor.widget.onTapImage(embed.value);
-      }
+      editor.widget.onTapImage(embed.value);
     }
   }
 
@@ -577,7 +575,9 @@ class RawEditor extends StatefulWidget {
         assert(maxHeight == null || maxHeight > 0),
         assert(minHeight == null || minHeight >= 0),
         assert(
-          (maxHeight == null) || (minHeight == null) || (maxHeight >= minHeight),
+          (maxHeight == null) ||
+              (minHeight == null) ||
+              (maxHeight >= minHeight),
           'minHeight can\'t be greater than maxHeight',
         ),
         assert(autofocus != null),
@@ -734,13 +734,15 @@ class RawEditor extends StatefulWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<ZefyrController>('controller', controller));
+    properties
+        .add(DiagnosticsProperty<ZefyrController>('controller', controller));
     properties.add(DiagnosticsProperty<FocusNode>('focusNode', focusNode));
     properties.add(DoubleProperty('maxLines', maxHeight, defaultValue: null));
     properties.add(DoubleProperty('minLines', minHeight, defaultValue: null));
-    properties
-        .add(DiagnosticsProperty<bool>('autofocus', autofocus, defaultValue: false));
-    properties.add(DiagnosticsProperty<ScrollPhysics>('scrollPhysics', scrollPhysics,
+    properties.add(
+        DiagnosticsProperty<bool>('autofocus', autofocus, defaultValue: false));
+    properties.add(DiagnosticsProperty<ScrollPhysics>(
+        'scrollPhysics', scrollPhysics,
         defaultValue: null));
   }
 }
@@ -904,8 +906,9 @@ class RawEditorState extends EditorState
     super.didChangeDependencies();
     final parentTheme = ZefyrTheme.of(context, nullOk: true);
     final fallbackTheme = ZefyrThemeData.fallback(context);
-    _themeData =
-        (parentTheme != null) ? fallbackTheme.merge(parentTheme) : fallbackTheme;
+    _themeData = (parentTheme != null)
+        ? fallbackTheme.merge(parentTheme)
+        : fallbackTheme;
 
     if (!_didAutoFocus && widget.autofocus) {
       FocusScope.of(context).autofocus(widget.focusNode);
@@ -914,7 +917,8 @@ class RawEditorState extends EditorState
   }
 
   bool _shouldShowSelectionHandles() {
-    return widget.showSelectionHandles && !widget.controller.selection.isCollapsed;
+    return widget.showSelectionHandles &&
+        !widget.controller.selection.isCollapsed;
   }
 
   @override
@@ -1165,7 +1169,8 @@ class RawEditorState extends EditorState
       /// the scroll view with [BaselineProxy] which mimics the editor's
       /// baseline.
       // This implies that the first line has no styles applied to it.
-      final baselinePadding = EdgeInsets.only(top: _themeData.paragraph.spacing.top);
+      final baselinePadding =
+          EdgeInsets.only(top: _themeData.paragraph.spacing.top);
       child = BaselineProxy(
         textStyle: _themeData.paragraph.style,
         padding: baselinePadding,
