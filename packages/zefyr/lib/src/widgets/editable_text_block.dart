@@ -97,16 +97,6 @@ class EditableTextBlock extends StatelessWidget {
         style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
         width: 16,
       );
-    } else if (block == NotusAttribute.block.code) {
-      return _NumberPoint(
-        index: index,
-        count: count,
-        style: theme.code.style
-            .copyWith(color: theme.code.style.color.withOpacity(0.4)),
-        width: 25.0,
-        padding: 16.0,
-        withDot: false,
-      );
     } else {
       return null;
     }
@@ -117,7 +107,7 @@ class EditableTextBlock extends StatelessWidget {
     if (block == NotusAttribute.block.quote) {
       return 16.0;
     } else if (block == NotusAttribute.block.code) {
-      return 32.0;
+      return 0;
     } else if (block == NotusAttribute.block.bulletList) {
       return 16.0;
     } else if (block == NotusAttribute.block.numberList) {
