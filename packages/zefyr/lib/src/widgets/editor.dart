@@ -174,7 +174,7 @@ class ZefyrEditor extends StatefulWidget {
   /// Callback to invoke when user wants to launch a URL.
   final ValueChanged<String> onLaunchUrl;
 
-  final void Function(EmbeddableObject) onTapImage;
+  final void Function(EmbeddableObject) onTapEmbedObject;
 
   /// Builder function for embeddable objects.
   ///
@@ -211,7 +211,7 @@ class ZefyrEditor extends StatefulWidget {
     this.keyboardAppearance = Brightness.light,
     this.scrollPhysics,
     this.onLaunchUrl,
-    this.onTapImage,
+    this.onTapEmbedObject,
     this.embedBuilder = defaultZefyrEmbedBuilder,
     this.onTapDown,
     this.onTapUp,
@@ -364,7 +364,7 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       keyboardAppearance: widget.keyboardAppearance,
       scrollPhysics: widget.scrollPhysics,
       onLaunchUrl: widget.onLaunchUrl,
-      onTapImage: widget.onTapImage,
+      onTapEmbedObject: widget.onTapEmbedObject,
       embedBuilder: widget.embedBuilder,
       // encapsulated fields below
       cursorStyle: CursorStyle(
@@ -455,7 +455,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     }
     if (line.hasEmbed) {
       final embed = line.children.single as EmbedNode;
-      editor.widget.onTapImage(embed.value);
+      editor.widget.onTapEmbedObject(embed.value);
     }
   }
 
@@ -552,7 +552,7 @@ class RawEditor extends StatefulWidget {
     this.textCapitalization = TextCapitalization.none,
     this.keyboardAppearance = Brightness.light,
     this.onLaunchUrl,
-    this.onTapImage,
+    this.onTapEmbedObject,
     @required this.selectionColor,
     this.scrollPhysics,
     this.toolbarOptions = const ToolbarOptions(
@@ -615,7 +615,7 @@ class RawEditor extends StatefulWidget {
   /// a link in the document.
   final ValueChanged<String> onLaunchUrl;
 
-  final void Function(EmbeddableObject) onTapImage;
+  final void Function(EmbeddableObject) onTapEmbedObject;
 
   /// Configuration of toolbar options.
   ///

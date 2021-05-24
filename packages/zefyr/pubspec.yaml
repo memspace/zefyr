@@ -3,9 +3,10 @@ description: Clean, minimalistic and collaboration-ready rich text editor for Fl
 version: 1.0.0-dev.2.0
 author: Anatoly Pulyaevskiy <anatoly.pulyaevskiy@gmail.com>
 homepage: https://github.com/memspace/zefyr
+publish_to: none
 
 environment:
-  sdk: '>=2.10.0 <3.0.0'
+  sdk: ">=2.10.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -13,7 +14,11 @@ dependencies:
   collection: ^1.14.6
   url_launcher: ^5.0.0
   quill_delta: ^2.0.0
-  notus: ^1.0.0-dev
+  notus:
+    git:
+      url: https://github.com/hokutoresident/zefyr
+      ref: feature/paste_pdf
+      path: packages/notus
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
   characters: ^1.0.0
