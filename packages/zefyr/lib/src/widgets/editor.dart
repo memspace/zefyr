@@ -1177,7 +1177,10 @@ class RawEditorState extends EditorState
         child: SingleChildScrollView(
           controller: _scrollController,
           physics: widget.scrollPhysics,
-          child: child,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 200),
+            child: child,
+          ),
         ),
       );
     }
