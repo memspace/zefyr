@@ -112,7 +112,11 @@ class BlockEmbed extends EmbeddableObject {
   BlockEmbed(
     String type, {
     Map<String, dynamic> data = const {},
-  }) : super(type, inline: false, data: data);
+  }) : super(type, inline: false, data: data) {
+    if (!['hr', 'image', 'pdf'].contains(type)) {
+      throw UnsupportedFormatException('BlockEmbed has a unsupported type. type: $type');
+    }
+  }
 
   static final BlockEmbed horizontalRule = BlockEmbed('hr');
   static BlockEmbed image(String source) =>
@@ -126,4 +130,13 @@ class BlockEmbed extends EmbeddableObject {
           'size': size,
         },
       );
+}
+
+// 対応してない規格があった場合になげる
+class UnsupportedFormatException implements Exception {
+  final String message;
+  const UnsupportedFormatException(this.message);
+
+  @override
+  String toString() => message;
 }

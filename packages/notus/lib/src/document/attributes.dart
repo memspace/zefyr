@@ -4,6 +4,8 @@
 import 'package:collection/collection.dart';
 import 'package:quiver_hashcode/hashcode.dart';
 
+import '../../notus.dart';
+
 /// Scope of a style attribute, defines context in which an attribute can be
 /// applied.
 enum NotusAttributeScope {
@@ -134,8 +136,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
-      throw ArgumentError.value(
-          key, 'No attribute with key "$key" registered.');
+      throw UnsupportedFormatException('NotusAttribute has a unsupported key. key: $key');
     }
     final builder = _registry[key];
     return builder.withValue(value);
