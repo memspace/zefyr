@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
+import 'package:notus/src/exceptions/unsupported_format.dart';
 import 'package:quiver_hashcode/hashcode.dart';
 
 const _dataEquality = DeepCollectionEquality();
@@ -130,13 +131,4 @@ class BlockEmbed extends EmbeddableObject {
           'size': size,
         },
       );
-}
-
-// 対応してない規格があった場合になげる
-class UnsupportedFormatException implements Exception {
-  final String message;
-  const UnsupportedFormatException(this.message);
-
-  @override
-  String toString() => message;
 }
