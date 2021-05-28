@@ -117,6 +117,12 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.heading.level3].
   static NotusAttribute<int> get h3 => heading.level3;
 
+  static final List<int> _validHeadingValues = [
+    heading.level1.value,
+    heading.level2.value,
+    heading.level3.value,
+  ];
+
   /// Block attribute
   // ignore: const_eval_throws_exception
   static const block = BlockAttributeBuilder._();
@@ -133,10 +139,24 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.block.code].
   static NotusAttribute<String> get code => block.code;
 
+  static final List<String> _validBlockValues = [
+    block.bulletList.value,
+    block.numberList.value,
+    block.quote.value,
+    block.code.value,
+  ];
+
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
       throw UnsupportedFormatException('NotusAttribute has a unsupported key. key: $key');
     }
+    if (key == NotusAttribute.block.key && !_validBlockValues.contains(value)) {
+      throw UnsupportedFormatException('NotusAttribute has a unsupported block value. block: $value');
+    }
+    if (key == NotusAttribute.heading.key && !_validHeadingValues.contains(value)) {
+      throw UnsupportedFormatException('NotusAttribute has a unsupported heading value. heading: $value');
+    }
+
     final builder = _registry[key];
     return builder.withValue(value);
   }
