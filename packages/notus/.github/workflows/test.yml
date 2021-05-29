@@ -1,0 +1,49 @@
+name: test_notus
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+      - master
+      - 1.0-dev
+      - hokuto
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: "2.0.0"
+
+      - name: Test
+        run: |
+          flutter pub get
+          flutter test
+
+      - name: Send Slack Notification on Success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2.0.2
+        env:
+          SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
+          SLACK_TITLE: Test Success
+          SLACK_MESSAGE: ":white_check_mark:[notus]全てのテストが成功しました:white_check_mark:"
+          SLACK_COLOR: good
+
+      - name: Send Slack Notification on Failure
+        uses: rtCamp/action-slack-notify@v2.0.2
+        if: failure()
+        env:
+          SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
+          SLACK_TITLE: Test Failure
+          SLACK_MESSAGE: |
+            :x:[notus]テスト失敗:x:
+            どのテストが落ちているか確認し、修正してください。
+          SLACK_COLOR: danger
