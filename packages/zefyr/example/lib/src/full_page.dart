@@ -42,7 +42,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
       ZefyrController(NotusDocument.fromJson(json.decode(doc)));
   final FocusNode _focusNode = FocusNode();
   bool _editing = false;
-  StreamSubscription<NotusChange> _sub;
+  StreamSubscription<NotusChange>? _sub;
   bool _darkTheme = false;
 
   @override
@@ -55,7 +55,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
 
   @override
   void dispose() {
-    _sub.cancel();
+    _sub?.cancel();
     super.dispose();
   }
 

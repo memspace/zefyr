@@ -12,12 +12,16 @@ bool isDisplaySmallDesktop(BuildContext context) {
 }
 
 class PageLayout extends StatefulWidget {
-  final Widget appBar;
+  final AppBar appBar;
   final Widget menuBar;
   final Widget body;
 
-  const PageLayout({Key key, this.appBar, this.menuBar, this.body})
-      : super(key: key);
+  const PageLayout({
+    Key? key,
+    required this.appBar,
+    required this.menuBar,
+    required this.body,
+  }) : super(key: key);
 
   @override
   _PageLayoutState createState() => _PageLayoutState();
@@ -39,12 +43,17 @@ class _PageLayoutState extends State<PageLayout> {
 }
 
 class _DesktopScaffold extends StatelessWidget {
-  final Widget appBar;
+  final AppBar appBar;
   final Widget menuBar;
   final Widget body;
 
-  const _DesktopScaffold({Key key, this.appBar, this.menuBar, this.body})
+  const _DesktopScaffold(
+      {Key? key,
+      required this.appBar,
+      required this.menuBar,
+      required this.body})
       : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,11 +83,15 @@ class _DesktopScaffold extends StatelessWidget {
 }
 
 class _MobileScaffold extends StatelessWidget {
-  final Widget appBar;
+  final AppBar appBar;
   final Widget menuBar;
   final Widget body;
 
-  const _MobileScaffold({Key key, this.appBar, this.menuBar, this.body})
+  const _MobileScaffold(
+      {Key? key,
+      required this.appBar,
+      required this.menuBar,
+      required this.body})
       : super(key: key);
 
   @override
