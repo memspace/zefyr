@@ -352,6 +352,8 @@ void main() {
       expect(doc.root.children.elementAt(2).toPlainText(), 'text\n');
     });
 
+    // TODO: 'DartConf\nLos Angeles'の4番目から4文字分を選択した後`horizontalRule`に置き換えると
+    // TODO: `horizontalRule`の後に余分に改行ができる問題がありテストが落ちるので実装の方を修正
     // test('replace text with embed', () {
     //   final doc = dartconfDoc();
     //   doc.replace(4, 4, BlockEmbed.horizontalRule);
@@ -361,7 +363,8 @@ void main() {
     //       '${EmbedNode.kObjectReplacementCharacter}\n');
     //   expect(doc.root.children.elementAt(2).toPlainText(), 'Los Angeles\n');
     // });
-    //
+
+    // TODO: ↑のテストと同じく`horizontalRule`の後に余分に改行ができる問題がありテストが落ちるので実装の方を修正
     // test('replace embed with embed', () {
     //   final doc = dartconfDoc();
     //   doc.replace(4, 4, BlockEmbed.horizontalRule);
