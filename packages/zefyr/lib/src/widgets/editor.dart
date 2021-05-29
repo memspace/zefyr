@@ -1200,6 +1200,11 @@ class RawEditorState extends EditorState
       return theme.lists?.spacing ?? VerticalSpacing.zero();
     }
   }
+
+  @override
+  void userUpdateTextEditingValue(TextEditingValue value, SelectionChangedCause cause) {
+    // TODO: implement userUpdateTextEditingValue
+  }
 }
 
 class _Editor extends MultiChildRenderObjectWidget {
