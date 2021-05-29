@@ -1,4 +1,4 @@
-name: test_notus
+name: test_zefyr
 
 on:
   workflow_dispatch:
@@ -24,8 +24,9 @@ jobs:
         with:
           flutter-version: "2.0.0"
 
-      - name: Test
+      - name: Test zefyr
         run: |
+          cd packages/zefyr/
           flutter pub get
           flutter test
 
@@ -35,7 +36,7 @@ jobs:
         env:
           SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
           SLACK_TITLE: Test Success
-          SLACK_MESSAGE: ":white_check_mark:[notus]全てのテストが成功しました:white_check_mark:"
+          SLACK_MESSAGE: ":white_check_mark:[zefyr]全てのテストが成功しました:white_check_mark:"
           SLACK_COLOR: good
 
       - name: Send Slack Notification on Failure
@@ -45,6 +46,6 @@ jobs:
           SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
           SLACK_TITLE: Test Failure
           SLACK_MESSAGE: |
-            :x:[notus]テスト失敗:x:
+            :x:[zefyr]テスト失敗:x:
             どのテストが落ちているか確認し、修正してください。
           SLACK_COLOR: danger
