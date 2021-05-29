@@ -8,6 +8,7 @@ on:
       - master
       - 1.0-dev
       - hokuto
+      - feature/run-test-on-ci
 
 jobs:
   build:
