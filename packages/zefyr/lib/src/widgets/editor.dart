@@ -1211,7 +1211,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   _Editor({
     required Key key,
     required List<Widget> children,
-    ViewportOffset? this.offset,
+    this.offset,
     required this.document,
     required this.textDirection,
     required this.hasFocus,
