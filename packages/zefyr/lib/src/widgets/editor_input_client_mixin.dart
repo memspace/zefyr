@@ -47,6 +47,20 @@ mixin RawEditorStateTextInputClientMixin on EditorState
     }
   }
 
+  void updateConnectionConfig() {
+    _textInputConnection!.updateConfig(
+      TextInputConfiguration(
+        inputType: TextInputType.multiline,
+        readOnly: widget.readOnly,
+        obscureText: false,
+        autocorrect: false,
+        inputAction: TextInputAction.newline,
+        keyboardAppearance: widget.keyboardAppearance,
+        textCapitalization: widget.textCapitalization,
+      ),
+    );
+  }
+
   void openConnectionIfNeeded() {
     if (!shouldCreateInputConnection) {
       return;
@@ -221,13 +235,14 @@ mixin RawEditorStateTextInputClientMixin on EditorState
 
   void _updateSizeAndTransform() {
     if (hasConnection) {
+      final size = renderEditor.size;
+      final transform = renderEditor.getTransformTo(null);
+      _textInputConnection!.setEditableSizeAndTransform(size, transform);
       // Asking for renderEditor.size here can cause errors if layout hasn't
       // occurred yet. So we schedule a post frame callback instead.
-      SchedulerBinding.instance!.addPostFrameCallback((Duration _) {
-        final size = renderEditor.size;
-        final transform = renderEditor.getTransformTo(null);
-        _textInputConnection!.setEditableSizeAndTransform(size, transform);
-      });
+      SchedulerBinding.instance!.addPostFrameCallback(
+        (Duration _) => _updateSizeAndTransform(),
+      );
     }
   }
 }
