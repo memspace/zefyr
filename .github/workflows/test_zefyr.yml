@@ -26,13 +26,15 @@ jobs:
 
       - name: Test zefyr
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"かーるてすと"}' https://hooks.slack.com/services/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
+          cd packages/zefyr/
+          flutter pub get
+          flutter test
 
       - name: Send Slack Notification on Success
         if: success()
         uses: rtCamp/action-slack-notify@v2.0.2
         env:
-          SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
+          SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
           SLACK_TITLE: Test Success
           SLACK_MESSAGE: ":white_check_mark:[zefyr]全てのテストが成功しました:white_check_mark:"
           SLACK_COLOR: good
@@ -41,7 +43,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2.0.2
         if: failure()
         env:
-          SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
+          SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
           SLACK_TITLE: Test Failure
           SLACK_MESSAGE: |
             :x:[zefyr]テスト失敗:x:
