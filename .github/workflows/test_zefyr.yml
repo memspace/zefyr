@@ -26,9 +26,6 @@ jobs:
 
       - name: Test zefyr
         run: |
-#          cd packages/zefyr/
-#          flutter pub get
-#          flutter test
           curl -X POST -H 'Content-type: application/json' --data '{"text":"かーるてすと"}' https://hooks.slack.com/services/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
 
       - name: Send Slack Notification on Success
