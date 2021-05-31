@@ -19,6 +19,7 @@ class EditableTextBlock extends StatelessWidget {
   final bool hasFocus;
   final EdgeInsets contentPadding;
   final ZefyrEmbedBuilder embedBuilder;
+  final TextRange Function(Node node) inputtingTextRange;
 
   EditableTextBlock({
     Key key,
@@ -32,6 +33,7 @@ class EditableTextBlock extends StatelessWidget {
     @required this.hasFocus,
     this.contentPadding,
     @required this.embedBuilder,
+    this.inputtingTextRange,
   })  : assert(hasFocus != null),
         assert(embedBuilder != null),
         super(key: key);
@@ -69,6 +71,7 @@ class EditableTextBlock extends StatelessWidget {
           node: line,
           textDirection: textDirection,
           embedBuilder: embedBuilder,
+          inputtingTextRange: inputtingTextRange(line),
         ),
         cursorController: cursorController,
         selection: selection,

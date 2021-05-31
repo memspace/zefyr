@@ -1200,8 +1200,32 @@ class RawEditorState extends EditorState
     );
   }
 
+  LookupResult get _inputtingNodeLookup {
+    if (inputtingTextEditingValue == null) return null;
+    final length = inputtingTextEditingValue.composing.end -
+        inputtingTextEditingValue.composing.start;
+    if (length <= 0) return null;
+    final lookupResult = widget.controller.document
+        .lookupLine(inputtingTextEditingValue.composing.start);
+    return lookupResult;
+  }
+
+  TextRange Function(Node node) _inputtingTextRange(LookupResult lookup) {
+    return (Node node) {
+      if (lookup == null) return null;
+      if (node is LineNode && node == lookup.node) {
+        final textNode = node.lookup(lookup.offset);
+        final length = inputtingTextEditingValue.composing.end -
+            inputtingTextEditingValue.composing.start;
+        return TextRange(start: textNode.offset, end: textNode.offset + length);
+      }
+      return null;
+    };
+  }
+
   List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
+    final lookup = _inputtingNodeLookup;
     for (final node in widget.controller.document.root.children) {
       if (node is LineNode) {
         result.add(EditableTextLine(
@@ -1217,6 +1241,7 @@ class RawEditorState extends EditorState
             node: node,
             textDirection: _textDirection,
             embedBuilder: widget.embedBuilder,
+            inputtingTextRange: _inputtingTextRange(lookup)(node),
           ),
           hasFocus: _hasFocus,
           devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
@@ -1235,6 +1260,7 @@ class RawEditorState extends EditorState
           contentPadding:
               (block == NotusAttribute.block.code) ? EdgeInsets.all(8.0) : null,
           embedBuilder: widget.embedBuilder,
+          inputtingTextRange: _inputtingTextRange(lookup),
         ));
       } else {
         throw StateError('Unreachable.');
