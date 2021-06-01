@@ -4,7 +4,7 @@ import 'package:notus/notus.dart';
 import 'editable_text_line.dart';
 import 'editor.dart';
 import 'embed_proxy.dart';
-import 'rich_text_proxy.dart';
+import 'paragraph.dart';
 import 'theme.dart';
 
 /// Line of text in Zefyr editor.
@@ -36,17 +36,12 @@ class TextLine extends StatelessWidget {
     final strutStyle = text.style != null
         ? StrutStyle.fromTextStyle(text.style!, forceStrutHeight: true)
         : null;
-    return RichTextProxy(
+    return ZefyrParagraph(
+      text,
       textStyle: text.style,
-      textDirection: textDirection,
+      textDirection: textDirection ?? Directionality.of(context),
       strutStyle: strutStyle,
       locale: Localizations.maybeLocaleOf(context),
-      child: RichText(
-        text: buildText(context, node),
-        textDirection: textDirection,
-        strutStyle: strutStyle,
-        textScaleFactor: MediaQuery.textScaleFactorOf(context),
-      ),
     );
   }
 

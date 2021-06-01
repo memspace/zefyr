@@ -876,6 +876,12 @@ class RawEditorState extends EditorState
       }
     }
 
+    if (kIsWeb && hasConnection) {
+      if (oldWidget.readOnly != widget.readOnly) {
+        updateConnectionConfig();
+      }
+    }
+
 //    if (widget.style != oldWidget.style) {
 //      final TextStyle style = widget.style;
 //      _textInputConnection?.setStyle(

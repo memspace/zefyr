@@ -2,21 +2,22 @@ import 'package:flutter/widgets.dart';
 
 import '../rendering/paragraph_proxy.dart';
 
-class RichTextProxy extends SingleChildRenderObjectWidget {
+class ZefyrParagraph extends LeafRenderObjectWidget {
   /// Child argument should be an instance of RichText widget.
-  RichTextProxy({
-    required RichText child,
+  ZefyrParagraph(
+    this.text, {
     this.textStyle,
-    this.textDirection,
+    required this.textDirection,
     this.textScaleFactor = 1.0,
     this.locale,
     this.strutStyle,
     this.textWidthBasis = TextWidthBasis.parent,
     this.textHeightBehavior,
-  }) : super(child: child);
+  }) : super();
 
+  final TextSpan text;
   final TextStyle? textStyle;
-  final TextDirection? textDirection;
+  final TextDirection textDirection;
   final double textScaleFactor;
   final Locale? locale;
   final StrutStyle? strutStyle;
@@ -26,6 +27,7 @@ class RichTextProxy extends SingleChildRenderObjectWidget {
   @override
   RenderParagraphProxy createRenderObject(BuildContext context) {
     return RenderParagraphProxy(
+      text,
       textStyle: textStyle,
       textDirection: textDirection,
       textScaleFactor: textScaleFactor,
@@ -39,6 +41,7 @@ class RichTextProxy extends SingleChildRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, covariant RenderParagraphProxy renderObject) {
+    renderObject.text = text;
     renderObject.textStyle = textStyle;
     renderObject.textDirection = textDirection;
     renderObject.textScaleFactor = textScaleFactor;
