@@ -34,7 +34,7 @@ jobs:
         if: success()
         uses: rtCamp/action-slack-notify@v2.0.2
         env:
-          SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
+          SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
           SLACK_TITLE: Test Success
           SLACK_MESSAGE: ":white_check_mark:[zefyr]全てのテストが成功しました:white_check_mark:"
           SLACK_COLOR: good
@@ -43,7 +43,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2.0.2
         if: failure()
         env:
-          SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
+          SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
           SLACK_TITLE: Test Failure
           SLACK_MESSAGE: |
             :x:[zefyr]テスト失敗:x:
