@@ -19,6 +19,12 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
     }
   }
 
+  @override
+  void userUpdateTextEditingValue(
+      TextEditingValue value, SelectionChangedCause cause) {
+    // TODO: implement userUpdateTextEditingValue
+  }
+
   void _setEditingValue(TextEditingValue value) async {
     if (await _isCut(value)) {
       widget.controller.replaceText(
@@ -45,14 +51,14 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
 
   Future<bool> _isCut(TextEditingValue value) async {
     final data = await Clipboard.getData(Clipboard.kTextPlain);
-    final isSameLength = textEditingValue.text.length - value.text.length == data.text.length;
+    final isSameLength =
+        textEditingValue.text.length - value.text.length == data.text.length;
     if (!isSameLength) {
       return false;
     }
     // If same length and length > 1, most likely a cut
     if (data.text.length > 1) {
       return true;
-
     } else {
       // TODO: Should we check more than length if length is 1?
       return true;
@@ -65,7 +71,7 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
   }
 
   @override
-  void hideToolbar() {
+  void hideToolbar([bool hideHandles = true]) {
     if (selectionOverlay?.toolbarIsVisible == true) {
       selectionOverlay?.hideToolbar();
     }
