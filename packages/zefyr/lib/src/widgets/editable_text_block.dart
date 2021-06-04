@@ -263,7 +263,7 @@ class _BulletPoint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: AlignmentDirectional.center,
+      alignment: AlignmentDirectional.topCenter,
       width: width,
       child: Text('•', style: style),
     );
