@@ -114,7 +114,7 @@ class ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   @override
-  void hideToolbar() {
+  void hideToolbar([bool hideHandles = true]) {
     _didCaretTap = false; // reset double tap.
     _toolbar?.remove();
     _toolbar = null;
@@ -657,15 +657,14 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
     );
 
     final toolbar = controls.buildToolbar(
-      context,
-      editingRegion,
-      block.preferredLineHeight,
-      midpoint,
-      endpoints,
-      widget.selectionOverlay,
-      widget.clipboardStatus,
-      Offset.zero	
-    );
+        context,
+        editingRegion,
+        block.preferredLineHeight,
+        midpoint,
+        endpoints,
+        widget.selectionOverlay,
+        widget.clipboardStatus,
+        Offset.zero);
     return CompositedTransformFollower(
       link: block.layerLink,
       showWhenUnlinked: false,
