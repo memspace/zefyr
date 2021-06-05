@@ -121,6 +121,10 @@ class ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
     _toolbarController?.stop();
   }
 
+  @override
+  void userUpdateTextEditingValue(
+      TextEditingValue value, SelectionChangedCause cause) {}
+
   static const Duration _kFadeDuration = Duration(milliseconds: 150);
 
   @override
