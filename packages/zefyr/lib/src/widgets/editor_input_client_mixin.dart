@@ -11,6 +11,8 @@ mixin RawEditorStateTextInputClientMixin on EditorState
   final List<TextEditingValue> _sentRemoteValues = [];
   TextInputConnection _textInputConnection;
   TextEditingValue _lastKnownRemoteTextEditingValue;
+  TextEditingValue _inputtingTextEditingValue;
+  TextEditingValue get inputtingTextEditingValue => _inputtingTextEditingValue;
 
   /// Whether to create an input connection with the platform for text editing
   /// or not.
@@ -146,21 +148,10 @@ mixin RawEditorStateTextInputClientMixin on EditorState
       return;
     }
 
+    if (value.composing != null) _inputtingTextEditingValue = value; // 副作用みがすごい
+
     if (_lastKnownRemoteTextEditingValue == value) {
       // There is no difference between this value and the last known value.
-      return;
-    }
-
-    // Check if only composing range changed.
-    if (_lastKnownRemoteTextEditingValue.text == value.text &&
-        _lastKnownRemoteTextEditingValue.selection == value.selection) {
-      // This update only modifies composing range. Since we don't keep track
-      // of composing range in Zefyr we just need to update last known value
-      // here.
-      // This check fixes an issue on Android when it sends
-      // composing updates separately from regular changes for text and
-      // selection.
-      _lastKnownRemoteTextEditingValue = value;
       return;
     }
 

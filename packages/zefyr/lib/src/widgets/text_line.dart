@@ -16,12 +16,14 @@ class TextLine extends StatelessWidget {
   final LineNode node;
   final TextDirection textDirection;
   final ZefyrEmbedBuilder embedBuilder;
+  final TextRange inputtingTextRange;
 
   const TextLine({
     Key key,
     @required this.node,
     this.textDirection,
     @required this.embedBuilder,
+    this.inputtingTextRange,
   })  : assert(node != null),
         assert(embedBuilder != null),
         super(key: key);
@@ -65,6 +67,23 @@ class TextLine extends StatelessWidget {
   TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme) {
     final TextNode segment = node;
     final attrs = segment.style;
+
+    if (inputtingTextRange != null) {
+      final style = _getInlineTextStyle(attrs, theme);
+      return TextSpan(
+        children: [
+          TextSpan(text: segment.value.substring(0, inputtingTextRange.start)),
+          TextSpan(
+              text: segment.value
+                  .substring(inputtingTextRange.start, inputtingTextRange.end),
+              style: style.copyWith(backgroundColor: const Color(0x220000FF))),
+          TextSpan(
+              text: segment.value
+                  .substring(inputtingTextRange.end, segment.value.length)),
+        ],
+        style: _getInlineTextStyle(attrs, theme),
+      );
+    }
 
     return TextSpan(
       text: segment.value,

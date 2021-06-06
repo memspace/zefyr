@@ -174,6 +174,8 @@ class ZefyrEditor extends StatefulWidget {
   /// Callback to invoke when user wants to launch a URL.
   final ValueChanged<String> onLaunchUrl;
 
+  final void Function(EmbeddableObject) onTapEmbedObject;
+
   /// Builder function for embeddable objects.
   ///
   /// Defaults to [defaultZefyrEmbedBuilder].
@@ -198,6 +200,7 @@ class ZefyrEditor extends StatefulWidget {
     this.keyboardAppearance = Brightness.light,
     this.scrollPhysics,
     this.onLaunchUrl,
+    this.onTapEmbedObject,
     this.embedBuilder = defaultZefyrEmbedBuilder,
   })  : assert(controller != null),
         super(key: key);
@@ -300,6 +303,7 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       keyboardAppearance: widget.keyboardAppearance,
       scrollPhysics: widget.scrollPhysics,
       onLaunchUrl: widget.onLaunchUrl,
+      onTapEmbedObject: widget.onTapEmbedObject,
       embedBuilder: widget.embedBuilder,
       // encapsulated fields below
       cursorStyle: CursorStyle(
@@ -380,12 +384,11 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     final segment = segmentResult.node as LeafNode;
     if (segment.style.contains(NotusAttribute.link) &&
         editor.widget.onLaunchUrl != null) {
-      if (editor.widget.readOnly) {
-        editor.widget.onLaunchUrl(segment.style.get(NotusAttribute.link).value);
-      } else {
-        // TODO: Implement a toolbar to display the URL and allow to launch it.
-        // editor.showToolbar();
-      }
+      editor.widget.onLaunchUrl(segment.style.get(NotusAttribute.link).value);
+    }
+    if (line.hasEmbed) {
+      final embed = line.children.single as EmbedNode;
+      editor.widget.onTapEmbedObject(embed.value);
     }
   }
 
@@ -469,6 +472,7 @@ class RawEditor extends StatefulWidget {
     this.textCapitalization = TextCapitalization.none,
     this.keyboardAppearance = Brightness.light,
     this.onLaunchUrl,
+    this.onTapEmbedObject,
     @required this.selectionColor,
     this.scrollPhysics,
     this.toolbarOptions = const ToolbarOptions(
@@ -527,6 +531,8 @@ class RawEditor extends StatefulWidget {
   /// Callback which is triggered when the user wants to open a URL from
   /// a link in the document.
   final ValueChanged<String> onLaunchUrl;
+
+  final void Function(EmbeddableObject) onTapEmbedObject;
 
   /// Configuration of toolbar options.
   ///
@@ -1116,8 +1122,32 @@ class RawEditorState extends EditorState
     );
   }
 
+  LookupResult get _inputtingNodeLookup {
+    if (inputtingTextEditingValue == null) return null;
+    final length = inputtingTextEditingValue.composing.end -
+        inputtingTextEditingValue.composing.start;
+    if (length <= 0) return null;
+    final lookupResult = widget.controller.document
+        .lookupLine(inputtingTextEditingValue.composing.start);
+    return lookupResult;
+  }
+
+  TextRange Function(Node node) _inputtingTextRange(LookupResult lookup) {
+    return (Node node) {
+      if (lookup == null) return null;
+      if (node is LineNode && node == lookup.node) {
+        final textNode = node.lookup(lookup.offset);
+        final length = inputtingTextEditingValue.composing.end -
+            inputtingTextEditingValue.composing.start;
+        return TextRange(start: textNode.offset, end: textNode.offset + length);
+      }
+      return null;
+    };
+  }
+
   List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
+    final lookup = _inputtingNodeLookup;
     for (final node in widget.controller.document.root.children) {
       if (node is LineNode) {
         result.add(EditableTextLine(
@@ -1133,6 +1163,7 @@ class RawEditorState extends EditorState
             node: node,
             textDirection: _textDirection,
             embedBuilder: widget.embedBuilder,
+            inputtingTextRange: _inputtingTextRange(lookup)(node),
           ),
           hasFocus: _hasFocus,
           devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
@@ -1148,10 +1179,10 @@ class RawEditorState extends EditorState
           selectionColor: widget.selectionColor,
           enableInteractiveSelection: widget.enableInteractiveSelection,
           hasFocus: _hasFocus,
-          contentPadding: (block == NotusAttribute.block.code)
-              ? EdgeInsets.all(16.0)
-              : null,
+          contentPadding:
+              (block == NotusAttribute.block.code) ? EdgeInsets.all(8.0) : null,
           embedBuilder: widget.embedBuilder,
+          inputtingTextRange: _inputtingTextRange(lookup),
         ));
       } else {
         throw StateError('Unreachable.');

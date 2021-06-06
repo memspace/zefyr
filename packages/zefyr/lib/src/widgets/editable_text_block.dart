@@ -19,6 +19,7 @@ class EditableTextBlock extends StatelessWidget {
   final bool hasFocus;
   final EdgeInsets contentPadding;
   final ZefyrEmbedBuilder embedBuilder;
+  final TextRange Function(Node node) inputtingTextRange;
 
   EditableTextBlock({
     Key key,
@@ -32,6 +33,7 @@ class EditableTextBlock extends StatelessWidget {
     @required this.hasFocus,
     this.contentPadding,
     @required this.embedBuilder,
+    this.inputtingTextRange,
   })  : assert(hasFocus != null),
         assert(embedBuilder != null),
         super(key: key);
@@ -69,6 +71,7 @@ class EditableTextBlock extends StatelessWidget {
           node: line,
           textDirection: textDirection,
           embedBuilder: embedBuilder,
+          inputtingTextRange: inputtingTextRange(line),
         ),
         cursorController: cursorController,
         selection: selection,
@@ -89,23 +92,13 @@ class EditableTextBlock extends StatelessWidget {
         index: index,
         count: count,
         style: theme.paragraph.style,
-        width: 32.0,
+        width: 25.0,
         padding: 8.0,
       );
     } else if (block == NotusAttribute.block.bulletList) {
       return _BulletPoint(
         style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
-        width: 32,
-      );
-    } else if (block == NotusAttribute.block.code) {
-      return _NumberPoint(
-        index: index,
-        count: count,
-        style: theme.code.style
-            .copyWith(color: theme.code.style.color.withOpacity(0.4)),
-        width: 32.0,
-        padding: 16.0,
-        withDot: false,
+        width: 16,
       );
     } else {
       return null;
@@ -117,9 +110,13 @@ class EditableTextBlock extends StatelessWidget {
     if (block == NotusAttribute.block.quote) {
       return 16.0;
     } else if (block == NotusAttribute.block.code) {
-      return 32.0;
+      return 0;
+    } else if (block == NotusAttribute.block.bulletList) {
+      return 16.0;
+    } else if (block == NotusAttribute.block.numberList) {
+      return 25.0;
     } else {
-      return 32.0;
+      return 16.0;
     }
   }
 
@@ -244,10 +241,12 @@ class _NumberPoint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: AlignmentDirectional.topEnd,
-      child: Text(withDot ? '$index.' : '$index', style: style),
       width: width,
-      padding: EdgeInsetsDirectional.only(end: padding),
+      child: Text(
+        withDot ? '$index.' : '$index',
+        style: style,
+        textAlign: TextAlign.left,
+      ),
     );
   }
 }
@@ -264,10 +263,9 @@ class _BulletPoint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: AlignmentDirectional.topEnd,
-      child: Text('•', style: style),
+      alignment: AlignmentDirectional.topCenter,
       width: width,
-      padding: EdgeInsetsDirectional.only(end: 13.0),
+      child: Text('•', style: style),
     );
   }
 }
