@@ -14,7 +14,7 @@ void main() {
 
     test('applies change as-is', () {
       final doc = Delta()..insert('Document\n');
-      final actual = rule.apply(doc, 8, 0, '!');
+      final actual = rule.apply(doc, 8, '!');
       final expected = Delta()
         ..retain(8)
         ..insert('!');
@@ -27,7 +27,7 @@ void main() {
 
     test('skips at the beginning of a document', () {
       final doc = Delta()..insert('One\n');
-      final actual = rule.apply(doc, 0, 0, '\n');
+      final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNull);
     });
 
@@ -37,7 +37,7 @@ void main() {
         ..insert('\n', ul)
         ..insert('Three')
         ..insert('\n', ul);
-      final actual = rule.apply(doc, 8, 0, '\n');
+      final actual = rule.apply(doc, 8, '\n');
       final expected = Delta()
         ..retain(8)
         ..insert('\n', ul);
@@ -53,7 +53,7 @@ void main() {
       final doc = Delta()
         ..insert('Hello world')
         ..insert('\n', NotusAttribute.h1.toJson());
-      final actual = rule.apply(doc, 11, 0, '\n');
+      final actual = rule.apply(doc, 11, '\n');
       expect(actual, isNotNull);
       final expected = Delta()
         ..retain(11)
@@ -64,7 +64,7 @@ void main() {
 
     test('applies without style reset if not needed', () {
       final doc = Delta()..insert('Hello world\n');
-      final actual = rule.apply(doc, 11, 0, '\n');
+      final actual = rule.apply(doc, 11, '\n');
       expect(actual, isNotNull);
       final expected = Delta()
         ..retain(11)
@@ -74,7 +74,7 @@ void main() {
 
     test('applies at the beginning of a document', () {
       final doc = Delta()..insert('\n', NotusAttribute.h1.toJson());
-      final actual = rule.apply(doc, 0, 0, '\n');
+      final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNotNull);
       final expected = Delta()
         ..insert('\n', NotusAttribute.h1.toJson())
@@ -86,7 +86,7 @@ void main() {
       final style = NotusAttribute.ul.toJson();
       style.addAll(NotusAttribute.h1.toJson());
       final doc = Delta()..insert('Hello world')..insert('\n', style);
-      final actual = rule.apply(doc, 11, 0, '\n');
+      final actual = rule.apply(doc, 11, '\n');
       expect(actual, isNotNull);
       final expected = Delta()
         ..retain(11)
@@ -99,7 +99,7 @@ void main() {
       final doc = Delta()
         ..insert('Hello \nworld!\nMore lines here.')
         ..insert('\n', NotusAttribute.h2.toJson());
-      final actual = rule.apply(doc, 30, 0, '\n');
+      final actual = rule.apply(doc, 30, '\n');
       expect(actual, isNotNull);
       final expected = Delta()
         ..retain(30)
@@ -120,7 +120,7 @@ void main() {
         ..insert('\n', ul)
         ..insert('Item 2')
         ..insert('\n\n', ul);
-      final actual = rule.apply(doc, 14, 0, '\n');
+      final actual = rule.apply(doc, 14, '\n');
       expect(actual, isNotNull);
       final expected = Delta()
         ..retain(14)
@@ -131,14 +131,14 @@ void main() {
     test('applies only on empty line', () {
       final ul = NotusAttribute.ul.toJson();
       final doc = Delta()..insert('Item 1')..insert('\n', ul);
-      final actual = rule.apply(doc, 6, 0, '\n');
+      final actual = rule.apply(doc, 6, '\n');
       expect(actual, isNull);
     });
 
     test('applies at the beginning of a document', () {
       final ul = NotusAttribute.ul.toJson();
       final doc = Delta()..insert('\n', ul);
-      final actual = rule.apply(doc, 0, 0, '\n');
+      final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNotNull);
       final expected = Delta()..retain(1, NotusAttribute.block.unset.toJson());
       expect(actual, expected);
@@ -147,14 +147,14 @@ void main() {
     test('ignores non-empty line at the beginning of a document', () {
       final ul = NotusAttribute.ul.toJson();
       final doc = Delta()..insert('Text')..insert('\n', ul);
-      final actual = rule.apply(doc, 0, 0, '\n');
+      final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNull);
     });
 
     test('ignores empty lines in the middle of a block', () {
       final ul = NotusAttribute.ul.toJson();
       final doc = Delta()..insert('Line1')..insert('\n\n\n\n', ul);
-      final actual = rule.apply(doc, 7, 0, '\n');
+      final actual = rule.apply(doc, 7, '\n');
       expect(actual, isNull);
     });
   });
@@ -166,7 +166,7 @@ void main() {
         ..insert('Doc with ')
         ..insert('bold', bold)
         ..insert(' text');
-      final actual = rule.apply(doc, 13, 0, 'er');
+      final actual = rule.apply(doc, 13, 'er');
       final expected = Delta()
         ..retain(13)
         ..insert('er', bold);
@@ -175,7 +175,7 @@ void main() {
 
     test('apply at the beginning of a document', () {
       final doc = Delta()..insert('Doc with ');
-      final actual = rule.apply(doc, 0, 0, 'A ');
+      final actual = rule.apply(doc, 0, 'A ');
       expect(actual, isNull);
     });
   });
@@ -186,7 +186,7 @@ void main() {
 
     test('apply simple', () {
       final doc = Delta()..insert('Doc with link https://example.com');
-      final actual = rule.apply(doc, 33, 0, ' ');
+      final actual = rule.apply(doc, 33, ' ');
       final expected = Delta()
         ..retain(14)
         ..retain(19, link)
@@ -196,13 +196,13 @@ void main() {
 
     test('applies only to insert of single space', () {
       final doc = Delta()..insert('Doc with link https://example.com');
-      final actual = rule.apply(doc, 33, 0, '/');
+      final actual = rule.apply(doc, 33, '/');
       expect(actual, isNull);
     });
 
     test('applies for links at the beginning of line', () {
       final doc = Delta()..insert('Doc with link\nhttps://example.com');
-      final actual = rule.apply(doc, 33, 0, ' ');
+      final actual = rule.apply(doc, 33, ' ');
       final expected = Delta()
         ..retain(14)
         ..retain(19, link)
@@ -214,7 +214,7 @@ void main() {
       final doc = Delta()
         ..insert('Doc with link\n')
         ..insert('https://example.com', link);
-      final actual = rule.apply(doc, 33, 0, ' ');
+      final actual = rule.apply(doc, 33, ' ');
       expect(actual, isNull);
     });
   });
@@ -228,7 +228,7 @@ void main() {
         ..insert('\n', ul)
         ..insert('Three')
         ..insert('\n', ul);
-      final actual = rule.apply(doc, 8, 0, 'also \n');
+      final actual = rule.apply(doc, 8, 'also \n');
       final expected = Delta()
         ..retain(8)
         ..insert('also ')
@@ -243,7 +243,7 @@ void main() {
         ..insert('\n\n', ul)
         ..insert('Three')
         ..insert('\n', ul);
-      final actual = rule.apply(doc, 12, 0, '\n');
+      final actual = rule.apply(doc, 12, '\n');
       final expected = Delta()
         ..retain(12)
         ..insert('\n', ul);
@@ -256,7 +256,7 @@ void main() {
         ..insert('\n\n', ul)
         ..insert('Three')
         ..insert('\n', ul);
-      final actual = rule.apply(doc, 8, 0, '111\n222\n333');
+      final actual = rule.apply(doc, 8, '111\n222\n333');
       final expected = Delta()
         ..retain(8)
         ..insert('111')
@@ -277,7 +277,7 @@ void main() {
         ..insert('\n', quote_h1)
         ..insert('Three')
         ..insert('\n', quote);
-      final actual = rule.apply(doc, 8, 0, '111\n');
+      final actual = rule.apply(doc, 8, '111\n');
       final expected = Delta()
         ..retain(8)
         ..insert('111')
@@ -298,7 +298,7 @@ void main() {
         ..insert('\n')
         ..insert('Three')
         ..insert('\n');
-      final actual = rule.apply(doc, 12, 0, BlockEmbed.horizontalRule);
+      final actual = rule.apply(doc, 12, BlockEmbed.horizontalRule);
       final expected = Delta()
         ..retain(12)
         ..insert(BlockEmbed.horizontalRule);
@@ -312,7 +312,7 @@ void main() {
         ..insert('embed here\n')
         ..insert('Three')
         ..insert('\n');
-      final actual = rule.apply(doc, 12, 0, BlockEmbed.horizontalRule);
+      final actual = rule.apply(doc, 12, BlockEmbed.horizontalRule);
       final expected = Delta()
         ..retain(12)
         ..insert(BlockEmbed.horizontalRule)
@@ -327,7 +327,7 @@ void main() {
         ..insert('embed here\n')
         ..insert('Three')
         ..insert('\n');
-      final actual = rule.apply(doc, 11, 0, BlockEmbed.horizontalRule);
+      final actual = rule.apply(doc, 11, BlockEmbed.horizontalRule);
       final expected = Delta()
         ..retain(11)
         ..insert('\n')
@@ -342,7 +342,7 @@ void main() {
         ..insert('embed here\n')
         ..insert('Three')
         ..insert('\n');
-      final actual = rule.apply(doc, 17, 0, BlockEmbed.horizontalRule);
+      final actual = rule.apply(doc, 17, BlockEmbed.horizontalRule);
       final expected = Delta()
         ..retain(17)
         ..insert('\n')

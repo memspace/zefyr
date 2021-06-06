@@ -34,7 +34,6 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
           children: children,
           node: node,
           textDirection: textDirection,
-          scrollBottomInset: scrollBottomInset,
           padding: padding.add(contentPadding),
         );
 
