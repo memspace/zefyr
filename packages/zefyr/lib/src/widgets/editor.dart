@@ -1190,7 +1190,7 @@ class RawEditorState extends EditorState
                     '\n',
                     selection: widget.controller.selection.copyWith(
                       baseOffset: widget.controller.selection.baseOffset + 1,
-                      extentOffset: widget.controller.selection.baseOffset + 1, //選択範囲を解除
+                      extentOffset: widget.controller.selection.baseOffset + 1,
                     ),
                   );
                 },
