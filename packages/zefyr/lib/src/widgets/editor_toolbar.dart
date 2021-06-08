@@ -7,13 +7,11 @@ const double kToolbarHeight = 56.0;
 
 class InsertEmbedButton extends StatelessWidget {
   final ZefyrController controller;
-  final Color fillColor;
   final IconData icon;
 
   const InsertEmbedButton({
     Key key,
     @required this.controller,
-    this.fillColor,
     @required this.icon,
   }) : super(key: key);
   @override
@@ -27,7 +25,7 @@ class InsertEmbedButton extends StatelessWidget {
         size: 18,
         color: Theme.of(context).iconTheme.color,
       ),
-      fillColor: fillColor,
+      fillColor: Theme.of(context).canvasColor,
       onPressed: () {
         final index = controller.selection.baseOffset;
         final length = controller.selection.extentOffset - index;
@@ -155,7 +153,6 @@ class _LinkDialogState extends State<_LinkDialog> {
 typedef ToggleStyleButtonBuilder = Widget Function(
   BuildContext context,
   NotusAttribute attribute,
-  Color fillColor,
   IconData icon,
   bool isToggled,
   VoidCallback onPressed,
@@ -240,8 +237,8 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
         _selectionStyle.containsSame(NotusAttribute.block.code);
     final isEnabled =
         !isInCodeBlock || widget.attribute == NotusAttribute.block.code;
-    return widget.childBuilder(context, widget.attribute, widget.fillColor,
-        widget.icon, _isToggled, isEnabled ? _toggleAttribute : null);
+    return widget.childBuilder(context, widget.attribute, widget.icon,
+        _isToggled, isEnabled ? _toggleAttribute : null);
   }
 
   void _toggleAttribute() {
@@ -257,7 +254,6 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
 Widget defaultToggleStyleButtonBuilder(
   BuildContext context,
   NotusAttribute attribute,
-  Color fillColor,
   IconData icon,
   bool isToggled,
   VoidCallback onPressed,
@@ -269,12 +265,12 @@ Widget defaultToggleStyleButtonBuilder(
           ? theme.primaryIconTheme.color
           : theme.iconTheme.color
       : theme.disabledColor;
-  fillColor = isToggled ? theme.toggleableActiveColor : fillColor;
+  final fillColor = isToggled ? theme.toggleableActiveColor : theme.canvasColor;
   return ZIconButton(
     highlightElevation: 0,
     hoverElevation: 0,
-    size: 36,
-    icon: Icon(icon, size: 22, color: iconColor),
+    size: 32,
+    icon: Icon(icon, size: 18, color: iconColor),
     fillColor: fillColor,
     onPressed: onPressed,
   );

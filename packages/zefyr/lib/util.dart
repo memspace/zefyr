@@ -12,9 +12,6 @@ import 'package:quill_delta/quill_delta.dart';
 export 'src/fast_diff.dart';
 
 int getPositionDelta(Delta user, Delta actual) {
-  if (actual.isEmpty) {
-    return 0;
-  }
   final userIter = DeltaIterator(user);
   final actualIter = DeltaIterator(actual);
   var diff = 0;

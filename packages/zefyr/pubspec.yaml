@@ -17,7 +17,7 @@ dependencies:
   notus:
     git:
       url: https://github.com/hokutoresident/zefyr
-      ref: feature/unsupported-exception
+      ref: 1.0-dev
       path: packages/notus
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
