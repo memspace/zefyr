@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:notus/notus.dart';
 
 import '../rendering/editable_text_block.dart';
@@ -98,7 +99,7 @@ class EditableTextBlock extends StatelessWidget {
     } else if (block == NotusAttribute.block.bulletList) {
       return _BulletPoint(
         style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
-        width: 16,
+        width: 24,
       );
     } else {
       return null;
@@ -112,9 +113,9 @@ class EditableTextBlock extends StatelessWidget {
     } else if (block == NotusAttribute.block.code) {
       return 0;
     } else if (block == NotusAttribute.block.bulletList) {
-      return 16.0;
+      return 28.0;
     } else if (block == NotusAttribute.block.numberList) {
-      return 25.0;
+      return 28.0;
     } else {
       return 16.0;
     }
@@ -242,10 +243,14 @@ class _NumberPoint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: width,
+      padding: EdgeInsets.only(right: 4),
       child: Text(
         withDot ? '$index.' : '$index',
-        style: style,
-        textAlign: TextAlign.left,
+        textAlign: TextAlign.right,
+        style: GoogleFonts.notoSans(
+          color: style.color,
+          fontSize: style.fontSize,
+        ),
       ),
     );
   }
@@ -265,7 +270,14 @@ class _BulletPoint extends StatelessWidget {
     return Container(
       alignment: AlignmentDirectional.topCenter,
       width: width,
-      child: Text('•', style: style),
+      child: Container(
+        height: 6,
+        width: 6,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.black,
+        ),
+      ),
     );
   }
 }
