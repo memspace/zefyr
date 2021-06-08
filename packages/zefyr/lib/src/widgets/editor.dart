@@ -1177,7 +1177,29 @@ class RawEditorState extends EditorState
         child: SingleChildScrollView(
           controller: _scrollController,
           physics: widget.scrollPhysics,
-          child: child,
+          // NOTE: ノートの下の方に余白を持たせて、余白をタップすると最後尾で改行する
+          child: Column(
+            children: [
+              child,
+              GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  widget.controller.replaceText(
+                    widget.controller.document.length - 1,
+                    0,
+                    '\n',
+                    selection: widget.controller.selection.copyWith(
+                      baseOffset: widget.controller.selection.baseOffset + 1,
+                      extentOffset: widget.controller.selection.baseOffset + 1,
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 200,
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
