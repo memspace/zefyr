@@ -181,17 +181,6 @@ class ZefyrEditor extends StatefulWidget {
   /// Defaults to [defaultZefyrEmbedBuilder].
   final ZefyrEmbedBuilder embedBuilder;
 
-  final bool Function(TapDownDetails details, TextPosition textPosition)
-      onTapDown;
-  final bool Function(TapUpDetails details, TextPosition textPosition) onTapUp;
-  final bool Function(LongPressStartDetails details, TextPosition textPosition)
-      onSingleLongTapStart;
-  final bool Function(
-          LongPressMoveUpdateDetails details, TextPosition textPosition)
-      onSingleLongTapMoveUpdate;
-  final bool Function(LongPressEndDetails details, TextPosition textPosition)
-      onSingleLongTapEnd;
-
   const ZefyrEditor({
     Key key,
     @required this.controller,
@@ -213,11 +202,6 @@ class ZefyrEditor extends StatefulWidget {
     this.onLaunchUrl,
     this.onTapEmbedObject,
     this.embedBuilder = defaultZefyrEmbedBuilder,
-    this.onTapDown,
-    this.onTapUp,
-    this.onSingleLongTapStart,
-    this.onSingleLongTapMoveUpdate,
-    this.onSingleLongTapEnd,
   })  : assert(controller != null),
         super(key: key);
 
@@ -238,50 +222,6 @@ class _ZefyrEditorState extends State<ZefyrEditor>
 
   @override
   bool get selectionEnabled => widget.enableInteractiveSelection;
-
-  @override
-  bool overrideHandleTapDown(
-      TapDownDetails details, TextPosition textPosition) {
-    if (widget.onTapDown == null) {
-      return false;
-    }
-    return widget.onTapDown(details, textPosition);
-  }
-
-  @override
-  bool overrideHandleTapUp(TapUpDetails details, TextPosition textPosition) {
-    if (widget.onTapUp == null) {
-      return false;
-    }
-    return widget.onTapUp(details, textPosition);
-  }
-
-  @override
-  bool overrideSingleLongTapStart(
-      LongPressStartDetails details, TextPosition textPosition) {
-    if (widget.onSingleLongTapStart == null) {
-      return false;
-    }
-    return widget.onSingleLongTapStart(details, textPosition);
-  }
-
-  @override
-  bool overrideSingleLongTapMoveUpdate(
-      LongPressMoveUpdateDetails details, TextPosition textPosition) {
-    if (widget.onSingleLongTapMoveUpdate == null) {
-      return false;
-    }
-    return widget.onSingleLongTapMoveUpdate(details, textPosition);
-  }
-
-  @override
-  bool overrideSingleLongTapEnd(
-      LongPressEndDetails details, TextPosition textPosition) {
-    if (widget.onSingleLongTapEnd == null) {
-      return false;
-    }
-    return widget.onSingleLongTapEnd(details, textPosition);
-  }
 
   EditorTextSelectionGestureDetectorBuilder _selectionGestureDetectorBuilder;
 
@@ -351,7 +291,6 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       focusNode: widget.focusNode,
       scrollController: widget.scrollController,
       scrollable: widget.scrollable,
-      scrollBottomInset: widget.scrollBottomInset,
       padding: widget.padding,
       autofocus: widget.autofocus,
       showCursor: widget.showCursor,
@@ -412,12 +351,6 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
 
   @override
   void onSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details) {
-    if (_state.widget.onSingleLongTapMoveUpdate != null) {
-      if (_state.widget.onSingleLongTapMoveUpdate(
-          details, renderEditor.getPositionForOffset(details.globalPosition))) {
-        return;
-      }
-    }
     if (delegate.selectionEnabled) {
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
@@ -461,12 +394,6 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
 
   @override
   void onSingleTapUp(TapUpDetails details) {
-    if (_state.widget.onTapUp != null) {
-      if (_state.widget.onTapUp(
-          details, renderEditor.getPositionForOffset(details.globalPosition))) {
-        return;
-      }
-    }
     editor.hideToolbar();
 
     // TODO: Explore if we can forward tap up events to the TextSpan gesture detector
@@ -506,12 +433,6 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
 
   @override
   void onSingleLongTapStart(LongPressStartDetails details) {
-    if (_state.widget.onSingleLongTapStart != null) {
-      if (_state.widget.onSingleLongTapStart(
-          details, renderEditor.getPositionForOffset(details.globalPosition))) {
-        return;
-      }
-    }
     if (delegate.selectionEnabled) {
       switch (Theme.of(_state.context).platform) {
         case TargetPlatform.iOS:
@@ -540,7 +461,6 @@ class RawEditor extends StatefulWidget {
     @required this.focusNode,
     this.scrollController,
     this.scrollable = true,
-    this.scrollBottomInset = 0,
     this.padding = EdgeInsets.zero,
     this.autofocus = false,
     bool showCursor,
@@ -596,9 +516,6 @@ class RawEditor extends StatefulWidget {
   final ScrollController scrollController;
 
   final bool scrollable;
-
-  /// Additional inset to show cursor properly.
-  final double scrollBottomInset;
 
   /// Additional space around the editor contents.
   final EdgeInsetsGeometry padding;
@@ -860,6 +777,12 @@ class RawEditorState extends EditorState
 
   void _updateSelectionOverlayForScroll() {
     _selectionOverlay?.updateForScroll();
+  }
+
+  @override
+  void userUpdateTextEditingValue(
+      TextEditingValue value, SelectionChangedCause cause) {
+    // TODO: implement userUpdateTextEditingValue
   }
 
   // State lifecycle:
@@ -1156,7 +1079,6 @@ class RawEditorState extends EditorState
           startHandleLayerLink: _startHandleLayerLink,
           endHandleLayerLink: _endHandleLayerLink,
           onSelectionChanged: _handleSelectionChanged,
-          scrollBottomInset: widget.scrollBottomInset,
           padding: widget.padding,
         ),
       ),
@@ -1305,7 +1227,6 @@ class _Editor extends MultiChildRenderObjectWidget {
     @required this.startHandleLayerLink,
     @required this.endHandleLayerLink,
     @required this.onSelectionChanged,
-    this.scrollBottomInset = 0,
     this.padding = EdgeInsets.zero,
   }) : super(key: key, children: children);
 
@@ -1316,7 +1237,6 @@ class _Editor extends MultiChildRenderObjectWidget {
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
   final TextSelectionChangedHandler onSelectionChanged;
-  final double scrollBottomInset;
   final EdgeInsetsGeometry padding;
 
   @override
@@ -1329,7 +1249,6 @@ class _Editor extends MultiChildRenderObjectWidget {
       startHandleLayerLink: startHandleLayerLink,
       endHandleLayerLink: endHandleLayerLink,
       onSelectionChanged: onSelectionChanged,
-      scrollBottomInset: scrollBottomInset,
       padding: padding,
     );
   }
@@ -1345,7 +1264,6 @@ class _Editor extends MultiChildRenderObjectWidget {
     renderObject.startHandleLayerLink = startHandleLayerLink;
     renderObject.endHandleLayerLink = endHandleLayerLink;
     renderObject.onSelectionChanged = onSelectionChanged;
-    renderObject.scrollBottomInset = scrollBottomInset;
     renderObject.padding = padding;
   }
 
