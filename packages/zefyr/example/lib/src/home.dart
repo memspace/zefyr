@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:notus/src/exceptions/unsupported_format.dart';
 
 import 'package:example/src/read_only_view.dart';
 import 'package:file/local.dart';
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   final FocusNode _focusNode = FocusNode();
 
   Settings _settings;
+  var _isContainsUnsupportedFormat = false;
 
   void _handleSettingsLoaded(Settings value) {
     setState(() {
@@ -44,8 +46,15 @@ class _HomePageState extends State<HomePage> {
       final doc = NotusDocument.fromJson(jsonDecode(result));
       setState(() {
         _controller = ZefyrController(doc);
+        _isContainsUnsupportedFormat = false;
       });
-    } catch (error) {
+    } catch (exception) {
+      if (exception is UnsupportedFormatException) {
+        // 対応してない規格エラー
+        setState(() {
+          _isContainsUnsupportedFormat = true;
+        });
+      }
       final doc = NotusDocument()..insert(0, 'Empty asset');
       setState(() {
         _controller = ZefyrController(doc);
@@ -185,56 +194,63 @@ class _HomePageState extends State<HomePage> {
           ).children
         ]),
         Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
-        Expanded(
-          child: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-            child: ZefyrEditor(
-              controller: _controller,
-              focusNode: _focusNode,
-              autofocus: true,
-              embedBuilder: (context, node) {
-                if (node.value.type == 'hr') {
-                  final theme = ZefyrTheme.of(context);
-                  assert(
-                      theme.paragraph != null, 'Paragraph theme must be set');
-                  return Divider(
-                    height: theme.paragraph.style.fontSize *
-                        theme.paragraph.style.height,
-                    thickness: 2,
-                    color: Colors.grey.shade200,
-                  );
-                }
-                if (node.value.type == 'image') {
-                  return Image.network(
-                    node.value.data['source'] as String,
-                    fit: BoxFit.fitWidth,
-                    loadingBuilder: (context, widget, event) => event == null
-                        ? widget
-                        : SizedBox(
+
+        _isContainsUnsupportedFormat
+            ? Expanded(
+              child: Center(
+                  child: Text('This document has unsupported format.'),
+                ),
+            )
+            : Expanded(
+                child: Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                  child: ZefyrEditor(
+                    controller: _controller,
+                    focusNode: _focusNode,
+                    autofocus: true,
+                    embedBuilder: (context, node) {
+                      if (node.value.type == 'hr') {
+                        final theme = ZefyrTheme.of(context);
+                        assert(
+                        theme.paragraph != null, 'Paragraph theme must be set');
+                        return Divider(
+                          height: theme.paragraph.style.fontSize *
+                              theme.paragraph.style.height,
+                          thickness: 2,
+                          color: Colors.grey.shade200,
+                        );
+                      }
+                      if (node.value.type == 'image') {
+                        return Image.network(
+                          node.value.data['source'] as String,
+                          fit: BoxFit.fitWidth,
+                          loadingBuilder: (context, widget, event) => event == null
+                              ? widget
+                              : SizedBox(
                             width: 200,
                             height: 200,
                           ),
-                  );
-                }
-                if (node.value.type == 'pdf') {
-                  final url = node.value.data['source'] as String;
-                  final fileName = node.value.data['name'] as String;
-                  final size = node.value.data['size'] as int;
-                  return Text(
-                    'pdf url: $url, fileName: $fileName, size: $size',
-                  );
-                }
-                throw UnimplementedError(
-                    'Embeddable type "${node.value.type}" is not supported by default embed '
-                    'builder of ZefyrEditor. You must pass your own builder function to '
-                    'embedBuilder property of ZefyrEditor or ZefyrField widgets.');
-              },
-              // readOnly: true,
-              // padding: EdgeInsets.only(left: 16, right: 16),
-              onLaunchUrl: _launchUrl,
-            ),
-          ),
+                        );
+                      }
+                      if (node.value.type == 'pdf') {
+                        final url = node.value.data['source'] as String;
+                        final fileName = node.value.data['name'] as String;
+                        final size = node.value.data['size'] as int;
+                        return Text(
+                          'pdf url: $url, fileName: $fileName, size: $size',
+                        );
+                      }
+                      throw UnimplementedError(
+                          'Embeddable type "${node.value.type}" is not supported by default embed '
+                              'builder of ZefyrEditor. You must pass your own builder function to '
+                              'embedBuilder property of ZefyrEditor or ZefyrField widgets.');
+                    },
+                    // readOnly: true,
+                    // padding: EdgeInsets.only(left: 16, right: 16),
+                    onLaunchUrl: _launchUrl,
+                  ),
+                ),
         ),
       ],
     );
