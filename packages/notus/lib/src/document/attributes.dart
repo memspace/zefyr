@@ -150,10 +150,10 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     if (!_registry.containsKey(key)) {
       throw UnsupportedFormatException('NotusAttribute has a unsupported key. key: $key');
     }
-    if (key == NotusAttribute.block.key && !_validBlockValues.contains(value)) {
+    if (key == NotusAttribute.block.key && !_validBlockValues.contains(value) && value != null) {
       throw UnsupportedFormatException('NotusAttribute has a unsupported block value. block: $value');
     }
-    if (key == NotusAttribute.heading.key && !_validHeadingValues.contains(value)) {
+    if (key == NotusAttribute.heading.key && !_validHeadingValues.contains(value) && value != null) {
       throw UnsupportedFormatException('NotusAttribute has a unsupported heading value. heading: $value');
     }
 
