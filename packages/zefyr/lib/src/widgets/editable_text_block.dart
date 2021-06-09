@@ -268,6 +268,7 @@ class _BulletPoint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.only(top: 7),
       alignment: AlignmentDirectional.topCenter,
       width: width,
       child: Container(
