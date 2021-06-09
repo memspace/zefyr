@@ -266,6 +266,11 @@ class NotusStyle {
     return get<dynamic>(attribute) == attribute;
   }
 
+  bool containsAny(List<NotusAttribute> attributes) {
+    assert(attributes != null);
+    return attributes.any((attribute) => get<dynamic>(attribute) == attribute);
+  }
+
   /// Returns value of specified attribute [key] in this set.
   T value<T>(NotusAttributeKey<T> key) => get(key).value;
 
