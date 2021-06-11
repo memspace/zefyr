@@ -1099,19 +1099,7 @@ class RawEditorState extends EditorState
         child: SingleChildScrollView(
           controller: _scrollController,
           physics: widget.scrollPhysics,
-          // NOTE: ノートの下の方に余白を持たせて、余白をタップすると最後尾で改行する
-          child: Column(
-            children: [
-              child,
-              GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () => _insertNewLineAtDocumentEnd(),
-                child: Container(
-                  height: 200,
-                ),
-              ),
-            ],
-          ),
+          child: child,
         ),
       );
     }
@@ -1128,13 +1116,23 @@ class RawEditorState extends EditorState
         cursor: SystemMouseCursors.text,
         child: Container(
           constraints: constraints,
-          // NOTE: ノートの下の方に余白を持たせて、余白をタップすると最後尾で改行する
           child: Column(
             children: [
               child,
+              // NOTE: ノートの下の方に余白を持たせて、余白をタップすると最後尾で改行する
               GestureDetector(
                 behavior: HitTestBehavior.translucent,
-                onTap: () => _insertNewLineAtDocumentEnd(),
+                onTap: () {
+                  widget.controller.replaceText(
+                    widget.controller.document.length - 1,
+                    0,
+                    '\n',
+                    selection: widget.controller.selection.copyWith(
+                      baseOffset: widget.controller.selection.baseOffset + 1,
+                      extentOffset: widget.controller.selection.baseOffset + 1,
+                    ),
+                  );
+                },
                 child: Container(
                   height: 200,
                 ),
@@ -1142,18 +1140,6 @@ class RawEditorState extends EditorState
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _insertNewLineAtDocumentEnd() {
-    widget.controller.replaceText(
-      widget.controller.document.length - 1,
-      0,
-      '\n',
-      selection: widget.controller.selection.copyWith(
-        baseOffset: widget.controller.selection.baseOffset + 1,
-        extentOffset: widget.controller.selection.baseOffset + 1,
       ),
     );
   }
