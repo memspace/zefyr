@@ -1099,10 +1099,27 @@ class RawEditorState extends EditorState
         child: SingleChildScrollView(
           controller: _scrollController,
           physics: widget.scrollPhysics,
-          // NOTE: ノートの下の方に余白を持たせて、余白をタップすると最後尾で改行する
+          child: child,
+        ),
+      );
+    }
+
+    final constraints = widget.expands
+        ? BoxConstraints.expand()
+        : BoxConstraints(
+            minHeight: widget.minHeight ?? 0.0,
+            maxHeight: widget.maxHeight ?? double.infinity);
+
+    return ZefyrTheme(
+      data: _themeData,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.text,
+        child: Container(
+          constraints: constraints,
           child: Column(
             children: [
               child,
+              // NOTE: ノートの下の方に余白を持たせて、余白をタップすると最後尾で改行する
               GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () {
@@ -1122,23 +1139,6 @@ class RawEditorState extends EditorState
               ),
             ],
           ),
-        ),
-      );
-    }
-
-    final constraints = widget.expands
-        ? BoxConstraints.expand()
-        : BoxConstraints(
-            minHeight: widget.minHeight ?? 0.0,
-            maxHeight: widget.maxHeight ?? double.infinity);
-
-    return ZefyrTheme(
-      data: _themeData,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.text,
-        child: Container(
-          constraints: constraints,
-          child: child,
         ),
       ),
     );
