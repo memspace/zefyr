@@ -1084,7 +1084,7 @@ class RawEditorState extends EditorState
       ),
     );
 
-    if (widget.scrollable) {
+    if (widget.scrollable || widget.scrollController != null) {
       /// Since [SingleChildScrollView] does not implement
       /// `computeDistanceToActualBaseline` it prevents the editor from
       /// providing its baseline metrics. To address this issue we wrap
