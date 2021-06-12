@@ -80,6 +80,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.underline.key: NotusAttribute.underline,
     NotusAttribute.strikethrough.key: NotusAttribute.strikethrough,
     NotusAttribute.textColor.key: NotusAttribute.textColor,
+    NotusAttribute.marker.key: NotusAttribute.marker,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
@@ -101,6 +102,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// text color style attribute.
   static const textColor = _TextColorAttribute();
+
+  /// marker style attribute.
+  static const marker = _MarkerAttribute();
 
   /// Link style attribute.
   // ignore: const_eval_throws_exception
@@ -381,6 +385,12 @@ class _StrikethroughAttribute extends NotusAttribute<bool> {
 class _TextColorAttribute extends NotusAttribute<bool> {
   const _TextColorAttribute()
       : super._('tc', NotusAttributeScope.inline, true);
+}
+
+/// Applies marker style to a text segment.
+class _MarkerAttribute extends NotusAttribute<bool> {
+  const _MarkerAttribute()
+      : super._('m', NotusAttributeScope.inline, true);
 }
 
 /// Builder for link attribute values.

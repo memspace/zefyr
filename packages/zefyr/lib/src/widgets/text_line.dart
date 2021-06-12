@@ -137,6 +137,9 @@ class TextLine extends StatelessWidget {
     if (style.contains(NotusAttribute.textColor)) {
       result = _mergeTextStyleWithDecoration(result, theme.textColor);
     }
+    if (style.contains(NotusAttribute.marker)) {
+      result = _mergeTextStyleWithDecoration(result, theme.marker);
+    }
 
     return result;
   }
