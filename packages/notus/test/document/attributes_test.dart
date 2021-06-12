@@ -31,6 +31,12 @@ void main() {
       final attr = attrs.get(NotusAttribute.strikethrough);
       expect(attr, NotusAttribute.strikethrough);
     });
+
+    test('valid marker', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'m': true});
+      final attr = attrs.get(NotusAttribute.marker);
+      expect(attr, NotusAttribute.marker);
+    });
   });
 
   group('$NotusStyle block', () {
