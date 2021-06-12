@@ -125,7 +125,7 @@ class ZefyrThemeData {
       italic: TextStyle(fontStyle: FontStyle.italic),
       underline: TextStyle(decoration: TextDecoration.underline),
       strikethrough: TextStyle(decoration: TextDecoration.lineThrough),
-      textColor: TextStyle(color: Colors.blue),
+      textColor: TextStyle(color: Color(0xffFF5555)),
       link: TextStyle(
         color: themeData.accentColor,
         decoration: TextDecoration.underline,
