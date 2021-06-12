@@ -31,6 +31,12 @@ void main() {
       final attr = attrs.get(NotusAttribute.strikethrough);
       expect(attr, NotusAttribute.strikethrough);
     });
+
+    test('valid text color', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'tc': true});
+      final attr = attrs.get(NotusAttribute.textColor);
+      expect(attr, NotusAttribute.textColor);
+    });
   });
 
   group('$NotusStyle block', () {
