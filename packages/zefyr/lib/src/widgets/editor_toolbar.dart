@@ -519,7 +519,10 @@ class _ZefyrToolbarState extends State<ZefyrToolbar> {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: widget.children,
+          children: [
+            const SizedBox(width: 8),
+            ...widget.children,
+          ],
         ),
       ),
     );
