@@ -522,6 +522,7 @@ class _ZefyrToolbarState extends State<ZefyrToolbar> {
           children: [
             const SizedBox(width: 8),
             ...widget.children,
+            const SizedBox(width: 8),
           ],
         ),
       ),
