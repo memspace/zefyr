@@ -515,7 +515,6 @@ class _ZefyrToolbarState extends State<ZefyrToolbar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8),
       constraints: BoxConstraints.tightFor(height: widget.preferredSize.height),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
