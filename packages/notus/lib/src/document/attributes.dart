@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:collection/collection.dart';
+import 'package:notus/src/exceptions/unsupported_format.dart';
 import 'package:quiver_hashcode/hashcode.dart';
 
 /// Scope of a style attribute, defines context in which an attribute can be
@@ -116,6 +117,12 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.heading.level3].
   static NotusAttribute<int> get h3 => heading.level3;
 
+  static final List<int> _validHeadingValues = [
+    heading.level1.value,
+    heading.level2.value,
+    heading.level3.value,
+  ];
+
   /// Block attribute
   // ignore: const_eval_throws_exception
   static const block = BlockAttributeBuilder._();
@@ -132,11 +139,24 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.block.code].
   static NotusAttribute<String> get code => block.code;
 
+  static final List<String> _validBlockValues = [
+    block.bulletList.value,
+    block.numberList.value,
+    block.quote.value,
+    block.code.value,
+  ];
+
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
-      throw ArgumentError.value(
-          key, 'No attribute with key "$key" registered.');
+      throw UnsupportedFormatException('NotusAttribute has a unsupported key. key: $key');
     }
+    if (key == NotusAttribute.block.key && !_validBlockValues.contains(value) && value != null) {
+      throw UnsupportedFormatException('NotusAttribute has a unsupported block value. block: $value');
+    }
+    if (key == NotusAttribute.heading.key && !_validHeadingValues.contains(value) && value != null) {
+      throw UnsupportedFormatException('NotusAttribute has a unsupported heading value. heading: $value');
+    }
+
     final builder = _registry[key];
     return builder.withValue(value);
   }
@@ -244,6 +264,11 @@ class NotusStyle {
   bool containsSame(NotusAttribute attribute) {
     assert(attribute != null);
     return get<dynamic>(attribute) == attribute;
+  }
+
+  bool containsAny(List<NotusAttribute> attributes) {
+    assert(attributes != null);
+    return attributes.any((attribute) => get<dynamic>(attribute) == attribute);
   }
 
   /// Returns value of specified attribute [key] in this set.

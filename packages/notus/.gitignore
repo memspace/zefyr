@@ -4,6 +4,7 @@
 .vscode/
 .packages
 .dart_tool/
+.fvm/flutter_sdk
 packages
 pubspec.lock
 coverage/

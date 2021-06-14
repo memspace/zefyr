@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
+import 'package:notus/src/exceptions/unsupported_format.dart';
 import 'package:quiver_hashcode/hashcode.dart';
 
 const _dataEquality = DeepCollectionEquality();
@@ -112,7 +113,11 @@ class BlockEmbed extends EmbeddableObject {
   BlockEmbed(
     String type, {
     Map<String, dynamic> data = const {},
-  }) : super(type, inline: false, data: data);
+  }) : super(type, inline: false, data: data) {
+    if (!['hr', 'image', 'pdf'].contains(type)) {
+      throw UnsupportedFormatException('BlockEmbed has a unsupported type. type: $type');
+    }
+  }
 
   static final BlockEmbed horizontalRule = BlockEmbed('hr');
   static BlockEmbed image(String source) =>

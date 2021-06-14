@@ -645,15 +645,6 @@ abstract class EditorTextSelectionGestureDetectorBuilderDelegate {
 
   /// Whether the user may select text in the textfield.
   bool get selectionEnabled;
-
-  bool overrideHandleTapDown(TapDownDetails details, TextPosition textPosition);
-  bool overrideHandleTapUp(TapUpDetails details, TextPosition textPosition);
-  bool overrideSingleLongTapStart(
-      LongPressStartDetails details, TextPosition textPosition);
-  bool overrideSingleLongTapMoveUpdate(
-      LongPressMoveUpdateDetails details, TextPosition textPosition);
-  bool overrideSingleLongTapEnd(
-      LongPressEndDetails details, TextPosition textPosition);
 }
 
 /// Builds a [EditorTextSelectionGestureDetector] to wrap an [EditableText].
@@ -718,11 +709,6 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///  * [EditorTextSelectionGestureDetector.onTapDown], which triggers this callback.
   @protected
   void onTapDown(TapDownDetails details) {
-    renderEditor.resetTapDownStatus();
-    if (delegate.overrideHandleTapDown(
-        details, renderEditor.getPositionForOffset(details.globalPosition))) {
-      return;
-    }
     renderEditor.handleTapDown(details);
     // The selection overlay should only be shown when the user is interacting
     // through a touch screen (via either a finger or a stylus). A mouse shouldn't
@@ -788,10 +774,6 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///    this callback.
   @protected
   void onSingleTapUp(TapUpDetails details) {
-    if (delegate.overrideHandleTapUp(
-        details, renderEditor.getPositionForOffset(details.globalPosition))) {
-      return;
-    }
     if (delegate.selectionEnabled) {
       renderEditor.selectWordEdge(cause: SelectionChangedCause.tap);
     }
@@ -821,10 +803,6 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///    this callback.
   @protected
   void onSingleLongTapStart(LongPressStartDetails details) {
-    if (delegate.overrideSingleLongTapStart(
-        details, renderEditor.getPositionForOffset(details.globalPosition))) {
-      return;
-    }
     if (delegate.selectionEnabled) {
       renderEditor.selectPositionAt(
         from: details.globalPosition,
@@ -844,10 +822,6 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///    triggers this callback.
   @protected
   void onSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details) {
-    if (delegate.overrideSingleLongTapMoveUpdate(
-        details, renderEditor.getPositionForOffset(details.globalPosition))) {
-      return;
-    }
     if (delegate.selectionEnabled) {
       renderEditor.selectPositionAt(
         from: details.globalPosition,
@@ -866,10 +840,6 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///    callback.
   @protected
   void onSingleLongTapEnd(LongPressEndDetails details) {
-    if (delegate.overrideSingleLongTapEnd(
-        details, renderEditor.getPositionForOffset(details.globalPosition))) {
-      return;
-    }
     if (shouldShowSelectionToolbar) editor.showToolbar();
   }
 

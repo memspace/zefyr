@@ -2,6 +2,7 @@
 .atom/
 .idea
 .vscode/
+.fvm/flutter_sdk
 *.code-workspace
 .packages
 .pub/

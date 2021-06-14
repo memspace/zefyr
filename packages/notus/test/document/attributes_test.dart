@@ -12,4 +12,95 @@ void main() {
       expect(attr, NotusAttribute.ul);
     });
   });
+
+  group('$NotusStyle inlines', () {
+    test('valid bold', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'b': true});
+      final attr = attrs.get(NotusAttribute.bold);
+      expect(attr, NotusAttribute.bold);
+    });
+
+    test('valid italic', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'i': true});
+      final attr = attrs.get(NotusAttribute.italic);
+      expect(attr, NotusAttribute.italic);
+    });
+
+    test('valid strikethrough', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'s': true});
+      final attr = attrs.get(NotusAttribute.strikethrough);
+      expect(attr, NotusAttribute.strikethrough);
+    });
+  });
+
+  group('$NotusStyle block', () {
+    test('valid block bulletList', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'ul'});
+      final attr = attrs.get(NotusAttribute.block);
+      expect(attr, NotusAttribute.ul);
+    });
+
+    test('valid block numberList', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'ol'});
+      final attr = attrs.get(NotusAttribute.block);
+      expect(attr, NotusAttribute.ol);
+    });
+
+    test('valid block quote', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'quote'});
+      final attr = attrs.get(NotusAttribute.block);
+      expect(attr, NotusAttribute.bq);
+    });
+
+    test('valid block code', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'code'});
+      final attr = attrs.get(NotusAttribute.block);
+      expect(attr, NotusAttribute.code);
+    });
+
+    test('throws exception when contain invalid block key', () {
+      expect(() => NotusStyle.fromJson(<String, dynamic>{'is not a block': 'ul'}),
+          throwsA(TypeMatcher<UnsupportedFormatException>()));
+    });
+
+    test('throws exception when contain invalid block value', () {
+      expect(() => NotusStyle.fromJson(<String, dynamic>{'block': 'is not a value'}),
+          throwsA(TypeMatcher<UnsupportedFormatException>()));
+    });
+  });
+
+  group('$NotusStyle heading', () {
+    test('valid heading 1', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'heading': 1});
+      final attr = attrs.get(NotusAttribute.heading);
+      expect(attr, NotusAttribute.heading.level1);
+    });
+
+    test('valid heading 2', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'heading': 2});
+      final attr = attrs.get(NotusAttribute.heading);
+      expect(attr, NotusAttribute.heading.level2);
+    });
+
+    test('valid heading 3', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'heading': 3});
+      final attr = attrs.get(NotusAttribute.heading);
+      expect(attr, NotusAttribute.heading.level3);
+    });
+
+    test('throws exception when contain invalid heading key', () {
+      expect(() => NotusStyle.fromJson(<String, dynamic>{'is not a heading key': 1}),
+          throwsA(TypeMatcher<UnsupportedFormatException>()));
+    });
+
+    test('throws exception when contain invalid heading value', () {
+      expect(() => NotusStyle.fromJson(<String, dynamic>{'heading': 6}),
+          throwsA(TypeMatcher<UnsupportedFormatException>()));
+    });
+
+    test('throws exception when contain invalid heading value', () {
+      expect(() => NotusStyle.fromJson(<String, dynamic>{'heading': 'is not a heading value'}),
+          throwsA(TypeMatcher<UnsupportedFormatException>()));
+    });
+  });
 }
