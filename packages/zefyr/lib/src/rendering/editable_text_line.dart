@@ -573,7 +573,6 @@ class RenderEditableTextLine extends RenderEditableBox {
       return;
     }
     final innerConstraints = constraints.deflate(_resolvedPadding);
-    print(innerConstraints);
 
     final indentWidth =
         textDirection == TextDirection.ltr ? _resolvedPadding.left : _resolvedPadding.right;
@@ -631,11 +630,7 @@ class RenderEditableTextLine extends RenderEditableBox {
           !_cursorController.style.paintAboveText) {
         _paintCursor(context, effectiveOffset);
       }
-      if (node.style.get(NotusAttribute.block) == NotusAttribute.block.bulletList) {
-        context.paintChild(body, effectiveOffset + Offset(0, -3.5));
-      } else {
-        context.paintChild(body, effectiveOffset);
-      }
+      context.paintChild(body, effectiveOffset);
       if (hasFocus &&
           _cursorController.showCursor.value &&
           containsCursor &&
