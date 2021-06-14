@@ -82,8 +82,7 @@ class EditableTextLine extends RenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, covariant RenderEditableTextLine renderObject) {
+  void updateRenderObject(BuildContext context, covariant RenderEditableTextLine renderObject) {
     renderObject.node = node;
     renderObject.padding = _padding;
     renderObject.textDirection = textDirection;
@@ -105,8 +104,7 @@ class _RenderEditableTextLineElement extends RenderObjectElement {
   EditableTextLine get widget => super.widget as EditableTextLine;
 
   @override
-  RenderEditableTextLine get renderObject =>
-      super.renderObject as RenderEditableTextLine;
+  RenderEditableTextLine get renderObject => super.renderObject as RenderEditableTextLine;
 
   @override
   void visitChildren(ElementVisitor visitor) {
@@ -186,8 +184,7 @@ class _RenderEditableTextLineElement extends RenderObjectElement {
   }
 
   @override
-  void moveRenderObjectChild(
-      RenderObject child, dynamic oldSlot, dynamic newSlot) {
+  void moveRenderObjectChild(RenderObject child, dynamic oldSlot, dynamic newSlot) {
     assert(false, 'not reachable');
   }
 }
