@@ -97,6 +97,10 @@ class ZefyrThemeData {
   /// Style theme for code blocks.
   final TextBlockTheme code;
 
+  final TextBlockTheme largeHeading;
+
+  final TextBlockTheme middleHeading;
+
   ZefyrThemeData({
     this.bold,
     this.italic,
@@ -110,6 +114,8 @@ class ZefyrThemeData {
     this.lists,
     this.quote,
     this.code,
+    this.largeHeading,
+    this.middleHeading,
   });
 
   factory ZefyrThemeData.fallback(BuildContext context) {
@@ -204,6 +210,24 @@ class ZefyrThemeData {
             width: 1,
           ),
         ),
+      ),
+      largeHeading: TextBlockTheme(
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w700,
+          fontSize: 20.0,
+          height: 2,
+        ),
+        spacing: VerticalSpacing(top: 16, bottom: 16),
+      ),
+      middleHeading: TextBlockTheme(
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w700,
+          fontSize: 18.0,
+          height: 1.6,
+        ),
+        spacing: VerticalSpacing(top: 16, bottom: 16),
       ),
     );
   }

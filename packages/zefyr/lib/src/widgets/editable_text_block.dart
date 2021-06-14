@@ -120,8 +120,7 @@ class EditableTextBlock extends StatelessWidget {
     }
   }
 
-  VerticalSpacing _getSpacingForLine(
-      LineNode node, int index, int count, ZefyrThemeData theme) {
+  VerticalSpacing _getSpacingForLine(LineNode node, int index, int count, ZefyrThemeData theme) {
     final heading = node.style.get(NotusAttribute.heading);
 
     var top = 0.0;
@@ -146,6 +145,10 @@ class EditableTextBlock extends StatelessWidget {
         lineSpacing = theme.lists.lineSpacing;
       } else if (block == NotusAttribute.block.code) {
         lineSpacing = theme.lists.lineSpacing;
+      } else if (block == NotusAttribute.largeHeading) {
+        lineSpacing = theme.largeHeading.lineSpacing;
+      } else if (block == NotusAttribute.middleHeading) {
+        lineSpacing = theme.middleHeading.lineSpacing;
       }
       top = lineSpacing.top;
       bottom = lineSpacing.bottom;
@@ -193,8 +196,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
     @required List<Widget> children,
   }) : super(key: key, children: children);
 
-  EdgeInsets get _padding =>
-      EdgeInsets.only(top: padding.top, bottom: padding.bottom);
+  EdgeInsets get _padding => EdgeInsets.only(top: padding.top, bottom: padding.bottom);
 
   EdgeInsets get _contentPadding => contentPadding ?? EdgeInsets.zero;
 
@@ -210,8 +212,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, covariant RenderEditableTextBlock renderObject) {
+  void updateRenderObject(BuildContext context, covariant RenderEditableTextBlock renderObject) {
     renderObject.node = node;
     renderObject.textDirection = textDirection;
     renderObject.padding = _padding;

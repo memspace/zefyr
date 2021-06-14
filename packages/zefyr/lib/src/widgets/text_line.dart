@@ -37,8 +37,7 @@ class TextLine extends StatelessWidget {
       return EmbedProxy(child: embedBuilder(context, embed));
     }
     final text = buildText(context, node);
-    final strutStyle =
-        StrutStyle.fromTextStyle(text.style, forceStrutHeight: true);
+    final strutStyle = StrutStyle.fromTextStyle(text.style, forceStrutHeight: true);
     return RichTextProxy(
       textStyle: text.style,
       textDirection: textDirection,
@@ -55,9 +54,8 @@ class TextLine extends StatelessWidget {
 
   TextSpan buildText(BuildContext context, LineNode node) {
     final theme = ZefyrTheme.of(context);
-    final children = node.children
-        .map((node) => _segmentToTextSpan(node, theme))
-        .toList(growable: false);
+    final children =
+        node.children.map((node) => _segmentToTextSpan(node, theme)).toList(growable: false);
     return TextSpan(
       style: _getParagraphTextStyle(node.style, theme),
       children: children,
@@ -74,12 +72,9 @@ class TextLine extends StatelessWidget {
         children: [
           TextSpan(text: segment.value.substring(0, inputtingTextRange.start)),
           TextSpan(
-              text: segment.value
-                  .substring(inputtingTextRange.start, inputtingTextRange.end),
+              text: segment.value.substring(inputtingTextRange.start, inputtingTextRange.end),
               style: style.copyWith(backgroundColor: const Color(0x220000FF))),
-          TextSpan(
-              text: segment.value
-                  .substring(inputtingTextRange.end, segment.value.length)),
+          TextSpan(text: segment.value.substring(inputtingTextRange.end, segment.value.length)),
         ],
         style: _getInlineTextStyle(attrs, theme),
       );
@@ -109,6 +104,10 @@ class TextLine extends StatelessWidget {
       textStyle = textStyle.merge(theme.quote.style);
     } else if (block == NotusAttribute.block.code) {
       textStyle = textStyle.merge(theme.code.style);
+    } else if (block == NotusAttribute.largeHeading) {
+      textStyle = textStyle.merge(theme.largeHeading.style);
+    } else if (block == NotusAttribute.middleHeading) {
+      textStyle = textStyle.merge(theme.middleHeading.style);
     } else if (block != null) {
       // lists
       textStyle = textStyle.merge(theme.lists.style);
