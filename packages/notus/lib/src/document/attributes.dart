@@ -43,8 +43,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
   final String key;
   final NotusAttributeScope scope;
   NotusAttribute<T> get unset => NotusAttribute<T>._(key, scope, null);
-  NotusAttribute<T> withValue(T value) =>
-      NotusAttribute<T>._(key, scope, value);
+  NotusAttribute<T> withValue(T value) => NotusAttribute<T>._(key, scope, value);
 }
 
 /// Style attribute applicable to a segment of a Notus document.
@@ -139,11 +138,17 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.block.code].
   static NotusAttribute<String> get code => block.code;
 
+  static NotusAttribute<String> get largeHeading => block.largeHeading;
+
+  static NotusAttribute<String> get middleHeading => block.middleHeading;
+
   static final List<String> _validBlockValues = [
     block.bulletList.value,
     block.numberList.value,
     block.quote.value,
     block.code.value,
+    block.largeHeading.value,
+    block.middleHeading.value,
   ];
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
@@ -151,10 +156,14 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
       throw UnsupportedFormatException('NotusAttribute has a unsupported key. key: $key');
     }
     if (key == NotusAttribute.block.key && !_validBlockValues.contains(value) && value != null) {
-      throw UnsupportedFormatException('NotusAttribute has a unsupported block value. block: $value');
+      throw UnsupportedFormatException(
+          'NotusAttribute has a unsupported block value. block: $value');
     }
-    if (key == NotusAttribute.heading.key && !_validHeadingValues.contains(value) && value != null) {
-      throw UnsupportedFormatException('NotusAttribute has a unsupported heading value. heading: $value');
+    if (key == NotusAttribute.heading.key &&
+        !_validHeadingValues.contains(value) &&
+        value != null) {
+      throw UnsupportedFormatException(
+          'NotusAttribute has a unsupported heading value. heading: $value');
     }
 
     final builder = _registry[key];
@@ -197,17 +206,14 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   bool get isInline => scope == NotusAttributeScope.inline;
 
   @override
-  NotusAttribute<T> withValue(T value) =>
-      NotusAttribute<T>._(key, scope, value);
+  NotusAttribute<T> withValue(T value) => NotusAttribute<T>._(key, scope, value);
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! NotusAttribute<T>) return false;
     NotusAttribute<T> typedOther = other;
-    return key == typedOther.key &&
-        scope == typedOther.scope &&
-        value == typedOther.value;
+    return key == typedOther.key && scope == typedOther.scope && value == typedOther.value;
   }
 
   @override
@@ -275,8 +281,7 @@ class NotusStyle {
   T value<T>(NotusAttributeKey<T> key) => get(key).value;
 
   /// Returns [NotusAttribute] from this set by specified [key].
-  NotusAttribute<T> get<T>(NotusAttributeKey<T> key) =>
-      _data[key.key] as NotusAttribute<T>;
+  NotusAttribute<T> get<T>(NotusAttributeKey<T> key) => _data[key.key] as NotusAttribute<T>;
 
   /// Returns collection of all attribute keys in this set.
   Iterable<String> get keys => _data.keys;
@@ -330,8 +335,8 @@ class NotusStyle {
   /// Returns JSON-serializable representation of this style.
   Map<String, dynamic> toJson() => _data.isEmpty
       ? null
-      : _data.map<String, dynamic>((String _, NotusAttribute value) =>
-          MapEntry<String, dynamic>(value.key, value.value));
+      : _data.map<String, dynamic>(
+          (String _, NotusAttribute value) => MapEntry<String, dynamic>(value.key, value.value));
 
   @override
   bool operator ==(Object other) {
@@ -369,8 +374,7 @@ class _UnderlineAttribute extends NotusAttribute<bool> {
 
 /// Applies strikethrough style to a text segment.
 class _StrikethroughAttribute extends NotusAttribute<bool> {
-  const _StrikethroughAttribute()
-      : super._('s', NotusAttributeScope.inline, true);
+  const _StrikethroughAttribute() : super._('s', NotusAttributeScope.inline, true);
 }
 
 /// Builder for link attribute values.
@@ -382,8 +386,7 @@ class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
   const LinkAttributeBuilder._() : super._(_kLink, NotusAttributeScope.inline);
 
   /// Creates a link attribute with specified link [value].
-  NotusAttribute<String> fromString(String value) =>
-      NotusAttribute<String>._(key, scope, value);
+  NotusAttribute<String> fromString(String value) => NotusAttribute<String>._(key, scope, value);
 }
 
 /// Builder for heading attribute styles.
@@ -392,8 +395,7 @@ class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
 /// [NotusAttribute.heading] instead.
 class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
   static const _kHeading = 'heading';
-  const HeadingAttributeBuilder._()
-      : super._(_kHeading, NotusAttributeScope.line);
+  const HeadingAttributeBuilder._() : super._(_kHeading, NotusAttributeScope.line);
 
   /// Level 1 heading, equivalent of `H1` in HTML.
   NotusAttribute<int> get level1 => NotusAttribute<int>._(key, scope, 1);
@@ -414,18 +416,20 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   const BlockAttributeBuilder._() : super._(_kBlock, NotusAttributeScope.line);
 
   /// Formats a block of lines as a bullet list.
-  NotusAttribute<String> get bulletList =>
-      NotusAttribute<String>._(key, scope, 'ul');
+  NotusAttribute<String> get bulletList => NotusAttribute<String>._(key, scope, 'ul');
 
   /// Formats a block of lines as a number list.
-  NotusAttribute<String> get numberList =>
-      NotusAttribute<String>._(key, scope, 'ol');
+  NotusAttribute<String> get numberList => NotusAttribute<String>._(key, scope, 'ol');
 
   /// Formats a block of lines as a code snippet, using monospace font.
-  NotusAttribute<String> get code =>
-      NotusAttribute<String>._(key, scope, 'code');
+  NotusAttribute<String> get code => NotusAttribute<String>._(key, scope, 'code');
 
   /// Formats a block of lines as a quote.
-  NotusAttribute<String> get quote =>
-      NotusAttribute<String>._(key, scope, 'quote');
+  NotusAttribute<String> get quote => NotusAttribute<String>._(key, scope, 'quote');
+
+  /// Formats a large heading
+  NotusAttribute<String> get largeHeading => NotusAttribute._(key, scope, 'largeHeading');
+
+  /// Formats a middle heading
+  NotusAttribute<String> get middleHeading => NotusAttribute._(key, scope, 'middleHeading');
 }
