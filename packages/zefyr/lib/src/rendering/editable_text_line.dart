@@ -582,8 +582,11 @@ class RenderEditableTextLine extends RenderEditableBox {
     bodyParentData.offset = Offset(_resolvedPadding.left, _resolvedPadding.top);
 
     if (leading != null) {
-      final leadingConstraints =
-          innerConstraints.copyWith(minWidth: 1, maxHeight: body.size.height);
+      final leadingConstraints = innerConstraints.copyWith(
+        minWidth: indentWidth,
+        maxWidth: indentWidth,
+        maxHeight: body.size.height,
+      );
       leading.layout(leadingConstraints, parentUsesSize: true);
       final parentData = leading.parentData as BoxParentData;
       parentData.offset = Offset(0.0, _resolvedPadding.top);
@@ -609,7 +612,7 @@ class RenderEditableTextLine extends RenderEditableBox {
   void paint(PaintingContext context, Offset offset) {
     if (leading != null) {
       final parentData = leading.parentData as BoxParentData;
-      final effectiveOffset = offset + parentData.offset + Offset(0, body.size.height);
+      final effectiveOffset = offset + parentData.offset;
       context.paintChild(leading, effectiveOffset);
     }
 
