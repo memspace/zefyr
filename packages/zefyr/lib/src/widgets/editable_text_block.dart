@@ -84,8 +84,7 @@ class EditableTextBlock extends StatelessWidget {
     return children.toList(growable: false);
   }
 
-  Widget _buildLeading(
-      BuildContext context, LineNode node, int index, int count) {
+  Widget _buildLeading(BuildContext context, LineNode node, int index, int count) {
     final theme = ZefyrTheme.of(context);
     final block = node.style.get(NotusAttribute.block);
     if (block == NotusAttribute.block.numberList) {
@@ -97,9 +96,14 @@ class EditableTextBlock extends StatelessWidget {
         padding: 8.0,
       );
     } else if (block == NotusAttribute.block.bulletList) {
-      return _BulletPoint(
-        style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
-        width: 24,
+      return Row(
+        children: [
+          Container(
+            color: Color(0xFF0099DD),
+            width: 8,
+            height: 32,
+          ),
+        ],
       );
     } else {
       return null;
@@ -113,7 +117,7 @@ class EditableTextBlock extends StatelessWidget {
     } else if (block == NotusAttribute.block.code) {
       return 0;
     } else if (block == NotusAttribute.block.bulletList) {
-      return 28.0;
+      return 16.0;
     } else if (block == NotusAttribute.block.numberList) {
       return 28.0;
     } else {
@@ -121,8 +125,7 @@ class EditableTextBlock extends StatelessWidget {
     }
   }
 
-  VerticalSpacing _getSpacingForLine(
-      LineNode node, int index, int count, ZefyrThemeData theme) {
+  VerticalSpacing _getSpacingForLine(LineNode node, int index, int count, ZefyrThemeData theme) {
     final heading = node.style.get(NotusAttribute.heading);
 
     var top = 0.0;
@@ -145,8 +148,7 @@ class EditableTextBlock extends StatelessWidget {
       } else if (block == NotusAttribute.block.numberList ||
           block == NotusAttribute.block.bulletList) {
         lineSpacing = theme.lists.lineSpacing;
-      } else if (block == NotusAttribute.block.code ||
-          block == NotusAttribute.block.code) {
+      } else if (block == NotusAttribute.block.code) {
         lineSpacing = theme.lists.lineSpacing;
       }
       top = lineSpacing.top;
@@ -173,6 +175,8 @@ class EditableTextBlock extends StatelessWidget {
       return theme.quote.decoration;
     } else if (style == NotusAttribute.block.code) {
       return theme.code.decoration;
+    } else if (style == NotusAttribute.block.bulletList) {
+      return theme.lists.decoration;
     }
     return null;
   }
@@ -195,8 +199,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
     @required List<Widget> children,
   }) : super(key: key, children: children);
 
-  EdgeInsets get _padding =>
-      EdgeInsets.only(top: padding.top, bottom: padding.bottom);
+  EdgeInsets get _padding => EdgeInsets.only(top: padding.top, bottom: padding.bottom);
 
   EdgeInsets get _contentPadding => contentPadding ?? EdgeInsets.zero;
 
@@ -212,8 +215,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, covariant RenderEditableTextBlock renderObject) {
+  void updateRenderObject(BuildContext context, covariant RenderEditableTextBlock renderObject) {
     renderObject.node = node;
     renderObject.textDirection = textDirection;
     renderObject.padding = _padding;

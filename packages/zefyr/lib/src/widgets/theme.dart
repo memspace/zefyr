@@ -141,6 +141,7 @@ class ZefyrThemeData {
           color: Colors.black,
           height: 1.15,
           fontWeight: FontWeight.w700,
+          backgroundColor: Color(0xFFE6F5FC),
         ),
         spacing: VerticalSpacing(top: 40.0, bottom: 0.0),
       ),
@@ -164,13 +165,16 @@ class ZefyrThemeData {
       ),
       lists: TextBlockTheme(
         style: TextStyle(
-          fontSize: 16.0,
+          fontSize: 20.0,
           color: Colors.black,
-          height: 1.3,
-          fontWeight: FontWeight.w400,
+          height: 1.5,
+          fontWeight: FontWeight.bold,
         ),
-        spacing: VerticalSpacing(top: 16.0, bottom: 0),
-        lineSpacing: VerticalSpacing(bottom: 6),
+        spacing: VerticalSpacing(top: 16.0, bottom: 20),
+        lineSpacing: VerticalSpacing(bottom: 0),
+        decoration: BoxDecoration(
+          color: Color(0xff0099dd).withAlpha(20),
+        ),
       ),
       quote: TextBlockTheme(
         style: TextStyle(
