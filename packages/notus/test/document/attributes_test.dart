@@ -58,6 +58,18 @@ void main() {
       expect(attr, NotusAttribute.code);
     });
 
+    test('valid largeHeading code', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'largeHeading'});
+      final attr = attrs.get(NotusAttribute.block);
+      expect(attr, NotusAttribute.largeHeading);
+    });
+
+    test('valid middleHeading code', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'middleHeading'});
+      final attr = attrs.get(NotusAttribute.block);
+      expect(attr, NotusAttribute.middleHeading);
+    });
+
     test('throws exception when contain invalid block key', () {
       expect(() => NotusStyle.fromJson(<String, dynamic>{'is not a block': 'ul'}),
           throwsA(TypeMatcher<UnsupportedFormatException>()));
