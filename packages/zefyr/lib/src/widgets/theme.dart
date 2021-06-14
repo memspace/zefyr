@@ -219,6 +219,10 @@ class ZefyrThemeData {
           height: 2,
         ),
         spacing: VerticalSpacing(top: 16, bottom: 16),
+        lineSpacing: VerticalSpacing(top: 6, bottom: 2),
+        decoration: BoxDecoration(
+          color: Color(0xff0099dd).withAlpha(20),
+        ),
       ),
       middleHeading: TextBlockTheme(
         style: TextStyle(

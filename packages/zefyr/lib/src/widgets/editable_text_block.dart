@@ -100,6 +100,12 @@ class EditableTextBlock extends StatelessWidget {
         style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
         width: 24,
       );
+    } else if (block == NotusAttribute.largeHeading) {
+      return Container(
+        height: 80,
+        width: 8,
+        color: Color(0xFF0099DD),
+      );
     } else {
       return null;
     }
@@ -174,6 +180,8 @@ class EditableTextBlock extends StatelessWidget {
       return theme.quote.decoration;
     } else if (style == NotusAttribute.block.code) {
       return theme.code.decoration;
+    } else if (style == NotusAttribute.largeHeading) {
+      return theme.largeHeading.decoration;
     }
     return null;
   }
