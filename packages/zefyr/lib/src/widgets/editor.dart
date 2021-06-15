@@ -1106,15 +1106,32 @@ class RawEditorState extends EditorState
               GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () {
-                  widget.controller.replaceText(
-                    widget.controller.document.length - 1,
-                    0,
-                    '\n',
-                    selection: widget.controller.selection.copyWith(
-                      baseOffset: widget.controller.selection.baseOffset + 1,
-                      extentOffset: widget.controller.selection.baseOffset + 1,
-                    ),
-                  );
+                  final wholeText = widget.controller.document.toPlainText();
+                  final lastIndex = wholeText.length - 1;
+                  final lastChar = wholeText[lastIndex];
+                  final secondLastChar = wholeText[lastIndex - 1];
+                  final endsNewLine = lastChar == '\n' && secondLastChar == '\n';
+
+                  // 最後が改行で終わってたらそこにカーソルを合わせる
+                  if (endsNewLine) {
+                    final newSelection = widget.controller.selection.copyWith(
+                      baseOffset: wholeText.length - 1,
+                      extentOffset: wholeText.length - 1,
+                    );
+                    widget.controller.updateSelection(newSelection);
+
+                  // そうでなければ改行を追加する
+                  } else {
+                    widget.controller.replaceText(
+                      widget.controller.document.length - 1,
+                      0,
+                      '\n',
+                      selection: widget.controller.selection.copyWith(
+                        baseOffset: widget.controller.selection.baseOffset + 1,
+                        extentOffset: widget.controller.selection.baseOffset + 1,
+                      ),
+                    );
+                  }
                 },
                 child: Container(
                   height: 200,
