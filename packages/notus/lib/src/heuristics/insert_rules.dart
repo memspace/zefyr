@@ -137,8 +137,7 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
 
     if (targetText.startsWith('\n')) {
       Map<String, dynamic> resetStyle;
-      if (target.attributes != null &&
-          target.attributes.containsKey(NotusAttribute.heading.key)) {
+      if (target.attributes != null && target.attributes.containsKey(NotusAttribute.heading.key)) {
         resetStyle = NotusAttribute.heading.unset.toJson();
       }
       return Delta()
@@ -163,8 +162,7 @@ class AutoExitBlockRule extends InsertRule {
   bool isEmptyLine(Operation before, Operation after) {
     final textBefore = before?.data is String ? before.data as String : '';
     final textAfter = after.data is String ? after.data as String : '';
-    return (before == null || textBefore.endsWith('\n')) &&
-        textAfter.startsWith('\n');
+    return (before == null || textBefore.endsWith('\n')) && textAfter.startsWith('\n');
   }
 
   @override
@@ -177,8 +175,7 @@ class AutoExitBlockRule extends InsertRule {
     final iter = DeltaIterator(document);
     final previous = iter.skip(index);
     final target = iter.next();
-    final isInBlock = target.isNotPlain &&
-        target.attributes.containsKey(NotusAttribute.block.key);
+    final isInBlock = target.isNotPlain && target.attributes.containsKey(NotusAttribute.block.key);
 
     // We are not in a block, ignore.
     if (!isInBlock) return null;
@@ -242,8 +239,7 @@ class PreserveInlineStylesRule extends InsertRule {
     if (previousText.contains('\n')) return null;
 
     final attributes = previous.attributes;
-    final hasLink =
-        (attributes != null && attributes.containsKey(NotusAttribute.link.key));
+    final hasLink = (attributes != null && attributes.containsKey(NotusAttribute.link.key));
     if (!hasLink) {
       return Delta()
         ..retain(index)
@@ -268,8 +264,7 @@ class PreserveInlineStylesRule extends InsertRule {
       return noLinkResult;
     }
     // We must make sure links are identical in previous and next operations.
-    if (attributes[NotusAttribute.link.key] ==
-        nextAttributes[NotusAttribute.link.key]) {
+    if (attributes[NotusAttribute.link.key] == nextAttributes[NotusAttribute.link.key]) {
       return Delta()
         ..retain(index)
         ..insert(text, attributes);
@@ -313,8 +308,7 @@ class AutoFormatLinksRule extends InsertRule {
       // Do nothing if already formatted as link.
       if (attributes.containsKey(NotusAttribute.link.key)) return null;
 
-      attributes
-          .addAll(NotusAttribute.link.fromString(link.toString()).toJson());
+      attributes.addAll(NotusAttribute.link.fromString(link.toString()).toJson());
       return Delta()
         ..retain(index - candidate.length)
         ..retain(candidate.length, attributes)
@@ -478,8 +472,7 @@ class InsertEmbedsRule extends InsertRule {
     return result;
   }
 
-  Map<String, dynamic> _getLineStyle(
-      DeltaIterator iterator, Operation current) {
+  Map<String, dynamic> _getLineStyle(DeltaIterator iterator, Operation current) {
     final currentText = current.data is String ? current.data as String : '';
 
     if (currentText.contains('\n')) {

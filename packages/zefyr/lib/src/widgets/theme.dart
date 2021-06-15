@@ -232,7 +232,7 @@ class ZefyrThemeData {
           height: 1.5,
         ),
         spacing: VerticalSpacing(top: 16, bottom: 0),
-        lineSpacing: VerticalSpacing(top: 0, bottom: 0),
+        lineSpacing: VerticalSpacing(top: 0, bottom: 15),
       ),
     );
   }
