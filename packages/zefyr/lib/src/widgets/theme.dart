@@ -229,9 +229,10 @@ class ZefyrThemeData {
           color: Colors.black,
           fontWeight: FontWeight.w700,
           fontSize: 18.0,
-          height: 1.6,
+          height: 1.5,
         ),
-        spacing: VerticalSpacing(top: 16, bottom: 16),
+        spacing: VerticalSpacing(top: 16, bottom: 0),
+        lineSpacing: VerticalSpacing(top: 0, bottom: 0),
       ),
     );
   }

@@ -19,6 +19,9 @@ class EditableTextLine extends RenderObjectWidget {
   /// The primary rich text content of this widget. Usually [TextLine] widget.
   final Widget body;
 
+  /// A widget to display underline the body.
+  final Widget bottom;
+
   /// Width of indentation space before the [body].
   final double indentWidth;
 
@@ -39,6 +42,7 @@ class EditableTextLine extends RenderObjectWidget {
     @required this.node,
     this.leading,
     @required this.body,
+    this.bottom,
     this.indentWidth = 0.0,
     this.spacing = const VerticalSpacing(),
     @required this.textDirection,
@@ -134,6 +138,7 @@ class _RenderEditableTextLineElement extends RenderObjectElement {
   @override
   void mount(Element parent, dynamic newSlot) {
     super.mount(parent, newSlot);
+    _mountChild(widget.bottom, TextLineSlot.bottom);
     _mountChild(widget.leading, TextLineSlot.leading);
     _mountChild(widget.body, TextLineSlot.body);
   }
@@ -154,6 +159,7 @@ class _RenderEditableTextLineElement extends RenderObjectElement {
     super.update(newWidget);
     assert(widget == newWidget);
     _updateChild(widget.leading, TextLineSlot.leading);
+    _updateChild(widget.bottom, TextLineSlot.bottom);
     _updateChild(widget.body, TextLineSlot.body);
   }
 
@@ -164,6 +170,9 @@ class _RenderEditableTextLineElement extends RenderObjectElement {
         break;
       case TextLineSlot.body:
         renderObject.body = child as RenderBox;
+        break;
+      case TextLineSlot.bottom:
+        renderObject.bottom = child as RenderBox;
         break;
     }
   }
