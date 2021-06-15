@@ -187,7 +187,7 @@ class RenderEditableTextLine extends RenderEditableBox {
   }
 
   RenderBox _updateChild(
-        RenderBox oldChild, RenderBox newChild, TextLineSlot slot) {
+      RenderBox oldChild, RenderBox newChild, TextLineSlot slot) {
     if (oldChild != null) {
       dropChild(oldChild);
       children.remove(slot);
@@ -239,7 +239,7 @@ class RenderEditableTextLine extends RenderEditableBox {
   @override
   Offset getOffsetForCaret(TextPosition position) {
     final BoxParentData parentData = body.parentData;
-    return body.getOffsetForCaret(position, _caretPrototype) + 
+    return body.getOffsetForCaret(position, _caretPrototype) +
         parentData.offset;
   }
 
@@ -453,7 +453,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
       case TargetPlatform.macOS:
-        _caretPrototype = 
+        _caretPrototype =
             Rect.fromLTWH(0.0, 0.0, cursorWidth, cursorHeight + 2);
         break;
       case TargetPlatform.android:
@@ -612,9 +612,9 @@ class RenderEditableTextLine extends RenderEditableBox {
 
     if (leading != null) {
       final leadingConstraints = innerConstraints.copyWith(
-        minWidth: indentWidth,
-        maxWidth: indentWidth,
-        maxHeight: body.size.height);
+          minWidth: indentWidth,
+          maxWidth: indentWidth,
+          maxHeight: body.size.height);
       leading.layout(leadingConstraints, parentUsesSize: true);
       final parentData = leading.parentData as BoxParentData;
       parentData.offset = Offset(0.0, _resolvedPadding.top);

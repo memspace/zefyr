@@ -199,7 +199,8 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
 
   void _didChangeEditingValue() {
     setState(() {
-      _isToggled = widget.controller.getSelectionStyle().containsSame(widget.attribute);
+      _isToggled =
+          widget.controller.getSelectionStyle().containsSame(widget.attribute);
     });
   }
 
@@ -232,10 +233,12 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
     // toggle style buttons (except the code block button itself) since there
     // is no point in applying styles to a unformatted block of text.
     // TODO: Add code block checks to heading and embed buttons as well.
-    final isInCodeBlock = _selectionStyle.containsSame(NotusAttribute.block.code);
-    final isEnabled = !isInCodeBlock || widget.attribute == NotusAttribute.block.code;
-    return widget.childBuilder(
-        context, widget.attribute, widget.icon, _isToggled, isEnabled ? _toggleAttribute : null);
+    final isInCodeBlock =
+        _selectionStyle.containsSame(NotusAttribute.block.code);
+    final isEnabled =
+        !isInCodeBlock || widget.attribute == NotusAttribute.block.code;
+    return widget.childBuilder(context, widget.attribute, widget.icon,
+        _isToggled, isEnabled ? _toggleAttribute : null);
   }
 
   void _toggleAttribute() {
@@ -281,10 +284,12 @@ Widget defaultToggleStyleButtonBuilder(
 class SelectHeadingStyleButton extends StatefulWidget {
   final ZefyrController controller;
 
-  const SelectHeadingStyleButton({Key key, @required this.controller}) : super(key: key);
+  const SelectHeadingStyleButton({Key key, @required this.controller}) 
+      : super(key: key);
 
   @override
-  _SelectHeadingStyleButtonState createState() => _SelectHeadingStyleButtonState();
+  _SelectHeadingStyleButtonState createState() =>
+      _SelectHeadingStyleButtonState();
 }
 
 class _SelectHeadingStyleButtonState extends State<SelectHeadingStyleButton> {
@@ -294,7 +299,8 @@ class _SelectHeadingStyleButtonState extends State<SelectHeadingStyleButton> {
 
   void _didChangeEditingValue() {
     setState(() {
-      _value = _selectionStyle.get(NotusAttribute.heading) ?? NotusAttribute.heading.unset;
+      _value = _selectionStyle.get(NotusAttribute.heading) ??
+          NotusAttribute.heading.unset;
     });
   }
 
@@ -305,7 +311,8 @@ class _SelectHeadingStyleButtonState extends State<SelectHeadingStyleButton> {
   @override
   void initState() {
     super.initState();
-    _value = _selectionStyle.get(NotusAttribute.heading) ?? NotusAttribute.heading.unset;
+    _value = _selectionStyle.get(NotusAttribute.heading) ??
+        NotusAttribute.heading.unset;
     widget.controller.addListener(_didChangeEditingValue);
   }
 
@@ -315,7 +322,8 @@ class _SelectHeadingStyleButtonState extends State<SelectHeadingStyleButton> {
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_didChangeEditingValue);
       widget.controller.addListener(_didChangeEditingValue);
-      _value = _selectionStyle.get(NotusAttribute.heading) ?? NotusAttribute.heading.unset;
+      _value = _selectionStyle.get(NotusAttribute.heading) ??
+          NotusAttribute.heading.unset;
     }
   }
 
@@ -331,8 +339,8 @@ class _SelectHeadingStyleButtonState extends State<SelectHeadingStyleButton> {
   }
 }
 
-Widget _selectHeadingStyleButtonBuilder(
-    BuildContext context, NotusAttribute value, ValueChanged<NotusAttribute> onSelected) {
+Widget _selectHeadingStyleButtonBuilder(BuildContext context,
+    NotusAttribute value, ValueChanged<NotusAttribute> onSelected) {
   final style = TextStyle(fontSize: 12);
 
   final valueToText = {
@@ -439,13 +447,12 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
         ),
       ),
       Visibility(
-        visible: !hideHeadingStyle,
-        child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
-      ),
+          visible: !hideHeadingStyle,
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
       Visibility(
-        visible: !hideHeadingStyle,
-        child: SelectHeadingStyleButton(controller: controller),
-      ),
+          visible: !hideHeadingStyle,
+          child: SelectHeadingStyleButton(controller: controller)),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       Visibility(
         visible: !hideListNumbers,
@@ -483,7 +490,8 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       Visibility(
           visible: !hideListNumbers && !hideListBullets && !hideCodeBlock,
-          child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
       Visibility(
         visible: !hideQuote,
         child: ToggleStyleButton(
@@ -494,7 +502,10 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       Visibility(
           visible: !hideQuote,
-          child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+      Visibility(
+          visible: !hideLink, child: LinkStyleButton(controller: controller)),
       Visibility(visible: !hideLink, child: LinkStyleButton(controller: controller)),
       Visibility(
         visible: !hideHorizontalRule,
@@ -624,7 +635,8 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
     final position = RelativeRect.fromRect(
       Rect.fromPoints(
         button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(button.size.bottomLeft(Offset.zero), ancestor: overlay),
+        button.localToGlobal(button.size.bottomLeft(Offset.zero),
+            ancestor: overlay),
       ),
       Offset.zero & overlay.size,
     );

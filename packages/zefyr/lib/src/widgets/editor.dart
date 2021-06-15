@@ -39,7 +39,8 @@ Widget defaultZefyrEmbedBuilder(BuildContext context, EmbedNode node) {
       color: Colors.grey.shade200,
     );
   }
-  throw UnimplementedError('Embeddable type "${node.value.type}" is not supported by default embed '
+  throw UnimplementedError(
+      'Embeddable type "${node.value.type}" is not supported by default embed '
       'builder of ZefyrEditor. You must pass your own builder function to '
       'embedBuilder property of ZefyrEditor or ZefyrField widgets.');
 }
