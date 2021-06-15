@@ -633,7 +633,11 @@ class RenderEditableTextLine extends RenderEditableBox {
           !_cursorController.style.paintAboveText) {
         _paintCursor(context, effectiveOffset);
       }
-      context.paintChild(body, effectiveOffset);
+      if (node.style.get(NotusAttribute.block) == NotusAttribute.largeHeading) {
+        context.paintChild(body, effectiveOffset + Offset(0, -4));
+      } else {
+        context.paintChild(body, effectiveOffset);
+      }
       if (hasFocus &&
           _cursorController.showCursor.value &&
           containsCursor &&

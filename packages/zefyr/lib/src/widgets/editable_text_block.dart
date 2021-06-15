@@ -101,10 +101,14 @@ class EditableTextBlock extends StatelessWidget {
         width: 24,
       );
     } else if (block == NotusAttribute.largeHeading) {
-      return Container(
-        height: 80,
-        width: 8,
-        color: Color(0xFF0099DD),
+      return Row(
+        children: [
+          Container(
+            height: 100,
+            width: 8,
+            color: Color(0xFF0099DD),
+          ),
+        ],
       );
     } else {
       return null;
@@ -121,6 +125,8 @@ class EditableTextBlock extends StatelessWidget {
       return 28.0;
     } else if (block == NotusAttribute.block.numberList) {
       return 28.0;
+    } else if (block == NotusAttribute.largeHeading) {
+      return 16.0;
     } else {
       return 16.0;
     }

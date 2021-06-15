@@ -218,8 +218,8 @@ class ZefyrThemeData {
           fontSize: 20.0,
           height: 2,
         ),
-        spacing: VerticalSpacing(top: 16, bottom: 16),
-        lineSpacing: VerticalSpacing(top: 6, bottom: 2),
+        spacing: VerticalSpacing(top: 16, bottom: 0),
+        lineSpacing: VerticalSpacing(top: 0, bottom: 0),
         decoration: BoxDecoration(
           color: Color(0xff0099dd).withAlpha(20),
         ),

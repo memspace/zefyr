@@ -428,8 +428,8 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   NotusAttribute<String> get quote => NotusAttribute<String>._(key, scope, 'quote');
 
   /// Formats a large heading
-  NotusAttribute<String> get largeHeading => NotusAttribute._(key, scope, 'largeHeading');
+  NotusAttribute<String> get largeHeading => NotusAttribute._(key, scope, 'lh');
 
   /// Formats a middle heading
-  NotusAttribute<String> get middleHeading => NotusAttribute._(key, scope, 'middleHeading');
+  NotusAttribute<String> get middleHeading => NotusAttribute._(key, scope, 'mh');
 }
