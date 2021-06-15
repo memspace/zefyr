@@ -85,20 +85,32 @@ class ZefyrController extends ChangeNotifier {
       if (delta == null) {
         _updateSelectionSilent(selection, source: ChangeSource.local);
       } else {
-        // need to transform selection position in case actual delta
-        // is different from user's version (in deletes and inserts).
-        final user = Delta()
-          ..retain(index)
-          ..insert(data)
-          ..delete(length);
-        var positionDelta = getPositionDelta(user, delta);
-        _updateSelectionSilent(
-          selection.copyWith(
-            baseOffset: selection.baseOffset + positionDelta,
-            extentOffset: selection.extentOffset + positionDelta,
-          ),
-          source: ChangeSource.local,
-        );
+        // NOTE: 削除中 && 一個前が改行 && ２個前がBlockEmbedの時には、削除の前に1個前にカーソルを移動
+        final isDelete = data == '';
+        final blockEmbed = '\n${EmbedNode.kObjectReplacementCharacter}\n';
+        final text = document.toPlainText().substring(0, selection.start + 1);
+        final hasBlockEmbedAtBeforeSelection = text.endsWith(blockEmbed);
+        if (isDelete && hasBlockEmbedAtBeforeSelection) {
+          updateSelection(selection.copyWith(
+            baseOffset: selection.baseOffset,
+            extentOffset: selection.baseOffset - 1,
+          ));
+        } else {
+          // need to transform selection position in case actual delta
+          // is different from user's version (in deletes and inserts).
+          final user = Delta()
+            ..retain(index)
+            ..insert(data)
+            ..delete(length);
+          var positionDelta = getPositionDelta(user, delta);
+          _updateSelectionSilent(
+            selection.copyWith(
+              baseOffset: selection.baseOffset + positionDelta,
+              extentOffset: selection.extentOffset + positionDelta,
+            ),
+            source: ChangeSource.local,
+          );
+        }
       }
     }
 //    _lastChangeSource = ChangeSource.local;
