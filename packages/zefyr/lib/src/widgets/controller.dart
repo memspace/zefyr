@@ -205,4 +205,16 @@ class ZefyrController extends ChangeNotifier {
       composing: TextRange.empty,
     );
   }
+
+  void addNewlineAtSelectionEnd() {
+    replaceText(
+      selection.baseOffset,
+      0,
+      '\n',
+      selection: selection.copyWith(
+        baseOffset: selection.baseOffset + 1,
+        extentOffset: selection.baseOffset + 1,
+      ),
+    );
+  }
 }
