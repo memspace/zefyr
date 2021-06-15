@@ -172,6 +172,14 @@ class ZefyrThemeData {
         ),
         spacing: VerticalSpacing(top: 24.0, bottom: 0.0),
       ),
+      caption: TextBlockTheme(
+        style: TextStyle(
+          fontSize: 12.0,
+          color: Color(0xFF999999),
+          height: 1.25,
+        ),
+        spacing: VerticalSpacing(top: 24.0, bottom: 0.0),
+      ),
       lists: TextBlockTheme(
         style: TextStyle(
           fontSize: 16.0,

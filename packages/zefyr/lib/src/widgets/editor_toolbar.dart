@@ -340,6 +340,7 @@ Widget _selectHeadingStyleButtonBuilder(
     NotusAttribute.heading.level1: 'Heading 1',
     NotusAttribute.heading.level2: 'Heading 2',
     NotusAttribute.heading.level3: 'Heading 3',
+    NotusAttribute.heading.caption: 'caption',
   };
 
   return ZDropdownButton<NotusAttribute>(
@@ -370,6 +371,11 @@ Widget _selectHeadingStyleButtonBuilder(
       PopupMenuItem(
         child: Text(valueToText[NotusAttribute.heading.level3], style: style),
         value: NotusAttribute.heading.level3,
+        height: 32,
+      ),
+      PopupMenuItem(
+        child: Text(valueToText[NotusAttribute.heading.caption], style: style),
+        value: NotusAttribute.heading.caption,
         height: 32,
       ),
     ],

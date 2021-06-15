@@ -95,6 +95,8 @@ class TextLine extends StatelessWidget {
       textStyle = textStyle.merge(theme.heading2.style);
     } else if (heading == NotusAttribute.heading.level3) {
       textStyle = textStyle.merge(theme.heading3.style);
+    } else if (heading == NotusAttribute.heading.caption) {
+      textStyle = textStyle.merge(theme.caption.style);
     } else {
       textStyle = textStyle.merge(theme.paragraph.style);
     }
