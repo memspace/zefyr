@@ -88,6 +88,9 @@ class ZefyrThemeData {
   /// Style theme for level 3 headings.
   final TextBlockTheme heading3;
 
+  /// Style theme for caption headings.
+  final TextBlockTheme caption;
+
   /// Style theme for bullet and number lists.
   final TextBlockTheme lists;
 
@@ -111,6 +114,7 @@ class ZefyrThemeData {
     this.heading1,
     this.heading2,
     this.heading3,
+    this.caption,
     this.lists,
     this.quote,
     this.code,

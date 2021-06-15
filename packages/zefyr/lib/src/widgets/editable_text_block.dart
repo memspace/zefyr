@@ -161,6 +161,9 @@ class EditableTextBlock extends StatelessWidget {
     } else if (heading == NotusAttribute.heading.level3) {
       top = theme.heading3.spacing.top;
       bottom = theme.heading3.spacing.bottom;
+    } else if (heading == NotusAttribute.heading.level3) {
+      top = theme.caption.spacing.top;
+      bottom = theme.caption.spacing.bottom;
     } else {
       final block = this.node.style.get(NotusAttribute.block);
       var lineSpacing;

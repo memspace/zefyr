@@ -116,10 +116,13 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.heading.level3].
   static NotusAttribute<int> get h3 => heading.level3;
 
+  static NotusAttribute<int> get caption => heading.caption;
+
   static final List<int> _validHeadingValues = [
     heading.level1.value,
     heading.level2.value,
     heading.level3.value,
+    heading.caption.value,
   ];
 
   /// Block attribute
@@ -405,6 +408,9 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
 
   /// Level 3 heading, equivalent of `H3` in HTML.
   NotusAttribute<int> get level3 => NotusAttribute<int>._(key, scope, 3);
+
+  /// caption, equivalent of `p`(same as normal text) in HTML.
+  NotusAttribute<int> get caption => NotusAttribute<int>._(key, scope, 4);
 }
 
 /// Builder for block attribute styles (number/bullet lists, code and quote).

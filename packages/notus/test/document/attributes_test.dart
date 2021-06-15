@@ -100,6 +100,12 @@ void main() {
       expect(attr, NotusAttribute.heading.level3);
     });
 
+    test('valid caption ', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'heading': 4});
+      final attr = attrs.get(NotusAttribute.heading);
+      expect(attr, NotusAttribute.heading.caption);
+    });
+
     test('throws exception when contain invalid heading key', () {
       expect(() => NotusStyle.fromJson(<String, dynamic>{'is not a heading key': 1}),
           throwsA(TypeMatcher<UnsupportedFormatException>()));
