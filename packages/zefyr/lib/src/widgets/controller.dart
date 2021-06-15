@@ -85,7 +85,7 @@ class ZefyrController extends ChangeNotifier {
       if (delta == null) {
         _updateSelectionSilent(selection, source: ChangeSource.local);
       } else {
-        // NOTE: 削除中 && 一個前が改行 && ２個前がBlockEmbedの時には、削除の前に1個前にカーソルを移動
+        // NOTE: 削除中 && 一個前が改行 && 1個前がBlockEmbedの時には、削除の前に1個前にカーソルを移動
         final isDelete = data == '';
         final blockEmbed = '\n${EmbedNode.kObjectReplacementCharacter}\n';
         final text = document.toPlainText().substring(0, selection.start + 1);
