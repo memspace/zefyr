@@ -33,7 +33,7 @@ void main() {
     });
 
     test('valid accent color', () {
-      final attrs = NotusStyle.fromJson(<String, dynamic>{'ac': 'FF5555'});
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'ac': 'FFFF5555'});
       final attr = attrs.get(NotusAttribute.accentColor);
       expect(attr, NotusAttribute.accentColor);
     });

@@ -380,7 +380,7 @@ class _StrikethroughAttribute extends NotusAttribute<bool> {
 /// Applies accent color style to a text segment.
 class _AccentColorAttribute extends NotusAttribute<String> {
   const _AccentColorAttribute()
-      : super._('ac', NotusAttributeScope.inline, 'FF5555');
+      : super._('ac', NotusAttributeScope.inline, 'FFFFF5555');
 }
 
 /// Builder for link attribute values.
