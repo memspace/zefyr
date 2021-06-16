@@ -1110,6 +1110,7 @@ class RawEditorState extends EditorState
                     widget.controller.updateSelectionAtLast();
                   } else {
                     widget.controller.addNewlineAtLast();
+                    widget.controller.updateSelectionAtLast();
                   }
                 },
                 child: Container(

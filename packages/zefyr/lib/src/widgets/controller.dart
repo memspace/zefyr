@@ -206,16 +206,24 @@ class ZefyrController extends ChangeNotifier {
     );
   }
 
-  // ノート最後尾に改行を追加
-  void addNewlineAtLast() {
+  void addNewlineAtSelectionEnd() {
     replaceText(
-      document.length - 1,
+      selection.baseOffset,
       0,
       '\n',
       selection: selection.copyWith(
         baseOffset: selection.baseOffset + 1,
         extentOffset: selection.baseOffset + 1,
       ),
+    );
+  }
+
+  // ノート最後尾に改行を追加
+  void addNewlineAtLast() {
+    replaceText(
+      document.length - 1,
+      0,
+      '\n',
     );
   }
 
@@ -237,4 +245,5 @@ class ZefyrController extends ChangeNotifier {
     final endsNewLine = lastChar == '\n' && secondLastChar == '\n';
     return endsNewLine;
   }
+
 }
