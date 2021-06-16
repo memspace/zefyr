@@ -414,7 +414,7 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
   NotusAttribute<int> get level3 => NotusAttribute<int>._(key, scope, 3);
 
   /// caption, equivalent of `p`(same as normal text) in HTML.
-  NotusAttribute<int> get caption => NotusAttribute<int>._(key, scope, 4);
+  NotusAttribute<int> get caption => NotusAttribute<int>._(key, scope, 5);
 }
 
 /// Builder for block attribute styles (number/bullet lists, code and quote).
