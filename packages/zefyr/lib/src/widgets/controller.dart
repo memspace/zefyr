@@ -93,7 +93,7 @@ class ZefyrController extends ChangeNotifier {
         final beforeText = document.toPlainText().substring(0, selection.start + 1);
         final hasBlockEmbedAtBeforeSelection = beforeText.endsWith(blockEmbedPattern);
         if (isDelete && hasBlockEmbedAtBeforeSelection) {
-          updateSelection(selection.copyWith(
+          _updateSelectionSilent(selection.copyWith(
             baseOffset: selection.baseOffset,
             extentOffset: selection.baseOffset - 1,
           ));
