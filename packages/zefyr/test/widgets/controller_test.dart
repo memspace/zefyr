@@ -186,5 +186,31 @@ void main() {
       );
       // expect(controller.lastChangeSource, ChangeSource.local);
     });
+    
+    test('addNewlineAtLast', () {
+      controller.replaceText(0, 0, 'words');
+      controller.addNewlineAtLast();
+      expect(
+        controller.document.toDelta(),
+        Delta()..insert('words')..insert('\n')..insert('\n'),
+      );
+    });
+
+    test('updateSelectionAtLast', () {
+      controller.replaceText(0, 0, 'words');
+      controller.updateSelectionAtLast();
+      expect(controller.selection, TextSelection.collapsed(offset: 5));
+    });
+
+    test('isEndNewline true', () {
+      controller.replaceText(0, 0, 'words\n');
+      expect(controller.isEndNewline(), isTrue);
+    });
+
+    test('isEndNewline false', () {
+      controller.replaceText(0, 0, 'words');
+      expect(controller.isEndNewline(), isFalse);
+    });
+
   });
 }

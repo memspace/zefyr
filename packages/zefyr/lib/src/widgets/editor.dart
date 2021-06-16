@@ -267,6 +267,8 @@ class _ZefyrEditorState extends State<ZefyrEditor>
             selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
         selectionColor = selectionTheme.selectionColor ??
             cupertinoTheme.primaryColor.withOpacity(0.40);
+        selectionColor =
+            selectionTheme.selectionColor ?? cupertinoTheme.primaryColor.withOpacity(0.40);
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
             iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
@@ -1084,7 +1086,7 @@ class RawEditorState extends EditorState
       ),
     );
 
-    if (widget.scrollable) {
+    if (widget.scrollable || widget.scrollController != null) {
       /// Since [SingleChildScrollView] does not implement
       /// `computeDistanceToActualBaseline` it prevents the editor from
       /// providing its baseline metrics. To address this issue we wrap
@@ -1106,15 +1108,12 @@ class RawEditorState extends EditorState
               GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () {
-                  widget.controller.replaceText(
-                    widget.controller.document.length - 1,
-                    0,
-                    '\n',
-                    selection: widget.controller.selection.copyWith(
-                      baseOffset: widget.controller.selection.baseOffset + 1,
-                      extentOffset: widget.controller.selection.baseOffset + 1,
-                    ),
-                  );
+                  if (widget.controller.isEndNewline()) {
+                    widget.controller.updateSelectionAtLast();
+                  } else {
+                    widget.controller.addNewlineAtLast();
+                    widget.controller.updateSelectionAtLast();
+                  }
                 },
                 child: Container(
                   height: 200,
@@ -1232,6 +1231,10 @@ class RawEditorState extends EditorState
       return theme.code.spacing;
     } else if (style == NotusAttribute.block.quote) {
       return theme.quote.spacing;
+    } else if (style == NotusAttribute.largeHeading) {
+      return theme.largeHeading.spacing;
+    } else if (style == NotusAttribute.middleHeading) {
+      return theme.middleHeading.spacing;
     } else {
       return theme.lists.spacing;
     }

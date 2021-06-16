@@ -100,6 +100,8 @@ class TextLine extends StatelessWidget {
       textStyle = textStyle.merge(theme.heading2.style);
     } else if (heading == NotusAttribute.heading.level3) {
       textStyle = textStyle.merge(theme.heading3.style);
+    } else if (heading == NotusAttribute.heading.caption) {
+      textStyle = textStyle.merge(theme.caption.style);
     } else {
       textStyle = textStyle.merge(theme.paragraph.style);
     }
@@ -109,6 +111,10 @@ class TextLine extends StatelessWidget {
       textStyle = textStyle.merge(theme.quote.style);
     } else if (block == NotusAttribute.block.code) {
       textStyle = textStyle.merge(theme.code.style);
+    } else if (block == NotusAttribute.largeHeading) {
+      textStyle = textStyle.merge(theme.largeHeading.style);
+    } else if (block == NotusAttribute.middleHeading) {
+      textStyle = textStyle.merge(theme.middleHeading.style);
     } else if (block != null) {
       // lists
       textStyle = textStyle.merge(theme.lists.style);

@@ -284,7 +284,7 @@ Widget defaultToggleStyleButtonBuilder(
 class SelectHeadingStyleButton extends StatefulWidget {
   final ZefyrController controller;
 
-  const SelectHeadingStyleButton({Key key, @required this.controller})
+  const SelectHeadingStyleButton({Key key, @required this.controller}) 
       : super(key: key);
 
   @override
@@ -348,6 +348,7 @@ Widget _selectHeadingStyleButtonBuilder(BuildContext context,
     NotusAttribute.heading.level1: 'Heading 1',
     NotusAttribute.heading.level2: 'Heading 2',
     NotusAttribute.heading.level3: 'Heading 3',
+    NotusAttribute.heading.caption: 'caption',
   };
 
   return ZDropdownButton<NotusAttribute>(
@@ -378,6 +379,11 @@ Widget _selectHeadingStyleButtonBuilder(BuildContext context,
       PopupMenuItem(
         child: Text(valueToText[NotusAttribute.heading.level3], style: style),
         value: NotusAttribute.heading.level3,
+        height: 32,
+      ),
+      PopupMenuItem(
+        child: Text(valueToText[NotusAttribute.heading.caption], style: style),
+        value: NotusAttribute.heading.caption,
         height: 32,
       ),
     ],
@@ -480,6 +486,16 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           icon: Icons.format_list_bulleted,
         ),
       ),
+      ToggleStyleButton(
+        attribute: NotusAttribute.block.largeHeading,
+        controller: controller,
+        icon: Icons.access_alarm,
+      ),
+      ToggleStyleButton(
+        attribute: NotusAttribute.block.middleHeading,
+        controller: controller,
+        icon: Icons.access_alarm,
+      ),
       Visibility(
         visible: !hideCodeBlock,
         child: ToggleStyleButton(
@@ -506,6 +522,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
               indent: 16, endIndent: 16, color: Colors.grey.shade400)),
       Visibility(
           visible: !hideLink, child: LinkStyleButton(controller: controller)),
+      Visibility(visible: !hideLink, child: LinkStyleButton(controller: controller)),
       Visibility(
         visible: !hideHorizontalRule,
         child: InsertEmbedButton(
@@ -527,12 +544,15 @@ class _ZefyrToolbarState extends State<ZefyrToolbar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8),
       constraints: BoxConstraints.tightFor(height: widget.preferredSize.height),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: widget.children,
+          children: [
+            const SizedBox(width: 8),
+            ...widget.children,
+            const SizedBox(width: 8),
+          ],
         ),
       ),
     );

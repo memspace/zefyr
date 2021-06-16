@@ -207,4 +207,45 @@ class ZefyrController extends ChangeNotifier {
       composing: TextRange.empty,
     );
   }
+
+  void addNewlineAtSelectionEnd() {
+    replaceText(
+      selection.baseOffset,
+      0,
+      '\n',
+      selection: selection.copyWith(
+        baseOffset: selection.baseOffset + 1,
+        extentOffset: selection.baseOffset + 1,
+      ),
+    );
+  }
+
+  // ノート最後尾に改行を追加
+  void addNewlineAtLast() {
+    replaceText(
+      document.length - 1,
+      0,
+      '\n',
+    );
+  }
+
+  // ノート最後尾を選択
+  void updateSelectionAtLast() {
+    final lastIndex = document.length - 1;
+    updateSelection(selection.copyWith(
+      baseOffset: lastIndex,
+      extentOffset: lastIndex,
+    ));
+  }
+
+  // ノート最後尾が改行で終わっているか
+  bool isEndNewline() {
+    final wholeText = document.toPlainText();
+    final lastIndex = wholeText.length - 1;
+    final lastChar = wholeText[lastIndex];
+    final secondLastChar = wholeText[lastIndex - 1];
+    final endsNewLine = lastChar == '\n' && secondLastChar == '\n';
+    return endsNewLine;
+  }
+
 }
