@@ -11,8 +11,8 @@ List<String> _insertionToggleableStyleKeys = [
   NotusAttribute.italic.key,
   NotusAttribute.underline.key,
   NotusAttribute.strikethrough.key,
-  NotusAttribute.textColor.key,
-  NotusAttribute.marker.key,
+  NotusAttribute.accentColor.key,
+  NotusAttribute.blueMarker.key,
 ];
 
 class ZefyrController extends ChangeNotifier {

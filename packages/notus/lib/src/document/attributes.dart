@@ -79,8 +79,8 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.italic.key: NotusAttribute.italic,
     NotusAttribute.underline.key: NotusAttribute.underline,
     NotusAttribute.strikethrough.key: NotusAttribute.strikethrough,
-    NotusAttribute.textColor.key: NotusAttribute.textColor,
-    NotusAttribute.marker.key: NotusAttribute.marker,
+    NotusAttribute.accentColor.key: NotusAttribute.accentColor,
+    NotusAttribute.blueMarker.key: NotusAttribute.blueMarker,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
@@ -100,11 +100,11 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Strikethrough style attribute.
   static const strikethrough = _StrikethroughAttribute();
 
-  /// text color style attribute.
-  static const textColor = _TextColorAttribute();
+  /// accent color style attribute.
+  static const accentColor = _AccentColorAttribute();
 
-  /// marker style attribute.
-  static const marker = _MarkerAttribute();
+  /// blue marker style attribute.
+  static const blueMarker = _BlueMarkerAttribute();
 
   /// Link style attribute.
   // ignore: const_eval_throws_exception
@@ -381,16 +381,16 @@ class _StrikethroughAttribute extends NotusAttribute<bool> {
       : super._('s', NotusAttributeScope.inline, true);
 }
 
-/// Applies text color style to a text segment.
-class _TextColorAttribute extends NotusAttribute<bool> {
-  const _TextColorAttribute()
-      : super._('tc', NotusAttributeScope.inline, true);
+/// Applies accent color style to a text segment.
+class _AccentColorAttribute extends NotusAttribute<String> {
+  const _AccentColorAttribute()
+      : super._('ac', NotusAttributeScope.inline, 'FFFF5555');
 }
 
 /// Applies marker style to a text segment.
-class _MarkerAttribute extends NotusAttribute<bool> {
-  const _MarkerAttribute()
-      : super._('m', NotusAttributeScope.inline, true);
+class _BlueMarkerAttribute extends NotusAttribute<String> {
+  const _BlueMarkerAttribute()
+      : super._('bm', NotusAttributeScope.inline, '');
 }
 
 /// Builder for link attribute values.
