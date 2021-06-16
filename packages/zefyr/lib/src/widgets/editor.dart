@@ -1086,7 +1086,7 @@ class RawEditorState extends EditorState
       ),
     );
 
-    if (widget.scrollable || widget.scrollController != null) {
+    if (widget.scrollable) {
       /// Since [SingleChildScrollView] does not implement
       /// `computeDistanceToActualBaseline` it prevents the editor from
       /// providing its baseline metrics. To address this issue we wrap
@@ -1101,26 +1101,7 @@ class RawEditorState extends EditorState
         child: SingleChildScrollView(
           controller: _scrollController,
           physics: widget.scrollPhysics,
-          // NOTE: ノートの下の方に余白を持たせて、余白をタップすると最後尾で改行する
-          child: Column(
-            children: [
-              child,
-              GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  if (widget.controller.isEndNewline()) {
-                    widget.controller.updateSelectionAtLast();
-                  } else {
-                    widget.controller.addNewlineAtLast();
-                    widget.controller.updateSelectionAtLast();
-                  }
-                },
-                child: Container(
-                  height: 200,
-                ),
-              ),
-            ],
-          ),
+          child: child,
         ),
       );
     }
