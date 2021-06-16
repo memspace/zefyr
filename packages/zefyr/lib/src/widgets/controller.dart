@@ -85,17 +85,17 @@ class ZefyrController extends ChangeNotifier {
       if (delta == null) {
         _updateSelectionSilent(selection, source: ChangeSource.local);
       } else {
-        // // NOTE: 削除中 && 文字列が(\n + BlockEmbed + \n)の時には、削除の前に1個前にカーソルを移動
-        // final isDelete = data == '';
-        // final blockEmbedPattern = '\n${EmbedNode.kObjectReplacementCharacter}\n';
-        // final beforeText = document.toPlainText().substring(0, selection.start + 1);
-        // final hasBlockEmbedAtBeforeSelection = beforeText.endsWith(blockEmbedPattern);
-        // if (isDelete && hasBlockEmbedAtBeforeSelection) {
-        //   updateSelection(selection.copyWith(
-        //     baseOffset: selection.baseOffset,
-        //     extentOffset: selection.baseOffset - 1,
-        //   ));
-        // } else {
+        // NOTE: 削除中 && 文字列が(\n + BlockEmbed + \n)の時には、削除の前に1個前にカーソルを移動
+        final isDelete = data == '';
+        final blockEmbedPattern = '\n${EmbedNode.kObjectReplacementCharacter}\n';
+        final beforeText = document.toPlainText().substring(0, selection.start + 1);
+        final hasBlockEmbedAtBeforeSelection = beforeText.endsWith(blockEmbedPattern);
+        if (isDelete && hasBlockEmbedAtBeforeSelection) {
+          _updateSelectionSilent(selection.copyWith(
+            baseOffset: selection.baseOffset,
+            extentOffset: selection.baseOffset - 1,
+          ));
+        } else {
           // need to transform selection position in case actual delta
           // is different from user's version (in deletes and inserts).
           final user = Delta()
@@ -110,7 +110,7 @@ class ZefyrController extends ChangeNotifier {
             ),
             source: ChangeSource.local,
           );
-        // }
+        }
       }
     }
 //    _lastChangeSource = ChangeSource.local;
