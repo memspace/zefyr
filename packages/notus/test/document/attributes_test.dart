@@ -32,10 +32,10 @@ void main() {
       expect(attr, NotusAttribute.strikethrough);
     });
 
-    test('valid text color', () {
-      final attrs = NotusStyle.fromJson(<String, dynamic>{'tc': true});
-      final attr = attrs.get(NotusAttribute.textColor);
-      expect(attr, NotusAttribute.textColor);
+    test('valid accent color', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'ac': 'FF5555'});
+      final attr = attrs.get(NotusAttribute.accentColor);
+      expect(attr, NotusAttribute.accentColor);
     });
   });
 

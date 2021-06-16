@@ -79,7 +79,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.italic.key: NotusAttribute.italic,
     NotusAttribute.underline.key: NotusAttribute.underline,
     NotusAttribute.strikethrough.key: NotusAttribute.strikethrough,
-    NotusAttribute.textColor.key: NotusAttribute.textColor,
+    NotusAttribute.accentColor.key: NotusAttribute.accentColor,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
@@ -99,8 +99,8 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Strikethrough style attribute.
   static const strikethrough = _StrikethroughAttribute();
 
-  /// text color style attribute.
-  static const textColor = _TextColorAttribute();
+  /// accent color style attribute.
+  static const accentColor = _AccentColorAttribute();
 
   /// Link style attribute.
   // ignore: const_eval_throws_exception
@@ -377,10 +377,10 @@ class _StrikethroughAttribute extends NotusAttribute<bool> {
       : super._('s', NotusAttributeScope.inline, true);
 }
 
-/// Applies text color style to a text segment.
-class _TextColorAttribute extends NotusAttribute<bool> {
-  const _TextColorAttribute()
-      : super._('tc', NotusAttributeScope.inline, true);
+/// Applies accent color style to a text segment.
+class _AccentColorAttribute extends NotusAttribute<String> {
+  const _AccentColorAttribute()
+      : super._('ac', NotusAttributeScope.inline, 'FF5555');
 }
 
 /// Builder for link attribute values.

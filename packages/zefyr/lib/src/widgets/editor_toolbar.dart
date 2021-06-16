@@ -408,7 +408,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       Visibility(
         visible: !hideBoldButton,
         child: ToggleStyleButton(
-          attribute: NotusAttribute.textColor,
+          attribute: NotusAttribute.accentColor,
           icon: Icons.format_paint,
           controller: controller,
         ),
