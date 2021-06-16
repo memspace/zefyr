@@ -32,7 +32,7 @@ void main() {
       expect(attr, NotusAttribute.strikethrough);
     });
 
-    test('valid marker', () {
+    test('valid blue marker', () {
       final attrs = NotusStyle.fromJson(<String, dynamic>{'bm': '330099DD'});
       final attr = attrs.get(NotusAttribute.blueMarker);
       expect(attr, NotusAttribute.blueMarker);
