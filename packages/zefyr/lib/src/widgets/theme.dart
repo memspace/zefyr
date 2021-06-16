@@ -88,6 +88,9 @@ class ZefyrThemeData {
   /// Style theme for level 3 headings.
   final TextBlockTheme heading3;
 
+  /// Style theme for caption headings.
+  final TextBlockTheme caption;
+
   /// Style theme for bullet and number lists.
   final TextBlockTheme lists;
 
@@ -96,6 +99,10 @@ class ZefyrThemeData {
 
   /// Style theme for code blocks.
   final TextBlockTheme code;
+
+  final TextBlockTheme largeHeading;
+
+  final TextBlockTheme middleHeading;
 
   ZefyrThemeData({
     this.bold,
@@ -107,9 +114,12 @@ class ZefyrThemeData {
     this.heading1,
     this.heading2,
     this.heading3,
+    this.caption,
     this.lists,
     this.quote,
     this.code,
+    this.largeHeading,
+    this.middleHeading,
   });
 
   factory ZefyrThemeData.fallback(BuildContext context) {
@@ -162,6 +172,14 @@ class ZefyrThemeData {
         ),
         spacing: VerticalSpacing(top: 24.0, bottom: 0.0),
       ),
+      caption: TextBlockTheme(
+        style: TextStyle(
+          fontSize: 12.0,
+          color: Color(0xFF999999),
+          height: 1.25,
+        ),
+        spacing: VerticalSpacing(top: 24.0, bottom: 0.0),
+      ),
       lists: TextBlockTheme(
         style: TextStyle(
           fontSize: 16.0,
@@ -204,6 +222,29 @@ class ZefyrThemeData {
             width: 1,
           ),
         ),
+      ),
+      largeHeading: TextBlockTheme(
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w700,
+          fontSize: 20.0,
+          height: 2,
+        ),
+        spacing: VerticalSpacing(top: 16, bottom: 0),
+        lineSpacing: VerticalSpacing(top: 0, bottom: 0),
+        decoration: BoxDecoration(
+          color: Color(0xff0099dd).withAlpha(20),
+        ),
+      ),
+      middleHeading: TextBlockTheme(
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w700,
+          fontSize: 18.0,
+          height: 1.5,
+        ),
+        spacing: VerticalSpacing(top: 16, bottom: 0),
+        lineSpacing: VerticalSpacing(top: 0, bottom: 15),
       ),
     );
   }

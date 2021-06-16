@@ -14,7 +14,7 @@ import 'editable_box.dart';
 
 const double _kCursorHeightOffset = 2.0; // pixels
 
-enum TextLineSlot { leading, body }
+enum TextLineSlot { leading, body, bottom }
 
 class RenderEditableTextLine extends RenderEditableBox {
   /// Creates new editable paragraph render box.
@@ -160,6 +160,9 @@ class RenderEditableTextLine extends RenderEditableBox {
     if (_leading != null) {
       yield _leading;
     }
+    if (_bottom != null) {
+      yield _bottom;
+    }
     if (_body != null) {
       yield _body;
     }
@@ -169,6 +172,12 @@ class RenderEditableTextLine extends RenderEditableBox {
   RenderBox _leading;
   set leading(RenderBox value) {
     _leading = _updateChild(_leading, value, TextLineSlot.leading);
+  }
+
+  RenderBox get bottom => _bottom;
+  RenderBox _bottom;
+  set bottom(RenderBox value) {
+    _bottom = _updateChild(_bottom, value, TextLineSlot.bottom);
   }
 
   RenderContentProxyBox get body => _body;
@@ -507,6 +516,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     }
 
     add(leading, 'leading');
+    add(bottom, 'bottom');
     add(body, 'body');
     return value;
   }
@@ -583,7 +593,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     _resolvePadding();
     assert(_resolvedPadding != null);
 
-    if (body == null && leading == null) {
+    if (body == null && leading == null && bottom == null) {
       size = constraints.constrain(Size(
         _resolvedPadding.left + _resolvedPadding.right,
         _resolvedPadding.top + _resolvedPadding.bottom,
@@ -607,6 +617,17 @@ class RenderEditableTextLine extends RenderEditableBox {
           maxHeight: body.size.height);
       leading.layout(leadingConstraints, parentUsesSize: true);
       final parentData = leading.parentData as BoxParentData;
+      parentData.offset = Offset(0.0, _resolvedPadding.top);
+    }
+
+    if (bottom != null) {
+      final bottomConstraints = innerConstraints.copyWith(
+        minWidth: body.size.width + _resolvedPadding.right + _resolvedPadding.left,
+        maxWidth: body.size.width + _resolvedPadding.right + _resolvedPadding.left,
+        maxHeight: body.size.height,
+      );
+      bottom.layout(bottomConstraints, parentUsesSize: true);
+      final parentData = bottom.parentData as BoxParentData;
       parentData.offset = Offset(0.0, _resolvedPadding.top);
     }
 
@@ -634,6 +655,11 @@ class RenderEditableTextLine extends RenderEditableBox {
       context.paintChild(leading, effectiveOffset);
     }
 
+    if (bottom != null) {
+      final effectiveOffset = offset + Offset(0, body.size.height - 4);
+      context.paintChild(bottom, effectiveOffset);
+    }
+
     if (body != null) {
       final parentData = body.parentData as BoxParentData;
       final effectiveOffset = offset + parentData.offset;
@@ -651,9 +677,11 @@ class RenderEditableTextLine extends RenderEditableBox {
           !_cursorController.style.paintAboveText) {
         _paintCursor(context, effectiveOffset);
       }
-
-      context.paintChild(body, effectiveOffset);
-
+      if (node.style.get(NotusAttribute.block) == NotusAttribute.largeHeading) {
+        context.paintChild(body, effectiveOffset + Offset(0, -4));
+      } else {
+        context.paintChild(body, effectiveOffset);
+      }
       if (hasFocus &&
           _cursorController.showCursor.value &&
           containsCursor &&
