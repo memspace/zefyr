@@ -1084,7 +1084,7 @@ class RawEditorState extends EditorState
       ),
     );
 
-    if (widget.scrollable) {
+    if (widget.scrollable || widget.scrollController != null) {
       /// Since [SingleChildScrollView] does not implement
       /// `computeDistanceToActualBaseline` it prevents the editor from
       /// providing its baseline metrics. To address this issue we wrap
@@ -1106,15 +1106,12 @@ class RawEditorState extends EditorState
               GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () {
-                  widget.controller.replaceText(
-                    widget.controller.document.length - 1,
-                    0,
-                    '\n',
-                    selection: widget.controller.selection.copyWith(
-                      baseOffset: widget.controller.selection.baseOffset + 1,
-                      extentOffset: widget.controller.selection.baseOffset + 1,
-                    ),
-                  );
+                  if (widget.controller.isEndNewline()) {
+                    widget.controller.updateSelectionAtLast();
+                  } else {
+                    widget.controller.addNewlineAtLast();
+                    widget.controller.updateSelectionAtLast();
+                  }
                 },
                 child: Container(
                   height: 200,
