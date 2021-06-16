@@ -77,6 +77,9 @@ class ZefyrThemeData {
   /// Style of accentColor text.
   final TextStyle accentColor;
 
+  /// Style of blue marker text.
+  final TextStyle blueMarker;
+
   /// Style of links in text.
   final TextStyle link;
 
@@ -113,6 +116,7 @@ class ZefyrThemeData {
     this.underline,
     this.strikethrough,
     this.accentColor,
+    this.blueMarker,
     this.link,
     this.paragraph,
     this.heading1,
@@ -136,6 +140,11 @@ class ZefyrThemeData {
       underline: TextStyle(decoration: TextDecoration.underline),
       strikethrough: TextStyle(decoration: TextDecoration.lineThrough),
       accentColor: TextStyle(color: Color(0xffFF5555)),
+      blueMarker: TextStyle(
+        decoration: TextDecoration.underline,
+        decorationColor: Color(0x330099DD),
+        decorationThickness: 10,
+      ),
       link: TextStyle(
         color: themeData.accentColor,
         decoration: TextDecoration.underline,
@@ -260,6 +269,7 @@ class ZefyrThemeData {
     TextStyle underline,
     TextStyle strikethrough,
     TextStyle accentColor,
+    TextStyle blueMarker,
     TextStyle link,
     TextBlockTheme paragraph,
     TextBlockTheme heading1,
@@ -275,6 +285,7 @@ class ZefyrThemeData {
       underline: underline ?? this.underline,
       strikethrough: strikethrough ?? this.strikethrough,
       accentColor: accentColor ?? this.accentColor,
+      blueMarker: blueMarker ?? this.blueMarker,
       link: link ?? this.link,
       paragraph: paragraph ?? this.paragraph,
       heading1: heading1 ?? this.heading1,
@@ -293,6 +304,7 @@ class ZefyrThemeData {
       underline: other.underline,
       strikethrough: other.strikethrough,
       accentColor: other.accentColor,
+      blueMarker: other.blueMarker,
       link: other.link,
       paragraph: other.paragraph,
       heading1: other.heading1,

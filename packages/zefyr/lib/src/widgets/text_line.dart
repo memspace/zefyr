@@ -143,6 +143,9 @@ class TextLine extends StatelessWidget {
     if (style.contains(NotusAttribute.accentColor)) {
       result = _mergeTextStyleWithDecoration(result, theme.accentColor);
     }
+    if (style.contains(NotusAttribute.blueMarker)) {
+      result = _mergeTextStyleWithDecoration(result, theme.blueMarker);
+    }
 
     return result;
   }
