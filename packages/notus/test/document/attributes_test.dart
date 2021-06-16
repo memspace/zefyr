@@ -31,6 +31,12 @@ void main() {
       final attr = attrs.get(NotusAttribute.strikethrough);
       expect(attr, NotusAttribute.strikethrough);
     });
+
+    test('valid accent color', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'ac': 'FFFF5555'});
+      final attr = attrs.get(NotusAttribute.accentColor);
+      expect(attr, NotusAttribute.accentColor);
+    });
   });
 
   group('$NotusStyle block', () {
