@@ -36,6 +36,7 @@ void main() {
       final attrs = NotusStyle.fromJson(<String, dynamic>{'bm': '330099DD'});
       final attr = attrs.get(NotusAttribute.blueMarker);
       expect(attr, NotusAttribute.blueMarker);
+    });
 
     test('valid accent color', () {
       final attrs = NotusStyle.fromJson(<String, dynamic>{'ac': 'FFFF5555'});
