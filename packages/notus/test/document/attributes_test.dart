@@ -59,13 +59,13 @@ void main() {
     });
 
     test('valid largeHeading code', () {
-      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'largeHeading'});
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'lh'});
       final attr = attrs.get(NotusAttribute.block);
       expect(attr, NotusAttribute.largeHeading);
     });
 
     test('valid middleHeading code', () {
-      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'middleHeading'});
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'mh'});
       final attr = attrs.get(NotusAttribute.block);
       expect(attr, NotusAttribute.middleHeading);
     });
@@ -101,7 +101,7 @@ void main() {
     });
 
     test('valid caption ', () {
-      final attrs = NotusStyle.fromJson(<String, dynamic>{'heading': 4});
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'heading': 5});
       final attr = attrs.get(NotusAttribute.heading);
       expect(attr, NotusAttribute.heading.caption);
     });
