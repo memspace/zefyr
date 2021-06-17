@@ -33,7 +33,7 @@ void main() {
     });
 
     test('valid blue marker', () {
-      final attrs = NotusStyle.fromJson(<String, dynamic>{'bm': '330099DD'});
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'bm': '1A0099DD'});
       final attr = attrs.get(NotusAttribute.blueMarker);
       expect(attr, NotusAttribute.blueMarker);
     });

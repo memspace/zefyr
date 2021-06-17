@@ -399,7 +399,7 @@ class _AccentColorAttribute extends NotusAttribute<String> {
 /// Applies marker style to a text segment.
 class _BlueMarkerAttribute extends NotusAttribute<String> {
   const _BlueMarkerAttribute()
-      : super._('bm', NotusAttributeScope.inline, '330099DD');
+      : super._('bm', NotusAttributeScope.inline, '1A0099DD');
 }
 
 /// Builder for link attribute values.
