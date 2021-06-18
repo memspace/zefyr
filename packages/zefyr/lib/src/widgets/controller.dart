@@ -87,12 +87,8 @@ class ZefyrController extends ChangeNotifier {
       if (delta == null) {
         _updateSelectionSilent(selection, source: ChangeSource.local);
       } else {
-        // NOTE: 削除中 && 文字列が(\n + BlockEmbed + \n)の時には、削除の前に1個前にカーソルを移動
-        final isDelete = data == '';
-        final blockEmbedPattern = '\n${EmbedNode.kObjectReplacementCharacter}\n';
-        final beforeText = document.toPlainText().substring(0, selection.start + 1);
-        final hasBlockEmbedAtBeforeSelection = beforeText.endsWith(blockEmbedPattern);
-        if (isDelete && hasBlockEmbedAtBeforeSelection) {
+        // カーソルの上にBlockEmbedがあるときは、カーソルを左にずらしてから削除する
+        if (_shouldBackSelection(data)) {
           _updateSelectionSilent(selection.copyWith(
             baseOffset: selection.baseOffset,
             extentOffset: selection.baseOffset - 1,
@@ -117,6 +113,16 @@ class ZefyrController extends ChangeNotifier {
     }
 //    _lastChangeSource = ChangeSource.local;
     notifyListeners();
+  }
+
+  // カーソルの位置を一つ左にずらすべきか否か
+  bool _shouldBackSelection(Object data) {
+    // 削除中 && 文字列が(\n + BlockEmbed + \n)の時
+    final isDelete = data == '';
+    final blockEmbedPattern = '\n${EmbedNode.kObjectReplacementCharacter}\n';
+    final beforeText = document.toPlainText().substring(0, isDelete ? selection.start + 1 : selection.start);
+    final hasBlockEmbedAtBeforeSelection = beforeText.endsWith(blockEmbedPattern);
+    return isDelete && hasBlockEmbedAtBeforeSelection;
   }
 
   void formatText(int index, int length, NotusAttribute attribute) {
