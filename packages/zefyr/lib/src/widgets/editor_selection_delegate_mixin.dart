@@ -54,7 +54,7 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
           if (value.selection.start == 0 && value.selection.end == textEditingValue.text.length){
             final newSelection = selection.copyWith(
               baseOffset: 0,
-              extentOffset: textEditingValue.text.length-100,
+              extentOffset: textEditingValue.text.length,
             );
             widget.controller.updateSelection(newSelection);
           }
