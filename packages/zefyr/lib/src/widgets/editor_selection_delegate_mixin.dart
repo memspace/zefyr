@@ -49,6 +49,15 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
               );
             }
           }
+
+          // select all
+          if (value.selection.start == 0 && value.selection.end == textEditingValue.text.length){
+            final newSelection = selection.copyWith(
+              baseOffset: 0,
+              extentOffset: textEditingValue.text.length-100,
+            );
+            widget.controller.updateSelection(newSelection);
+          }
       }
   }
 
