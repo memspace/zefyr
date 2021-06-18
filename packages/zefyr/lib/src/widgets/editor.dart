@@ -781,11 +781,6 @@ class RawEditorState extends EditorState
     _selectionOverlay?.updateForScroll();
   }
 
-  @override
-  void userUpdateTextEditingValue(
-      TextEditingValue value, SelectionChangedCause cause) {
-    // TODO: implement userUpdateTextEditingValue
-  }
 
   // State lifecycle:
 

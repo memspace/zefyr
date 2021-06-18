@@ -18,6 +18,41 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
   }
 
   @override
+  void userUpdateTextEditingValue(
+      TextEditingValue value, SelectionChangedCause cause) async {
+        if(cause == SelectionChangedCause.toolBar){
+          final selection = widget.controller.selection;
+          final compare = value.selection.start - selection.start; // よくわからんがこれでcut or pasteの検証できる
+
+          // cut
+          if(compare == 0){
+            final data = selection.textInside(value.text);
+            widget.controller.replaceText(
+              selection.start,
+              data.length,
+              '',
+              selection: TextSelection.collapsed(offset: selection.start),
+            );
+          }
+
+          // paste
+          if(compare > 0){
+            final data = await Clipboard.getData(Clipboard.kTextPlain);
+            if (data != null) {
+              final length = selection.end - selection.start;
+              widget.controller.replaceText(
+                selection.start,
+                length,
+                data.text,
+                selection: TextSelection.collapsed(
+                    offset: selection.start + data.text.length),
+              );
+            }
+          }
+      }
+  }
+
+  @override
   void bringIntoView(TextPosition position) {
     // TODO: implement bringIntoView
   }
