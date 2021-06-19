@@ -131,7 +131,8 @@ mixin RawEditorStateTextInputClientMixin on EditorState
     if (!shouldCreateInputConnection) {
       return;
     }
-    //
+    // めっちゃやばそうだけど、悪影響は観測されなかったので消している
+    // これがあると、Block要素(code, list, quote)の下で削除を押した時にカーソルが消える
     // if (_sentRemoteValues.contains(value)) {
     //   /// There is a race condition in Flutter text input plugin where sending
     //   /// updates to native side too often results in broken behavior.
