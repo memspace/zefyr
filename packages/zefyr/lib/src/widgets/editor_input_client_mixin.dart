@@ -131,22 +131,22 @@ mixin RawEditorStateTextInputClientMixin on EditorState
     if (!shouldCreateInputConnection) {
       return;
     }
-
-    if (_sentRemoteValues.contains(value)) {
-      /// There is a race condition in Flutter text input plugin where sending
-      /// updates to native side too often results in broken behavior.
-      /// TextInputConnection.setEditingValue is an async call to native side.
-      /// For each such call native side _always_ sends an update which triggers
-      /// this method (updateEditingValue) with the same value we've sent it.
-      /// If multiple calls to setEditingValue happen too fast and we only
-      /// track the last sent value then there is no way for us to filter out
-      /// automatic callbacks from native side.
-      /// Therefore we have to keep track of all values we send to the native
-      /// side and when we see this same value appear here we skip it.
-      /// This is fragile but it's probably the only available option.
-      _sentRemoteValues.remove(value);
-      return;
-    }
+    //
+    // if (_sentRemoteValues.contains(value)) {
+    //   /// There is a race condition in Flutter text input plugin where sending
+    //   /// updates to native side too often results in broken behavior.
+    //   /// TextInputConnection.setEditingValue is an async call to native side.
+    //   /// For each such call native side _always_ sends an update which triggers
+    //   /// this method (updateEditingValue) with the same value we've sent it.
+    //   /// If multiple calls to setEditingValue happen too fast and we only
+    //   /// track the last sent value then there is no way for us to filter out
+    //   /// automatic callbacks from native side.
+    //   /// Therefore we have to keep track of all values we send to the native
+    //   /// side and when we see this same value appear here we skip it.
+    //   /// This is fragile but it's probably the only available option.
+    //   _sentRemoteValues.remove(value);
+    //   return;
+    // }
 
     if (value.composing != null) _inputtingTextEditingValue = value; // 副作用みがすごい
 
