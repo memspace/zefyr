@@ -33,15 +33,15 @@ void main() {
     });
 
     test('valid blue marker', () {
-      final attrs = NotusStyle.fromJson(<String, dynamic>{'bm': '330099DD'});
-      final attr = attrs.get(NotusAttribute.blueMarker);
-      expect(attr, NotusAttribute.blueMarker);
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'m': '1A0099DD'});
+      final attr = attrs.get(NotusAttribute.marker);
+      expect(attr, NotusAttribute.marker);
     });
 
-    test('valid accent color', () {
-      final attrs = NotusStyle.fromJson(<String, dynamic>{'ac': 'FFFF5555'});
-      final attr = attrs.get(NotusAttribute.accentColor);
-      expect(attr, NotusAttribute.accentColor);
+    test('valid text color', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'tc': 'FFFF5555'});
+      final attr = attrs.get(NotusAttribute.textColor);
+      expect(attr, NotusAttribute.textColor);
     });
   });
 
