@@ -68,19 +68,26 @@ class TextLine extends StatelessWidget {
     final TextNode segment = node;
     final attrs = segment.style;
 
-    if (inputtingTextRange != null) {
-      final style = _getInlineTextStyle(attrs, theme);
+    try {
+      if (inputtingTextRange != null) {
+        final style = _getInlineTextStyle(attrs, theme);
+        return TextSpan(
+          children: [
+            TextSpan(text: segment.value.substring(0, inputtingTextRange.start)),
+            TextSpan(
+                text: segment.value
+                    .substring(inputtingTextRange.start, inputtingTextRange.end),
+                style: style.copyWith(backgroundColor: const Color(0x220000FF))),
+            TextSpan(
+                text: segment.value
+                    .substring(inputtingTextRange.end, segment.value.length)),
+          ],
+          style: _getInlineTextStyle(attrs, theme),
+        );
+      }
+    } catch (_) {
       return TextSpan(
-        children: [
-          TextSpan(text: segment.value.substring(0, inputtingTextRange.start)),
-          TextSpan(
-              text: segment.value
-                  .substring(inputtingTextRange.start, inputtingTextRange.end),
-              style: style.copyWith(backgroundColor: const Color(0x220000FF))),
-          TextSpan(
-              text: segment.value
-                  .substring(inputtingTextRange.end, segment.value.length)),
-        ],
+        text: segment.value,
         style: _getInlineTextStyle(attrs, theme),
       );
     }
@@ -140,11 +147,11 @@ class TextLine extends StatelessWidget {
     if (style.contains(NotusAttribute.strikethrough)) {
       result = _mergeTextStyleWithDecoration(result, theme.strikethrough);
     }
-    if (style.contains(NotusAttribute.accentColor)) {
-      result = _mergeTextStyleWithDecoration(result, theme.accentColor);
+    if (style.contains(NotusAttribute.textColor)) {
+      result = _mergeTextStyleWithDecoration(result, theme.textColor);
     }
-    if (style.contains(NotusAttribute.blueMarker)) {
-      result = _mergeTextStyleWithDecoration(result, theme.blueMarker);
+    if (style.contains(NotusAttribute.marker)) {
+      result = _mergeTextStyleWithDecoration(result, theme.marker);
     }
 
     return result;

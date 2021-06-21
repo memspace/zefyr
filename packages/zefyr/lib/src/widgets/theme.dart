@@ -74,11 +74,11 @@ class ZefyrThemeData {
   /// Style of strikethrough text.
   final TextStyle strikethrough;
 
-  /// Style of accentColor text.
-  final TextStyle accentColor;
+  /// Style of textColor text.
+  final TextStyle textColor;
 
-  /// Style of blue marker text.
-  final TextStyle blueMarker;
+  /// Style of marker text.
+  final TextStyle marker;
 
   /// Style of links in text.
   final TextStyle link;
@@ -115,8 +115,8 @@ class ZefyrThemeData {
     this.italic,
     this.underline,
     this.strikethrough,
-    this.accentColor,
-    this.blueMarker,
+    this.textColor,
+    this.marker,
     this.link,
     this.paragraph,
     this.heading1,
@@ -139,10 +139,10 @@ class ZefyrThemeData {
       italic: TextStyle(fontStyle: FontStyle.italic),
       underline: TextStyle(decoration: TextDecoration.underline),
       strikethrough: TextStyle(decoration: TextDecoration.lineThrough),
-      accentColor: TextStyle(color: Color(0xffFF5555)),
-      blueMarker: TextStyle(
+      textColor: TextStyle(color: Color(0xffFF5555)),
+      marker: TextStyle(
         decoration: TextDecoration.underline,
-        decorationColor: Color(0x330099DD),
+        decorationColor: Color(0x1A0099DD),
         decorationThickness: 10,
       ),
       link: TextStyle(
@@ -268,8 +268,8 @@ class ZefyrThemeData {
     TextStyle italic,
     TextStyle underline,
     TextStyle strikethrough,
-    TextStyle accentColor,
-    TextStyle blueMarker,
+    TextStyle textColor,
+    TextStyle marker,
     TextStyle link,
     TextBlockTheme paragraph,
     TextBlockTheme heading1,
@@ -284,8 +284,8 @@ class ZefyrThemeData {
       italic: italic ?? this.italic,
       underline: underline ?? this.underline,
       strikethrough: strikethrough ?? this.strikethrough,
-      accentColor: accentColor ?? this.accentColor,
-      blueMarker: blueMarker ?? this.blueMarker,
+      textColor: textColor ?? this.textColor,
+      marker: marker ?? this.marker,
       link: link ?? this.link,
       paragraph: paragraph ?? this.paragraph,
       heading1: heading1 ?? this.heading1,
@@ -303,8 +303,8 @@ class ZefyrThemeData {
       italic: other.italic,
       underline: other.underline,
       strikethrough: other.strikethrough,
-      accentColor: other.accentColor,
-      blueMarker: other.blueMarker,
+      textColor: other.textColor,
+      marker: other.marker,
       link: other.link,
       paragraph: other.paragraph,
       heading1: other.heading1,

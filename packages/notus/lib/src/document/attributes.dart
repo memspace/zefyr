@@ -79,8 +79,8 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.italic.key: NotusAttribute.italic,
     NotusAttribute.underline.key: NotusAttribute.underline,
     NotusAttribute.strikethrough.key: NotusAttribute.strikethrough,
-    NotusAttribute.accentColor.key: NotusAttribute.accentColor,
-    NotusAttribute.blueMarker.key: NotusAttribute.blueMarker,
+    NotusAttribute.textColor.key: NotusAttribute.textColor,
+    NotusAttribute.marker.key: NotusAttribute.marker,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
@@ -100,11 +100,11 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Strikethrough style attribute.
   static const strikethrough = _StrikethroughAttribute();
 
-  /// accent color style attribute.
-  static const accentColor = _AccentColorAttribute();
+  /// text color style attribute.
+  static const textColor = _TextColorAttribute();
 
-  /// blue marker style attribute.
-  static const blueMarker = _BlueMarkerAttribute();
+  /// marker style attribute.
+  static const marker = _MarkerAttribute();
 
   /// Link style attribute.
   // ignore: const_eval_throws_exception
@@ -390,16 +390,16 @@ class _StrikethroughAttribute extends NotusAttribute<bool> {
       : super._('s', NotusAttributeScope.inline, true);
 }
 
-/// Applies accent color style to a text segment.
-class _AccentColorAttribute extends NotusAttribute<String> {
-  const _AccentColorAttribute()
-      : super._('ac', NotusAttributeScope.inline, 'FFFF5555');
+/// Applies text color style to a text segment.
+class _TextColorAttribute extends NotusAttribute<String> {
+  const _TextColorAttribute()
+      : super._('tc', NotusAttributeScope.inline, 'FFFF5555');
 }
 
 /// Applies marker style to a text segment.
-class _BlueMarkerAttribute extends NotusAttribute<String> {
-  const _BlueMarkerAttribute()
-      : super._('bm', NotusAttributeScope.inline, '330099DD');
+class _MarkerAttribute extends NotusAttribute<String> {
+  const _MarkerAttribute()
+      : super._('m', NotusAttributeScope.inline, '1A0099DD');
 }
 
 /// Builder for link attribute values.
