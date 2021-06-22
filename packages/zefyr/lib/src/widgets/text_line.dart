@@ -68,19 +68,26 @@ class TextLine extends StatelessWidget {
     final TextNode segment = node;
     final attrs = segment.style;
 
-    if (inputtingTextRange != null) {
-      final style = _getInlineTextStyle(attrs, theme);
+    try {
+      if (inputtingTextRange != null) {
+        final style = _getInlineTextStyle(attrs, theme);
+        return TextSpan(
+          children: [
+            TextSpan(text: segment.value.substring(0, inputtingTextRange.start)),
+            TextSpan(
+                text: segment.value
+                    .substring(inputtingTextRange.start, inputtingTextRange.end),
+                style: style.copyWith(backgroundColor: const Color(0x220000FF))),
+            TextSpan(
+                text: segment.value
+                    .substring(inputtingTextRange.end, segment.value.length)),
+          ],
+          style: _getInlineTextStyle(attrs, theme),
+        );
+      }
+    } catch (_) {
       return TextSpan(
-        children: [
-          TextSpan(text: segment.value.substring(0, inputtingTextRange.start)),
-          TextSpan(
-              text: segment.value
-                  .substring(inputtingTextRange.start, inputtingTextRange.end),
-              style: style.copyWith(backgroundColor: const Color(0x220000FF))),
-          TextSpan(
-              text: segment.value
-                  .substring(inputtingTextRange.end, segment.value.length)),
-        ],
+        text: segment.value,
         style: _getInlineTextStyle(attrs, theme),
       );
     }
@@ -100,6 +107,8 @@ class TextLine extends StatelessWidget {
       textStyle = textStyle.merge(theme.heading2.style);
     } else if (heading == NotusAttribute.heading.level3) {
       textStyle = textStyle.merge(theme.heading3.style);
+    } else if (heading == NotusAttribute.heading.caption) {
+      textStyle = textStyle.merge(theme.caption.style);
     } else {
       textStyle = textStyle.merge(theme.paragraph.style);
     }
@@ -109,6 +118,10 @@ class TextLine extends StatelessWidget {
       textStyle = textStyle.merge(theme.quote.style);
     } else if (block == NotusAttribute.block.code) {
       textStyle = textStyle.merge(theme.code.style);
+    } else if (block == NotusAttribute.largeHeading) {
+      textStyle = textStyle.merge(theme.largeHeading.style);
+    } else if (block == NotusAttribute.middleHeading) {
+      textStyle = textStyle.merge(theme.middleHeading.style);
     } else if (block != null) {
       // lists
       textStyle = textStyle.merge(theme.lists.style);
@@ -133,6 +146,12 @@ class TextLine extends StatelessWidget {
     }
     if (style.contains(NotusAttribute.strikethrough)) {
       result = _mergeTextStyleWithDecoration(result, theme.strikethrough);
+    }
+    if (style.contains(NotusAttribute.textColor)) {
+      result = _mergeTextStyleWithDecoration(result, theme.textColor);
+    }
+    if (style.contains(NotusAttribute.marker)) {
+      result = _mergeTextStyleWithDecoration(result, theme.marker);
     }
 
     return result;

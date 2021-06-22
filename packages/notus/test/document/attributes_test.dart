@@ -31,6 +31,18 @@ void main() {
       final attr = attrs.get(NotusAttribute.strikethrough);
       expect(attr, NotusAttribute.strikethrough);
     });
+
+    test('valid blue marker', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'m': '1A0099DD'});
+      final attr = attrs.get(NotusAttribute.marker);
+      expect(attr, NotusAttribute.marker);
+    });
+
+    test('valid text color', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'tc': 'FFFF5555'});
+      final attr = attrs.get(NotusAttribute.textColor);
+      expect(attr, NotusAttribute.textColor);
+    });
   });
 
   group('$NotusStyle block', () {
@@ -56,6 +68,18 @@ void main() {
       final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'code'});
       final attr = attrs.get(NotusAttribute.block);
       expect(attr, NotusAttribute.code);
+    });
+
+    test('valid largeHeading code', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'lh'});
+      final attr = attrs.get(NotusAttribute.block);
+      expect(attr, NotusAttribute.largeHeading);
+    });
+
+    test('valid middleHeading code', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'block': 'mh'});
+      final attr = attrs.get(NotusAttribute.block);
+      expect(attr, NotusAttribute.middleHeading);
     });
 
     test('throws exception when contain invalid block key', () {
@@ -86,6 +110,12 @@ void main() {
       final attrs = NotusStyle.fromJson(<String, dynamic>{'heading': 3});
       final attr = attrs.get(NotusAttribute.heading);
       expect(attr, NotusAttribute.heading.level3);
+    });
+
+    test('valid caption ', () {
+      final attrs = NotusStyle.fromJson(<String, dynamic>{'heading': 5});
+      final attr = attrs.get(NotusAttribute.heading);
+      expect(attr, NotusAttribute.heading.caption);
     });
 
     test('throws exception when contain invalid heading key', () {

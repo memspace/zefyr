@@ -74,6 +74,12 @@ class ZefyrThemeData {
   /// Style of strikethrough text.
   final TextStyle strikethrough;
 
+  /// Style of textColor text.
+  final TextStyle textColor;
+
+  /// Style of marker text.
+  final TextStyle marker;
+
   /// Style of links in text.
   final TextStyle link;
 
@@ -88,6 +94,9 @@ class ZefyrThemeData {
   /// Style theme for level 3 headings.
   final TextBlockTheme heading3;
 
+  /// Style theme for caption headings.
+  final TextBlockTheme caption;
+
   /// Style theme for bullet and number lists.
   final TextBlockTheme lists;
 
@@ -97,19 +106,28 @@ class ZefyrThemeData {
   /// Style theme for code blocks.
   final TextBlockTheme code;
 
+  final TextBlockTheme largeHeading;
+
+  final TextBlockTheme middleHeading;
+
   ZefyrThemeData({
     this.bold,
     this.italic,
     this.underline,
     this.strikethrough,
+    this.textColor,
+    this.marker,
     this.link,
     this.paragraph,
     this.heading1,
     this.heading2,
     this.heading3,
+    this.caption,
     this.lists,
     this.quote,
     this.code,
+    this.largeHeading,
+    this.middleHeading,
   });
 
   factory ZefyrThemeData.fallback(BuildContext context) {
@@ -121,6 +139,12 @@ class ZefyrThemeData {
       italic: TextStyle(fontStyle: FontStyle.italic),
       underline: TextStyle(decoration: TextDecoration.underline),
       strikethrough: TextStyle(decoration: TextDecoration.lineThrough),
+      textColor: TextStyle(color: Color(0xffFF5555)),
+      marker: TextStyle(
+        decoration: TextDecoration.underline,
+        decorationColor: Color(0x1A0099DD),
+        decorationThickness: 10,
+      ),
       link: TextStyle(
         color: themeData.accentColor,
         decoration: TextDecoration.underline,
@@ -159,6 +183,14 @@ class ZefyrThemeData {
           color: Colors.black,
           height: 1.25,
           fontWeight: FontWeight.w700,
+        ),
+        spacing: VerticalSpacing(top: 24.0, bottom: 0.0),
+      ),
+      caption: TextBlockTheme(
+        style: TextStyle(
+          fontSize: 12.0,
+          color: Color(0xFF999999),
+          height: 1.25,
         ),
         spacing: VerticalSpacing(top: 24.0, bottom: 0.0),
       ),
@@ -205,6 +237,29 @@ class ZefyrThemeData {
           ),
         ),
       ),
+      largeHeading: TextBlockTheme(
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w700,
+          fontSize: 20.0,
+          height: 2,
+        ),
+        spacing: VerticalSpacing(top: 16, bottom: 0),
+        lineSpacing: VerticalSpacing(top: 0, bottom: 0),
+        decoration: BoxDecoration(
+          color: Color(0xff0099dd).withAlpha(20),
+        ),
+      ),
+      middleHeading: TextBlockTheme(
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w700,
+          fontSize: 18.0,
+          height: 1.5,
+        ),
+        spacing: VerticalSpacing(top: 16, bottom: 0),
+        lineSpacing: VerticalSpacing(top: 0, bottom: 15),
+      ),
     );
   }
 
@@ -213,6 +268,8 @@ class ZefyrThemeData {
     TextStyle italic,
     TextStyle underline,
     TextStyle strikethrough,
+    TextStyle textColor,
+    TextStyle marker,
     TextStyle link,
     TextBlockTheme paragraph,
     TextBlockTheme heading1,
@@ -227,6 +284,8 @@ class ZefyrThemeData {
       italic: italic ?? this.italic,
       underline: underline ?? this.underline,
       strikethrough: strikethrough ?? this.strikethrough,
+      textColor: textColor ?? this.textColor,
+      marker: marker ?? this.marker,
       link: link ?? this.link,
       paragraph: paragraph ?? this.paragraph,
       heading1: heading1 ?? this.heading1,
@@ -244,6 +303,8 @@ class ZefyrThemeData {
       italic: other.italic,
       underline: other.underline,
       strikethrough: other.strikethrough,
+      textColor: other.textColor,
+      marker: other.marker,
       link: other.link,
       paragraph: other.paragraph,
       heading1: other.heading1,

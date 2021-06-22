@@ -11,6 +11,8 @@ List<String> _insertionToggleableStyleKeys = [
   NotusAttribute.italic.key,
   NotusAttribute.underline.key,
   NotusAttribute.strikethrough.key,
+  NotusAttribute.textColor.key,
+  NotusAttribute.marker.key,
 ];
 
 class ZefyrController extends ChangeNotifier {
@@ -85,24 +87,42 @@ class ZefyrController extends ChangeNotifier {
       if (delta == null) {
         _updateSelectionSilent(selection, source: ChangeSource.local);
       } else {
-        // need to transform selection position in case actual delta
-        // is different from user's version (in deletes and inserts).
-        final user = Delta()
-          ..retain(index)
-          ..insert(data)
-          ..delete(length);
-        var positionDelta = getPositionDelta(user, delta);
-        _updateSelectionSilent(
-          selection.copyWith(
-            baseOffset: selection.baseOffset + positionDelta,
-            extentOffset: selection.extentOffset + positionDelta,
-          ),
-          source: ChangeSource.local,
-        );
+        // カーソルの上にBlockEmbedがあるときは、カーソルを左にずらしてから削除する
+        if (_shouldBackSelection(data)) {
+          _updateSelectionSilent(selection.copyWith(
+            baseOffset: selection.baseOffset,
+            extentOffset: selection.baseOffset - 1,
+          ));
+        } else {
+          // need to transform selection position in case actual delta
+          // is different from user's version (in deletes and inserts).
+          final user = Delta()
+            ..retain(index)
+            ..insert(data)
+            ..delete(length);
+          var positionDelta = getPositionDelta(user, delta);
+          _updateSelectionSilent(
+            selection.copyWith(
+              baseOffset: selection.baseOffset + positionDelta,
+              extentOffset: selection.extentOffset + positionDelta,
+            ),
+            source: ChangeSource.local,
+          );
+        }
       }
     }
 //    _lastChangeSource = ChangeSource.local;
     notifyListeners();
+  }
+
+  // カーソルの位置を一つ左にずらすべきか否か
+  bool _shouldBackSelection(Object data) {
+    // 削除中 && 文字列が(\n + BlockEmbed + \n)の時
+    final isDelete = data == '';
+    final blockEmbedPattern = '\n${EmbedNode.kObjectReplacementCharacter}\n';
+    final beforeText = document.toPlainText().substring(0, isDelete ? selection.start + 1 : selection.start);
+    final hasBlockEmbedAtBeforeSelection = beforeText.endsWith(blockEmbedPattern);
+    return isDelete && hasBlockEmbedAtBeforeSelection;
   }
 
   void formatText(int index, int length, NotusAttribute attribute) {
@@ -205,4 +225,45 @@ class ZefyrController extends ChangeNotifier {
       composing: TextRange.empty,
     );
   }
+
+  void addNewlineAtSelectionEnd() {
+    replaceText(
+      selection.baseOffset,
+      0,
+      '\n',
+      selection: selection.copyWith(
+        baseOffset: selection.baseOffset + 1,
+        extentOffset: selection.baseOffset + 1,
+      ),
+    );
+  }
+
+  // ノート最後尾に改行を追加
+  void addNewlineAtLast() {
+    replaceText(
+      document.length - 1,
+      0,
+      '\n',
+    );
+  }
+
+  // ノート最後尾を選択
+  void updateSelectionAtLast() {
+    final lastIndex = document.length - 1;
+    updateSelection(selection.copyWith(
+      baseOffset: lastIndex,
+      extentOffset: lastIndex,
+    ));
+  }
+
+  // ノート最後尾が改行で終わっているか
+  bool isEndNewline() {
+    final wholeText = document.toPlainText();
+    final lastIndex = wholeText.length - 1;
+    final lastChar = wholeText[lastIndex];
+    final secondLastChar = wholeText[lastIndex - 1];
+    final endsNewLine = lastChar == '\n' && secondLastChar == '\n';
+    return endsNewLine;
+  }
+
 }

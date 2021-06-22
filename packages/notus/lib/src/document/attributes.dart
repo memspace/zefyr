@@ -79,6 +79,8 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.italic.key: NotusAttribute.italic,
     NotusAttribute.underline.key: NotusAttribute.underline,
     NotusAttribute.strikethrough.key: NotusAttribute.strikethrough,
+    NotusAttribute.textColor.key: NotusAttribute.textColor,
+    NotusAttribute.marker.key: NotusAttribute.marker,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
@@ -97,6 +99,12 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Strikethrough style attribute.
   static const strikethrough = _StrikethroughAttribute();
+
+  /// text color style attribute.
+  static const textColor = _TextColorAttribute();
+
+  /// marker style attribute.
+  static const marker = _MarkerAttribute();
 
   /// Link style attribute.
   // ignore: const_eval_throws_exception
@@ -117,10 +125,13 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.heading.level3].
   static NotusAttribute<int> get h3 => heading.level3;
 
+  static NotusAttribute<int> get caption => heading.caption;
+
   static final List<int> _validHeadingValues = [
     heading.level1.value,
     heading.level2.value,
     heading.level3.value,
+    heading.caption.value,
   ];
 
   /// Block attribute
@@ -139,11 +150,17 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.block.code].
   static NotusAttribute<String> get code => block.code;
 
+  static NotusAttribute<String> get largeHeading => block.largeHeading;
+
+  static NotusAttribute<String> get middleHeading => block.middleHeading;
+
   static final List<String> _validBlockValues = [
     block.bulletList.value,
     block.numberList.value,
     block.quote.value,
     block.code.value,
+    block.largeHeading.value,
+    block.middleHeading.value,
   ];
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
@@ -373,6 +390,18 @@ class _StrikethroughAttribute extends NotusAttribute<bool> {
       : super._('s', NotusAttributeScope.inline, true);
 }
 
+/// Applies text color style to a text segment.
+class _TextColorAttribute extends NotusAttribute<String> {
+  const _TextColorAttribute()
+      : super._('tc', NotusAttributeScope.inline, 'FFFF5555');
+}
+
+/// Applies marker style to a text segment.
+class _MarkerAttribute extends NotusAttribute<String> {
+  const _MarkerAttribute()
+      : super._('m', NotusAttributeScope.inline, '1A0099DD');
+}
+
 /// Builder for link attribute values.
 ///
 /// There is no need to use this class directly, consider using
@@ -403,6 +432,9 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
 
   /// Level 3 heading, equivalent of `H3` in HTML.
   NotusAttribute<int> get level3 => NotusAttribute<int>._(key, scope, 3);
+
+  /// caption, equivalent of `p`(same as normal text) in HTML.
+  NotusAttribute<int> get caption => NotusAttribute<int>._(key, scope, 5);
 }
 
 /// Builder for block attribute styles (number/bullet lists, code and quote).
@@ -428,4 +460,12 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a block of lines as a quote.
   NotusAttribute<String> get quote =>
       NotusAttribute<String>._(key, scope, 'quote');
+
+  /// Formats a large heading
+  NotusAttribute<String> get largeHeading =>
+      NotusAttribute._(key, scope, 'lh');
+
+  /// Formats a middle heading
+  NotusAttribute<String> get middleHeading =>
+      NotusAttribute._(key, scope, 'mh');
 }
