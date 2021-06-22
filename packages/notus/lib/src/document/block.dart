@@ -36,7 +36,7 @@ class BlockNode extends ContainerNode<LineNode>
       final before = clone();
       insertBefore(before);
 
-      LineNode child = first;
+      var child = first as LineNode;
       while (child != line) {
         child.unlink();
         before.add(child);
@@ -82,7 +82,7 @@ class BlockNode extends ContainerNode<LineNode>
 
     var block = this;
     if (!block.isFirst && block.previous is BlockNode) {
-      BlockNode prev = block.previous;
+      var prev = block.previous as BlockNode;
       if (prev.style == block.style) {
         block.moveChildren(prev);
         block.unlink();
@@ -90,7 +90,7 @@ class BlockNode extends ContainerNode<LineNode>
       }
     }
     if (!block.isLast && block.next is BlockNode) {
-      BlockNode nextBlock = block.next;
+      var nextBlock = block.next as BlockNode;
       if (nextBlock.style == block.style) {
         nextBlock.moveChildren(block);
         nextBlock.unlink();

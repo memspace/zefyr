@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart';
-import 'package:meta/meta.dart';
 import 'package:quiver_hashcode/hashcode.dart';
 
 const _dataEquality = DeepCollectionEquality();
@@ -21,11 +20,9 @@ class EmbeddableObject {
 
   EmbeddableObject(
     this.type, {
-    @required this.inline,
+    required this.inline,
     Map<String, dynamic> data = const {},
-  })  : assert(type != null),
-        assert(inline != null),
-        assert(!data.containsKey(kTypeKey),
+  })  : assert(!data.containsKey(kTypeKey),
             'The "$kTypeKey" key is reserved in $EmbeddableObject data and cannot be used.'),
         assert(!data.containsKey(kInlineKey),
             'The "$kInlineKey" key is reserved in $EmbeddableObject data and cannot be used.'),
@@ -58,7 +55,7 @@ class EmbeddableObject {
   bool operator ==(dynamic other) {
     if (identical(this, other)) return true;
     if (other is! EmbeddableObject) return false;
-    final typedOther = other as EmbeddableObject;
+    final typedOther = other;
     return typedOther.type == type &&
         typedOther.inline == inline &&
         _dataEquality.equals(typedOther._data, _data);

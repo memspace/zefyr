@@ -11,7 +11,7 @@ abstract class DeleteRule {
 
   /// Applies heuristic rule to a delete operation on a [document] and returns
   /// resulting [Delta].
-  Delta apply(Delta document, int index, int length);
+  Delta? apply(Delta document, int index, int length);
 }
 
 /// Fallback rule for delete operations which simply deletes specified text
@@ -20,7 +20,7 @@ class CatchAllDeleteRule extends DeleteRule {
   const CatchAllDeleteRule();
 
   @override
-  Delta apply(Delta document, int index, int length) {
+  Delta? apply(Delta document, int index, int length) {
     return Delta()
       ..retain(index)
       ..delete(length);
@@ -37,7 +37,7 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
   const PreserveLineStyleOnMergeRule();
 
   @override
-  Delta apply(Delta document, int index, int length) {
+  Delta? apply(Delta document, int index, int length) {
     final iter = DeltaIterator(document);
     iter.skip(index);
     final target = iter.next(1);
@@ -54,13 +54,13 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
       final opText = op.data is String ? op.data as String : '';
       final lf = opText.indexOf('\n');
       if (lf == -1) {
-        result..retain(op.length);
+        result.retain(op.length);
         continue;
       }
       var attributes = _unsetAttributes(op.attributes);
       if (target.isNotPlain) {
         attributes ??= <String, dynamic>{};
-        attributes.addAll(target.attributes);
+        attributes.addAll(target.attributes!);
       }
       result..retain(lf)..retain(1, attributes);
       break;
@@ -68,7 +68,7 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
     return result;
   }
 
-  Map<String, dynamic> _unsetAttributes(Map<String, dynamic> attributes) {
+  Map<String, dynamic>? _unsetAttributes(Map<String, dynamic>? attributes) {
     if (attributes == null) return null;
     return attributes.map<String, dynamic>(
         (String key, dynamic value) => MapEntry<String, dynamic>(key, null));
@@ -80,7 +80,7 @@ class EnsureEmbedLineRule extends DeleteRule {
   const EnsureEmbedLineRule();
 
   @override
-  Delta apply(Delta document, int index, int length) {
+  Delta? apply(Delta document, int index, int length) {
     final iter = DeltaIterator(document);
 
     // First, check if newline deleted after an embed.
@@ -108,13 +108,13 @@ class EnsureEmbedLineRule extends DeleteRule {
       }
     } else {
       // If op is `null` it's beginning of the doc, e.g. implicit line break.
-      final opText = op?.data as String;
-      hasLineBreakBefore = op == null || opText.endsWith('\n');
+      final opText = op?.data as String?;
+      hasLineBreakBefore = op == null || opText!.endsWith('\n');
     }
 
     // Second, check if newline deleted before an embed.
     op = iter.skip(remaining);
-    final opText = op?.data is String ? op.data as String : '';
+    final opText = op?.data is String ? op!.data as String : '';
     if (op != null && opText.endsWith('\n')) {
       final candidate = iter.next(1);
       // If there is a newline before deleted range we allow the operation
