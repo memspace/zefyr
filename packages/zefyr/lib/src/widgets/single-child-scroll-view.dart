@@ -15,12 +15,10 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
   /// Creates a box in which a single widget can be scrolled.
   const ZefyrSingleChildScrollView({
     Key? key,
-    this.scrollDirection = Axis.vertical,
-    this.reverse = false,
     this.padding,
     bool? primary,
-    this.physics,
     this.controller,
+    this.physics,
     this.dragStartBehavior = DragStartBehavior.start,
     this.clipBehavior = Clip.hardEdge,
     required this.viewportBuilder,
@@ -29,31 +27,13 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
             !(controller != null && primary == true),
             'Primary ScrollViews obtain their ScrollController via inheritance from a PrimaryScrollController widget. '
             'You cannot both set primary to true and pass an explicit controller.'),
-        primary = primary ??
-            controller == null && identical(scrollDirection, Axis.vertical),
+        primary = primary ?? controller == null,
         super(key: key);
-
-  /// The axis along which the scroll view scrolls.
-  ///
-  /// Defaults to [Axis.vertical].
-  final Axis scrollDirection;
-
-  /// Whether the scroll view scrolls in the reading direction.
-  ///
-  /// For example, if the reading direction is left-to-right and
-  /// [scrollDirection] is [Axis.horizontal], then the scroll view scrolls from
-  /// left to right when [reverse] is false and from right to left when
-  /// [reverse] is true.
-  ///
-  /// Similarly, if [scrollDirection] is [Axis.vertical], then the scroll view
-  /// scrolls from top to bottom when [reverse] is false and from bottom to top
-  /// when [reverse] is true.
-  ///
-  /// Defaults to false.
-  final bool reverse;
 
   /// The amount of space by which to inset the child.
   final EdgeInsetsGeometry? padding;
+
+  final ScrollPhysics? physics;
 
   /// An object that can be used to control the position to which this scroll
   /// view is scrolled.
@@ -84,14 +64,6 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
   /// not specified.
   final bool primary;
 
-  /// How the scroll view should respond to user input.
-  ///
-  /// For example, determines how the scroll view continues to animate after the
-  /// user stops dragging the scroll view.
-  ///
-  /// Defaults to matching platform conventions.
-  final ScrollPhysics? physics;
-
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
   final DragStartBehavior dragStartBehavior;
 
@@ -107,26 +79,24 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
 
   AxisDirection _getDirection(BuildContext context) {
     return getAxisDirectionFromAxisReverseAndDirectionality(
-        context, scrollDirection, reverse);
+        context, Axis.vertical, false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final axisDirection = _getDirection(context);
     final scrollController =
         primary ? PrimaryScrollController.of(context) : controller;
     final scrollable = Scrollable(
       dragStartBehavior: dragStartBehavior,
-      axisDirection: axisDirection,
-      controller: scrollController,
+      axisDirection: AxisDirection.down,
       physics: physics,
+      controller: scrollController,
       restorationId: restorationId,
       viewportBuilder: (BuildContext context, ViewportOffset offset) {
         var contents = viewportBuilder(context, offset);
         if (padding != null)
           contents = Padding(padding: padding!, child: contents);
         return _SingleChildViewport(
-            axisDirection: axisDirection,
             offset: offset,
             clipBehavior: clipBehavior,
             child: contents);
@@ -141,20 +111,17 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
 class _SingleChildViewport extends SingleChildRenderObjectWidget {
   const _SingleChildViewport({
     Key? key,
-    this.axisDirection = AxisDirection.down,
     required this.offset,
     Widget? child,
     required this.clipBehavior,
   }) : super(key: key, child: child);
 
-  final AxisDirection axisDirection;
   final ViewportOffset offset;
   final Clip clipBehavior;
 
   @override
   _RenderSingleChildViewport createRenderObject(BuildContext context) {
     return _RenderSingleChildViewport(
-      axisDirection: axisDirection,
       offset: offset,
       clipBehavior: clipBehavior,
     );
@@ -165,7 +132,6 @@ class _SingleChildViewport extends SingleChildRenderObjectWidget {
       BuildContext context, _RenderSingleChildViewport renderObject) {
     // Order dependency: The offset setter reads the axis direction.
     renderObject
-      ..axisDirection = axisDirection
       ..offset = offset
       ..clipBehavior = clipBehavior;
   }
@@ -175,28 +141,17 @@ class _RenderSingleChildViewport extends RenderBox
     with RenderObjectWithChildMixin<RenderBox>
     implements RenderAbstractViewport {
   _RenderSingleChildViewport({
-    AxisDirection axisDirection = AxisDirection.down,
     required ViewportOffset offset,
     double cacheExtent = RenderAbstractViewport.defaultCacheExtent,
     RenderBox? child,
     required Clip clipBehavior,
-  })   : _axisDirection = axisDirection,
-        _offset = offset,
+  })  :_offset = offset,
         _cacheExtent = cacheExtent,
         _clipBehavior = clipBehavior {
     this.child = child;
   }
 
-  AxisDirection get axisDirection => _axisDirection;
-  AxisDirection _axisDirection;
-
-  set axisDirection(AxisDirection value) {
-    if (value == _axisDirection) return;
-    _axisDirection = value;
-    markNeedsLayout();
-  }
-
-  Axis get axis => axisDirectionToAxis(axisDirection);
+  Axis get axis => axisDirectionToAxis(AxisDirection.down);
 
   ViewportOffset get offset => _offset;
   ViewportOffset _offset;
@@ -350,16 +305,7 @@ class _RenderSingleChildViewport extends RenderBox
   Offset get _paintOffset => _paintOffsetForPosition(offset.pixels);
 
   Offset _paintOffsetForPosition(double position) {
-    switch (axisDirection) {
-      case AxisDirection.up:
-        return Offset(0.0, position - child!.size.height + size.height);
-      case AxisDirection.down:
-        return Offset(0.0, -position);
-      case AxisDirection.left:
-        return Offset(position - child!.size.width + size.width, 0.0);
-      case AxisDirection.right:
-        return Offset(-position, 0.0);
-    }
+    return Offset(0.0, -position);
   }
 
   bool _shouldClipAtPaintOffset(Offset paintOffset) {
@@ -432,34 +378,14 @@ class _RenderSingleChildViewport extends RenderBox
     final targetBox = target;
     final transform = targetBox.getTransformTo(child);
     final bounds = MatrixUtils.transformRect(transform, rect);
-    final contentSize = child!.size;
 
     final double leadingScrollOffset;
     final double targetMainAxisExtent;
     final double mainAxisExtent;
 
-    switch (axisDirection) {
-      case AxisDirection.up:
-        mainAxisExtent = size.height;
-        leadingScrollOffset = contentSize.height - bounds.bottom;
-        targetMainAxisExtent = bounds.height;
-        break;
-      case AxisDirection.right:
-        mainAxisExtent = size.width;
-        leadingScrollOffset = bounds.left;
-        targetMainAxisExtent = bounds.width;
-        break;
-      case AxisDirection.down:
-        mainAxisExtent = size.height;
-        leadingScrollOffset = bounds.top;
-        targetMainAxisExtent = bounds.height;
-        break;
-      case AxisDirection.left:
-        mainAxisExtent = size.width;
-        leadingScrollOffset = contentSize.width - bounds.right;
-        targetMainAxisExtent = bounds.width;
-        break;
-    }
+    mainAxisExtent = size.height;
+    leadingScrollOffset = bounds.top;
+    targetMainAxisExtent = bounds.height;
 
     final targetOffset = leadingScrollOffset -
         (mainAxisExtent - targetMainAxisExtent) * alignment;

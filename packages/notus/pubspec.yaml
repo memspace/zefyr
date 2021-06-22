@@ -12,7 +12,7 @@ dependencies:
   meta: ^1.1.0
   quill_delta:
     git:
-      url: https://github.com/miDeb/quill-delta-dart.git
+      url: https://github.com/amantoux/quill-delta-dart.git
       ref: nnbd
   quiver: ^3.0.0
 

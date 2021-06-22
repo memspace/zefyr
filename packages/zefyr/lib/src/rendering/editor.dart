@@ -513,6 +513,10 @@ class RenderEditor extends RenderEditableContainerBox
     return TextSelection(baseOffset: line.start, extentOffset: line.end);
   }
 
+  Rect? getRectForComposingRange(TextRange composingRange) {
+    // TODO : this must be implemented for each
+  }
+
 // Call through to onSelectionChanged.
   void _handleSelectionChange(
     TextSelection nextSelection,

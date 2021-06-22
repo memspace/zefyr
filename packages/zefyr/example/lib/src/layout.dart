@@ -58,7 +58,7 @@ class _DesktopScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             decoration: BoxDecoration(color: Colors.grey.shade800),
