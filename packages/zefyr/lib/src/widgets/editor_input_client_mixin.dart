@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -84,25 +82,10 @@ mixin RawEditorStateTextInputClientMixin on EditorState
       );
       _textInputConnection!.show();
       _updateSizeAndTransform();
-      // TODO
       _updateComposingRectIfNeeded();
       // TODO: This is used on macOS for positioning the accent selection menu.
       //_updateCaretRectIfNeeded();
-      // TODO:
-      // final style = widget.currentStyle()
-      _textInputConnection!
-        // TODO
-        // ..setStyle(
-        //     fontFamily: style.fontFamily,
-        //     fontSize: style.fontSize,
-        //     fontWeight: style.fontWeight,
-        //     textDirection: Directionality.of(context),
-        //     // TODO: get current focused editable text line/block/embeds text align
-        //     //       for support of column alignment
-        //     textAlign: TextAlign.start,
-        // )
-        // TODO: send local editing value instead of global one
-        ..setEditingState(_lastKnownRemoteTextEditingValue!);
+      _textInputConnection!.setEditingState(_lastKnownRemoteTextEditingValue!);
       _sentRemoteValues.add(_lastKnownRemoteTextEditingValue!);
     } else {
       _textInputConnection!.show();
@@ -116,15 +99,14 @@ mixin RawEditorStateTextInputClientMixin on EditorState
   // when the composing rect info didn't arrive in time.
   void _updateComposingRectIfNeeded() {
     final value = widget.controller.plainTextEditingValue;
-    final TextRange composingRange = value.composing;
+    final composingRange = value.composing;
     if (hasConnection) {
       assert(mounted);
-      Rect? composingRect =
-          renderEditor.getRectForComposingRange(composingRange);
+      var composingRect = renderEditor.getRectForComposingRange(composingRange);
       // Send the caret location instead if there's no marked text yet.
       if (composingRect == null) {
         assert(!composingRange.isValid || composingRange.isCollapsed);
-        final int offset = composingRange.isValid ? composingRange.start : 0;
+        final offset = composingRange.isValid ? composingRange.start : 0;
         composingRect =
             renderEditor.getLocalRectForCaret(TextPosition(offset: offset));
       }
@@ -280,9 +262,10 @@ mixin RawEditorStateTextInputClientMixin on EditorState
 
   void _updateSizeAndTransform() {
     if (hasConnection) {
-      final renderBox = _lastKnownRemoteTextEditingValue != null ?
-      renderEditor.childAtPosition(
-          _lastKnownRemoteTextEditingValue!.selection.extent): renderEditor;
+      final renderBox = _lastKnownRemoteTextEditingValue != null
+          ? renderEditor.childAtPosition(
+              _lastKnownRemoteTextEditingValue!.selection.extent)
+          : renderEditor;
       final size = renderBox.size;
       final transform = renderBox.getTransformTo(null);
       _textInputConnection!.setEditableSizeAndTransform(size, transform);

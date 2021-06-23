@@ -30,10 +30,7 @@ dependencies:
   file: ^6.1.0
   path_provider: ^2.0.1
   zefyr:
-    git:
-      url: https://github.com/amantoux/zefyr.git
-      ref: 1.0-dev-master
-      path: packages/zefyr
+    path: ../
 
 dev_dependencies:
   flutter_test:

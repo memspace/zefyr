@@ -73,13 +73,14 @@ class KeyboardListener {
     required this.onDelete,
   });
 
-  bool handleKeyEvent(RawKeyEvent keyEvent) {
+  KeyEventResult handleKeyEvent(RawKeyEvent keyEvent) {
     if (kIsWeb) {
       // On web platform, we should ignore the key because it's processed already.
-      return false;
+      return KeyEventResult.skipRemainingHandlers;
     }
 
-    if (keyEvent is! RawKeyDownEvent) return false;
+    if (keyEvent is! RawKeyDownEvent)
+      return KeyEventResult.skipRemainingHandlers;
 
     final Set<LogicalKeyboardKey> keysPressed =
         LogicalKeyboardKey.collapseSynonyms(RawKeyboard.instance.keysPressed);
@@ -95,7 +96,7 @@ class KeyboardListener {
       // If the most recently pressed key isn't a non-modifier key, or more than
       // one non-modifier key is down, or keys other than the ones we're interested in
       // are pressed, just ignore the keypress.
-      return false;
+      return KeyEventResult.skipRemainingHandlers;
     }
 
     final bool isWordModifierPressed =
@@ -122,8 +123,8 @@ class KeyboardListener {
     } else if (key == LogicalKeyboardKey.backspace) {
       onDelete(false);
     } else {
-      return false;
+      return KeyEventResult.skipRemainingHandlers;
     }
-    return true;
+    return KeyEventResult.handled;
   }
 }

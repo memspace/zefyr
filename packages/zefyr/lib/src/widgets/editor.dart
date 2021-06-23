@@ -325,7 +325,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     extends EditorTextSelectionGestureDetectorBuilder {
   _ZefyrEditorSelectionGestureDetectorBuilder({
     required _ZefyrEditorState state,
-  })   : _state = state,
+  })  : _state = state,
         super(delegate: state);
 
   final _ZefyrEditorState _state;
@@ -690,6 +690,8 @@ class RawEditorState extends EditorState
 
   // Cursors
   late CursorController _cursorController;
+
+  // ignore: unused_field
   late FloatingCursorController _floatingCursorController;
 
   // Keyboard
@@ -804,7 +806,8 @@ class RawEditorState extends EditorState
     );
 
     // Focus
-    _focusAttachment = widget.focusNode.attach(context);
+    _focusAttachment = widget.focusNode.attach(context,
+        onKey: (node, event) => _keyboardListener.handleKeyEvent(event));
     widget.focusNode.addListener(_handleFocusChanged);
   }
 
@@ -1209,7 +1212,8 @@ class RawEditorState extends EditorState
   }
 
   @override
-  void userUpdateTextEditingValue(TextEditingValue value, SelectionChangedCause cause) {
+  void userUpdateTextEditingValue(
+      TextEditingValue value, SelectionChangedCause cause) {
     // TODO: implement userUpdateTextEditingValue
   }
 }

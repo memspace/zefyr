@@ -648,6 +648,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     _computeCaretPrototype();
   }
 
+  @override
   CursorPainter get cursorPainter => CursorPainter(
         editable: body!,
         style: _cursorController.style,
