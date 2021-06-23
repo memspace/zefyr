@@ -159,7 +159,7 @@ abstract class LeafNode extends Node
     final remaining = length - local;
     if (remaining > 0) {
       assert(node.next != null);
-      node.next?.retain(0, remaining, style);
+      node.next!.retain(0, remaining, style);
     }
     // Optimize at the very end
     node.formatAndOptimize(style);
@@ -179,7 +179,7 @@ abstract class LeafNode extends Node
     final remaining = length - local;
     if (remaining > 0) {
       assert(actualNext != null);
-      actualNext?.delete(0, remaining);
+      actualNext!.delete(0, remaining);
     }
 
     if (needsOptimize != null) needsOptimize.optimize();

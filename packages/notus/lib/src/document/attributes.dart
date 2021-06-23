@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:collection/collection.dart';
-import 'package:quiver_hashcode/hashcode.dart';
+import 'package:quiver/core.dart';
 
 /// Scope of a style attribute, defines context in which an attribute can be
 /// applied.
@@ -184,10 +184,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! NotusAttribute<T>) return false;
-    var typedOther = other;
-    return key == typedOther.key &&
-        scope == typedOther.scope &&
-        value == typedOther.value;
+    return key == other.key &&
+        scope == other.scope &&
+        value == other.value;
   }
 
   @override
@@ -311,9 +310,8 @@ class NotusStyle {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! NotusStyle) return false;
-    var typedOther = other;
     final eq = const MapEquality<String, NotusAttribute>();
-    return eq.equals(_data, typedOther._data);
+    return eq.equals(_data, other._data);
   }
 
   @override

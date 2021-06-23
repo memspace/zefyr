@@ -69,7 +69,7 @@ class LineNode extends ContainerNode<LeafNode>
     if (index == length - 1) return line;
 
     final split = lookup(index);
-    while (!(split.node?.isLast ?? true)) {
+    while (!split.node!.isLast) {
       var child = last as LeafNode;
       child.unlink();
       line.addFirst(child);
@@ -135,8 +135,8 @@ class LineNode extends ContainerNode<LeafNode>
       result = result.mergeAll(node.style);
       var pos = node.length - data.offset;
       while (!node!.isLast && pos < local) {
-        node = node.next as LeafNode?;
-        _handle(node!.style);
+        node = node.next as LeafNode;
+        _handle(node.style);
         pos += node.length;
       }
     }
@@ -167,7 +167,7 @@ class LineNode extends ContainerNode<LeafNode>
   Delta toDelta() {
     final delta = children
         .map((child) => child.toDelta())
-        .fold(Delta(), (dynamic a, b) => a.concat(b));
+        .fold(Delta(), (Delta a, b) => a.concat(b));
     var attributes = style;
     if (parent is BlockNode) {
       var block = parent as BlockNode;
@@ -300,7 +300,7 @@ class LineNode extends ContainerNode<LeafNode>
       // Now we can remove this line.
       final block = parent; // remember reference before un-linking.
       unlink();
-      block?.optimize();
+      block!.optimize();
     }
   }
 
@@ -348,7 +348,7 @@ class LineNode extends ContainerNode<LeafNode>
       child.formatAndOptimize(style);
     } else {
       final result = lookup(index, inclusive: true);
-      result.node?.insert(result.offset, data, style);
+      result.node!.insert(result.offset, data, style);
     }
   }
 }

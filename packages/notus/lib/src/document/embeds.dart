@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart';
-import 'package:quiver_hashcode/hashcode.dart';
+import 'package:quiver/core.dart';
 
 const _dataEquality = DeepCollectionEquality();
 
@@ -55,10 +55,9 @@ class EmbeddableObject {
   bool operator ==(dynamic other) {
     if (identical(this, other)) return true;
     if (other is! EmbeddableObject) return false;
-    final typedOther = other;
-    return typedOther.type == type &&
-        typedOther.inline == inline &&
-        _dataEquality.equals(typedOther._data, _data);
+    return other.type == type &&
+        other.inline == inline &&
+        _dataEquality.equals(other._data, _data);
   }
 
   @override
