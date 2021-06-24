@@ -665,12 +665,21 @@ class RawEditor extends StatefulWidget {
 ///
 abstract class EditorState extends State<RawEditor> {
   TextEditingValue get textEditingValue;
+
   set textEditingValue(TextEditingValue value);
+
   RenderEditor get renderEditor;
+
   EditorTextSelectionOverlay get selectionOverlay;
+
   bool showToolbar();
+
   void hideToolbar();
+
   void requestKeyboard();
+
+  void userUpdateTextEditingValue(
+      TextEditingValue value, SelectionChangedCause cause) {}
 }
 
 class RawEditorState extends EditorState
@@ -709,6 +718,7 @@ class RawEditorState extends EditorState
 
   bool _didAutoFocus = false;
   FocusAttachment _focusAttachment;
+
   bool get _hasFocus => widget.focusNode.hasFocus;
 
   @override
@@ -921,7 +931,9 @@ class RawEditorState extends EditorState
         (Duration _) => _updateOrDisposeSelectionOverlayIfNeeded());
 //    _textChangedSinceLastCaretUpdate = true;
 
-    setState(() {/* We use widget.controller.value in build(). */});
+    setState(() {
+      /* We use widget.controller.value in build(). */
+    });
   }
 
   void _handleSelectionChanged(

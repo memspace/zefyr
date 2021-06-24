@@ -354,6 +354,7 @@ class EditorTextSelectionOverlay {
           endpoints,
           selectionDelegate,
           clipboardStatus,
+          null,
         ),
       ),
     );
@@ -370,6 +371,7 @@ class EditorTextSelectionOverlay {
         textPosition = newSelection.extent;
         break;
     }
+    // TODO: update to use userUpdateTextEditingValue
     selectionDelegate.textEditingValue =
         _value.copyWith(selection: newSelection, composing: TextRange.empty);
     selectionDelegate.bringIntoView(textPosition);
