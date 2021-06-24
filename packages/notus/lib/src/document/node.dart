@@ -21,14 +21,14 @@ import 'line.dart';
 /// considered [mounted] when the [parent] property is not `null`.
 abstract class Node extends LinkedListEntry<Node> {
   /// Current parent of this node. May be null if this node is not mounted.
-  ContainerNode get parent => _parent;
-  ContainerNode _parent;
+  ContainerNode? get parent => _parent;
+  ContainerNode? _parent;
 
   /// Returns `true` if this node is the first node in the [parent] list.
-  bool get isFirst => list.first == this;
+  bool get isFirst => list?.first == this;
 
   /// Returns `true` if this node is the last node in the [parent] list.
-  bool get isLast => list.last == this;
+  bool get isLast => list?.last == this;
 
   /// Length of this node in characters.
   int get length;
@@ -45,7 +45,7 @@ abstract class Node extends LinkedListEntry<Node> {
     var offset = 0;
     var node = this;
     do {
-      node = node.previous;
+      node = node.previous!;
       offset += node.length;
     } while (!node.isFirst);
     return offset;
@@ -53,7 +53,7 @@ abstract class Node extends LinkedListEntry<Node> {
 
   /// Offset in characters of this node in the document.
   int get documentOffset {
-    final parentOffset = (_parent is! RootNode) ? _parent.documentOffset : 0;
+    final parentOffset = (_parent is! RootNode) ? _parent!.documentOffset : 0;
     return parentOffset + offset;
   }
 
@@ -77,11 +77,11 @@ abstract class Node extends LinkedListEntry<Node> {
   String toPlainText();
 
   /// Insert [data] at specified character [index] with style [style].
-  void insert(int index, Object data, NotusStyle style);
+  void insert(int index, Object data, NotusStyle? style);
 
   /// Format [length] characters of this node starting from [index] with
   /// specified style [style].
-  void retain(int index, int length, NotusStyle style);
+  void retain(int index, int length, NotusStyle? style);
 
   /// Delete [length] characters of this node starting from [index].
   void delete(int index, int length);
@@ -111,7 +111,7 @@ abstract class Node extends LinkedListEntry<Node> {
 /// Result of a child lookup in a [ContainerNode].
 class LookupResult {
   /// The child node if found, otherwise `null`.
-  final Node node;
+  final Node? node;
 
   /// Starting offset within the child [node] which points at the same
   /// character in the document as the original offset passed to
@@ -187,9 +187,9 @@ abstract class ContainerNode<T extends Node> extends Node {
   /// Moves children of this node to [newParent].
   void moveChildren(ContainerNode newParent) {
     if (isEmpty) return;
-    T toBeOptimized = newParent.isEmpty ? null : newParent.last;
+    var toBeOptimized = newParent.isEmpty ? null : newParent.last;
     while (isNotEmpty) {
-      T child = first;
+      var child = first;
       child.unlink();
       newParent.add(child);
     }
@@ -233,7 +233,7 @@ abstract class ContainerNode<T extends Node> extends Node {
   int get length => _children.fold(0, (current, node) => current + node.length);
 
   @override
-  void insert(int index, Object data, NotusStyle style) {
+  void insert(int index, Object data, NotusStyle? style) {
     assert(index == 0 || (index > 0 && index < length));
 
     if (isEmpty) {
@@ -243,22 +243,22 @@ abstract class ContainerNode<T extends Node> extends Node {
       node.insert(index, data, style);
     } else {
       final result = lookup(index);
-      result.node.insert(result.offset, data, style);
+      result.node!.insert(result.offset, data, style);
     }
   }
 
   @override
-  void retain(int index, int length, NotusStyle attributes) {
+  void retain(int index, int length, NotusStyle? attributes) {
     assert(isNotEmpty);
     final res = lookup(index);
-    res.node.retain(res.offset, length, attributes);
+    res.node!.retain(res.offset, length, attributes);
   }
 
   @override
   void delete(int index, int length) {
     assert(isNotEmpty);
     final res = lookup(index);
-    res.node.delete(res.offset, length);
+    res.node!.delete(res.offset, length);
   }
 
   @override
@@ -285,7 +285,6 @@ abstract class StyledNodeMixin implements StyledNode {
   /// Applies new style [value] to this node. Provided [value] is merged
   /// into current style.
   void applyStyle(NotusStyle value) {
-    assert(value != null);
     _style = _style.mergeAll(value);
   }
 

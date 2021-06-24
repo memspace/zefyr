@@ -15,13 +15,9 @@ abstract class LeafNode extends Node
     with StyledNodeMixin
     implements StyledNode {
   /// Creates a new [LeafNode] with specified [data].
-  LeafNode._(Object data)
-      : assert(data != null),
-        _value = data;
+  LeafNode._(Object data) : _value = data;
 
-  factory LeafNode([Object data]) {
-    assert(data != null);
-
+  factory LeafNode(Object data) {
     LeafNode node;
     if (data is EmbeddableObject) {
       node = EmbedNode(data);
@@ -49,7 +45,7 @@ abstract class LeafNode extends Node
   ///
   /// In case a new node is actually split from this one, it inherits this
   /// node's style.
-  LeafNode splitAt(int index) {
+  LeafNode? splitAt(int index) {
     assert(index >= 0 && index <= length);
     if (index == 0) return this;
     if (index == length && isLast) return null;
@@ -80,7 +76,7 @@ abstract class LeafNode extends Node
   ///
   /// Splitting logic is identical to one described in [splitAt], meaning this
   /// method may return `null`.
-  LeafNode cutAt(int index) {
+  LeafNode? cutAt(int index) {
     assert(index >= 0 && index <= length);
     final cut = splitAt(index);
     cut?.unlink();
@@ -101,13 +97,13 @@ abstract class LeafNode extends Node
         'Actual node length: ${this.length}.');
     // Since `index < this.length` (guarded by assert) below line
     // always returns a new node.
-    final target = splitAt(index);
+    final target = splitAt(index)!;
     target.splitAt(length);
     return target;
   }
 
   /// Formats this node and optimizes it with adjacent leaf nodes if needed.
-  void formatAndOptimize(NotusStyle style) {
+  void formatAndOptimize(NotusStyle? style) {
     if (style != null && style.isNotEmpty) {
       applyStyle(style);
     }
@@ -116,7 +112,7 @@ abstract class LeafNode extends Node
 
   @override
   void applyStyle(NotusStyle value) {
-    assert(value != null && (value.isInline || value.isEmpty),
+    assert(value.isInline || value.isEmpty,
         'Style cannot be applied to this leaf node: $value');
     super.applyStyle(value);
   }
@@ -141,21 +137,20 @@ abstract class LeafNode extends Node
   }
 
   @override
-  void insert(int index, Object data, NotusStyle style) {
-    assert(data != null);
+  void insert(int index, Object data, NotusStyle? style) {
     assert(index >= 0 && (index <= length),
         'Index out of bounds. Must be between 0 and $length, but got $index.');
     final node = LeafNode(data);
     if (index == length) {
       insertAfter(node);
     } else {
-      splitAt(index).insertBefore(node);
+      splitAt(index)!.insertBefore(node);
     }
     node.formatAndOptimize(style);
   }
 
   @override
-  void retain(int index, int length, NotusStyle style) {
+  void retain(int index, int length, NotusStyle? style) {
     if (style == null) return;
 
     final local = math.min(this.length - index, length);
@@ -164,7 +159,7 @@ abstract class LeafNode extends Node
     final remaining = length - local;
     if (remaining > 0) {
       assert(node.next != null);
-      node.next.retain(0, remaining, style);
+      node.next!.retain(0, remaining, style);
     }
     // Optimize at the very end
     node.formatAndOptimize(style);
@@ -184,7 +179,7 @@ abstract class LeafNode extends Node
     final remaining = length - local;
     if (remaining > 0) {
       assert(actualNext != null);
-      actualNext.delete(0, remaining);
+      actualNext!.delete(0, remaining);
     }
 
     if (needsOptimize != null) needsOptimize.optimize();
@@ -210,9 +205,9 @@ abstract class LeafNode extends Node
 
     // This is a text node and it can only be merged with other text nodes.
 
-    TextNode node = this;
+    var node = this as TextNode;
     if (!node.isFirst && node.previous is TextNode) {
-      TextNode mergeWith = node.previous;
+      var mergeWith = node.previous as TextNode;
       if (mergeWith.style == node.style) {
         final combinedValue = mergeWith.value + node.value;
         mergeWith._value = combinedValue;
@@ -221,7 +216,7 @@ abstract class LeafNode extends Node
       }
     }
     if (!node.isLast && node.next is TextNode) {
-      TextNode mergeWith = node.next;
+      var mergeWith = node.next as TextNode;
       if (mergeWith.style == node.style) {
         final combinedValue = node.value + mergeWith.value;
         node._value = combinedValue;

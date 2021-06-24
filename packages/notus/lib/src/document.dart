@@ -53,8 +53,7 @@ class NotusDocument {
 
   /// Creates new NotusDocument from provided `delta`.
   NotusDocument.fromDelta(Delta delta)
-      : assert(delta != null),
-        _heuristics = NotusHeuristics.fallback,
+      : _heuristics = NotusHeuristics.fallback,
         _delta = _migrateDelta(delta) {
     _loadDocument(_delta);
   }
@@ -175,7 +174,7 @@ class NotusDocument {
   /// The returned [Delta] may be empty in which case this document remains
   /// unchanged and no change event is published to the [changes] stream.
   Delta format(int index, int length, NotusAttribute attribute) {
-    assert(index >= 0 && length >= 0 && attribute != null);
+    assert(index >= 0 && length >= 0);
 
     var change = Delta();
 
@@ -201,7 +200,7 @@ class NotusDocument {
   ///   for every character within this range (line-break characters excluded).
   NotusStyle collectStyle(int index, int length) {
     var result = lookupLine(index);
-    LineNode line = result.node;
+    var line = result.node as LineNode;
     return line.collectStyle(result.offset, length);
   }
 
@@ -210,7 +209,7 @@ class NotusDocument {
     // TODO: prevent user from moving caret after last line-break.
     var result = _root.lookup(offset, inclusive: true);
     if (result.node is LineNode) return result;
-    BlockNode block = result.node;
+    var block = result.node as BlockNode;
     return block.lookup(result.offset, inclusive: true);
   }
 
@@ -282,7 +281,7 @@ class NotusDocument {
     for (final op in delta.toList()) {
       if (op.hasAttribute(_kEmbedAttributeKey)) {
         // Convert legacy embed style attribute into the embed insert operation.
-        final attrs = Map<String, dynamic>.from(op.attributes);
+        final attrs = Map<String, dynamic>.from(op.attributes!);
         final data = Map<String, dynamic>.from(attrs[_kEmbedAttributeKey]);
         data[EmbeddableObject.kTypeKey] = data['type'];
         data[EmbeddableObject.kInlineKey] = false;
@@ -300,7 +299,7 @@ class NotusDocument {
   Object _normalizeData(Object data) {
     return data is String
         ? data
-        : data is EmbeddableObject ? data : EmbeddableObject.fromJson(data);
+        : data is EmbeddableObject ? data : EmbeddableObject.fromJson(data as Map<String, dynamic>);
   }
 
   /// Loads [document] delta into this document.

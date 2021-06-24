@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('$Node', () {
-    RootNode root;
+    late RootNode root;
     setUp(() {
       root = RootNode();
     });
@@ -27,16 +27,16 @@ void main() {
 
     test('documentOffset', () {
       root.insert(0, 'First line\nSecond line', null);
-      LineNode line = root.children.last;
-      TextNode text = line.first;
+      final line = root.children.last as LineNode;
+      final text = line.first as TextNode;
       expect(line.documentOffset, 11);
       expect(text.documentOffset, 11);
     });
 
     test('containsOffset', () {
       root.insert(0, 'First line\nSecond line', null);
-      LineNode line = root.children.last;
-      TextNode text = line.first;
+      final line = root.children.last as LineNode;
+      final text = line.first as TextNode;
       expect(line.containsOffset(10), isFalse);
       expect(line.containsOffset(12), isTrue);
       expect(text.containsOffset(10), isFalse);

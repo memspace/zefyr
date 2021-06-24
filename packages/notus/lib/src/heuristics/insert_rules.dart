@@ -9,10 +9,10 @@ import '../document/attributes.dart';
 /// The result of [_findNextNewline] function.
 class _FindResult {
   /// The operation containing a newline character, can be null.
-  final Operation op;
+  final Operation? op;
 
   /// Total length of skipped characters before [op].
-  final int skippedLength;
+  final int? skippedLength;
 
   _FindResult(this.op, this.skippedLength);
 
@@ -47,7 +47,7 @@ abstract class InsertRule {
 
   /// Applies heuristic rule to an insert operation on a [document] and returns
   /// resulting [Delta].
-  Delta apply(Delta document, int index, Object data);
+  Delta? apply(Delta document, int index, Object data);
 }
 
 /// Fallback rule which simply inserts text as-is without any special handling.
@@ -69,7 +69,7 @@ class CatchAllInsertRule extends InsertRule {
 class PreserveLineStyleOnSplitRule extends InsertRule {
   const PreserveLineStyleOnSplitRule();
 
-  bool isEdgeLineSplit(Operation before, Operation after) {
+  bool isEdgeLineSplit(Operation? before, Operation after) {
     if (before == null) return true; // split at the beginning of a doc
     final textBefore = before.data is String ? before.data as String : '';
     final textAfter = after.data is String ? after.data as String : '';
@@ -77,11 +77,10 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
   }
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta? apply(Delta document, int index, Object data) {
     if (data is! String) return null;
 
-    final text = data as String;
-    if (text != '\n') return null;
+    if (data != '\n') return null;
 
     final iter = DeltaIterator(document);
     final before = iter.skip(index);
@@ -100,12 +99,12 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
       // The only scenario we get such operation is when the text is plain.
       assert(after.isPlain);
       // No attributes to apply so we simply create a new line.
-      result..insert('\n');
+      result.insert('\n');
       return result;
     }
     // Continue looking for a newline.
     final nextNewline = _findNextNewline(iter);
-    final attributes = nextNewline?.op?.attributes;
+    final attributes = nextNewline.op?.attributes;
 
     return result..insert('\n', attributes);
   }
@@ -120,11 +119,10 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
   const ResetLineFormatOnNewLineRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta? apply(Delta document, int index, Object data) {
     if (data is! String) return null;
 
-    final text = data as String;
-    if (text != '\n') return null;
+    if (data != '\n') return null;
 
     final iter = DeltaIterator(document);
     iter.skip(index);
@@ -136,9 +134,9 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
     final targetText = target.data as String;
 
     if (targetText.startsWith('\n')) {
-      Map<String, dynamic> resetStyle;
+      Map<String, dynamic>? resetStyle;
       if (target.attributes != null &&
-          target.attributes.containsKey(NotusAttribute.heading.key)) {
+          target.attributes!.containsKey(NotusAttribute.heading.key)) {
         resetStyle = NotusAttribute.heading.unset.toJson();
       }
       return Delta()
@@ -160,32 +158,31 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
 class AutoExitBlockRule extends InsertRule {
   const AutoExitBlockRule();
 
-  bool isEmptyLine(Operation before, Operation after) {
-    final textBefore = before?.data is String ? before.data as String : '';
+  bool isEmptyLine(Operation? before, Operation after) {
+    final textBefore = before?.data is String ? before!.data as String : '';
     final textAfter = after.data is String ? after.data as String : '';
     return (before == null || textBefore.endsWith('\n')) &&
         textAfter.startsWith('\n');
   }
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta? apply(Delta document, int index, Object data) {
     if (data is! String) return null;
 
-    final text = data as String;
-    if (text != '\n') return null;
+    if (data != '\n') return null;
 
     final iter = DeltaIterator(document);
     final previous = iter.skip(index);
     final target = iter.next();
     final isInBlock = target.isNotPlain &&
-        target.attributes.containsKey(NotusAttribute.block.key);
+        target.attributes!.containsKey(NotusAttribute.block.key);
 
     // We are not in a block, ignore.
     if (!isInBlock) return null;
     // We are not on an empty line, ignore.
     if (!isEmptyLine(previous, target)) return null;
 
-    final blockStyle = target.attributes[NotusAttribute.block.key];
+    final blockStyle = target.attributes![NotusAttribute.block.key];
 
     // We are on an empty line. Now we need to determine if we are on the
     // last line of a block.
@@ -204,8 +201,8 @@ class AutoExitBlockRule extends InsertRule {
     // block style as `target`.
     final nextNewline = _findNextNewline(iter);
     if (nextNewline.isNotEmpty &&
-        nextNewline.op.attributes != null &&
-        nextNewline.op.attributes[NotusAttribute.block.key] == blockStyle) {
+        nextNewline.op!.attributes != null &&
+        nextNewline.op!.attributes![NotusAttribute.block.key] == blockStyle) {
       // We are not at the end of this block, ignore.
       return null;
     }
@@ -223,14 +220,12 @@ class PreserveInlineStylesRule extends InsertRule {
   const PreserveInlineStylesRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta? apply(Delta document, int index, Object data) {
     // There is no other text around embeds so no inline styles to preserve.
     if (data is! String) return null;
 
-    final text = data as String;
-
     // This rule is only applicable to characters other than newline.
-    if (text.contains('\n')) return null;
+    if (data.contains('\n')) return null;
 
     final iter = DeltaIterator(document);
     final previous = iter.skip(index);
@@ -247,32 +242,28 @@ class PreserveInlineStylesRule extends InsertRule {
     if (!hasLink) {
       return Delta()
         ..retain(index)
-        ..insert(text, attributes);
+        ..insert(data, attributes);
     }
     // Special handling needed for inserts inside fragments with link attribute.
     // Link style should only be preserved if insert occurs inside the fragment.
     // Link style should NOT be preserved on the boundaries.
-    var noLinkAttributes = previous.attributes;
+    var noLinkAttributes = previous.attributes!;
     noLinkAttributes.remove(NotusAttribute.link.key);
     final noLinkResult = Delta()
       ..retain(index)
-      ..insert(text, noLinkAttributes.isEmpty ? null : noLinkAttributes);
+      ..insert(data, noLinkAttributes.isEmpty ? null : noLinkAttributes);
     final next = iter.next();
-    if (next == null) {
-      // Nothing after us, we are not inside link-styled fragment.
-      return noLinkResult;
-    }
     final nextAttributes = next.attributes ?? const <String, dynamic>{};
     if (!nextAttributes.containsKey(NotusAttribute.link.key)) {
       // Next fragment is not styled as link.
       return noLinkResult;
     }
     // We must make sure links are identical in previous and next operations.
-    if (attributes[NotusAttribute.link.key] ==
+    if (attributes![NotusAttribute.link.key] ==
         nextAttributes[NotusAttribute.link.key]) {
       return Delta()
         ..retain(index)
-        ..insert(text, attributes);
+        ..insert(data, attributes);
     } else {
       return noLinkResult;
     }
@@ -285,13 +276,12 @@ class AutoFormatLinksRule extends InsertRule {
   const AutoFormatLinksRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta? apply(Delta document, int index, Object data) {
     if (data is! String) return null;
 
     // This rule applies to a space inserted after a link, so we can ignore
     // everything else.
-    final text = data as String;
-    if (text != ' ') return null;
+    if (data != ' ') return null;
 
     final iter = DeltaIterator(document);
     final previous = iter.skip(index);
@@ -318,7 +308,7 @@ class AutoFormatLinksRule extends InsertRule {
       return Delta()
         ..retain(index - candidate.length)
         ..retain(candidate.length, attributes)
-        ..insert(text, previous.attributes);
+        ..insert(data, previous.attributes);
     } on FormatException {
       return null; // Our candidate is not a link.
     }
@@ -333,10 +323,8 @@ class ForceNewlineForInsertsAroundEmbedRule extends InsertRule {
   const ForceNewlineForInsertsAroundEmbedRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta? apply(Delta document, int index, Object data) {
     if (data is! String) return null;
-
-    final text = data as String;
 
     final iter = DeltaIterator(document);
     final previous = iter.skip(index);
@@ -346,13 +334,13 @@ class ForceNewlineForInsertsAroundEmbedRule extends InsertRule {
 
     if (cursorBeforeEmbed || cursorAfterEmbed) {
       final delta = Delta()..retain(index);
-      if (cursorBeforeEmbed && !text.endsWith('\n')) {
-        return delta..insert(text)..insert('\n');
+      if (cursorBeforeEmbed && !data.endsWith('\n')) {
+        return delta..insert(data)..insert('\n');
       }
-      if (cursorAfterEmbed && !text.startsWith('\n')) {
-        return delta..insert('\n')..insert(text);
+      if (cursorAfterEmbed && !data.startsWith('\n')) {
+        return delta..insert('\n')..insert(data);
       }
-      return delta..insert(text);
+      return delta..insert(data);
     }
     return null;
   }
@@ -369,7 +357,7 @@ class ForceNewlineForInsertsAroundEmbedRule extends InsertRule {
 class PreserveBlockStyleOnInsertRule extends InsertRule {
   const PreserveBlockStyleOnInsertRule();
 
-  bool isEdgeLineSplit(Operation before, Operation after) {
+  bool isEdgeLineSplit(Operation? before, Operation after) {
     if (before == null) return true; // split at the beginning of a doc
     final textBefore = before.data is String ? before.data as String : '';
     final textAfter = after.data is String ? after.data as String : '';
@@ -377,12 +365,11 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
   }
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta? apply(Delta document, int index, Object data) {
     // Embeds are handled by a different rule.
     if (data is! String) return null;
 
-    final text = data as String;
-    if (!text.contains('\n')) {
+    if (!data.contains('\n')) {
       // Only interested in text containing at least one newline character.
       return null;
     }
@@ -401,7 +388,7 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
       NotusAttribute.block.key: lineStyle[NotusAttribute.block.key]
     };
 
-    Map<String, dynamic> resetStyle;
+    Map<String, dynamic>? resetStyle;
     // If current line had heading style applied to it we'll need to move this
     // style to the newly inserted line before it and reset style of the
     // original line.
@@ -410,7 +397,7 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
     }
 
     // Go over each inserted line and ensure block style is applied.
-    final lines = text.split('\n');
+    final lines = data.split('\n');
     final result = Delta()..retain(index);
     for (var i = 0; i < lines.length; i++) {
       final line = lines[i];
@@ -428,8 +415,8 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
 
     // Reset style of the original newline character if needed.
     if (resetStyle != null) {
-      result.retain(nextNewline.skippedLength);
-      final opText = nextNewline.op.data as String;
+      result.retain(nextNewline.skippedLength!);
+      final opText = nextNewline.op!.data as String;
       final lf = opText.indexOf('\n');
       result..retain(lf)..retain(1, resetStyle);
     }
@@ -443,7 +430,7 @@ class InsertEmbedsRule extends InsertRule {
   const InsertEmbedsRule();
 
   @override
-  Delta apply(Delta document, int index, Object data) {
+  Delta? apply(Delta document, int index, Object data) {
     // We are only interested in embeddable objects.
     if (data is String) return null;
 
@@ -453,7 +440,7 @@ class InsertEmbedsRule extends InsertRule {
     final target = iter.next();
 
     // Check if [index] is on an empty line already.
-    final textBefore = previous?.data is String ? previous.data as String : '';
+    final textBefore = previous?.data is String ? previous!.data as String : '';
     final textAfter = target.data is String ? target.data as String : '';
 
     final isNewlineBefore = previous == null || textBefore.endsWith('\n');
@@ -467,16 +454,16 @@ class InsertEmbedsRule extends InsertRule {
     // and insert our embed.
     final lineStyle = _getLineStyle(iter, target);
     if (!isNewlineBefore) {
-      result..insert('\n', lineStyle);
+      result.insert('\n', lineStyle);
     }
-    result..insert(data);
+    result.insert(data);
     if (!isNewlineAfter) {
-      result..insert('\n');
+      result.insert('\n');
     }
     return result;
   }
 
-  Map<String, dynamic> _getLineStyle(
+  Map<String, dynamic>? _getLineStyle(
       DeltaIterator iterator, Operation current) {
     final currentText = current.data is String ? current.data as String : '';
 
@@ -484,7 +471,7 @@ class InsertEmbedsRule extends InsertRule {
       return current.attributes;
     }
     // Continue looking for a newline.
-    Map<String, dynamic> attributes;
+    Map<String, dynamic>? attributes;
     while (iterator.hasNext) {
       final op = iterator.next();
       final opText = op.data is String ? op.data as String : '';
