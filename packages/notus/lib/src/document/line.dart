@@ -38,7 +38,7 @@ class LineNode extends ContainerNode<LeafNode>
         var line = (parent!.next is BlockNode)
             ? (parent!.next as BlockNode).first
             : parent!.next;
-        return line as LineNode;
+        return line as LineNode?;
       } else {
         return null;
       }

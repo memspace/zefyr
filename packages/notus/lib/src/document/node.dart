@@ -25,10 +25,10 @@ abstract class Node extends LinkedListEntry<Node> {
   ContainerNode? _parent;
 
   /// Returns `true` if this node is the first node in the [parent] list.
-  bool get isFirst => list?.first == this;
+  bool get isFirst => list!.first == this;
 
   /// Returns `true` if this node is the last node in the [parent] list.
-  bool get isLast => list?.last == this;
+  bool get isLast => list!.last == this;
 
   /// Length of this node in characters.
   int get length;
