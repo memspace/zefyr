@@ -1,3 +1,7 @@
+## 1.0.0-dev.5.0
+
+* Added support for null-safety (#510)
+
 ## 1.0.0-dev.4.0
 
 * Added support for underline and strikethrough inline styles (#429).
