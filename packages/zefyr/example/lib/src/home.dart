@@ -241,6 +241,34 @@ class _HomePageState extends State<HomePage> {
                           'pdf url: $url, fileName: $fileName, size: $size',
                         );
                       }
+                      if (node.value.type == 'table') {
+                        final contents = node.value.data['contents'] as List<dynamic>;
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey, width: 1),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(contents[0][0]),
+                                  Container(color: Colors.grey, width: 1, height: 15),
+                                  Text(contents[0][1]),
+                                ],
+                              ),
+                              Container(color: Colors.grey, height: 1),
+                              Row(
+                                children: [
+                                  Text(contents[1][0]),
+                                  Container(color: Colors.grey, width: 1, height: 15),
+                                  Text(contents[1][1]),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                       throw UnimplementedError(
                           'Embeddable type "${node.value.type}" is not supported by default embed '
                               'builder of ZefyrEditor. You must pass your own builder function to '
