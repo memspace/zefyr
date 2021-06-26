@@ -98,6 +98,7 @@ class NotusDocument {
   /// Closes [changes] stream.
   void close() {
     _controller.close();
+    _inconsistentDeltaController.close();
   }
 
   /// Inserts [data] in this document at specified [index].
