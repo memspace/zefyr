@@ -12,17 +12,17 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.14.6
-  url_launcher: ^5.0.0
+  url_launcher: ^6.0.0
   quill_delta: ^2.0.0
   notus:
     git:
       url: https://github.com/hokutoresident/zefyr
-      ref: hokuto
+      ref: feature/inconsistent-deta-new
       path: packages/notus
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
   characters: ^1.0.0
-  google_fonts: ^1.0.0
+  google_fonts: ^2.1.0
 
 dev_dependencies:
   flutter_test:
