@@ -114,21 +114,35 @@ class BlockEmbed extends EmbeddableObject {
     String type, {
     Map<String, dynamic> data = const {},
   }) : super(type, inline: false, data: data) {
-    if (!['hr', 'image', 'pdf'].contains(type)) {
+    if (!['hr', 'image', 'pdf', 'table'].contains(type)) {
       throw UnsupportedFormatException('BlockEmbed has a unsupported type. type: $type');
     }
   }
 
   static final BlockEmbed horizontalRule = BlockEmbed('hr');
-  static BlockEmbed image(String source) =>
-      BlockEmbed('image', data: {'source': source});
 
-  static BlockEmbed pdf(String source, String name, int size) => BlockEmbed(
-        'pdf',
-        data: {
-          'source': source,
-          'name': name,
-          'size': size,
-        },
-      );
+  static BlockEmbed image(String source) {
+    return BlockEmbed('image', data: {'source': source});
+  }
+
+  static BlockEmbed pdf(String source, String name, int size) {
+    return BlockEmbed(
+      'pdf',
+      data: {
+        'source': source,
+        'name': name,
+        'size': size,
+      },
+    );
+  }
+
+  static BlockEmbed table({String style, List<List<String>> contents}) {
+    return BlockEmbed(
+      'table',
+      data: {
+        'style': style,
+        'contents': contents,
+      }
+    );
+  }
 }
