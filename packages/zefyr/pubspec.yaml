@@ -17,7 +17,7 @@ dependencies:
   notus:
     git:
       url: https://github.com/hokutoresident/zefyr
-      ref: hokuto
+      ref: feature/table
       path: packages/notus
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
