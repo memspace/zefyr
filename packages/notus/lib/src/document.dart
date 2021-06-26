@@ -74,6 +74,10 @@ class NotusDocument {
   final StreamController<NotusChange> _controller =
       StreamController.broadcast();
 
+  Stream<void> get onDetectInconsistentDelta => _inconsistentDeltaController.stream;
+
+  final StreamController<void> _inconsistentDeltaController = StreamController.broadcast();
+
   /// Returns contents of this document as [Delta].
   Delta toDelta() => Delta.from(_delta);
   Delta _delta;
@@ -250,8 +254,7 @@ class NotusDocument {
     _delta = _delta.compose(change);
 
     if (_delta != _root.toDelta()) {
-      throw StateError('Compose produced inconsistent results. '
-          'This is likely due to a bug in the library. Tried to compose change $change from $source.');
+      _inconsistentDeltaController.add({});
     }
     _controller.add(NotusChange(before, change, source));
   }
