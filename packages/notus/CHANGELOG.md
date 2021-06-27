@@ -1,3 +1,7 @@
+## 1.0.0-dev.7.0
+
+* Fixed remaining usage of annotations from the meta package
+
 ## 1.0.0-dev.6.0
 
 * Removed dependency on meta package
