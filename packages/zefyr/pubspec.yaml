@@ -13,7 +13,7 @@ dependencies:
   collection: ^1.14.6
   url_launcher: ^5.0.0
   quill_delta: ^3.0.0-nullsafety.0
-  notus: ^1.0.0-dev.5.0
+  notus: ^1.0.0-dev.7.0
   meta: ^1.3.0
   characters: ^1.0.0
 
