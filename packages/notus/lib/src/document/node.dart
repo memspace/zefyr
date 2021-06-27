@@ -3,7 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'dart:collection';
 
-import 'package:meta/meta.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 import 'attributes.dart';
