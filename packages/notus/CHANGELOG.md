@@ -1,3 +1,7 @@
+## 1.0.0-dev.6.0
+
+* Removed dependency on meta package
+
 ## 1.0.0-dev.5.0
 
 * Added support for null-safety (#510)
