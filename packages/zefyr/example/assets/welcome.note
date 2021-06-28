@@ -11,16 +11,10 @@
     "insert": {
       "_type": "table",
   	  "_inline": false,
-  	  "style": "normal",
+  	  "style": "default",
   	  "contents": [
-  	    {
-          "0": { "text": "sad", "style": "plain"},
-          "1": { "text": "sad", "style": "plain"}
-        },
-        {
-          "0": { "text": "sad", "style": "plain"},
-          "1": { "text": "sad", "style": "plain"}
-        }
+  	    ["aaa", "bbb"],
+  	    ["ccc", "ddd"]
   	  ]
     }
   },
