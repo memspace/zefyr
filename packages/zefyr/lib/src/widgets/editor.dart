@@ -1161,6 +1161,7 @@ class RawEditorState extends EditorState
             textDirection: _textDirection,
             embedBuilder: widget.embedBuilder,
             inputtingTextRange: _inputtingTextRange(lookup)(node),
+            lookupResult: lookup,
           ),
           hasFocus: _hasFocus,
           devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
@@ -1180,6 +1181,7 @@ class RawEditorState extends EditorState
               (block == NotusAttribute.block.code) ? EdgeInsets.all(8.0) : null,
           embedBuilder: widget.embedBuilder,
           inputtingTextRange: _inputtingTextRange(lookup),
+          lookupResult: lookup,
         ));
       } else {
         throw StateError('Unreachable.');

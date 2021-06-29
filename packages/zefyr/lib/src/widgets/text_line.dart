@@ -17,6 +17,7 @@ class TextLine extends StatelessWidget {
   final TextDirection textDirection;
   final ZefyrEmbedBuilder embedBuilder;
   final TextRange inputtingTextRange;
+  final LookupResult lookupResult;
 
   const TextLine({
     Key key,
@@ -24,6 +25,7 @@ class TextLine extends StatelessWidget {
     this.textDirection,
     @required this.embedBuilder,
     this.inputtingTextRange,
+    this.lookupResult,
   })  : assert(node != null),
         assert(embedBuilder != null),
         super(key: key);
@@ -53,10 +55,15 @@ class TextLine extends StatelessWidget {
     );
   }
 
+  TextRange _textNodeInputtingRange(LookupResult textNodeLookup, TextNode child){
+    return  (textNodeLookup != null && textNodeLookup.node == child) ? inputtingTextRange : null;
+  }
+
   TextSpan buildText(BuildContext context, LineNode node) {
     final theme = ZefyrTheme.of(context);
+    final textNodeLookup = lookupResult != null ? node.lookup(lookupResult.offset) : null;
     final children = node.children
-        .map((node) => _segmentToTextSpan(node, theme))
+        .map((node) => _segmentToTextSpan(node, theme, _textNodeInputtingRange(textNodeLookup, node)))
         .toList(growable: false);
     return TextSpan(
       style: _getParagraphTextStyle(node.style, theme),
@@ -64,23 +71,23 @@ class TextLine extends StatelessWidget {
     );
   }
 
-  TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme) {
+  TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme, TextRange textRange) {
     final TextNode segment = node;
     final attrs = segment.style;
 
     try {
-      if (inputtingTextRange != null) {
+      if (textRange != null) {
         final style = _getInlineTextStyle(attrs, theme);
         return TextSpan(
           children: [
-            TextSpan(text: segment.value.substring(0, inputtingTextRange.start)),
+            TextSpan(text: segment.value.substring(0, textRange.start)),
             TextSpan(
                 text: segment.value
-                    .substring(inputtingTextRange.start, inputtingTextRange.end),
+                    .substring(textRange.start, textRange.end),
                 style: style.copyWith(backgroundColor: const Color(0x220000FF))),
             TextSpan(
                 text: segment.value
-                    .substring(inputtingTextRange.end, segment.value.length)),
+                    .substring(textRange.end, segment.value.length)),
           ],
           style: _getInlineTextStyle(attrs, theme),
         );
