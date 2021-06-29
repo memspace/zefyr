@@ -252,17 +252,17 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               Row(
                                 children: [
-                                  Text(contents[0][0]),
+                                  Text(contents[0]['0']['text']),
                                   Container(color: Colors.grey, width: 1, height: 15),
-                                  Text(contents[0][1]),
+                                  Text(contents[0]['1']['text']),
                                 ],
                               ),
                               Container(color: Colors.grey, height: 1),
                               Row(
                                 children: [
-                                  Text(contents[1][0]),
+                                  Text(contents[1]['0']['text']),
                                   Container(color: Colors.grey, width: 1, height: 15),
-                                  Text(contents[1][1]),
+                                  Text(contents[1]['1']['text']),
                                 ],
                               ),
                             ],

@@ -136,7 +136,7 @@ class BlockEmbed extends EmbeddableObject {
     );
   }
 
-  static BlockEmbed table({String style, List<List<String>> contents}) {
+  static BlockEmbed table({String style, List<Map<String, dynamic>> contents}) {
     return BlockEmbed(
       'table',
       data: {
