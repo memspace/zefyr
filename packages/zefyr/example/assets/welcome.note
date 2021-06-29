@@ -14,11 +14,11 @@
   	  "style": "normal",
   	  "contents": [
   	    {
-          "0": { "type": "image", "url": "url" },
+          "0": { "type": "text", "text": "aaaaaaaaaaa", "style": "plain" },
           "1": { "type": "text", "text": "aaaaaaaaaaa", "style": "plain" }
         },
         {
-          "0": { "type": "image", "url": "url" },
+          "0": { "type": "text", "text": "aaaaaaaaaaa", "style": "plain" },
           "1": { "type": "text", "text": "aaaaaaaaaaa", "style": "plain" }
         }
   	  ]
