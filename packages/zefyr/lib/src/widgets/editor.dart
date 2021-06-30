@@ -781,11 +781,6 @@ class RawEditorState extends EditorState
     _selectionOverlay?.updateForScroll();
   }
 
-  @override
-  void userUpdateTextEditingValue(
-      TextEditingValue value, SelectionChangedCause cause) {
-    // TODO: implement userUpdateTextEditingValue
-  }
 
   // State lifecycle:
 
@@ -1166,6 +1161,7 @@ class RawEditorState extends EditorState
             textDirection: _textDirection,
             embedBuilder: widget.embedBuilder,
             inputtingTextRange: _inputtingTextRange(lookup)(node),
+            lookupResult: lookup,
           ),
           hasFocus: _hasFocus,
           devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
@@ -1185,6 +1181,7 @@ class RawEditorState extends EditorState
               (block == NotusAttribute.block.code) ? EdgeInsets.all(8.0) : null,
           embedBuilder: widget.embedBuilder,
           inputtingTextRange: _inputtingTextRange(lookup),
+          lookupResult: lookup,
         ));
       } else {
         throw StateError('Unreachable.');
