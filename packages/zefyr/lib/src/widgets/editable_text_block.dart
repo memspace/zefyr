@@ -21,6 +21,7 @@ class EditableTextBlock extends StatelessWidget {
   final EdgeInsets contentPadding;
   final ZefyrEmbedBuilder embedBuilder;
   final TextRange Function(Node node) inputtingTextRange;
+  final LookupResult lookupResult;
 
   EditableTextBlock({
     Key key,
@@ -34,7 +35,8 @@ class EditableTextBlock extends StatelessWidget {
     @required this.hasFocus,
     this.contentPadding,
     @required this.embedBuilder,
-    this.inputtingTextRange,
+    @required this.inputtingTextRange,
+    @required this.lookupResult,
   })  : assert(hasFocus != null),
         assert(embedBuilder != null),
         super(key: key);
@@ -74,6 +76,7 @@ class EditableTextBlock extends StatelessWidget {
           textDirection: textDirection,
           embedBuilder: embedBuilder,
           inputtingTextRange: inputtingTextRange(line),
+          lookupResult: lookupResult,
         ),
         cursorController: cursorController,
         selection: selection,
