@@ -22,7 +22,7 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v1
         with:
-          flutter-version: "2.0.0"
+          flutter-version: "2.2.2"
 
       - name: Test notus
         run: |
