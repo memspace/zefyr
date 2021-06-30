@@ -61,7 +61,7 @@ class TextLine extends StatelessWidget {
 
   TextSpan buildText(BuildContext context, LineNode node) {
     final theme = ZefyrTheme.of(context);
-    final textNodeLookup = lookupResult != null ? node.lookup(lookupResult.offset) : null;
+    final textNodeLookup = lookupResult != null && lookupResult.offset <= node.length ? node.lookup(lookupResult.offset) : null;
     final children = node.children
         .map((node) => _segmentToTextSpan(node, theme, _textNodeInputtingRange(textNodeLookup, node)))
         .toList(growable: false);
