@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:zefyr/zefyr.dart';
@@ -26,13 +28,17 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
 
           // cut
           if(compare == 0){
-            final data = selection.textInside(value.text);
-            widget.controller.replaceText(
-              selection.start,
-              data.length,
-              '',
-              selection: TextSelection.collapsed(offset: selection.start),
-            );
+            // TODO: widgets/text_selection.dart widget.renderObject.preferredLineHeight(textPosition)で文字消え直後のselectionの参照破壊を修正
+            // カットした瞬間末尾のセレクションの参照が破壊されてしまうため、セレクション変更後delayをかけてからreplaceTextを行う
+            widget.controller.updateSelection(TextSelection.collapsed(offset: selection.start));
+            Future.delayed(Duration(milliseconds: 100), (){
+              widget.controller.replaceText(
+                selection.start,
+                selection.end - selection.start,
+                '',
+                selection: TextSelection.collapsed(offset: selection.start),
+              );
+            });
           }
 
           // paste
