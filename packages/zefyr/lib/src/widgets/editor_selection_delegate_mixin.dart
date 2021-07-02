@@ -28,7 +28,8 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
 
           // cut
           if(compare == 0){
-            // カットした瞬間末尾のセレクションが変更されてしまうため、セレクション変更後delayをかけてからreplaceTextを行う
+            // TODO: widgets/text_selection.dart widget.renderObject.preferredLineHeight(textPosition)で文字消え直後のselectionの参照破壊を修正
+            // カットした瞬間末尾のセレクションの参照が破壊されてしまうため、セレクション変更後delayをかけてからreplaceTextを行う
             widget.controller.updateSelection(TextSelection.collapsed(offset: selection.start));
             Future.delayed(Duration(milliseconds: 100), (){
               widget.controller.replaceText(
