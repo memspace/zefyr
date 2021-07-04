@@ -84,6 +84,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
+    NotusAttribute.indent.key: NotusAttribute.indent,
   };
 
   // Inline attributes
@@ -163,8 +164,13 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     block.middleHeading.value,
   ];
 
+  /// indent attribute
+  static const indent = IndentAttributeBuilder._();
+
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
+      final aa = _registry;
+      print(aa);
       throw UnsupportedFormatException('NotusAttribute has a unsupported key. key: $key');
     }
     if (key == NotusAttribute.block.key && !_validBlockValues.contains(value) && value != null) {
@@ -468,4 +474,15 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a middle heading
   NotusAttribute<String> get middleHeading =>
       NotusAttribute._(key, scope, 'mh');
+}
+
+class IndentAttributeBuilder extends NotusAttributeBuilder<int> {
+  static const _kIntent = 'indent';
+
+  const IndentAttributeBuilder._()
+      : super._(_kIntent, NotusAttributeScope.line);
+
+  /// Creates an indent attribute with specified [value].
+  NotusAttribute<int> fromInt(int value) =>
+      NotusAttribute<int>._(key, scope, value);
 }
