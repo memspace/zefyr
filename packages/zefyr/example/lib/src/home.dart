@@ -200,28 +200,27 @@ class _HomePageState extends State<HomePage> {
             ),
             fillColor: Theme.of(context).canvasColor,
             onPressed: () {
-              _controller.formatSelection(NotusAttribute.indent.fromInt(10));
-              // final indent = _controller
-              //     .getSelectionStyle().containsAny(attributes)
-              //     .attributes[Attribute.indent.key];
-              // if (indent == null) {
-              //   if (widget.isIncrease) {
-              //     _controller.formatSelection(Attribute.indentL1);
-              //   }
-              //   return;
-              // }
-              // if (indent.value == 1 && !widget.isIncrease) {
-              //   _controller
-              //       .formatSelection(Attribute.clone(Attribute.indentL1, null));
-              //   return;
-              // }
-              // if (widget.isIncrease) {
-              //   _controller
-              //       .formatSelection(Attribute.getIndentLevel(indent.value + 1));
-              //   return;
-              // }
-              // _controller
-              //     .formatSelection(Attribute.getIndentLevel(indent.value - 1));
+              final indent = _controller.getSelectionStyle().get(NotusAttribute.indent);
+              final nextValue = (indent?.value ?? 0) + 1;
+              if (nextValue > 5) return;
+              _controller.formatSelection(NotusAttribute.indent.fromInt(nextValue));
+            },
+          ),
+          ZIconButton(
+            highlightElevation: 0,
+            hoverElevation: 0,
+            size: 32,
+            icon: Icon(
+              Icons.format_indent_decrease_outlined,
+              size: 18,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            fillColor: Theme.of(context).canvasColor,
+            onPressed: () {
+              final indent = _controller.getSelectionStyle().get(NotusAttribute.indent);
+              final nextValue = (indent?.value ?? 0) - 1;
+              if (nextValue < 0) return;
+              _controller.formatSelection(NotusAttribute.indent.fromInt(nextValue));
             },
           ),
           ...ZefyrToolbar.basic(

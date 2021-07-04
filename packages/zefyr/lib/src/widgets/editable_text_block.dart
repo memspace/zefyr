@@ -22,6 +22,7 @@ class EditableTextBlock extends StatelessWidget {
   final ZefyrEmbedBuilder embedBuilder;
   final TextRange Function(Node node) inputtingTextRange;
   final LookupResult lookupResult;
+  final double indentWidth;
 
   EditableTextBlock({
     Key key,
@@ -37,6 +38,7 @@ class EditableTextBlock extends StatelessWidget {
     @required this.embedBuilder,
     @required this.inputtingTextRange,
     @required this.lookupResult,
+    @required this.indentWidth,
   })  : assert(hasFocus != null),
         assert(embedBuilder != null),
         super(key: key);
@@ -69,7 +71,7 @@ class EditableTextBlock extends StatelessWidget {
         spacing: _getSpacingForLine(line, index, count, theme),
         leading: _buildLeading(context, line, index, count),
         bottom: _buildBottom(context, line),
-        indentWidth: _getIndentWidth(),
+        indentWidth: _getIndentWidth() + _extraIndentWidth(),
         devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         body: TextLine(
           node: line,
@@ -131,6 +133,15 @@ class EditableTextBlock extends StatelessWidget {
       );
     }
     return null;
+  }
+
+  double _extraIndentWidth() {
+    final indent = node.style.get(NotusAttribute.indent);
+    var extraIndent = 0.0;
+    if (indent != null && indent.value != null) {
+      extraIndent = 16.0 * indent.value;
+    }
+    return extraIndent;
   }
 
   double _getIndentWidth() {

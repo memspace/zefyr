@@ -1150,7 +1150,7 @@ class RawEditorState extends EditorState
         result.add(EditableTextLine(
           node: node,
           textDirection: _textDirection,
-          indentWidth: 0,
+          indentWidth: _indentWidth(node),
           spacing: _getSpacingForLine(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,
@@ -1171,6 +1171,7 @@ class RawEditorState extends EditorState
         result.add(EditableTextBlock(
           node: node,
           textDirection: _textDirection,
+          indentWidth: _indentWidth(node),
           spacing: _getSpacingForBlock(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,
@@ -1217,6 +1218,16 @@ class RawEditorState extends EditorState
       return theme.lists.spacing;
     }
   }
+
+  double _indentWidth(StyledNode node) {
+    final indent = node.style.get(NotusAttribute.indent);
+    var extraIndent = 0.0;
+    if (indent != null && indent.value != null) {
+      extraIndent = 24.0 * indent.value;
+    }
+    return extraIndent;
+  }
+
 }
 
 class _Editor extends MultiChildRenderObjectWidget {

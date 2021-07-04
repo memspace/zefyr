@@ -169,8 +169,6 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
-      final aa = _registry;
-      print(aa);
       throw UnsupportedFormatException('NotusAttribute has a unsupported key. key: $key');
     }
     if (key == NotusAttribute.block.key && !_validBlockValues.contains(value) && value != null) {
