@@ -118,11 +118,12 @@ class ZefyrController extends ChangeNotifier {
   // カーソルの位置を一つ左にずらすべきか否か
   bool _shouldBackSelection(Object data) {
     // 削除中 && 文字列が(\n + BlockEmbed + \n)の時
-    final isDelete = data == '';
+    if(data != '') return false;
     final blockEmbedPattern = '\n${EmbedNode.kObjectReplacementCharacter}\n';
-    final beforeText = document.toPlainText().substring(0, isDelete ? selection.start + 1 : selection.start);
+    final isLastCaractor = selection.start >= document.toPlainText().length;
+    final beforeText = document.toPlainText().substring(0, isLastCaractor ? selection.start : selection.start + 1);
     final hasBlockEmbedAtBeforeSelection = beforeText.endsWith(blockEmbedPattern);
-    return isDelete && hasBlockEmbedAtBeforeSelection;
+    return hasBlockEmbedAtBeforeSelection;
   }
 
   void formatText(int index, int length, NotusAttribute attribute) {
