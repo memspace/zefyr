@@ -205,10 +205,7 @@ class _HomePageState extends State<HomePage> {
             ),
             fillColor: Theme.of(context).canvasColor,
             onPressed: () {
-              final indent = _controller.getSelectionStyle().get(NotusAttribute.indent);
-              final nextValue = (indent?.value ?? 0) + 1;
-              if (nextValue > 5) return;
-              _controller.formatSelection(NotusAttribute.indent.fromInt(nextValue));
+              _controller.increaseIndentAtSelection();
             },
           ),
           ZIconButton(
@@ -222,10 +219,7 @@ class _HomePageState extends State<HomePage> {
             ),
             fillColor: Theme.of(context).canvasColor,
             onPressed: () {
-              final indent = _controller.getSelectionStyle().get(NotusAttribute.indent);
-              final nextValue = (indent?.value ?? 0) - 1;
-              if (nextValue < 0) return;
-              _controller.formatSelection(NotusAttribute.indent.fromInt(nextValue));
+              _controller.decreaseIndentAtSelection();
             },
           ),
           ...ZefyrToolbar.basic(
