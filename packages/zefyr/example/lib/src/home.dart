@@ -47,6 +47,11 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _controller = ZefyrController(doc);
         _isContainsUnsupportedFormat = false;
+        _controller.document.changes.listen((event) {
+          // final encoder = JsonEncoder.withIndent('  ');
+          // final prettyprint = encoder.convert(_controller.document.toDelta().toJson());
+          // debugPrint(prettyprint);
+        });
       });
     } catch (exception) {
       if (exception is UnsupportedFormatException) {

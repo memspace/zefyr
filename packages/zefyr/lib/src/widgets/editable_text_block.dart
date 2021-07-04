@@ -71,7 +71,7 @@ class EditableTextBlock extends StatelessWidget {
         spacing: _getSpacingForLine(line, index, count, theme),
         leading: _buildLeading(context, line, index, count),
         bottom: _buildBottom(context, line),
-        indentWidth: _getIndentWidth() + _extraIndentWidth(),
+        indentWidth: _getIndentWidth() + indentWidth,
         devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         body: TextLine(
           node: line,
@@ -133,15 +133,6 @@ class EditableTextBlock extends StatelessWidget {
       );
     }
     return null;
-  }
-
-  double _extraIndentWidth() {
-    final indent = node.style.get(NotusAttribute.indent);
-    var extraIndent = 0.0;
-    if (indent != null && indent.value != null) {
-      extraIndent = 16.0 * indent.value;
-    }
-    return extraIndent;
   }
 
   double _getIndentWidth() {
@@ -316,8 +307,8 @@ class _BulletPoint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(top: 7),
-      alignment: AlignmentDirectional.topCenter,
+      padding: EdgeInsets.only(top: 8, right: 10),
+      alignment: AlignmentDirectional.topEnd,
       width: width,
       child: Container(
         height: 6,

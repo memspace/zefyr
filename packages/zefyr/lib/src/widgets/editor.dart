@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -1171,7 +1173,7 @@ class RawEditorState extends EditorState
         result.add(EditableTextBlock(
           node: node,
           textDirection: _textDirection,
-          indentWidth: _indentWidth(node),
+          indentWidth: _blockIndentWidth(node),
           spacing: _getSpacingForBlock(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,
@@ -1219,7 +1221,16 @@ class RawEditorState extends EditorState
     }
   }
 
-  double _indentWidth(StyledNode node) {
+  double _indentWidth(LineNode node) {
+    final indent = node.style.get(NotusAttribute.indent);
+    var extraIndent = 0.0;
+    if (indent != null && indent.value != null) {
+      extraIndent = 24.0 * indent.value;
+    }
+    return extraIndent;
+  }
+
+  double _blockIndentWidth(BlockNode node) {
     final indent = node.style.get(NotusAttribute.indent);
     var extraIndent = 0.0;
     if (indent != null && indent.value != null) {
