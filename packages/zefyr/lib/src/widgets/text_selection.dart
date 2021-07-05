@@ -488,8 +488,9 @@ class _TextSelectionHandleOverlayState
         );
         break;
     }
-    // if (newSelection.baseOffset >= newSelection.extentOffset)
-    //   return; // don't allow order swapping.
+
+    if (newSelection.baseOffset >= newSelection.extentOffset)
+      return; // don't allow order swapping.
 
     widget.onSelectionHandleChanged(newSelection);
   }
