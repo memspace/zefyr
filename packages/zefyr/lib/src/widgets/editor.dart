@@ -665,12 +665,21 @@ class RawEditor extends StatefulWidget {
 ///
 abstract class EditorState extends State<RawEditor> {
   TextEditingValue get textEditingValue;
+
   set textEditingValue(TextEditingValue value);
+
   RenderEditor get renderEditor;
+
   EditorTextSelectionOverlay get selectionOverlay;
+
   bool showToolbar();
+
   void hideToolbar();
+
   void requestKeyboard();
+
+  void userUpdateTextEditingValue(
+      TextEditingValue value, SelectionChangedCause cause) {}
 }
 
 class RawEditorState extends EditorState
@@ -709,6 +718,7 @@ class RawEditorState extends EditorState
 
   bool _didAutoFocus = false;
   FocusAttachment _focusAttachment;
+
   bool get _hasFocus => widget.focusNode.hasFocus;
 
   @override
@@ -921,7 +931,9 @@ class RawEditorState extends EditorState
         (Duration _) => _updateOrDisposeSelectionOverlayIfNeeded());
 //    _textChangedSinceLastCaretUpdate = true;
 
-    setState(() {/* We use widget.controller.value in build(). */});
+    setState(() {
+      /* We use widget.controller.value in build(). */
+    });
   }
 
   void _handleSelectionChanged(
@@ -1013,6 +1025,10 @@ class RawEditorState extends EditorState
     SchedulerBinding.instance.addPostFrameCallback((Duration _) {
       _showCaretOnScreenScheduled = false;
 
+      if (!mounted) {
+        return;
+      }
+
       final viewport = RenderAbstractViewport.of(renderEditor);
       assert(viewport != null);
       final editorOffset =
@@ -1055,7 +1071,6 @@ class RawEditorState extends EditorState
 //            onPaste: _semanticsOnPaste(controls),
         child: _Editor(
           key: _editorKey,
-          children: _buildChildren(context),
           document: widget.controller.document,
           selection: widget.controller.selection,
           hasFocus: _hasFocus,
@@ -1064,6 +1079,7 @@ class RawEditorState extends EditorState
           endHandleLayerLink: _endHandleLayerLink,
           onSelectionChanged: _handleSelectionChanged,
           padding: widget.padding,
+          children: _buildChildren(context),
         ),
       ),
     );
