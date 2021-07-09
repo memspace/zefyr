@@ -5,7 +5,6 @@ import 'dart:ui';
 
 import 'package:characters/characters.dart';
 import 'package:flutter/services.dart';
-import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
 
 import '../services/keyboard.dart';
@@ -103,7 +102,7 @@ int previousCharacter(int index, String string,
   }
 
   int count = 0;
-  int lastNonWhitespace;
+  int? lastNonWhitespace;
   for (final String currentString in string.characters) {
     if (!includeWhitespace &&
         !_isWhitespace(
@@ -135,18 +134,17 @@ mixin RawEditorStateKeyboardMixin on EditorState {
 
   void handleCursorMovement(
     LogicalKeyboardKey key, {
-    @required bool wordModifier,
-    @required bool lineModifier,
-    @required bool shift,
+    required bool wordModifier,
+    required bool lineModifier,
+    required bool shift,
   }) {
     if (wordModifier && lineModifier) {
       // If both modifiers are down, nothing happens on any of the platforms.
       return;
     }
     final selection = widget.controller.selection;
-    assert(selection != null);
 
-    TextSelection /*!*/ newSelection = widget.controller.selection;
+    TextSelection newSelection = widget.controller.selection;
 
     final plainText = textEditingValue.text;
 
@@ -245,7 +243,7 @@ mixin RawEditorStateKeyboardMixin on EditorState {
       final localPosition = TextPosition(
           offset: originPosition.offset - child.node.documentOffset);
 
-      TextPosition position = upArrow
+      TextPosition? position = upArrow
           ? child.getPositionAbove(localPosition)
           : child.getPositionBelow(localPosition);
 
@@ -322,10 +320,9 @@ mixin RawEditorStateKeyboardMixin on EditorState {
   // Handles shortcut functionality including cut, copy, paste and select all
   // using control/command + (X, C, V, A).
   // TODO: Add support for formatting shortcuts: Cmd+B (bold), Cmd+I (italic)
-  Future<void> handleShortcut(InputShortcut shortcut) async {
+  Future<void> handleShortcut(InputShortcut? shortcut) async {
     final selection = widget.controller.selection;
     final plainText = textEditingValue.text;
-    assert(selection != null);
     if (shortcut == InputShortcut.copy) {
       if (!selection.isCollapsed) {
         // ignore: unawaited_futures
@@ -357,16 +354,15 @@ mixin RawEditorStateKeyboardMixin on EditorState {
     if (shortcut == InputShortcut.paste && !widget.readOnly) {
       // Snapshot the input before using `await`.
       // See https://github.com/flutter/flutter/issues/11427
-      final TextEditingValue value = textEditingValue;
-      final ClipboardData data = await Clipboard.getData(Clipboard.kTextPlain);
-      if (data != null) {
+      final ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
+      if (data != null && data.text != null) {
         final length = selection.end - selection.start;
         widget.controller.replaceText(
           selection.start,
           length,
-          data.text,
+          data.text!,
           selection: TextSelection.collapsed(
-              offset: selection.start + data.text.length),
+              offset: selection.start + data.text!.length),
         );
       }
       return;
@@ -385,7 +381,6 @@ mixin RawEditorStateKeyboardMixin on EditorState {
   void handleDelete(bool forward) {
     final selection = widget.controller.selection;
     final plainText = textEditingValue.text;
-    assert(selection != null);
     int cursorPosition = selection.start;
     String textBefore = selection.textBefore(plainText);
     String textAfter = selection.textAfter(plainText);

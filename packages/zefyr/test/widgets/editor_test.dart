@@ -24,7 +24,7 @@ void main() {
       // await tester.pumpAndSettle();
       final p = tester.widget(find.byType(RichText).first) as RichText;
       final text = p.text as TextSpan;
-      expect(text.children.first.style.color, Colors.red);
+      expect(text.children!.first.style!.color, Colors.red);
     });
 
     testWidgets('collapses selection when unfocused', (tester) async {

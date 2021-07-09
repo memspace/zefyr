@@ -13,16 +13,16 @@ import '../rendering/baseline_proxy.dart';
 /// [textStyle] of the first line in the document as well as additional
 /// [padding] around it.
 class BaselineProxy extends SingleChildRenderObjectWidget {
-  final TextStyle textStyle;
-  final EdgeInsets padding;
+  final TextStyle? textStyle;
+  final EdgeInsets? padding;
 
-  BaselineProxy({Key key, Widget child, this.textStyle, this.padding})
+  BaselineProxy({Key? key, Widget? child, this.textStyle, this.padding})
       : super(key: key, child: child);
 
   @override
   RenderBaselineProxy createRenderObject(BuildContext context) {
     return RenderBaselineProxy(
-      textStyle: textStyle,
+      textStyle: textStyle!,
       padding: padding,
     );
   }
@@ -31,7 +31,7 @@ class BaselineProxy extends SingleChildRenderObjectWidget {
   void updateRenderObject(
       BuildContext context, covariant RenderBaselineProxy renderObject) {
     renderObject
-      ..textStyle = textStyle
-      ..padding = padding;
+      ..textStyle = textStyle!
+      ..padding = padding!;
   }
 }

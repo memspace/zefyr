@@ -4,7 +4,7 @@ import '../rendering/embed_proxy.dart';
 
 class EmbedProxy extends SingleChildRenderObjectWidget {
   EmbedProxy({
-    @required Widget child,
+    required Widget child,
   }) : super(child: child);
 
   @override
