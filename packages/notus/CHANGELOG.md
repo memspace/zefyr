@@ -1,3 +1,7 @@
+## 1.0.0-dev.8.0
+
+* Fixed an issue with composing unset attributes with null-safety (#514)
+
 ## 1.0.0-dev.7.0
 
 * Fixed remaining usage of annotations from the meta package
