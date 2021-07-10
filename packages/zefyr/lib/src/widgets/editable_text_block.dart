@@ -22,7 +22,6 @@ class EditableTextBlock extends StatelessWidget {
   final ZefyrEmbedBuilder embedBuilder;
   final TextRange Function(Node node) inputtingTextRange;
   final LookupResult lookupResult;
-  final double indentWidth;
 
   EditableTextBlock({
     Key key,
@@ -38,7 +37,6 @@ class EditableTextBlock extends StatelessWidget {
     @required this.embedBuilder,
     @required this.inputtingTextRange,
     @required this.lookupResult,
-    @required this.indentWidth,
   })  : assert(hasFocus != null),
         assert(embedBuilder != null),
         super(key: key);
@@ -71,7 +69,7 @@ class EditableTextBlock extends StatelessWidget {
         spacing: _getSpacingForLine(line, index, count, theme),
         leading: _buildLeading(context, line, index, count),
         bottom: _buildBottom(context, line),
-        indentWidth: _getIndentWidth() + indentWidth,
+        indentWidth: _styleIndentWidth() + _userIndentWidth(line),
         devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         body: TextLine(
           node: line,
@@ -135,7 +133,12 @@ class EditableTextBlock extends StatelessWidget {
     return null;
   }
 
-  double _getIndentWidth() {
+  double _userIndentWidth(LineNode node) {
+    final indentValue = node.style.get(NotusAttribute.indent)?.value ?? 0.0;
+    return 24.0 * indentValue;
+  }
+
+  double _styleIndentWidth() {
     final block = node.style.get(NotusAttribute.block);
     if (block == NotusAttribute.block.quote) {
       return 16.0;
@@ -295,6 +298,7 @@ class _NumberPoint extends StatelessWidget {
   }
 }
 
+// TODO: ここまでインデント情報を持ってくる？？？？
 class _BulletPoint extends StatelessWidget {
   final TextStyle style;
   final double width;

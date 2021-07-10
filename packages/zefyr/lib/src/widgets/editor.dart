@@ -1173,7 +1173,6 @@ class RawEditorState extends EditorState
         result.add(EditableTextBlock(
           node: node,
           textDirection: _textDirection,
-          indentWidth: _indentWidth(node),
           spacing: _getSpacingForBlock(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,
