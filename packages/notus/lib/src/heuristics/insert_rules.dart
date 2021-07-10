@@ -192,7 +192,8 @@ class AutoExitBlockRule extends InsertRule {
     // First check if `target` length is greater than 1, this would indicate
     // that it contains multiple newline characters which share the same style.
     // This would mean we are not on the last line yet.
-    final targetText = target.value as String; // this is safe since we already called isEmptyLine and know it contains a newline
+    final targetText = target.value
+        as String; // this is safe since we already called isEmptyLine and know it contains a newline
 
     if (targetText.length > 1) {
       // We are not on the last line of this block, ignore.
