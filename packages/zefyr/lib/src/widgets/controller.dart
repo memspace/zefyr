@@ -268,6 +268,8 @@ class ZefyrController extends ChangeNotifier {
 
   // インデント追加
   void increaseIndentAtSelection() {
+    final hasExclusiveStyle = getSelectionStyle().containsAny(NotusAttribute.exclusives);
+    if (hasExclusiveStyle) return;
     final indent = getSelectionStyle().get(NotusAttribute.indent);
     final nextValue = (indent?.value ?? 0) + 1;
     if (nextValue > 5) return;

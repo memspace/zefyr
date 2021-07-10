@@ -167,6 +167,14 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// indent attribute
   static const indent = IndentAttributeBuilder._();
 
+  /// 他のスタイルを許容しないattribute
+  static final List<NotusAttribute> exclusives = [
+    NotusAttribute.block.middleHeading,
+    NotusAttribute.block.largeHeading,
+    NotusAttribute.block.quote,
+    NotusAttribute.block.code,
+  ];
+
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
       throw UnsupportedFormatException('NotusAttribute has a unsupported key. key: $key');
