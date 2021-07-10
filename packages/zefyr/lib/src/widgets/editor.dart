@@ -1147,6 +1147,7 @@ class RawEditorState extends EditorState
   List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
     final lookup = _inputtingNodeLookup;
+    final indentLevelCounts = <int, int>{};
     for (final node in widget.controller.document.root.children) {
       if (node is LineNode) {
         result.add(EditableTextLine(
@@ -1184,6 +1185,7 @@ class RawEditorState extends EditorState
           embedBuilder: widget.embedBuilder,
           inputtingTextRange: _inputtingTextRange(lookup),
           lookupResult: lookup,
+          indentLevelCounts: indentLevelCounts,
         ));
       } else {
         throw StateError('Unreachable.');

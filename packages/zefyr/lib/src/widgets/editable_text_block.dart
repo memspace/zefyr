@@ -22,6 +22,7 @@ class EditableTextBlock extends StatelessWidget {
   final ZefyrEmbedBuilder embedBuilder;
   final TextRange Function(Node node) inputtingTextRange;
   final LookupResult lookupResult;
+  final Map<int, int> indentLevelCounts;
 
   EditableTextBlock({
     Key key,
@@ -37,6 +38,7 @@ class EditableTextBlock extends StatelessWidget {
     @required this.embedBuilder,
     @required this.inputtingTextRange,
     @required this.lookupResult,
+    @required this.indentLevelCounts,
   })  : assert(hasFocus != null),
         assert(embedBuilder != null),
         super(key: key);
@@ -52,11 +54,11 @@ class EditableTextBlock extends StatelessWidget {
       padding: spacing,
       contentPadding: contentPadding,
       decoration: _getDecorationForBlock(node, theme) ?? BoxDecoration(),
-      children: _buildChildren(context),
+      children: _buildChildren(context, indentLevelCounts),
     );
   }
 
-  List<Widget> _buildChildren(BuildContext context) {
+  List<Widget> _buildChildren(BuildContext context, Map<int, int> indentLevelCounts) {
     final theme = ZefyrTheme.of(context);
     final count = node.children.length;
     final children = <Widget>[];
@@ -67,7 +69,7 @@ class EditableTextBlock extends StatelessWidget {
         node: line,
         textDirection: textDirection,
         spacing: _getSpacingForLine(line, index, count, theme),
-        leading: _buildLeading(context, line, index, count),
+        leading: _buildLeading(context, line, index, count, indentLevelCounts),
         bottom: _buildBottom(context, line),
         indentWidth: _styleIndentWidth() + _userIndentWidth(line),
         devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
@@ -89,16 +91,19 @@ class EditableTextBlock extends StatelessWidget {
   }
 
   Widget _buildLeading(
-      BuildContext context, LineNode node, int index, int count) {
+      BuildContext context, LineNode node, int index, int count, Map<int, int> indentLevelCounts) {
     final theme = ZefyrTheme.of(context);
     final block = node.style.get(NotusAttribute.block);
+    final indent = node.style.get(NotusAttribute.indent)?.value ?? 0;
+
     if (block == NotusAttribute.block.numberList) {
       return _NumberPoint(
         index: index,
-        count: count,
+        indent: indent,
         style: theme.paragraph.style,
         width: 25.0,
         padding: 8.0,
+        indentLevelCounts: indentLevelCounts,
       );
     } else if (block == NotusAttribute.block.bulletList) {
       return _BulletPoint(
@@ -271,28 +276,68 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
 
 class _NumberPoint extends StatelessWidget {
   final int index;
-  final int count;
+  final int indent;
   final TextStyle style;
   final double width;
   final bool withDot;
   final double padding;
+  final Map<int, int> indentLevelCounts;
 
   const _NumberPoint({
     Key key,
     @required this.index,
-    @required this.count,
+    @required this.indent,
     @required this.style,
     @required this.width,
+    @required this.indentLevelCounts,
     this.withDot = true,
     this.padding = 0.0,
   }) : super(key: key);
+
+  // 以下のようにインデントするごとに数字をリセットしてる
+  // 1.
+  // 2.
+  // 3.
+  //   1.
+  //   2.
+  //     1.
+  //     2.
   @override
   Widget build(BuildContext context) {
+    var level = 0;
+
+    if (indent == 0 && !indentLevelCounts.containsKey(1)) {
+      indentLevelCounts.clear();
+      return Container(
+        width: width,
+        padding: EdgeInsets.only(right: 4),
+        child: Text(
+          withDot ? '$index.' : '$index',
+          textAlign: TextAlign.right,
+          style: GoogleFonts.notoSans(
+            color: style.color,
+            fontSize: style.fontSize,
+          ),
+        ),
+      );
+    }
+
+    if (indent != 0) {
+      level = indent;
+    } else {
+      indentLevelCounts[0] = 1;
+    }
+    if (indentLevelCounts.containsKey(level + 1)) {
+      indentLevelCounts.remove(level + 1);
+    }
+    final count = (indentLevelCounts[level] ?? 0) + 1;
+    indentLevelCounts[level] = count;
+
     return Container(
       width: width,
       padding: EdgeInsets.only(right: 4),
       child: Text(
-        withDot ? '$index.' : '$index',
+        withDot ? '$count.' : '$count',
         textAlign: TextAlign.right,
         style: GoogleFonts.notoSans(
           color: style.color,
