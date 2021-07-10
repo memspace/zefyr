@@ -179,16 +179,13 @@ class AutoExitBlockRule extends InsertRule {
     final target = iter.next();
     final isInBlock = target.isNotPlain &&
         target.attributes.containsKey(NotusAttribute.block.key);
-    final isInIndent = target.isNotPlain &&
-        target.attributes.containsKey(NotusAttribute.indent.key);
 
-    // We are not in a block, indent, ignore.
-    if (!isInBlock || !isInIndent) return null;
+    // We are not in a block, ignore.
+    if (!isInBlock) return null;
     // We are not on an empty line, ignore.
     if (!isEmptyLine(previous, target)) return null;
 
     final blockStyle = target.attributes[NotusAttribute.block.key];
-    final indentStyle = target.attributes[NotusAttribute.indent.key];
 
     // We are on an empty line. Now we need to determine if we are on the
     // last line of a block.
@@ -207,9 +204,8 @@ class AutoExitBlockRule extends InsertRule {
     final nextNewline = _findNextNewline(iter);
     if (nextNewline.isNotEmpty &&
         nextNewline.op.attributes != null &&
-        (nextNewline.op.attributes[NotusAttribute.block.key] == blockStyle ||
-            nextNewline.op.attributes[NotusAttribute.indent.key] == indentStyle)) {
-      // We are not at the end of this block/indent, ignore.
+        nextNewline.op.attributes[NotusAttribute.block.key] == blockStyle) {
+      // We are not at the end of this block, ignore.
       return null;
     }
 
@@ -217,6 +213,52 @@ class AutoExitBlockRule extends InsertRule {
     // therefore we can exit this block.
     final attributes = target.attributes ?? <String, dynamic>{};
     attributes.addAll(NotusAttribute.block.unset.toJson());
+    return Delta()..retain(index)..retain(1, attributes);
+  }
+}
+
+class AutoExitIndentRule extends InsertRule {
+  const AutoExitIndentRule();
+
+  bool isEmptyLine(Operation before, Operation after) {
+    final textBefore = before?.data is String ? before.data as String : '';
+    final textAfter = after.data is String ? after.data as String : '';
+    return (before == null || textBefore.endsWith('\n')) &&
+        textAfter.startsWith('\n');
+  }
+
+  @override
+  Delta apply(Delta document, int index, Object data) {
+    if (data is! String) return null;
+
+    final text = data as String;
+    if (text != '\n') return null;
+
+    final iter = DeltaIterator(document);
+    final previous = iter.skip(index);
+    final target = iter.next();
+
+    final isInIndent = target.isNotPlain &&
+        target.attributes.containsKey(NotusAttribute.indent.key);
+
+    if (!isInIndent) return null;
+    if (!isEmptyLine(previous, target)) return null;
+
+    final indentStyle = target.attributes[NotusAttribute.indent.key];
+    final targetText = target.value as String;
+
+    if (targetText.length > 1) {
+      return null;
+    }
+
+    final nextNewline = _findNextNewline(iter);
+    if (nextNewline.isNotEmpty &&
+        nextNewline.op.attributes != null &&
+        nextNewline.op.attributes[NotusAttribute.indent.key] == indentStyle) {
+      return null;
+    }
+
+    final attributes = target.attributes ?? <String, dynamic>{};
     attributes.addAll(NotusAttribute.indent.unset.toJson());
     return Delta()..retain(index)..retain(1, attributes);
   }
