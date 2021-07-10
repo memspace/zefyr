@@ -315,6 +315,7 @@ class LineNode extends ContainerNode<LeafNode>
 
     final blockStyle = newStyle.get(NotusAttribute.block);
     final indentStyle = newStyle.get(NotusAttribute.indent);
+    final shouldApplyIndent = NotusAttribute.exclusives.contains(blockStyle) && indentStyle != null;
     if (parent is BlockNode) {
       final parentStyle = (parent as BlockNode).style.get(NotusAttribute.block);
       if (blockStyle == NotusAttribute.block.unset) {
@@ -323,7 +324,7 @@ class LineNode extends ContainerNode<LeafNode>
         unwrap();
         final block = BlockNode();
         block.applyAttribute(blockStyle);
-        if (indentStyle != null) {
+        if (shouldApplyIndent) {
           block.applyAttribute(indentStyle);
         }
         wrap(block);
@@ -333,7 +334,7 @@ class LineNode extends ContainerNode<LeafNode>
       // Only wrap with a new block if this is not an unset
       final block = BlockNode();
       block.applyAttribute(blockStyle);
-      if (indentStyle != null) {
+      if (shouldApplyIndent) {
         block.applyAttribute(indentStyle);
       }
       wrap(block);
