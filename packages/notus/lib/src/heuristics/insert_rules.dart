@@ -179,21 +179,23 @@ class AutoExitBlockRule extends InsertRule {
     final target = iter.next();
     final isInBlock = target.isNotPlain &&
         target.attributes.containsKey(NotusAttribute.block.key);
+    final isInIndent = target.isNotPlain &&
+        target.attributes.containsKey(NotusAttribute.indent.key);
 
-    // We are not in a block, ignore.
-    if (!isInBlock) return null;
+    // We are not in a block, indent, ignore.
+    if (!isInBlock || !isInIndent) return null;
     // We are not on an empty line, ignore.
     if (!isEmptyLine(previous, target)) return null;
 
     final blockStyle = target.attributes[NotusAttribute.block.key];
+    final indentStyle = target.attributes[NotusAttribute.indent.key];
 
     // We are on an empty line. Now we need to determine if we are on the
     // last line of a block.
     // First check if `target` length is greater than 1, this would indicate
     // that it contains multiple newline characters which share the same style.
     // This would mean we are not on the last line yet.
-    final targetText = target.value
-        as String; // this is safe since we already called isEmptyLine and know it contains a newline
+    final targetText = target.value as String; // this is safe since we already called isEmptyLine and know it contains a newline
 
     if (targetText.length > 1) {
       // We are not on the last line of this block, ignore.
@@ -205,8 +207,9 @@ class AutoExitBlockRule extends InsertRule {
     final nextNewline = _findNextNewline(iter);
     if (nextNewline.isNotEmpty &&
         nextNewline.op.attributes != null &&
-        nextNewline.op.attributes[NotusAttribute.block.key] == blockStyle) {
-      // We are not at the end of this block, ignore.
+        (nextNewline.op.attributes[NotusAttribute.block.key] == blockStyle ||
+            nextNewline.op.attributes[NotusAttribute.indent.key] == indentStyle)) {
+      // We are not at the end of this block/indent, ignore.
       return null;
     }
 
@@ -214,6 +217,7 @@ class AutoExitBlockRule extends InsertRule {
     // therefore we can exit this block.
     final attributes = target.attributes ?? <String, dynamic>{};
     attributes.addAll(NotusAttribute.block.unset.toJson());
+    attributes.addAll(NotusAttribute.indent.unset.toJson());
     return Delta()..retain(index)..retain(1, attributes);
   }
 }
