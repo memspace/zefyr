@@ -134,8 +134,13 @@ class EditableTextBlock extends StatelessWidget {
   }
 
   double _userIndentWidth(LineNode node) {
-    final indentValue = node.style.get(NotusAttribute.indent)?.value ?? 0.0;
-    return 24.0 * indentValue;
+    final block = node.style.get(NotusAttribute.block);
+    if (block == NotusAttribute.block.bulletList || block == NotusAttribute.block.numberList) {
+      final indentValue = node.style.get(NotusAttribute.indent)?.value ?? 0.0;
+      return 24.0 * indentValue;
+    } else {
+      return 0.0;
+    }
   }
 
   double _styleIndentWidth() {
