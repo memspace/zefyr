@@ -12,14 +12,11 @@ dependencies:
   flutter:
     sdk: flutter
   url_launcher: ^6.0.2
-  quill_delta:
-    git:
-      url: https://github.com/amantoux/quill-delta-dart.git
-      ref: nnbd
+  quill_delta: ^3.0.0-nullsafety.0
   notus:
     git:
-      url: https://github.com/amantoux/zefyr.git
-      ref: 1.0-dev-master
+      url: https://github.com/memspace/zefyr.git
+      ref: 1.0-dev
       path: packages/notus
   characters: ^1.0.0
 

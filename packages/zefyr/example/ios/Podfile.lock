@@ -25,7 +25,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
+  image_picker: 50e7c7ff960e5f58faa4d1f4af84a771c671bc4a
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
 
