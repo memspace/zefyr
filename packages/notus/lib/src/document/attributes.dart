@@ -42,7 +42,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
   final String key;
   final NotusAttributeScope scope;
   NotusAttribute<T> get unset => NotusAttribute<T>._(key, scope, null);
-  NotusAttribute<T> withValue(T value) =>
+  NotusAttribute<T> withValue(T? value) =>
       NotusAttribute<T>._(key, scope, value);
 }
 
@@ -177,7 +177,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   bool get isInline => scope == NotusAttributeScope.inline;
 
   @override
-  NotusAttribute<T> withValue(T value) =>
+  NotusAttribute<T> withValue(T? value) =>
       NotusAttribute<T>._(key, scope, value);
 
   @override
