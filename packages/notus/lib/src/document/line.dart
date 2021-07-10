@@ -303,7 +303,7 @@ class LineNode extends ContainerNode<LeafNode>
       block.optimize();
     }
   }
-  // TODO: 後ろのdeltaを見て、判定
+
   /// Formats this line and optimizes layout afterwards.
   void _formatAndOptimize(NotusStyle newStyle) {
     if (newStyle == null || newStyle.isEmpty) return;

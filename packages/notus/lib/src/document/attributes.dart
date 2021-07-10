@@ -480,7 +480,6 @@ class IndentAttributeBuilder extends NotusAttributeBuilder<int> {
   const IndentAttributeBuilder._()
       : super._(_kIntent, NotusAttributeScope.line);
 
-  /// Creates an indent attribute with specified [value].
   NotusAttribute<int> fromInt(int value) =>
       NotusAttribute<int>._(key, scope, value);
 }
