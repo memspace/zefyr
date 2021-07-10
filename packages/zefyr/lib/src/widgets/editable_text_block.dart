@@ -303,7 +303,6 @@ class _NumberPoint extends StatelessWidget {
   }
 }
 
-// TODO: ここまでインデント情報を持ってくる？？？？
 class _BulletPoint extends StatelessWidget {
   final TextStyle style;
   final double width;
