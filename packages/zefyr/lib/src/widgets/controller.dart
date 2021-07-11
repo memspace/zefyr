@@ -231,7 +231,7 @@ class ZefyrController extends ChangeNotifier {
     replaceText(
       selection.baseOffset,
       0,
-      '\n',
+      ' ',
       selection: selection.copyWith(
         baseOffset: selection.baseOffset + 1,
         extentOffset: selection.baseOffset + 1,

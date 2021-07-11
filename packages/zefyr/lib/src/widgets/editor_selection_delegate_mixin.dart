@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:validators/validators.dart';
 import 'package:zefyr/zefyr.dart';
 
 import 'editor.dart';
@@ -53,6 +54,19 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
                 selection: TextSelection.collapsed(
                     offset: selection.start + data.text.length),
               );
+
+              if (isURL(data.text)) {
+                // URLの場合はURLと認識させるために最後尾にスペースを追加する
+                widget.controller.replaceText(
+                  widget.controller.selection.baseOffset,
+                  0,
+                  ' ',
+                  selection: widget.controller.selection.copyWith(
+                    baseOffset: widget.controller.selection.baseOffset + 1,
+                    extentOffset: widget.controller.selection.baseOffset + 1,
+                  ),
+                );
+              }
             }
           }
 
