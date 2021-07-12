@@ -244,7 +244,7 @@ class ZefyrThemeData {
           fontSize: 20.0,
           height: 2,
         ),
-        spacing: VerticalSpacing(top: 16, bottom: 0),
+        spacing: VerticalSpacing(top: 32, bottom: 0),
         lineSpacing: VerticalSpacing(top: 0, bottom: 0),
         decoration: BoxDecoration(
           color: Color(0xff0099dd).withAlpha(20),
@@ -257,7 +257,7 @@ class ZefyrThemeData {
           fontSize: 18.0,
           height: 1.5,
         ),
-        spacing: VerticalSpacing(top: 16, bottom: 0),
+        spacing: VerticalSpacing(top: 24, bottom: 0),
         lineSpacing: VerticalSpacing(top: 0, bottom: 15),
       ),
     );

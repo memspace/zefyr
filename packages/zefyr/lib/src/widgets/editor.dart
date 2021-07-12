@@ -267,8 +267,8 @@ class _ZefyrEditorState extends State<ZefyrEditor>
             selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
         selectionColor = selectionTheme.selectionColor ??
             cupertinoTheme.primaryColor.withOpacity(0.40);
-        selectionColor =
-            selectionTheme.selectionColor ?? cupertinoTheme.primaryColor.withOpacity(0.40);
+        selectionColor = selectionTheme.selectionColor ??
+            cupertinoTheme.primaryColor.withOpacity(0.40);
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
             iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
@@ -781,7 +781,6 @@ class RawEditorState extends EditorState
     _selectionOverlay?.updateForScroll();
   }
 
-
   // State lifecycle:
 
   @override
@@ -1210,8 +1209,14 @@ class RawEditorState extends EditorState
     } else if (style == NotusAttribute.block.quote) {
       return theme.quote.spacing;
     } else if (style == NotusAttribute.largeHeading) {
+      if (node.isFirst) {
+        return VerticalSpacing(top: 16, bottom: 0);
+      }
       return theme.largeHeading.spacing;
     } else if (style == NotusAttribute.middleHeading) {
+      if (node.isFirst) {
+        return VerticalSpacing(top: 16, bottom: 0);
+      }
       return theme.middleHeading.spacing;
     } else {
       return theme.lists.spacing;

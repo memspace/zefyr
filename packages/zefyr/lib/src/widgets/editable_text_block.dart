@@ -126,7 +126,7 @@ class EditableTextBlock extends StatelessWidget {
     if (block == NotusAttribute.middleHeading) {
       return Divider(
         height: theme.paragraph.style.fontSize * theme.paragraph.style.height,
-        thickness: 2,
+        thickness: 1,
         color: Color(0xFF0099DD),
       );
     }
