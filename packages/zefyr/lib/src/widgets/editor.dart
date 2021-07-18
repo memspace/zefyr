@@ -34,7 +34,7 @@ Widget defaultZefyrEmbedBuilder(BuildContext context, EmbedNode node) {
   if (node.value.type == 'hr') {
     final theme = ZefyrTheme.of(context)!;
     return Divider(
-      height: theme.paragraph!.style.fontSize! * theme.paragraph!.style.height!,
+      height: theme.paragraph.style.fontSize! * theme.paragraph.style.height!,
       thickness: 2,
       color: Colors.grey.shade200,
     );
@@ -493,6 +493,7 @@ class RawEditor extends StatefulWidget {
   /// Controls the document being edited.
   final ZefyrController controller;
 
+  //TODO: Make it optional and create an instance if it's null
   /// Controls whether this editor has keyboard focus.
   final FocusNode focusNode;
 
@@ -685,7 +686,7 @@ class RawEditorState extends EditorState
   final GlobalKey _editorKey = GlobalKey();
 
   // Theme
-  ZefyrThemeData? _themeData;
+  late ZefyrThemeData _themeData;
 
   // Cursors
   late CursorController _cursorController;
@@ -1084,9 +1085,9 @@ class RawEditorState extends EditorState
       /// baseline.
       // This implies that the first line has no styles applied to it.
       final baselinePadding =
-          EdgeInsets.only(top: _themeData!.paragraph!.spacing.top);
+          EdgeInsets.only(top: _themeData.paragraph.spacing.top);
       child = BaselineProxy(
-        textStyle: _themeData!.paragraph!.style,
+        textStyle: _themeData.paragraph.style,
         padding: baselinePadding,
         child: SingleChildScrollView(
           controller: _scrollController,
@@ -1103,7 +1104,7 @@ class RawEditorState extends EditorState
             maxHeight: widget.maxHeight ?? double.infinity);
 
     return ZefyrTheme(
-      data: _themeData!,
+      data: _themeData,
       child: MouseRegion(
         cursor: SystemMouseCursors.text,
         child: Container(
@@ -1158,27 +1159,27 @@ class RawEditorState extends EditorState
     return result;
   }
 
-  VerticalSpacing _getSpacingForLine(LineNode node, ZefyrThemeData? theme) {
+  VerticalSpacing _getSpacingForLine(LineNode node, ZefyrThemeData theme) {
     final style = node.style.get(NotusAttribute.heading);
     if (style == NotusAttribute.heading.level1) {
-      return theme!.heading1!.spacing;
+      return theme.heading1.spacing;
     } else if (style == NotusAttribute.heading.level2) {
-      return theme!.heading2!.spacing;
+      return theme.heading2.spacing;
     } else if (style == NotusAttribute.heading.level3) {
-      return theme!.heading3!.spacing;
+      return theme.heading3.spacing;
     }
 
-    return theme!.paragraph!.spacing;
+    return theme.paragraph.spacing;
   }
 
-  VerticalSpacing _getSpacingForBlock(BlockNode node, ZefyrThemeData? theme) {
+  VerticalSpacing _getSpacingForBlock(BlockNode node, ZefyrThemeData theme) {
     final style = node.style.get(NotusAttribute.block);
     if (style == NotusAttribute.block.code) {
-      return theme!.code!.spacing;
+      return theme.code.spacing;
     } else if (style == NotusAttribute.block.quote) {
-      return theme!.quote!.spacing;
+      return theme.quote.spacing;
     } else {
-      return theme!.lists!.spacing;
+      return theme.lists.spacing;
     }
   }
 }

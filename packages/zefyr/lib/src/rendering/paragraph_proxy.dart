@@ -7,14 +7,14 @@ import 'editable_box.dart';
 class RenderParagraphProxy extends RenderProxyBox
     implements RenderContentProxyBox {
   RenderParagraphProxy({
-    RenderParagraph? child,
-    required TextStyle? textStyle,
-    required TextDirection? textDirection,
+    required TextStyle textStyle,
     required double textScaleFactor,
-    required StrutStyle strutStyle,
-    required Locale? locale,
     required TextWidthBasis textWidthBasis,
-    required TextHeightBehavior? textHeightBehavior,
+    RenderParagraph? child,
+    TextDirection? textDirection,
+    StrutStyle? strutStyle,
+    Locale? locale,
+    TextHeightBehavior? textHeightBehavior,
   })  : _prototypePainter = TextPainter(
             text: TextSpan(text: ' ', style: textStyle),
             textAlign: TextAlign.left,

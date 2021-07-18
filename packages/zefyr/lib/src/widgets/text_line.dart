@@ -74,23 +74,23 @@ class TextLine extends StatelessWidget {
     var textStyle = TextStyle();
     final heading = node.style.get(NotusAttribute.heading);
     if (heading == NotusAttribute.heading.level1) {
-      textStyle = textStyle.merge(theme.heading1?.style);
+      textStyle = textStyle.merge(theme.heading1.style);
     } else if (heading == NotusAttribute.heading.level2) {
-      textStyle = textStyle.merge(theme.heading2?.style);
+      textStyle = textStyle.merge(theme.heading2.style);
     } else if (heading == NotusAttribute.heading.level3) {
-      textStyle = textStyle.merge(theme.heading3?.style);
+      textStyle = textStyle.merge(theme.heading3.style);
     } else {
-      textStyle = textStyle.merge(theme.paragraph?.style);
+      textStyle = textStyle.merge(theme.paragraph.style);
     }
 
     final block = style.get(NotusAttribute.block);
     if (block == NotusAttribute.block.quote) {
-      textStyle = textStyle.merge(theme.quote?.style);
+      textStyle = textStyle.merge(theme.quote.style);
     } else if (block == NotusAttribute.block.code) {
-      textStyle = textStyle.merge(theme.code?.style);
+      textStyle = textStyle.merge(theme.code.style);
     } else if (block != null) {
       // lists
-      textStyle = textStyle.merge(theme.lists?.style);
+      textStyle = textStyle.merge(theme.lists.style);
     }
 
     return textStyle;

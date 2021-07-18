@@ -61,53 +61,53 @@ class VerticalSpacing {
 
 class ZefyrThemeData {
   /// Style of bold text.
-  final TextStyle? bold;
+  final TextStyle bold;
 
   /// Style of italic text.
-  final TextStyle? italic;
+  final TextStyle italic;
 
   /// Style of underline text.
-  final TextStyle? underline;
+  final TextStyle underline;
 
   /// Style of strikethrough text.
-  final TextStyle? strikethrough;
+  final TextStyle strikethrough;
 
   /// Style of links in text.
-  final TextStyle? link;
+  final TextStyle link;
 
   /// Default style theme for regular paragraphs of text.
-  final TextBlockTheme? paragraph; // spacing: top: 6, bottom: 10
+  final TextBlockTheme paragraph; // spacing: top: 6, bottom: 10
   /// Style theme for level 1 headings.
-  final TextBlockTheme? heading1;
+  final TextBlockTheme heading1;
 
   /// Style theme for level 2 headings.
-  final TextBlockTheme? heading2;
+  final TextBlockTheme heading2;
 
   /// Style theme for level 3 headings.
-  final TextBlockTheme? heading3;
+  final TextBlockTheme heading3;
 
   /// Style theme for bullet and number lists.
-  final TextBlockTheme? lists;
+  final TextBlockTheme lists;
 
   /// Style theme for quote blocks.
-  final TextBlockTheme? quote;
+  final TextBlockTheme quote;
 
   /// Style theme for code blocks.
-  final TextBlockTheme? code;
+  final TextBlockTheme code;
 
   ZefyrThemeData({
-    this.bold,
-    this.italic,
-    this.underline,
-    this.strikethrough,
-    this.link,
-    this.paragraph,
-    this.heading1,
-    this.heading2,
-    this.heading3,
-    this.lists,
-    this.quote,
-    this.code,
+    required this.bold,
+    required this.italic,
+    required this.underline,
+    required this.strikethrough,
+    required this.link,
+    required this.paragraph,
+    required this.heading1,
+    required this.heading2,
+    required this.heading3,
+    required this.lists,
+    required this.quote,
+    required this.code,
   });
 
   factory ZefyrThemeData.fallback(BuildContext context) {

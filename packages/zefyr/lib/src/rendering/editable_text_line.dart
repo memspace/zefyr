@@ -82,10 +82,10 @@ class RenderEditableTextLine extends RenderEditableBox {
   }
 
   /// The color to use when painting the selection.
-  Color? get selectionColor => _selectionColor;
-  Color? _selectionColor;
+  Color get selectionColor => _selectionColor;
+  Color _selectionColor;
 
-  set selectionColor(Color? value) {
+  set selectionColor(Color value) {
     if (_selectionColor == value) return;
     _selectionColor = value;
     if (containsSelection) markNeedsPaint();
@@ -102,10 +102,10 @@ class RenderEditableTextLine extends RenderEditableBox {
   ///
   /// This field is used by [selectionEnabled] (which then controls
   /// the accessibility hints mentioned above).
-  bool? get enableInteractiveSelection => _enableInteractiveSelection;
-  bool? _enableInteractiveSelection;
+  bool get enableInteractiveSelection => _enableInteractiveSelection;
+  bool _enableInteractiveSelection;
 
-  set enableInteractiveSelection(bool? value) {
+  set enableInteractiveSelection(bool value) {
     if (_enableInteractiveSelection == value) return;
     _enableInteractiveSelection = value;
     markNeedsTextLayout();
@@ -117,7 +117,7 @@ class RenderEditableTextLine extends RenderEditableBox {
   ///
   /// If [enableInteractiveSelection] is not set then defaults to `true`.
   bool get selectionEnabled {
-    return enableInteractiveSelection ?? true;
+    return enableInteractiveSelection;
   }
 
   bool get containsSelection {
@@ -673,7 +673,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     //     _textLayoutLastMinWidth == constraints.minWidth,
     // 'Last width ($_textLayoutLastMinWidth, $_textLayoutLastMaxWidth) not the same as max width constraint (${constraints.minWidth}, ${constraints.maxWidth}).');
     assert(_selectionRects != null);
-    final paint = Paint()..color = _selectionColor!;
+    final paint = Paint()..color = _selectionColor;
     for (final box in _selectionRects!) {
       context.canvas.drawRect(box.toRect().shift(effectiveOffset), paint);
     }

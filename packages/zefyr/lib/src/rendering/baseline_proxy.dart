@@ -2,9 +2,9 @@ import 'package:flutter/rendering.dart';
 
 class RenderBaselineProxy extends RenderProxyBox {
   RenderBaselineProxy({
-    RenderParagraph? child,
     required TextStyle textStyle,
-    required EdgeInsets? padding,
+    RenderParagraph? child,
+    EdgeInsets? padding,
   })  : _prototypePainter = TextPainter(
             text: TextSpan(text: ' ', style: textStyle),
             textDirection: TextDirection.ltr,
