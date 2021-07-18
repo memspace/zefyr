@@ -16,8 +16,12 @@ class BaselineProxy extends SingleChildRenderObjectWidget {
   final TextStyle textStyle;
   final EdgeInsets padding;
 
-  BaselineProxy({Key key, Widget child, this.textStyle, this.padding})
-      : super(key: key, child: child);
+  BaselineProxy({
+    Key? key,
+    Widget? child,
+    required this.textStyle,
+    required this.padding,
+  }) : super(key: key, child: child);
 
   @override
   RenderBaselineProxy createRenderObject(BuildContext context) {

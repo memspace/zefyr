@@ -8,7 +8,7 @@ import 'package:zefyr/zefyr.dart';
 
 void main() {
   group('$ZefyrController', () {
-    ZefyrController controller;
+    late ZefyrController controller;
 
     setUp(() {
       var doc = NotusDocument();

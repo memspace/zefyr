@@ -14,17 +14,15 @@ import 'theme.dart';
 class TextLine extends StatelessWidget {
   /// Line of text represented by this widget.
   final LineNode node;
-  final TextDirection textDirection;
+  final TextDirection? textDirection;
   final ZefyrEmbedBuilder embedBuilder;
 
   const TextLine({
-    Key key,
-    @required this.node,
+    Key? key,
+    required this.node,
+    required this.embedBuilder,
     this.textDirection,
-    @required this.embedBuilder,
-  })  : assert(node != null),
-        assert(embedBuilder != null),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +34,9 @@ class TextLine extends StatelessWidget {
     }
     final text = buildText(context, node);
     final strutStyle =
-        StrutStyle.fromTextStyle(text.style, forceStrutHeight: true);
+        StrutStyle.fromTextStyle(text.style!, forceStrutHeight: true);
     return RichTextProxy(
-      textStyle: text.style,
+      textStyle: text.style!,
       textDirection: textDirection,
       strutStyle: strutStyle,
       locale: Localizations.maybeLocaleOf(context),
@@ -52,7 +50,7 @@ class TextLine extends StatelessWidget {
   }
 
   TextSpan buildText(BuildContext context, LineNode node) {
-    final theme = ZefyrTheme.of(context);
+    final theme = ZefyrTheme.of(context)!;
     final children = node.children
         .map((node) => _segmentToTextSpan(node, theme))
         .toList(growable: false);
@@ -63,7 +61,7 @@ class TextLine extends StatelessWidget {
   }
 
   TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme) {
-    final TextNode segment = node;
+    final segment = node as TextNode;
     final attrs = segment.style;
 
     return TextSpan(
@@ -118,13 +116,13 @@ class TextLine extends StatelessWidget {
     return result;
   }
 
-  TextStyle _mergeTextStyleWithDecoration(TextStyle a, TextStyle b) {
+  TextStyle _mergeTextStyleWithDecoration(TextStyle a, TextStyle? b) {
     var decorations = <TextDecoration>[];
     if (a.decoration != null) {
-      decorations.add(a.decoration);
+      decorations.add(a.decoration!);
     }
-    if (b.decoration != null) {
-      decorations.add(b.decoration);
+    if (b?.decoration != null) {
+      decorations.add(b!.decoration!);
     }
     return a.merge(b).apply(decoration: TextDecoration.combine(decorations));
   }
