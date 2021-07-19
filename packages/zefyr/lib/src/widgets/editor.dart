@@ -729,7 +729,7 @@ class RawEditorState extends EditorState
   /// This property is typically used to notify the renderer of input gestures.
   @override
   RenderEditor get renderEditor =>
-      _editorKey.currentContext?.findRenderObject() as RenderEditor;
+      _editorKey.currentContext!.findRenderObject() as RenderEditor;
 
   /// Express interest in interacting with the keyboard.
   ///

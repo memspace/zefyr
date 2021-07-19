@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
-import 'package:zefyr/src/rendering/editable_box.dart';
 
+import '../rendering/editable_box.dart';
 import '../rendering/editable_text_line.dart';
 import 'cursor.dart';
 import 'text_line.dart';
