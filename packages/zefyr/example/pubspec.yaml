@@ -9,6 +9,9 @@ description: A new Flutter project.
 # Read more about versioning at semver.org.
 version: 1.0.0+1
 
+environment:
+  sdk: ">=2.2.0 <3.0.0"
+
 dependencies:
   flutter:
     sdk: flutter
@@ -19,6 +22,7 @@ dependencies:
   image_picker: ^0.6.1
   zefyr:
     path: ../
+  video_player: ^1.0.1
 
 dependency_overrides:
   notus:
@@ -43,6 +47,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/breeze.jpg
+    - video/nature_videos_UCDQ_Stczw0.mp4
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

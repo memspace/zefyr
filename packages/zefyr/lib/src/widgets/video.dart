@@ -13,8 +13,7 @@ import 'package:zefyr/zefyr.dart';
 
 import 'editable_box.dart';
 
-/// Provides interface for embedding images into Zefyr editor.
-// TODO: allow configuring image sources and related toolbar buttons.
+/// Provides interface for embedding video into Zefyr editor.
 @experimental
 abstract class ZefyrVideoDelegate<S> {
   /// Unique key to identify camera source.
@@ -22,26 +21,20 @@ abstract class ZefyrVideoDelegate<S> {
 
   /// Unique key to identify gallery source.
   S get gallerySource;
-  /*S get asset;
 
-  /// Unique key to identify gallery source.
-  S get network;
-
-  S get file;*/
-
-  /// Builds image widget for specified image [key].
+  /// Builds video widget for specified video [key].
   ///
   /// The [key] argument contains value which was previously returned from
   /// [pickVideo] method.
   Widget buildVideo(BuildContext context, String key);
 
-  /// Picks an image from specified [source].
+  /// Picks an video from specified [source].
   ///
-  /// Returns unique string key for the selected image. Returned key is stored
+  /// Returns unique string key for the selected video. Returned key is stored
   /// in the document.
   ///
   /// Depending on your application returned key may represent a path to
-  /// an image file on user's device, an HTTP link, or an identifier generated
+  /// an video file on user's device, an HTTP link, or an identifier generated
   /// by a file hosting service like AWS S3 or Google Drive.
   Future<String> pickVideo(S source);
 }
@@ -100,7 +93,6 @@ class RenderEditableVideo extends RenderBox
     with RenderObjectWithChildMixin<RenderBox>, RenderProxyBoxMixin<RenderBox>
     implements RenderEditableBox {
   RenderEditableVideo({
-    //RenderImage child,
     TextureBox child,
     @required EmbedNode node,
   }) : node = node {

@@ -288,7 +288,7 @@ class VideoButton extends StatefulWidget {
   _VideoButtonState createState() => _VideoButtonState();
 }
 
-//TODO Video button
+/// Controls video attribute.
 class _VideoButtonState extends State<VideoButton> {
   void _pickFromCamera() async {
     final editor = ZefyrToolbar.of(context).editor;
@@ -301,10 +301,8 @@ class _VideoButtonState extends State<VideoButton> {
 
   void _pickFromGallery() async {
     final editor = ZefyrToolbar.of(context).editor;
-    print("editor.videoDelegate: ${editor.videoDelegate}");
     final video = await editor.videoDelegate
         .pickVideo(editor.videoDelegate.gallerySource);
-    print('video: $video');
     if (video != null) {
       editor.formatSelection(NotusAttribute.embed.video(video));
     }
