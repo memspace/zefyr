@@ -42,6 +42,7 @@ enum ZefyrToolbarAction {
   confirm,
   undo,
   redo,
+  video
 }
 
 final kZefyrToolbarAttributeActions = <ZefyrToolbarAction, NotusAttributeKey>{
@@ -267,6 +268,7 @@ class ZefyrToolbarState extends State<ZefyrToolbar>
       buildButton(context, ZefyrToolbarAction.italic),
       buildButton(context, ZefyrToolbarAction.underline),
       if (editor.imageDelegate != null) ImageButton(),
+      if (editor.videoDelegate != null) VideoButton(),
       LinkButton(),
       HeadingButton(),
       AlignButton(),
@@ -378,6 +380,7 @@ class _DefaultZefyrToolbarDelegate implements ZefyrToolbarDelegate {
     ZefyrToolbarAction.confirm: Icons.check,
     ZefyrToolbarAction.undo: Icons.undo,
     ZefyrToolbarAction.redo: Icons.redo,
+    ZefyrToolbarAction.video: Icons.movie,
   };
 
   static const kSpecialIconSizes = {

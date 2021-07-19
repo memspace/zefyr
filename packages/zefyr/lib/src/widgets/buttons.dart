@@ -283,6 +283,63 @@ class _AlignButtonState extends State<AlignButton> {
   }
 }
 
+class VideoButton extends StatefulWidget {
+  @override
+  _VideoButtonState createState() => _VideoButtonState();
+}
+
+//TODO Video button
+class _VideoButtonState extends State<VideoButton> {
+  void _pickFromCamera() async {
+    final editor = ZefyrToolbar.of(context).editor;
+    final video =
+        await editor.videoDelegate.pickVideo(editor.videoDelegate.cameraSource);
+    if (video != null) {
+      editor.formatSelection(NotusAttribute.embed.video(video));
+    }
+  }
+
+  void _pickFromGallery() async {
+    final editor = ZefyrToolbar.of(context).editor;
+    print("editor.videoDelegate: ${editor.videoDelegate}");
+    final video = await editor.videoDelegate
+        .pickVideo(editor.videoDelegate.gallerySource);
+    print('video: $video');
+    if (video != null) {
+      editor.formatSelection(NotusAttribute.embed.video(video));
+    }
+  }
+
+  Widget buildOverlay(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    final buttons = Row(
+      children: <Widget>[
+        SizedBox(width: 8.0),
+        toolbar.buildButton(context, ZefyrToolbarAction.cameraImage,
+            onPressed: _pickFromCamera),
+        toolbar.buildButton(context, ZefyrToolbarAction.galleryImage,
+            onPressed: _pickFromGallery),
+      ],
+    );
+    return ZefyrToolbarScaffold(body: buttons);
+  }
+
+  void showOverlay() {
+    final toolbar = ZefyrToolbar.of(context);
+    toolbar.showOverlay(buildOverlay);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final toolbar = ZefyrToolbar.of(context);
+    return toolbar.buildButton(
+      context,
+      ZefyrToolbarAction.video,
+      onPressed: showOverlay,
+    );
+  }
+}
+
 /// Controls image attribute.
 class ImageButton extends StatefulWidget {
   const ImageButton({Key key}) : super(key: key);

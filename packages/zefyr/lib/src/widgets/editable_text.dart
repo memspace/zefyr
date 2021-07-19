@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/widgets/video.dart';
 
 import 'code.dart';
 import 'common.dart';
@@ -36,6 +37,7 @@ class ZefyrEditableText extends StatefulWidget {
     @required this.controller,
     @required this.focusNode,
     @required this.imageDelegate,
+    @required this.videoDelegate,
     this.selectionControls,
     this.autofocus = true,
     this.mode = ZefyrMode.edit,
@@ -54,6 +56,7 @@ class ZefyrEditableText extends StatefulWidget {
   /// Controls whether this editor has keyboard focus.
   final FocusNode focusNode;
   final ZefyrImageDelegate imageDelegate;
+  final ZefyrVideoDelegate videoDelegate;
 
   /// Whether this text field should focus itself if nothing else is already
   /// focused.

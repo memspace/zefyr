@@ -4,7 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/widgets/video.dart';
 
+import 'align.dart';
 import 'code.dart';
 import 'common.dart';
 import 'image.dart';
@@ -13,15 +15,19 @@ import 'paragraph.dart';
 import 'quote.dart';
 import 'scope.dart';
 import 'theme.dart';
-import 'align.dart';
 
 /// Non-scrollable read-only view of Notus rich text documents.
 @experimental
 class ZefyrView extends StatefulWidget {
   final NotusDocument document;
   final ZefyrImageDelegate imageDelegate;
+  final ZefyrVideoDelegate videoDelegate;
 
-  const ZefyrView({Key key, @required this.document, this.imageDelegate})
+  const ZefyrView(
+      {Key key,
+      @required this.document,
+      this.imageDelegate,
+      this.videoDelegate})
       : super(key: key);
 
   @override
@@ -33,17 +39,21 @@ class ZefyrViewState extends State<ZefyrView> {
   ZefyrThemeData _themeData;
 
   ZefyrImageDelegate get imageDelegate => widget.imageDelegate;
+  ZefyrVideoDelegate get videoDelegate => widget.videoDelegate;
 
   @override
   void initState() {
     super.initState();
-    _scope = ZefyrScope.view(imageDelegate: widget.imageDelegate);
+    _scope = ZefyrScope.view(
+        imageDelegate: widget.imageDelegate,
+        videoDelegate: widget.videoDelegate);
   }
 
   @override
   void didUpdateWidget(ZefyrView oldWidget) {
     super.didUpdateWidget(oldWidget);
     _scope.imageDelegate = widget.imageDelegate;
+    _scope.videoDelegate = widget.videoDelegate;
   }
 
   @override

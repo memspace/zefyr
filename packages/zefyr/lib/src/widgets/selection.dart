@@ -102,7 +102,7 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
   }
 
   @override
-  void hideToolbar() {
+  void hideToolbar([bool hideHandles = true]) {
     _didCaretTap = false; // reset double tap.
     _toolbar?.remove();
     _toolbar = null;
@@ -310,6 +310,12 @@ class _ZefyrSelectionOverlayState extends State<ZefyrSelectionOverlay>
 
   @override
   bool get selectAllEnabled => _scope.mode.canSelect;
+
+  @override
+  void userUpdateTextEditingValue(
+      TextEditingValue value, SelectionChangedCause cause) {
+    // TODO: implement userUpdateTextEditingValue
+  }
 }
 
 enum _SelectionHandlePosition { base, extent }
@@ -604,14 +610,13 @@ class _SelectionToolbarState extends State<_SelectionToolbar> {
     );
 
     final toolbar = controls.buildToolbar(
-      context,
-      editingRegion,
-      block.preferredLineHeight,
-      midpoint,
-      endpoints,
-      widget.selectionOverlay,
-      null,
-    );
+        context,
+        editingRegion,
+        block.preferredLineHeight,
+        midpoint,
+        endpoints,
+        widget.selectionOverlay,
+        null);
     return CompositedTransformFollower(
       link: block.layerLink,
       showWhenUnlinked: false,

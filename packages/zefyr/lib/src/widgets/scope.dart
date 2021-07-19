@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/widgets/video.dart';
 
 import 'controller.dart';
 import 'cursor_timer.dart';
@@ -25,10 +26,12 @@ class ZefyrScope extends ChangeNotifier {
   /// Creates a view-only scope.
   ///
   /// Normally used in [ZefyrView].
-  ZefyrScope.view({ZefyrImageDelegate imageDelegate})
+  ZefyrScope.view(
+      {ZefyrImageDelegate imageDelegate, ZefyrVideoDelegate videoDelegate})
       : isEditable = false,
         _mode = ZefyrMode.view,
-        _imageDelegate = imageDelegate;
+        _imageDelegate = imageDelegate,
+        _videoDelegate = videoDelegate;
 
   /// Creates editable scope.
   ///
@@ -39,6 +42,7 @@ class ZefyrScope extends ChangeNotifier {
     @required FocusNode focusNode,
     @required FocusScopeNode focusScope,
     ZefyrImageDelegate imageDelegate,
+    ZefyrVideoDelegate videoDelegate,
   })  : assert(mode != null),
         assert(controller != null),
         assert(focusNode != null),
@@ -47,6 +51,7 @@ class ZefyrScope extends ChangeNotifier {
         _mode = mode,
         _controller = controller,
         _imageDelegate = imageDelegate,
+        _videoDelegate = videoDelegate,
         _focusNode = focusNode,
         _focusScope = focusScope,
         _cursorTimer = CursorTimer(),
@@ -68,6 +73,15 @@ class ZefyrScope extends ChangeNotifier {
   set imageDelegate(ZefyrImageDelegate value) {
     if (_imageDelegate != value) {
       _imageDelegate = value;
+      notifyListeners();
+    }
+  }
+
+  ZefyrVideoDelegate _videoDelegate;
+  ZefyrVideoDelegate get videoDelegate => _videoDelegate;
+  set videoDelegate(ZefyrVideoDelegate value) {
+    if (_videoDelegate != value) {
+      _videoDelegate = value;
       notifyListeners();
     }
   }
