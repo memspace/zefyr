@@ -43,12 +43,12 @@ class CursorStyle {
   ///
   /// By default, the cursor height is set to the preferred line height of the
   /// text.
-  final double height;
+  final double? height;
 
   /// How rounded the corners of the cursor should be.
   ///
   /// By default, the cursor has no radius.
-  final Radius radius;
+  final Radius? radius;
 
   /// The offset that is used, in pixels, when painting the cursor on screen.
   ///
@@ -56,7 +56,7 @@ class CursorStyle {
   /// (-[cursorWidth] * 0.5, 0.0) on iOS platforms and (0, 0) on Android
   /// platforms. The origin from where the offset is applied to is the arbitrary
   /// location where the cursor ends up being rendered from by default.
-  final Offset offset;
+  final Offset? offset;
 
   /// Whether the cursor will animate from fully transparent to fully opaque
   /// during each cursor blink.
@@ -72,32 +72,28 @@ class CursorStyle {
   final bool paintAboveText;
 
   const CursorStyle({
-    @required this.color,
-    @required this.backgroundColor,
+    required this.color,
+    required this.backgroundColor,
     this.width = 1.0,
     this.height,
     this.radius,
     this.offset,
     this.opacityAnimates = false,
     this.paintAboveText = false,
-  })  : assert(color != null),
-        assert(backgroundColor != null),
-        assert(opacityAnimates != null),
-        assert(paintAboveText != null);
+  });
 
   @override
   bool operator ==(dynamic other) {
     if (identical(this, other)) return true;
     if (other is! CursorStyle) return false;
-    final CursorStyle typedOther = other;
-    return typedOther.color == color &&
-        typedOther.backgroundColor == backgroundColor &&
-        typedOther.width == width &&
-        typedOther.height == height &&
-        typedOther.radius == radius &&
-        typedOther.offset == offset &&
-        typedOther.opacityAnimates == opacityAnimates &&
-        typedOther.paintAboveText == paintAboveText;
+    return other.color == color &&
+        other.backgroundColor == backgroundColor &&
+        other.width == width &&
+        other.height == height &&
+        other.radius == radius &&
+        other.offset == offset &&
+        other.opacityAnimates == opacityAnimates &&
+        other.paintAboveText == paintAboveText;
   }
 
   @override
@@ -111,13 +107,10 @@ class CursorStyle {
 /// cursor [style].
 class CursorController extends ChangeNotifier {
   CursorController({
-    @required ValueNotifier<bool> showCursor,
-    @required CursorStyle style,
-    @required TickerProvider tickerProvider,
-  })  : assert(showCursor != null),
-        assert(style != null),
-        assert(tickerProvider != null),
-        showCursor = showCursor ?? ValueNotifier<bool>(false),
+    required ValueNotifier<bool> showCursor,
+    required CursorStyle style,
+    required TickerProvider tickerProvider,
+  })  : showCursor = showCursor,
         _style = style,
         _cursorBlink = ValueNotifier(false),
         _cursorColor = ValueNotifier(style.color) {
@@ -132,9 +125,9 @@ class CursorController extends ChangeNotifier {
 
   final ValueNotifier<bool> showCursor;
 
-  Timer _cursorTimer;
+  Timer? _cursorTimer;
   bool _targetCursorVisibility = false;
-  AnimationController _cursorBlinkOpacityController;
+  late AnimationController _cursorBlinkOpacityController;
 
   ValueNotifier<bool> get cursorBlink => _cursorBlink;
   final ValueNotifier<bool> _cursorBlink;
@@ -144,8 +137,8 @@ class CursorController extends ChangeNotifier {
 
   CursorStyle get style => _style;
   CursorStyle _style;
+
   set style(CursorStyle value) {
-    assert(value != null);
     if (_style == value) return;
     _style = value;
     notifyListeners();
@@ -229,7 +222,7 @@ class CursorController extends ChangeNotifier {
 
 class FloatingCursorController {
   FloatingCursorController({
-    @required TickerProvider tickerProvider,
+    required TickerProvider tickerProvider,
   }) {
     _floatingCursorResetController = AnimationController(vsync: tickerProvider);
     _floatingCursorResetController.addListener(_onFloatingCursorResetTick);
@@ -239,20 +232,20 @@ class FloatingCursorController {
   // cursor position after the user has finished placing it.
   static const Duration _floatingCursorResetTime = Duration(milliseconds: 125);
 
-  AnimationController _floatingCursorResetController;
+  late AnimationController _floatingCursorResetController;
 
   // The original position of the caret on FloatingCursorDragState.start.
-  Rect _startCaretRect;
+  Rect? _startCaretRect;
 
   // The most recent text position as determined by the location of the floating
   // cursor.
-  TextPosition _lastTextPosition;
+  TextPosition? _lastTextPosition;
 
   // The offset of the floating cursor as determined from the first update call.
-  Offset _pointOffsetOrigin;
+  Offset? _pointOffsetOrigin;
 
   // The most recent position of the floating cursor.
-  Offset _lastBoundedOffset;
+  Offset? _lastBoundedOffset;
 
   // Because the center of the cursor is preferredLineHeight / 2 below the touch
   // origin, but the touch origin is used to determine which line the cursor is
