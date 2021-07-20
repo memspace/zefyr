@@ -90,7 +90,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
           onChanged: _assetsPathChanged,
         ),
       ),
-      actions: [FlatButton(onPressed: _save, child: Text('Save'))],
+      actions: [TextButton(onPressed: _save, child: Text('Save'))],
     );
   }
 

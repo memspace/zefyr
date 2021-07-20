@@ -296,10 +296,15 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/path_provider_macos/path_provider_macos.framework",
+				"${BUILT_PRODUCTS_DIR}/url_launcher_macos/url_launcher_macos.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/path_provider_macos.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/url_launcher_macos.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

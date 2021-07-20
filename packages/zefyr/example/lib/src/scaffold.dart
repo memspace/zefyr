@@ -33,7 +33,7 @@ class DemoScaffold extends StatefulWidget {
 }
 
 class _DemoScaffoldState extends State<DemoScaffold> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   ZefyrController _controller;
 
   bool _loading = false;
@@ -107,7 +107,8 @@ class _DemoScaffoldState extends State<DemoScaffold> {
         .childFile('${widget.documentFilename}');
     final data = jsonEncode(_controller.document);
     await file.writeAsString(data);
-    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('Saved.')));
+    _scaffoldMessengerKey.currentState
+        .showSnackBar(SnackBar(content: Text('Saved.')));
   }
 
   @override
@@ -123,30 +124,32 @@ class _DemoScaffoldState extends State<DemoScaffold> {
         ),
       ));
     }
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Theme.of(context).canvasColor,
-        centerTitle: false,
-        titleSpacing: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.chevron_left,
-            color: Colors.grey.shade800,
-            size: 18,
+    return ScaffoldMessenger(
+      key: _scaffoldMessengerKey,
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Theme.of(context).canvasColor,
+          centerTitle: false,
+          titleSpacing: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.chevron_left,
+              color: Colors.grey.shade800,
+              size: 18,
+            ),
+            onPressed: () => Navigator.pop(context),
           ),
-          onPressed: () => Navigator.pop(context),
+          title: _loading || widget.showToolbar == false
+              ? null
+              : ZefyrToolbar.basic(controller: _controller),
+          actions: actions,
         ),
-        title: _loading || widget.showToolbar == false
-            ? null
-            : ZefyrToolbar.basic(controller: _controller),
-        actions: actions,
+        floatingActionButton: widget.floatingActionButton,
+        body: _loading
+            ? Center(child: Text('Loading...'))
+            : widget.builder(context, _controller),
       ),
-      floatingActionButton: widget.floatingActionButton,
-      body: _loading
-          ? Center(child: Text('Loading...'))
-          : widget.builder(context, _controller),
     );
   }
 }
