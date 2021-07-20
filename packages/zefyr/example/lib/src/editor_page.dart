@@ -76,7 +76,8 @@ class EditorPageState extends State<EditorPage> {
     final file = File(Directory.systemTemp.path + '/quick_start.json');
     // And show a snack bar on success.
     file.writeAsString(contents).then((_) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text('Saved.')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Saved.')));
     });
   }
 }

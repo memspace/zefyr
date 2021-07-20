@@ -244,9 +244,9 @@ class _NumberPoint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: AlignmentDirectional.topEnd,
-      child: Text(withDot ? '$index.' : '$index', style: style),
       width: width,
       padding: EdgeInsetsDirectional.only(end: padding),
+      child: Text(withDot ? '$index.' : '$index', style: style),
     );
   }
 }
@@ -265,9 +265,9 @@ class _BulletPoint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: AlignmentDirectional.topEnd,
-      child: Text('•', style: style),
       width: width,
       padding: EdgeInsetsDirectional.only(end: 13.0),
+      child: Text('•', style: style),
     );
   }
 }
