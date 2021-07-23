@@ -283,13 +283,19 @@ class _AlignButtonState extends State<AlignButton> {
   }
 }
 
+/// Controls video attribute.
 class VideoButton extends StatefulWidget {
+  const VideoButton({Key key}) : super(key: key);
+
   @override
   _VideoButtonState createState() => _VideoButtonState();
 }
 
-/// Controls video attribute.
 class _VideoButtonState extends State<VideoButton> {
+  String youtubeVideo;
+  ValueNotifier<bool> isPaste = ValueNotifier(true);
+  TextEditingController textEditingController = TextEditingController();
+
   void _pickFromCamera() async {
     final editor = ZefyrToolbar.of(context).editor;
     final video =
@@ -308,6 +314,102 @@ class _VideoButtonState extends State<VideoButton> {
     }
   }
 
+  //TODO alternate possible for translation use Icons.done & Icons.close for OK & Cancel
+  void _youtubeLink() async {
+    final editor = ZefyrToolbar.of(context).editor;
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return Center(
+            child: Container(
+              height: 200, //MediaQuery.of(context).size.height * .2,
+              width: MediaQuery.of(context).size.width * 0.95,
+              //padding: EdgeInsets.all(20),
+              margin: MediaQuery.of(context).viewInsets,
+              child: Material(
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  child: ValueListenableBuilder<bool>(
+                      valueListenable: isPaste,
+                      builder: (context, currentState, child) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            TextField(
+                              autofocus: true,
+                              controller: textEditingController,
+                              decoration: InputDecoration(
+                                  suffixIcon: isPaste.value
+                                      ? IconButton(
+                                          icon: Icon(
+                                            Icons.paste,
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                          ),
+                                          onPressed: () async {
+                                            final data =
+                                                await Clipboard.getData(
+                                                    Clipboard.kTextPlain);
+                                            if (data.text.isNotEmpty) {
+                                              isPaste.value = !isPaste.value;
+                                              textEditingController.text =
+                                                  data.text;
+                                            }
+                                          },
+                                        )
+                                      : IconButton(
+                                          icon: Icon(
+                                            Icons.clear,
+                                            color: Colors.red,
+                                          ),
+                                          onPressed: () async {
+                                            isPaste.value = !isPaste.value;
+                                            textEditingController.text = '';
+                                          },
+                                        ),
+                                  hintText: 'Add a Youtube Link here'),
+                            ),
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                FlatButton(
+                                  color: Theme.of(context).primaryColor,
+                                  onPressed: () {
+                                    youtubeVideo = null;
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('Cancel',
+                                      style: TextStyle(color: Colors.white)),
+                                ),
+                                FlatButton(
+                                  color: Theme.of(context).primaryColor,
+                                  onPressed: () {
+                                    youtubeVideo = textEditingController.text;
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(
+                                    'OK',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }),
+                ),
+              ),
+            ),
+          );
+        });
+    final video = youtubeVideo;
+    if (video != null) {
+      editor.formatSelection(NotusAttribute.embed.video(video));
+    }
+  }
+
   Widget buildOverlay(BuildContext context) {
     final toolbar = ZefyrToolbar.of(context);
     final buttons = Row(
@@ -317,6 +419,8 @@ class _VideoButtonState extends State<VideoButton> {
             onPressed: _pickFromCamera),
         toolbar.buildButton(context, ZefyrToolbarAction.galleryImage,
             onPressed: _pickFromGallery),
+        toolbar.buildButton(context, ZefyrToolbarAction.link,
+            onPressed: _youtubeLink)
       ],
     );
     return ZefyrToolbarScaffold(body: buttons);
