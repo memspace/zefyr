@@ -315,6 +315,7 @@ class LineNode extends ContainerNode<LeafNode>
 
     final blockStyle = newStyle.get(NotusAttribute.block);
     final indentStyle = newStyle.get(NotusAttribute.indent);
+    // NOTE: なぜかわからないけど、`!NotusAttribute.exclusives.contains(blockStyle)`にすると、箇条書きの時に無駄なスペースができて表示崩れが起きるので
     final shouldApplyIndent = NotusAttribute.exclusives.contains(blockStyle) && indentStyle != null;
     if (parent is BlockNode) {
       final parentStyle = (parent as BlockNode).style.get(NotusAttribute.block);
