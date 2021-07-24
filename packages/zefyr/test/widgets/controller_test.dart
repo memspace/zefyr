@@ -236,9 +236,10 @@ void main() {
 
     test('decreaseIndent', () {
       controller.replaceText(0, 0, 'words');
-      controller.increaseIndentAtSelection();
+      controller.formatText(0, 0, NotusAttribute.indent.fromInt(3));
+      controller.decreaseIndentAtSelection();
       final indent = controller.getSelectionStyle().get(NotusAttribute.indent);
-      expect(indent.value, 1);
+      expect(indent.value, 2);
     });
 
     test('decreaseIndent min: null', () {
@@ -271,6 +272,38 @@ void main() {
       print(controller.document.toJson());
       expect(indent?.value, null);
       expect(block.value, 'ul');
+    });
+
+    test('indent middleHeading', () {
+      controller.replaceText(0, 0, 'words');
+      controller.formatSelection(NotusAttribute.block.middleHeading);
+      controller.decreaseIndentAtSelection();
+      final indent = controller.getSelectionStyle().get(NotusAttribute.indent);
+      expect(indent?.value, null);
+    });
+
+    test('indent largeHeading', () {
+      controller.replaceText(0, 0, 'words');
+      controller.formatSelection(NotusAttribute.block.largeHeading);
+      controller.decreaseIndentAtSelection();
+      final indent = controller.getSelectionStyle().get(NotusAttribute.indent);
+      expect(indent?.value, null);
+    });
+
+    test('indent quote', () {
+      controller.replaceText(0, 0, 'words');
+      controller.formatSelection(NotusAttribute.block.quote);
+      controller.decreaseIndentAtSelection();
+      final indent = controller.getSelectionStyle().get(NotusAttribute.indent);
+      expect(indent?.value, null);
+    });
+
+    test('indent code', () {
+      controller.replaceText(0, 0, 'words');
+      controller.formatSelection(NotusAttribute.block.code);
+      controller.decreaseIndentAtSelection();
+      final indent = controller.getSelectionStyle().get(NotusAttribute.indent);
+      expect(indent?.value, null);
     });
   });
 }
