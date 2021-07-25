@@ -142,7 +142,7 @@ class ZefyrThemeData {
       textColor: TextStyle(color: Color(0xffFF5555)),
       marker: TextStyle(
         decoration: TextDecoration.underline,
-        decorationColor: Color(0x1A0099DD),
+        decorationColor: Color(0xff0099DD).withOpacity(0.15),
         decorationThickness: 10,
       ),
       link: TextStyle(
