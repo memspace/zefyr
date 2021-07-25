@@ -29,6 +29,7 @@ class NotusHeuristics {
       ForceNewlineForInsertsAroundEmbedRule(),
       // Blocks
       AutoExitBlockRule(), // must go first
+      AutoExitIndentRule(),
       PreserveBlockStyleOnInsertRule(),
       // Lines
       PreserveLineStyleOnSplitRule(),

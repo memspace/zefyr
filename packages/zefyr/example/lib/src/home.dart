@@ -189,6 +189,34 @@ class _HomePageState extends State<HomePage> {
                       'https://firebasestorage.googleapis.com/v0/b/hokutoapp-jp.appspot.com/o/admin%2Fsample-notes%2Fintroduce%2F2.png?alt=media&token=5c054a6a-fb45-43ff-9a83-87f2dec7a568'));
             },
           ),
+          ZIconButton(
+            highlightElevation: 0,
+            hoverElevation: 0,
+            size: 32,
+            icon: Icon(
+              Icons.format_indent_increase_outlined,
+              size: 18,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            fillColor: Theme.of(context).canvasColor,
+            onPressed: () {
+              _controller.increaseIndentAtSelection();
+            },
+          ),
+          ZIconButton(
+            highlightElevation: 0,
+            hoverElevation: 0,
+            size: 32,
+            icon: Icon(
+              Icons.format_indent_decrease_outlined,
+              size: 18,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            fillColor: Theme.of(context).canvasColor,
+            onPressed: () {
+              _controller.decreaseIndentAtSelection();
+            },
+          ),
           ...ZefyrToolbar.basic(
             controller: _controller,
           ).children

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -1144,12 +1146,13 @@ class RawEditorState extends EditorState
   List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
     final lookup = _inputtingNodeLookup;
+    final indentLevelCounts = <int, int>{};
     for (final node in widget.controller.document.root.children) {
       if (node is LineNode) {
         result.add(EditableTextLine(
           node: node,
           textDirection: _textDirection,
-          indentWidth: 0,
+          indentWidth: _indentWidth(node),
           spacing: _getSpacingForLine(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,
@@ -1181,6 +1184,7 @@ class RawEditorState extends EditorState
           embedBuilder: widget.embedBuilder,
           inputtingTextRange: _inputtingTextRange(lookup),
           lookupResult: lookup,
+          indentLevelCounts: indentLevelCounts,
         ));
       } else {
         throw StateError('Unreachable.');
@@ -1222,6 +1226,12 @@ class RawEditorState extends EditorState
       return theme.lists.spacing;
     }
   }
+
+  double _indentWidth(StyledNode node) {
+    final indentValue = node.style.get(NotusAttribute.indent)?.value ?? 0.0;
+    return 24.0 * indentValue;
+  }
+
 }
 
 class _Editor extends MultiChildRenderObjectWidget {

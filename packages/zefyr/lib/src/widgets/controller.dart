@@ -267,4 +267,22 @@ class ZefyrController extends ChangeNotifier {
     return endsNewLine;
   }
 
+  // インデント追加
+  void increaseIndentAtSelection() {
+    final hasExclusiveStyle = getSelectionStyle().containsAny(NotusAttribute.exclusives);
+    if (hasExclusiveStyle) return;
+    final indent = getSelectionStyle().get(NotusAttribute.indent);
+    final nextValue = (indent?.value ?? 0) + 1;
+    if (nextValue > 5) return;
+    formatSelection(NotusAttribute.indent.fromInt(nextValue));
+  }
+
+  // インデント削除
+  void decreaseIndentAtSelection() {
+    final indent = getSelectionStyle().get(NotusAttribute.indent);
+    final nextValue = (indent?.value ?? 0) - 1;
+    if (nextValue < 0) return;
+    formatSelection(NotusAttribute.indent.fromInt(nextValue));
+  }
+
 }

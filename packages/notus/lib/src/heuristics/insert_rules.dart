@@ -218,6 +218,53 @@ class AutoExitBlockRule extends InsertRule {
   }
 }
 
+class AutoExitIndentRule extends InsertRule {
+  const AutoExitIndentRule();
+
+  bool isEmptyLine(Operation before, Operation after) {
+    final textBefore = before?.data is String ? before.data as String : '';
+    final textAfter = after.data is String ? after.data as String : '';
+    return (before == null || textBefore.endsWith('\n')) &&
+        textAfter.startsWith('\n');
+  }
+
+  @override
+  Delta apply(Delta document, int index, Object data) {
+    if (data is! String) return null;
+
+    final text = data as String;
+    if (text != '\n') return null;
+
+    final iter = DeltaIterator(document);
+    final previous = iter.skip(index);
+    final target = iter.next();
+
+    final isInIndent = target.isNotPlain &&
+        target.attributes.containsKey(NotusAttribute.indent.key);
+
+    if (!isInIndent) return null;
+    if (!isEmptyLine(previous, target)) return null;
+
+    final indentStyle = target.attributes[NotusAttribute.indent.key];
+    final targetText = target.value as String;
+
+    if (targetText.length > 1) {
+      return null;
+    }
+
+    final nextNewline = _findNextNewline(iter);
+    if (nextNewline.isNotEmpty &&
+        nextNewline.op.attributes != null &&
+        nextNewline.op.attributes[NotusAttribute.indent.key] == indentStyle) {
+      return null;
+    }
+
+    final attributes = target.attributes ?? <String, dynamic>{};
+    attributes.addAll(NotusAttribute.indent.unset.toJson());
+    return Delta()..retain(index)..retain(1, attributes);
+  }
+}
+
 /// Preserves inline styles when user inserts text inside formatted segment.
 class PreserveInlineStylesRule extends InsertRule {
   const PreserveInlineStylesRule();
