@@ -314,9 +314,6 @@ class LineNode extends ContainerNode<LeafNode>
     } // no block-level changes
 
     final blockStyle = newStyle.get(NotusAttribute.block);
-    final indentStyle = newStyle.get(NotusAttribute.indent);
-    // NOTE: なぜかわからないけど、`!NotusAttribute.exclusives.contains(blockStyle)`にすると、箇条書きの時に無駄なスペースができて表示崩れが起きるので
-    final shouldApplyIndent = NotusAttribute.exclusives.contains(blockStyle) && indentStyle != null;
     if (parent is BlockNode) {
       final parentStyle = (parent as BlockNode).style.get(NotusAttribute.block);
       if (blockStyle == NotusAttribute.block.unset) {
@@ -325,9 +322,6 @@ class LineNode extends ContainerNode<LeafNode>
         unwrap();
         final block = BlockNode();
         block.applyAttribute(blockStyle);
-        if (shouldApplyIndent) {
-          block.applyAttribute(indentStyle);
-        }
         wrap(block);
         block.optimize();
       } // else the same style, no-op.
@@ -335,9 +329,6 @@ class LineNode extends ContainerNode<LeafNode>
       // Only wrap with a new block if this is not an unset
       final block = BlockNode();
       block.applyAttribute(blockStyle);
-      if (shouldApplyIndent) {
-        block.applyAttribute(indentStyle);
-      }
       wrap(block);
       block.optimize();
     }
