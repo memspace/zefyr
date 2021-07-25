@@ -192,7 +192,7 @@ class ZefyrThemeData {
           color: Color(0xFF999999),
           height: 1.25,
         ),
-        spacing: VerticalSpacing(top: 24.0, bottom: 0.0),
+        spacing: VerticalSpacing(top: 8.0, bottom: 0.0),
       ),
       lists: TextBlockTheme(
         style: TextStyle(
