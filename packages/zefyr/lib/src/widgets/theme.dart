@@ -230,7 +230,7 @@ class ZefyrThemeData {
         ),
         spacing: VerticalSpacing(top: 16, bottom: 0),
         decoration: BoxDecoration(
-          color: Color(0xffF1F1F1).withOpacity(0.5),
+          color: Color(0xffF1F1F1).withOpacity(0.8),
           border: Border.all(
             color: Color(0xffF1F1F1),
             width: 1,
