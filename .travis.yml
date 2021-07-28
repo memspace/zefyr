@@ -31,6 +31,6 @@ before_script:
 
 script:
 - pwd
-- ./tool/travis.sh notus
+# - ./tool/travis.sh notus
 - ./tool/travis.sh zefyr
 - bash <(curl -s https://codecov.io/bash)
