@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quill_delta/quill_delta.dart';
+import 'package:zefyr/src/widgets/paragraph.dart';
 import 'package:zefyr/zefyr.dart';
 
 import '../testing.dart';
@@ -21,10 +22,9 @@ void main() {
       var theme = ZefyrThemeData(link: TextStyle(color: Colors.red));
       var editor = EditorSandBox(tester: tester, document: doc, theme: theme);
       await editor.pumpAndTap();
-      // await tester.pumpAndSettle();
-      final p = tester.widget(find.byType(RichText).first) as RichText;
-      final text = p.text as TextSpan;
-      expect(text.children?.first.style?.color, Colors.red);
+      final p =
+          tester.widget<ZefyrParagraph>(find.byType(ZefyrParagraph).first);
+      expect(p.text.children?.first.style?.color, Colors.red);
     });
 
     // TODO: Add Icon.keyboard_hide
