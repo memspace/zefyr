@@ -622,10 +622,8 @@ class RenderEditableTextLine extends RenderEditableBox {
 
     if (bottom != null) {
       final bottomConstraints = innerConstraints.copyWith(
-        minWidth:
-            body.size.width + _resolvedPadding.right + _resolvedPadding.left,
-        maxWidth:
-            body.size.width + _resolvedPadding.right + _resolvedPadding.left,
+        minWidth: body.size.width + _resolvedPadding.right + _resolvedPadding.left,
+        maxWidth: body.size.width + _resolvedPadding.right + _resolvedPadding.left,
         maxHeight: body.size.height,
       );
       bottom.layout(bottomConstraints, parentUsesSize: true);
@@ -679,9 +677,11 @@ class RenderEditableTextLine extends RenderEditableBox {
           !_cursorController.style.paintAboveText) {
         _paintCursor(context, effectiveOffset);
       }
-
-      context.paintChild(body, effectiveOffset);
-
+      if (node.style.get(NotusAttribute.block) == NotusAttribute.largeHeading) {
+        context.paintChild(body, effectiveOffset + Offset(0, -4));
+      } else {
+        context.paintChild(body, effectiveOffset);
+      }
       if (hasFocus &&
           _cursorController.showCursor.value &&
           containsCursor &&
