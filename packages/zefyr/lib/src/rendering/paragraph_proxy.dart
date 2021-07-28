@@ -87,5 +87,4 @@ class RenderParagraphProxy extends RenderParagraph
 
   @override
   double get preferredLineHeight => _prototypePainter.preferredLineHeight;
-
 }

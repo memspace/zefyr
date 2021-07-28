@@ -97,9 +97,7 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
         if (padding != null)
           contents = Padding(padding: padding!, child: contents);
         return _SingleChildViewport(
-            offset: offset,
-            clipBehavior: clipBehavior,
-            child: contents);
+            offset: offset, clipBehavior: clipBehavior, child: contents);
       },
     );
     return primary && scrollController != null
@@ -145,7 +143,7 @@ class _RenderSingleChildViewport extends RenderBox
     double cacheExtent = RenderAbstractViewport.defaultCacheExtent,
     RenderBox? child,
     required Clip clipBehavior,
-  })  :_offset = offset,
+  })  : _offset = offset,
         _cacheExtent = cacheExtent,
         _clipBehavior = clipBehavior {
     this.child = child;

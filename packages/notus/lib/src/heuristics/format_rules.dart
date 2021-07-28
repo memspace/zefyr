@@ -49,7 +49,7 @@ class ResolveLineFormatRule extends FormatRule {
       final opText = op.data is String ? op.data as String : '';
       final lf = opText.indexOf('\n');
       if (lf == -1) {
-        result..retain(op.length);
+        result.retain(op.length);
         continue;
       }
       result..retain(lf)..retain(1, attribute.toJson());
@@ -138,7 +138,7 @@ class FormatLinkAtCaretPositionRule extends FormatRule {
       startIndex -= before.length;
       retain = before.length;
     }
-    if (after != null && after.hasAttribute(attribute.key)) {
+    if (after.hasAttribute(attribute.key)) {
       retain += after.length;
     }
     // There is no link-styled text around `index` position so it becomes a

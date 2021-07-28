@@ -161,7 +161,7 @@ class RenderEditableContainerBox extends RenderBox
     required ContainerNode node,
     required TextDirection textDirection,
     required EdgeInsetsGeometry padding,
-  })   : assert(padding.isNonNegative),
+  })  : assert(padding.isNonNegative),
         _node = node,
         _textDirection = textDirection,
         _padding = padding {

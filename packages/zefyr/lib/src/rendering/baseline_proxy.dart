@@ -5,7 +5,7 @@ class RenderBaselineProxy extends RenderProxyBox {
     RenderParagraph? child,
     TextStyle? textStyle,
     required EdgeInsets padding,
-  })   : _prototypePainter = TextPainter(
+  })  : _prototypePainter = TextPainter(
             text: TextSpan(text: ' ', style: textStyle),
             textDirection: TextDirection.ltr,
             strutStyle: textStyle != null

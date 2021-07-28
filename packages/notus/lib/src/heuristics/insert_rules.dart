@@ -100,7 +100,7 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
       // The only scenario we get such operation is when the text is plain.
       assert(after.isPlain);
       // No attributes to apply so we simply create a new line.
-      result..insert('\n');
+      result.insert('\n');
       return result;
     }
     // Continue looking for a newline.
@@ -258,11 +258,6 @@ class PreserveInlineStylesRule extends InsertRule {
       ..retain(index)
       ..insert(text, noLinkAttributes.isEmpty ? null : noLinkAttributes);
     final next = iter.next();
-    // TODO: next is null safe by design => check if legitimate
-    if (next == null) {
-      // Nothing after us, we are not inside link-styled fragment.
-      return noLinkResult;
-    }
     final nextAttributes = next.attributes ?? const <String, dynamic>{};
     if (!nextAttributes.containsKey(NotusAttribute.link.key)) {
       // Next fragment is not styled as link.
@@ -469,11 +464,11 @@ class InsertEmbedsRule extends InsertRule {
     // and insert our embed.
     final lineStyle = _getLineStyle(iter, target);
     if (!isNewlineBefore) {
-      result..insert('\n', lineStyle);
+      result.insert('\n', lineStyle);
     }
-    result..insert(data);
+    result.insert(data);
     if (!isNewlineAfter) {
-      result..insert('\n');
+      result.insert('\n');
     }
     return result;
   }
