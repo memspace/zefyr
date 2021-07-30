@@ -381,16 +381,16 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     final result = editor.widget.controller.document.lookupLine(pos.offset);
     if (result.node == null) return;
     final line = result.node as LineNode;
+    if (line.hasEmbed) {
+      final embed = line.children.single as EmbedNode;
+      editor.widget.onTapEmbedObject(embed.value);
+    }
     final segmentResult = line.lookup(result.offset);
     if (segmentResult.node == null) return;
     final segment = segmentResult.node as LeafNode;
     if (segment.style.contains(NotusAttribute.link) &&
         editor.widget.onLaunchUrl != null) {
       editor.widget.onLaunchUrl(segment.style.get(NotusAttribute.link).value);
-    }
-    if (line.hasEmbed) {
-      final embed = line.children.single as EmbedNode;
-      editor.widget.onTapEmbedObject(embed.value);
     }
   }
 
