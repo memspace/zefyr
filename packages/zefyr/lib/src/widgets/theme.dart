@@ -142,7 +142,7 @@ class ZefyrThemeData {
       textColor: TextStyle(color: Color(0xffFF5555)),
       marker: TextStyle(
         decoration: TextDecoration.underline,
-        decorationColor: Color(0x1A0099DD),
+        decorationColor: Color(0xff0099DD).withOpacity(0.15),
         decorationThickness: 10,
       ),
       link: TextStyle(
@@ -192,7 +192,7 @@ class ZefyrThemeData {
           color: Color(0xFF999999),
           height: 1.25,
         ),
-        spacing: VerticalSpacing(top: 24.0, bottom: 0.0),
+        spacing: VerticalSpacing(top: 8.0, bottom: 0.0),
       ),
       lists: TextBlockTheme(
         style: TextStyle(
@@ -230,7 +230,7 @@ class ZefyrThemeData {
         ),
         spacing: VerticalSpacing(top: 16, bottom: 0),
         decoration: BoxDecoration(
-          color: Color(0xffF1F1F1).withAlpha(50),
+          color: Color(0xffF1F1F1).withOpacity(0.8),
           border: Border.all(
             color: Color(0xffF1F1F1),
             width: 1,

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -1201,9 +1199,11 @@ class RawEditorState extends EditorState
       return theme.heading2.spacing;
     } else if (style == NotusAttribute.heading.level3) {
       return theme.heading3.spacing;
+    } else if (style == NotusAttribute.caption) {
+      return theme.caption.spacing;
+    } else {
+      return theme.paragraph.spacing;
     }
-
-    return theme.paragraph.spacing;
   }
 
   VerticalSpacing _getSpacingForBlock(BlockNode node, ZefyrThemeData theme) {
@@ -1231,7 +1231,6 @@ class RawEditorState extends EditorState
     final indentValue = node.style.get(NotusAttribute.indent)?.value ?? 0.0;
     return 24.0 * indentValue;
   }
-
 }
 
 class _Editor extends MultiChildRenderObjectWidget {
