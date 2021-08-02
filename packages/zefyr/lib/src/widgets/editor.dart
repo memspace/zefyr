@@ -1229,7 +1229,7 @@ class RawEditorState extends EditorState
 
   double _indentWidth(StyledNode node) {
     final indentValue = node.style.get(NotusAttribute.indent)?.value ?? 0.0;
-    return 24.0 * indentValue;
+    return 28.0 * indentValue;
   }
 }
 

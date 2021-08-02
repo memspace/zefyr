@@ -101,14 +101,14 @@ class EditableTextBlock extends StatelessWidget {
         index: index,
         indent: indent,
         style: theme.paragraph.style,
-        width: 25.0,
+        width: 28.0,
         padding: 8.0,
         indentLevelCounts: indentLevelCounts,
       );
     } else if (block == NotusAttribute.block.bulletList) {
       return _BulletPoint(
         style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
-        width: 24,
+        width: 28,
       );
     } else if (block == NotusAttribute.largeHeading) {
       return Row(
@@ -142,7 +142,7 @@ class EditableTextBlock extends StatelessWidget {
     final block = node.style.get(NotusAttribute.block);
     if (block == NotusAttribute.block.bulletList || block == NotusAttribute.block.numberList) {
       final indentValue = node.style.get(NotusAttribute.indent)?.value ?? 0.0;
-      return 24.0 * indentValue;
+      return 28.0 * indentValue;
     } else {
       return 0.0;
     }
