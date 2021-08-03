@@ -10,6 +10,8 @@ import 'scope.dart';
 import 'theme.dart';
 import 'toolbar.dart';
 
+const List<String> _kSchemes = ['http', 'https', 'tel', 'whatsapp', 'mailto'];
+
 /// A button used in [ZefyrToolbar].
 ///
 /// Create an instance of this widget with [ZefyrButton.icon] or
@@ -361,10 +363,10 @@ class _LinkButtonState extends State<LinkButton> {
       if (_inputController.text.isNotEmpty) {
         try {
           var uri = Uri.parse(_inputController.text);
-          if ((uri.isScheme('https') || uri.isScheme('http')) &&
-              uri.host.isNotEmpty) {
+          if (_kSchemes.contains(uri.scheme) && uri.host.isNotEmpty) {
             toolbar.editor.formatSelection(
-                NotusAttribute.link.fromString(_inputController.text));
+              NotusAttribute.link.fromString(_inputController.text),
+            );
           } else {
             error = true;
           }
