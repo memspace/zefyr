@@ -5,7 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/gestures.dart';
 import 'package:notus/notus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'editable_box.dart';
 import 'horizontal_rule.dart';
@@ -36,6 +38,13 @@ class ZefyrLine extends StatefulWidget {
 
 class _ZefyrLineState extends State<ZefyrLine> {
   final LayerLink _link = LayerLink();
+  TapGestureRecognizer _recognizer;
+
+  @override
+  void dispose() {
+    _recognizer?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +139,24 @@ class _ZefyrLineState extends State<ZefyrLine> {
   TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme) {
     final TextNode segment = node;
     final attrs = segment.style;
+
+    if (attrs.contains(NotusAttribute.link)) {
+      _recognizer ??= TapGestureRecognizer();
+
+      _recognizer.onTap = () async {
+        final url = attrs.value(NotusAttribute.link);
+
+        await canLaunch(url).then((isOk) {
+          if (isOk) launch(url);
+        });
+      };
+
+      return TextSpan(
+        text: segment.value,
+        style: _getTextStyle(attrs, theme),
+        recognizer: _recognizer,
+      );
+    }
 
     return TextSpan(
       text: segment.value,
