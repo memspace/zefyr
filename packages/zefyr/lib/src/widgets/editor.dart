@@ -280,7 +280,7 @@ class _ZefyrEditorState extends State<ZefyrEditor>
     final child = RawEditor(
       key: _editorKey,
       controller: widget.controller,
-      focusNode: widget.focusNode!,
+      focusNode: widget.focusNode,
       scrollController: widget.scrollController,
       scrollable: widget.scrollable,
       padding: widget.padding,
@@ -451,7 +451,7 @@ class RawEditor extends StatefulWidget {
   RawEditor({
     Key? key,
     required this.controller,
-    required this.focusNode,
+    this.focusNode,
     this.scrollController,
     this.scrollable = true,
     this.padding = EdgeInsets.zero,
@@ -495,7 +495,7 @@ class RawEditor extends StatefulWidget {
 
   //TODO: Make it optional and create an instance if it's null
   /// Controls whether this editor has keyboard focus.
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
 
   final ScrollController? scrollController;
 
@@ -672,6 +672,8 @@ abstract class EditorState extends State<RawEditor> {
 
   void userUpdateTextEditingValue(
       TextEditingValue value, SelectionChangedCause cause) {}
+
+  FocusNode get effectiveFocusNode;
 }
 
 class RawEditorState extends EditorState
@@ -712,10 +714,15 @@ class RawEditorState extends EditorState
   bool _didAutoFocus = false;
   FocusAttachment? _focusAttachment;
 
-  bool get _hasFocus => widget.focusNode.hasFocus;
+  FocusNode? _focusNode;
 
   @override
-  bool get wantKeepAlive => widget.focusNode.hasFocus;
+  FocusNode get effectiveFocusNode => widget.focusNode ?? (_focusNode ??= FocusNode());
+
+  bool get _hasFocus => effectiveFocusNode.hasFocus;
+
+  @override
+  bool get wantKeepAlive => effectiveFocusNode.hasFocus;
 
   TextDirection get _textDirection {
     final result = Directionality.maybeOf(context);
@@ -743,7 +750,7 @@ class RawEditorState extends EditorState
     if (_hasFocus) {
       openConnectionIfNeeded();
     } else {
-      widget.focusNode.requestFocus();
+      effectiveFocusNode.requestFocus();
     }
   }
 
@@ -807,9 +814,9 @@ class RawEditorState extends EditorState
     );
 
     // Focus
-    _focusAttachment = widget.focusNode.attach(context,
+    _focusAttachment = effectiveFocusNode.attach(context,
         onKey: (node, event) => _keyboardListener.handleKeyEvent(event));
-    widget.focusNode.addListener(_handleFocusChanged);
+    effectiveFocusNode.addListener(_handleFocusChanged);
   }
 
   @override
@@ -822,7 +829,7 @@ class RawEditorState extends EditorState
         : fallbackTheme;
 
     if (!_didAutoFocus && widget.autofocus) {
-      FocusScope.of(context).autofocus(widget.focusNode);
+      FocusScope.of(context).autofocus(effectiveFocusNode);
       _didAutoFocus = true;
     }
   }
@@ -853,11 +860,11 @@ class RawEditorState extends EditorState
     }
 
     if (widget.focusNode != oldWidget.focusNode) {
-      oldWidget.focusNode.removeListener(_handleFocusChanged);
+      oldWidget.focusNode?.removeListener(_handleFocusChanged);
       _focusAttachment?.detach();
-      _focusAttachment = widget.focusNode.attach(context,
+      _focusAttachment = effectiveFocusNode.attach(context,
           onKey: (node, event) => _keyboardListener.handleKeyEvent(event));
-      widget.focusNode.addListener(_handleFocusChanged);
+      effectiveFocusNode.addListener(_handleFocusChanged);
       updateKeepAlive();
     }
 
@@ -893,7 +900,8 @@ class RawEditorState extends EditorState
     _selectionOverlay?.dispose();
     _selectionOverlay = null;
     widget.controller.removeListener(_didChangeTextEditingValue);
-    widget.focusNode.removeListener(_handleFocusChanged);
+    effectiveFocusNode.removeListener(_handleFocusChanged);
+    _focusNode?.dispose();
     _focusAttachment!.detach();
     _cursorController.dispose();
     _clipboardStatus?.removeListener(_onChangedClipboardStatus);
