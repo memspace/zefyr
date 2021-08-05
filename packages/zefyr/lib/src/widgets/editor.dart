@@ -717,7 +717,7 @@ class RawEditorState extends EditorState
   FocusNode? _focusNode;
 
   @override
-  FocusNode get effectiveFocusNode => widget.focusNode ?? (_focusNode ??= FocusNode());
+  FocusNode get effectiveFocusNode => widget.focusNode ?? _focusNode!;
 
   bool get _hasFocus => effectiveFocusNode.hasFocus;
 
@@ -793,6 +793,8 @@ class RawEditorState extends EditorState
     _scrollController = widget.scrollController ?? ScrollController();
     _scrollController!.addListener(_updateSelectionOverlayForScroll);
 
+    _createInternalFocusNodeIfRequired();
+
     // Cursor
     _cursorController = CursorController(
       showCursor: ValueNotifier<bool>(widget.showCursor),
@@ -839,6 +841,12 @@ class RawEditorState extends EditorState
         !widget.controller.selection.isCollapsed;
   }
 
+  void _createInternalFocusNodeIfRequired() {
+    if (widget.focusNode != null) {
+      _focusNode ??= FocusNode();
+    }
+  }
+
   @override
   void didUpdateWidget(RawEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -861,6 +869,10 @@ class RawEditorState extends EditorState
 
     if (widget.focusNode != oldWidget.focusNode) {
       oldWidget.focusNode?.removeListener(_handleFocusChanged);
+      if (_focusNode != null && widget.focusNode != null) {
+        _focusNode?.dispose();
+      }
+      _createInternalFocusNodeIfRequired();
       _focusAttachment?.detach();
       _focusAttachment = effectiveFocusNode.attach(context,
           onKey: (node, event) => _keyboardListener.handleKeyEvent(event));
