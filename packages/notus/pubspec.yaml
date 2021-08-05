@@ -9,7 +9,7 @@ environment:
 
 dependencies:
   collection: ^1.15.0
-  quill_delta: ^3.0.0-nullsafety.0
+  quill_delta: ^3.0.0-nullsafety.1
   quiver: ^3.0.1
 
 dev_dependencies:
