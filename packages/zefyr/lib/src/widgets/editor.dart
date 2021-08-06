@@ -493,7 +493,6 @@ class RawEditor extends StatefulWidget {
   /// Controls the document being edited.
   final ZefyrController controller;
 
-  //TODO: Make it optional and create an instance if it's null
   /// Controls whether this editor has keyboard focus.
   final FocusNode? focusNode;
 
@@ -793,7 +792,7 @@ class RawEditorState extends EditorState
     _scrollController = widget.scrollController ?? ScrollController();
     _scrollController!.addListener(_updateSelectionOverlayForScroll);
 
-    _createInternalFocusNodeIfRequired();
+    _createInternalFocusNodeIfNeeded();
 
     // Cursor
     _cursorController = CursorController(
@@ -841,7 +840,7 @@ class RawEditorState extends EditorState
         !widget.controller.selection.isCollapsed;
   }
 
-  void _createInternalFocusNodeIfRequired() {
+  void _createInternalFocusNodeIfNeeded() {
     if (widget.focusNode != null) {
       _focusNode ??= FocusNode();
     }
@@ -869,10 +868,10 @@ class RawEditorState extends EditorState
 
     if (widget.focusNode != oldWidget.focusNode) {
       oldWidget.focusNode?.removeListener(_handleFocusChanged);
-      if (_focusNode != null && widget.focusNode != null) {
-        _focusNode?.dispose();
-      }
-      _createInternalFocusNodeIfRequired();
+      _focusNode?.removeListener(_handleFocusChanged);
+      _focusNode?.dispose();
+      _focusNode = null;
+      _createInternalFocusNodeIfNeeded();
       _focusAttachment?.detach();
       _focusAttachment = effectiveFocusNode.attach(context,
           onKey: (node, event) => _keyboardListener.handleKeyEvent(event));
