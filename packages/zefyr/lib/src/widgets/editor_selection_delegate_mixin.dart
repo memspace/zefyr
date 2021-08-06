@@ -25,7 +25,8 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
   }
 
   @override
-  void userUpdateTextEditingValue(TextEditingValue value, SelectionChangedCause cause) {
+  void userUpdateTextEditingValue(
+      TextEditingValue value, SelectionChangedCause cause) {
     textEditingValue = value;
   }
 

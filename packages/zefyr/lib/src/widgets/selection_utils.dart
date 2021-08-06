@@ -41,7 +41,8 @@ int _selectionPointRestrict(int base, int extent, int point) {
 }
 
 // Returns a selection that is trimmed if necessary to be between base and extent
-TextSelection? selectionRestrict(int base, int extent, TextSelection selection) {
+TextSelection? selectionRestrict(
+    int base, int extent, TextSelection selection) {
   if (!selectionIntersectsWith(base, extent, selection)) {
     return null;
   }
