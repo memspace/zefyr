@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/util.dart';
 
 import 'editor.dart';
 
@@ -12,8 +13,20 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
 
   @override
   set textEditingValue(TextEditingValue value) {
+    final cursorPosition = value.selection.extentOffset;
+    final oldText = widget.controller.document.toPlainText();
+    final newText = value.text;
+    final diff = fastDiff(oldText, newText, cursorPosition);
+    widget.controller.replaceText(
+        diff.start, diff.deleted.length, diff.inserted,
+        selection: value.selection);
     widget.controller
         .updateSelection(value.selection, source: ChangeSource.local);
+  }
+
+  @override
+  void userUpdateTextEditingValue(TextEditingValue value, SelectionChangedCause cause) {
+    textEditingValue = value;
   }
 
   @override
