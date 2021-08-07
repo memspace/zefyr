@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:notus/notus.dart';
 import 'package:zefyr/util.dart';
 
 import 'editor.dart';
@@ -20,8 +19,6 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
     widget.controller.replaceText(
         diff.start, diff.deleted.length, diff.inserted,
         selection: value.selection);
-    widget.controller
-        .updateSelection(value.selection, source: ChangeSource.local);
   }
 
   @override
