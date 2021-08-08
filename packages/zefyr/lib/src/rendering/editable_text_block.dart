@@ -3,9 +3,9 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
-import 'package:zefyr/src/rendering/cursor_painter.dart';
 
 import '../widgets/selection_utils.dart';
+import 'cursor_painter.dart';
 import 'editable_box.dart';
 
 // TODO: Move contentPadding to RenderEditableContainerBox as having it here is a bit  messy.
@@ -120,8 +120,7 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
 
   @override
   TextPosition? globalToLocalPosition(TextPosition position) {
-    if (position.offset < node.documentOffset ||
-        position.offset > node.documentOffset + node.length) return null;
+    if (node.containsOffset(position.offset)) return null;
     return TextPosition(
       offset: position.offset - node.documentOffset,
       affinity: position.affinity,

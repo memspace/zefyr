@@ -249,8 +249,7 @@ class RenderEditableTextLine extends RenderEditableBox {
 
   @override
   TextPosition? globalToLocalPosition(TextPosition position) {
-    if (position.offset < node.documentOffset ||
-        position.offset > node.documentOffset + node.length) return null;
+    if (node.containsOffset(position.offset)) return null;
     return TextPosition(
       offset: position.offset - node.documentOffset,
       affinity: position.affinity,
