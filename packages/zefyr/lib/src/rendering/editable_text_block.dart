@@ -5,7 +5,6 @@ import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
 
 import '../widgets/selection_utils.dart';
-import 'cursor_painter.dart';
 import 'editable_box.dart';
 
 // TODO: Move contentPadding to RenderEditableContainerBox as having it here is a bit  messy.
@@ -92,11 +91,6 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
   }
 
   @override
-  CursorPainter? get cursorPainter {
-    return null;
-  }
-
-  @override
   Offset getOffsetForCaret(TextPosition position) {
     final child = childAtPosition(position);
     final localPosition = TextPosition(
@@ -120,7 +114,7 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
 
   @override
   TextPosition? globalToLocalPosition(TextPosition position) {
-    if (node.containsOffset(position.offset)) return null;
+    if (!node.containsOffset(position.offset)) return null;
     return TextPosition(
       offset: position.offset - node.documentOffset,
       affinity: position.affinity,

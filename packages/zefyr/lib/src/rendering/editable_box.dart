@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:notus/notus.dart';
 
-import 'cursor_painter.dart';
-
 /// A common interface to render boxes which represent a piece of rich text
 /// content.
 ///
@@ -138,8 +136,6 @@ abstract class RenderEditableBox extends RenderBox {
   /// Returns the [Rect] in local coordinates for the caret at the given text
   /// position.
   Rect getLocalRectForCaret(TextPosition position);
-
-  CursorPainter? get cursorPainter;
 }
 
 class EditableContainerParentData

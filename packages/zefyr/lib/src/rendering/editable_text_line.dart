@@ -249,7 +249,7 @@ class RenderEditableTextLine extends RenderEditableBox {
 
   @override
   TextPosition? globalToLocalPosition(TextPosition position) {
-    if (node.containsOffset(position.offset)) return null;
+    if (!node.containsOffset(position.offset)) return null;
     return TextPosition(
       offset: position.offset - node.documentOffset,
       affinity: position.affinity,
@@ -643,8 +643,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     _computeCaretPrototype();
   }
 
-  @override
-  CursorPainter get cursorPainter => CursorPainter(
+  CursorPainter get _cursorPainter => CursorPainter(
         editable: body!,
         style: _cursorController.style,
         cursorPrototype: _caretPrototype,
@@ -705,7 +704,7 @@ class RenderEditableTextLine extends RenderEditableBox {
       offset: selection.extentOffset - node.documentOffset,
       affinity: selection.base.affinity,
     );
-    cursorPainter.paint(context.canvas, effectiveOffset, position);
+    _cursorPainter.paint(context.canvas, effectiveOffset, position);
   }
 
 // End render box overrides
