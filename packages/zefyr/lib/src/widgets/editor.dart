@@ -701,11 +701,11 @@ class RawEditorState extends EditorState
   // Selection overlay
   @override
   EditorTextSelectionOverlay? get selectionOverlay => _selectionOverlay;
-
   EditorTextSelectionOverlay? _selectionOverlay;
 
   @override
-  late ScrollController scrollController;
+  ScrollController get scrollController => _scrollController;
+  late ScrollController _scrollController;
 
   final ClipboardStatusNotifier? _clipboardStatus =
       kIsWeb ? null : ClipboardStatusNotifier();
@@ -792,8 +792,8 @@ class RawEditorState extends EditorState
 
     widget.controller.addListener(_didChangeTextEditingValue);
 
-    scrollController = widget.scrollController ?? ScrollController();
-    scrollController.addListener(_updateSelectionOverlayForScroll);
+    _scrollController = widget.scrollController ?? ScrollController();
+    _scrollController.addListener(_updateSelectionOverlayForScroll);
 
     _createInternalFocusNodeIfNeeded();
 
@@ -863,10 +863,10 @@ class RawEditorState extends EditorState
     }
 
     if (widget.scrollController != null &&
-        widget.scrollController != scrollController) {
-      scrollController.removeListener(_updateSelectionOverlayForScroll);
-      scrollController = widget.scrollController!;
-      scrollController.addListener(_updateSelectionOverlayForScroll);
+        widget.scrollController != _scrollController) {
+      _scrollController.removeListener(_updateSelectionOverlayForScroll);
+      _scrollController = widget.scrollController!;
+      _scrollController.addListener(_updateSelectionOverlayForScroll);
     }
 
     if (widget.focusNode != oldWidget.focusNode) {
@@ -1048,16 +1048,16 @@ class RawEditorState extends EditorState
       final viewport = RenderAbstractViewport.of(renderEditor)!;
       final editorOffset =
           renderEditor.localToGlobal(Offset(0.0, 0.0), ancestor: viewport);
-      final offsetInViewport = scrollController.offset + editorOffset.dy;
+      final offsetInViewport = _scrollController.offset + editorOffset.dy;
 
       final offset = renderEditor.getOffsetToRevealCursor(
-        scrollController.position.viewportDimension,
-        scrollController.offset,
+        _scrollController.position.viewportDimension,
+        _scrollController.offset,
         offsetInViewport,
       );
 
       if (offset != null) {
-        scrollController.animateTo(
+        _scrollController.animateTo(
           offset,
           duration: _caretAnimationDuration,
           curve: _caretAnimationCurve,
@@ -1112,7 +1112,7 @@ class RawEditorState extends EditorState
         textStyle: _themeData.paragraph.style,
         padding: baselinePadding,
         child: SingleChildScrollView(
-          controller: scrollController,
+          controller: _scrollController,
           physics: widget.scrollPhysics,
           child: child,
         ),
