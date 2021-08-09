@@ -575,8 +575,7 @@ class RenderEditor extends RenderEditableContainerBox
     final targetChild = childAtPosition(position);
     final localPosition = targetChild.globalToLocalPosition(position);
 
-    assert(localPosition != null);
-    final childLocalRect = targetChild.getLocalRectForCaret(localPosition!);
+    final childLocalRect = targetChild.getLocalRectForCaret(localPosition);
 
     final boxParentData = targetChild.parentData as BoxParentData;
     return childLocalRect.shift(Offset(0, boxParentData.offset.dy));
