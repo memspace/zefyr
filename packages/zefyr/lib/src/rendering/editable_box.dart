@@ -62,6 +62,11 @@ abstract class RenderEditableBox extends RenderBox {
   /// Valid only after [layout].
   TextPosition getPositionForOffset(Offset offset);
 
+  /// Returns the position relative to the [node] content
+  ///
+  /// The `position` must be within the [node] content
+  TextPosition globalToLocalPosition(TextPosition position);
+
   /// Returns the position within the text which is on the line above the given
   /// `position`.
   ///
@@ -128,6 +133,10 @@ abstract class RenderEditableBox extends RenderBox {
   /// The `selection` parameter is expected to be in local offsets to this
   /// render object's [node].
   TextSelectionPoint getExtentEndpointForSelection(TextSelection selection);
+
+  /// Returns the [Rect] in local coordinates for the caret at the given text
+  /// position.
+  Rect getLocalRectForCaret(TextPosition position);
 }
 
 class EditableContainerParentData

@@ -101,6 +101,26 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
     return child.getOffsetForCaret(localPosition) + parentData.offset;
   }
 
+  @override
+  Rect getLocalRectForCaret(TextPosition position) {
+    final child = childAtPosition(position);
+    final localPosition = TextPosition(
+      offset: position.offset - child.node.offset,
+      affinity: position.affinity,
+    );
+    final parentData = child.parentData as BoxParentData;
+    return child.getLocalRectForCaret(localPosition).shift(parentData.offset);
+  }
+
+  @override
+  TextPosition globalToLocalPosition(TextPosition position) {
+    assert(node.containsOffset(position.offset), 'The provided text position is not in the current node');
+    return TextPosition(
+      offset: position.offset - node.documentOffset,
+      affinity: position.affinity,
+    );
+  }
+
   /// This method unlike [RenderEditor.getPositionForOffset] expects the
   /// `offset` parameter to be local to the coordinate system of this render
   /// object.

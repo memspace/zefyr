@@ -236,6 +236,27 @@ class RenderEditableTextLine extends RenderEditableBox {
         parentData.offset;
   }
 
+  @override
+  Rect getLocalRectForCaret(TextPosition position) {
+    final caretOffset = getOffsetForCaret(position);
+    var rect =
+        Rect.fromLTWH(0.0, 0.0, cursorWidth, cursorHeight).shift(caretOffset);
+    final cursorOffset = _cursorController.style.offset;
+    // Add additional cursor offset (generally only if on iOS).
+    if (cursorOffset != null) rect = rect.shift(cursorOffset);
+    return rect;
+  }
+
+  @override
+  TextPosition globalToLocalPosition(TextPosition position) {
+    assert(node.containsOffset(position.offset),
+        'The provided text position is not in the current node');
+    return TextPosition(
+      offset: position.offset - node.documentOffset,
+      affinity: position.affinity,
+    );
+  }
+
   /// The [offset] parameter is expected to be local coordinates of this render
   /// object.
   @override

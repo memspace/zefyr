@@ -26,6 +26,11 @@ abstract class RenderAbstractEditor {
 
   TextPosition getPositionForOffset(Offset offset);
 
+  /// Returns [Rect] for caret in local coordinates
+  ///
+  /// Useful to enforce visibility of full caret at given position
+  Rect getLocalRectForCaret(TextPosition position);
+
   /// Returns the local coordinates of the endpoints of the given selection.
   ///
   /// If the selection is collapsed (and therefore occupies a single point), the
@@ -233,8 +238,8 @@ class RenderEditor extends RenderEditableContainerBox
     if (endpoints.length == 1) {
       // Collapsed selection => caret
       final child = childAtPosition(selection.extent);
-      final childPosition =
-          TextPosition(offset: selection.extentOffset - child.node.offset);
+      final childPosition = TextPosition(
+          offset: selection.extentOffset - child.node.documentOffset);
       final caretTop = endpoints.single.point.dy -
           child.preferredLineHeight(childPosition) -
           kMargin +
@@ -563,5 +568,16 @@ class RenderEditor extends RenderEditableContainerBox
       offset: localPosition.offset + child.node.offset,
       affinity: localPosition.affinity,
     );
+  }
+
+  @override
+  Rect getLocalRectForCaret(TextPosition position) {
+    final targetChild = childAtPosition(position);
+    final localPosition = targetChild.globalToLocalPosition(position);
+
+    final childLocalRect = targetChild.getLocalRectForCaret(localPosition);
+
+    final boxParentData = targetChild.parentData as BoxParentData;
+    return childLocalRect.shift(Offset(0, boxParentData.offset.dy));
   }
 }
