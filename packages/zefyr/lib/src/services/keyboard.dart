@@ -64,24 +64,24 @@ final Set<LogicalKeyboardKey> _interestingKeys = <LogicalKeyboardKey>{
 };
 
 /// Keyboard listener for editable widgets.
-class KeyboardListener {
+class KeyboardEventHandler {
   final CursorMovementCallback onCursorMovement;
   final InputShortcutCallback onShortcut;
   final OnDeleteCallback onDelete;
 
-  KeyboardListener({
+  KeyboardEventHandler({
     required this.onCursorMovement,
     required this.onShortcut,
     required this.onDelete,
   });
 
-  bool handleKeyEvent(RawKeyEvent keyEvent) {
+  KeyEventResult handleKeyEvent(RawKeyEvent keyEvent) {
     if (kIsWeb) {
       // On web platform, we should ignore the key because it's processed already.
-      return false;
+      return KeyEventResult.ignored;
     }
 
-    if (keyEvent is! RawKeyDownEvent) return false;
+    if (keyEvent is! RawKeyDownEvent) return KeyEventResult.ignored;
 
     final Set<LogicalKeyboardKey> keysPressed =
         LogicalKeyboardKey.collapseSynonyms(RawKeyboard.instance.keysPressed);
@@ -97,7 +97,7 @@ class KeyboardListener {
       // If the most recently pressed key isn't a non-modifier key, or more than
       // one non-modifier key is down, or keys other than the ones we're interested in
       // are pressed, just ignore the keypress.
-      return false;
+      return KeyEventResult.ignored;
     }
 
     final bool isWordModifierPressed =
@@ -124,8 +124,8 @@ class KeyboardListener {
     } else if (key == LogicalKeyboardKey.backspace) {
       onDelete(false);
     } else {
-      return false;
+      return KeyEventResult.ignored;
     }
-    return true;
+    return KeyEventResult.handled;
   }
 }

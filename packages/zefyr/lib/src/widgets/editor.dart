@@ -696,7 +696,7 @@ class RawEditorState extends EditorState
   FloatingCursorController? _floatingCursorController;
 
   // Keyboard
-  late KeyboardListener _keyboardListener;
+  late KeyboardEventHandler _keyboardListener;
 
   // Selection overlay
   @override
@@ -811,7 +811,7 @@ class RawEditorState extends EditorState
     );
 
     // Keyboard
-    _keyboardListener = KeyboardListener(
+    _keyboardListener = KeyboardEventHandler(
       onCursorMovement: handleCursorMovement,
       onShortcut: handleShortcut,
       onDelete: handleDelete,
