@@ -1155,13 +1155,24 @@ class RawEditorState extends EditorState
     );
   }
 
+  TextDirection getTextDirectionForStyledNode(StyledNode node){
+    final preferredDirection = node.style.get(NotusAttribute.direction);
+    if (preferredDirection == NotusAttribute.rtl) {
+      return TextDirection.rtl;
+    } else if (preferredDirection == NotusAttribute.ltr) {
+      return TextDirection.ltr;
+    }
+    return _textDirection;
+  }
+
   List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
     for (final node in widget.controller.document.root.children) {
       if (node is LineNode) {
+        final textDirection = getTextDirectionForStyledNode(node);
         result.add(EditableTextLine(
           node: node,
-          textDirection: _textDirection,
+          textDirection: textDirection,
           indentWidth: 0,
           spacing: _getSpacingForLine(node, _themeData),
           cursorController: _cursorController,
@@ -1170,17 +1181,18 @@ class RawEditorState extends EditorState
           enableInteractiveSelection: widget.enableInteractiveSelection,
           body: TextLine(
             node: node,
-            textDirection: _textDirection,
             embedBuilder: widget.embedBuilder,
+            textDirection: textDirection,
           ),
           hasFocus: _hasFocus,
           devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         ));
       } else if (node is BlockNode) {
         final block = node.style.get(NotusAttribute.block);
+        final textDirection = getTextDirectionForStyledNode(node);
         result.add(EditableTextBlock(
           node: node,
-          textDirection: _textDirection,
+          textDirection: textDirection,
           spacing: _getSpacingForBlock(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,

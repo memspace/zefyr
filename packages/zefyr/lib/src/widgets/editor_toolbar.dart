@@ -386,20 +386,22 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
 
   const ZefyrToolbar({Key? key, required this.children}) : super(key: key);
 
-  factory ZefyrToolbar.basic(
-      {Key? key,
-      required ZefyrController controller,
-      bool hideBoldButton = false,
-      bool hideItalicButton = false,
-      bool hideUnderLineButton = false,
-      bool hideStrikeThrough = false,
-      bool hideHeadingStyle = false,
-      bool hideListNumbers = false,
-      bool hideListBullets = false,
-      bool hideCodeBlock = false,
-      bool hideQuote = false,
-      bool hideLink = false,
-      bool hideHorizontalRule = false}) {
+  factory ZefyrToolbar.basic({
+    Key? key,
+    required ZefyrController controller,
+    bool hideBoldButton = false,
+    bool hideItalicButton = false,
+    bool hideUnderLineButton = false,
+    bool hideStrikeThrough = false,
+    bool hideHeadingStyle = false,
+    bool hideListNumbers = false,
+    bool hideListBullets = false,
+    bool hideCodeBlock = false,
+    bool hideQuote = false,
+    bool hideLink = false,
+    bool hideHorizontalRule = false,
+    bool hideDirection = false,
+  }) {
     return ZefyrToolbar(key: key, children: [
       Visibility(
         visible: !hideBoldButton,
@@ -433,6 +435,27 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
         child: ToggleStyleButton(
           attribute: NotusAttribute.strikethrough,
           icon: Icons.format_strikethrough,
+          controller: controller,
+        ),
+      ),
+      Visibility(
+          visible: !hideDirection,
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+      Visibility(
+        visible: !hideDirection,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.ltr,
+          icon: Icons.format_textdirection_l_to_r,
+          controller: controller,
+        ),
+      ),
+      SizedBox(width: 1),
+      Visibility(
+        visible: !hideDirection,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.rtl,
+          icon: Icons.format_textdirection_r_to_l,
           controller: controller,
         ),
       ),

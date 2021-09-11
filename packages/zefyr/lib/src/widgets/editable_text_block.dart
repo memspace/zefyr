@@ -49,6 +49,16 @@ class EditableTextBlock extends StatelessWidget {
     );
   }
 
+  TextDirection getTextDirectionForNode(BuildContext context, StyledNode node) {
+    final preferredDirection = node.style.get(NotusAttribute.direction);
+    if (preferredDirection == NotusAttribute.rtl) {
+      return TextDirection.rtl;
+    } else if (preferredDirection == NotusAttribute.ltr) {
+      return TextDirection.ltr;
+    }
+    return Directionality.of(context);
+  }
+
   List<Widget> _buildChildren(BuildContext context) {
     final theme = ZefyrTheme.of(context)!;
     final count = node.children.length;
@@ -56,17 +66,19 @@ class EditableTextBlock extends StatelessWidget {
     var index = 0;
     for (final line in node.children) {
       index++;
+      final nodeTextDirection =
+          getTextDirectionForNode(context, line as LineNode);
       children.add(EditableTextLine(
-        node: line as LineNode,
-        textDirection: textDirection,
+        node: line,
+        textDirection: nodeTextDirection,
         spacing: _getSpacingForLine(line, index, count, theme),
         leading: _buildLeading(context, line, index, count),
         indentWidth: _getIndentWidth(),
         devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         body: TextLine(
           node: line,
-          textDirection: textDirection,
           embedBuilder: embedBuilder,
+          textDirection: nodeTextDirection,
         ),
         cursorController: cursorController,
         selection: selection,
