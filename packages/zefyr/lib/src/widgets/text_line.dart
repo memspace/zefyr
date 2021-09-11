@@ -40,7 +40,7 @@ class TextLine extends StatelessWidget {
       strutStyle: strutStyle,
       locale: Localizations.maybeLocaleOf(context),
       child: RichText(
-        text: buildText(context, node),
+        text: text,
         textAlign: textAlign,
         strutStyle: strutStyle,
         textScaleFactor: MediaQuery.textScaleFactorOf(context),
