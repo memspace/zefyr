@@ -52,16 +52,16 @@ class EditableTextBlock extends StatelessWidget {
   List<Widget> _buildChildren(BuildContext context) {
     final theme = ZefyrTheme.of(context)!;
     final count = node.children.length;
+    final leadingWidgets = _buildLeading(theme, node.children.toList());
     final children = <Widget>[];
     var index = 0;
     for (final line in node.children) {
-      index++;
       children.add(EditableTextLine(
         node: line as LineNode,
         textDirection: textDirection,
         spacing: _getSpacingForLine(line, index, count, theme),
-        leading: _buildLeading(context, line, index, count),
-        indentWidth: _getIndentWidth(),
+        leading: leadingWidgets?[index],
+        indentWidth: _getIndentWidth(line),
         devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         body: TextLine(
           node: line,
@@ -74,50 +74,94 @@ class EditableTextBlock extends StatelessWidget {
         enableInteractiveSelection: enableInteractiveSelection,
         hasFocus: hasFocus,
       ));
+      index++;
     }
     return children.toList(growable: false);
   }
 
-  Widget? _buildLeading(
-      BuildContext context, LineNode node, int index, int count) {
-    final theme = ZefyrTheme.of(context)!;
+  List<Widget>? _buildLeading(ZefyrThemeData theme, List<Node> children) {
     final block = node.style.get(NotusAttribute.block);
     if (block == NotusAttribute.block.numberList) {
-      return _NumberPoint(
-        index: index,
-        count: count,
-        style: theme.paragraph.style,
-        width: 32.0,
-        padding: 8.0,
-      );
+      return _getNumberPointsForNumberList(theme, children);
     } else if (block == NotusAttribute.block.bulletList) {
-      return _BulletPoint(
-        style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
-        width: 32,
-      );
+      return _getBulletPointForBulletList(theme, children);
     } else if (block == NotusAttribute.block.code) {
-      return _NumberPoint(
-        index: index,
-        count: count,
-        style: theme.code.style
-            .copyWith(color: theme.code.style.color?.withOpacity(0.4)),
-        width: 32.0,
-        padding: 16.0,
-        withDot: false,
-      );
+      return _getNumberPointsForCodeBlock(theme, children);
     } else {
       return null;
     }
   }
 
-  double _getIndentWidth() {
+  List<Widget> _getBulletPointForBulletList(
+          ZefyrThemeData theme, List<Node> children) =>
+      children
+          .map((_) => _BulletPoint(
+                style:
+                    theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
+                width: 32,
+              ))
+          .toList();
+
+  List<Widget> _getNumberPointsForCodeBlock(
+      ZefyrThemeData theme, List<Node> children) {
+    final leadingWidgets = <Widget>[];
+    children.forEach((element) {
+      leadingWidgets.add(_NumberPoint(
+        index: leadingWidgets.length,
+        style: theme.code.style
+            .copyWith(color: theme.code.style.color?.withOpacity(0.4)),
+        width: 32.0,
+        padding: 16.0,
+        withDot: false,
+      ));
+    });
+    return leadingWidgets;
+  }
+
+  List<Widget> _getNumberPointsForNumberList(
+      ZefyrThemeData theme, List<Node> children) {
+    final leadingWidgets = <Widget>[];
+    final levels = <int>[];
+    final indexes = <int>[];
+    children.forEach((element) {
+      final currentLevel =
+          (element as LineNode).style.get(NotusAttribute.indent)?.value ?? 0;
+      var currentIndex = 0;
+
+      if (leadingWidgets.isNotEmpty) {
+        if (levels.last == currentLevel) {
+          currentIndex = indexes.last + 1;
+        } else if (levels.last > currentLevel) {
+          final lastIndex =
+              levels.lastIndexWhere((element) => element == currentLevel);
+          if (lastIndex != -1) {
+            currentIndex = indexes[lastIndex] + 1;
+          }
+        }
+      }
+
+      leadingWidgets.add(_NumberPoint(
+        index: currentIndex,
+        style: theme.paragraph.style,
+        width: 32.0,
+        padding: 8.0,
+      ));
+      levels.add(currentLevel);
+      indexes.add(currentIndex);
+    });
+    return leadingWidgets;
+  }
+
+  double _getIndentWidth(LineNode line) {
     final block = node.style.get(NotusAttribute.block);
+
+    final indentationLevel = line.style.get(NotusAttribute.indent)?.value ?? 0;
+    var extraIndent = indentationLevel * 16;
+
     if (block == NotusAttribute.block.quote) {
-      return 16.0;
-    } else if (block == NotusAttribute.block.code) {
-      return 32.0;
+      return extraIndent + 16.0;
     } else {
-      return 32.0;
+      return extraIndent + 32.0;
     }
   }
 
@@ -156,11 +200,11 @@ class EditableTextBlock extends StatelessWidget {
     // If this line is the top one in this block we ignore its top spacing
     // because the block itself already has it. Similarly with the last line
     // and its bottom spacing.
-    if (index == 1) {
+    if (index == 0) {
       top = 0.0;
     }
 
-    if (index == count) {
+    if (index == count - 1) {
       bottom = 0.0;
     }
 
@@ -224,7 +268,6 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
 
 class _NumberPoint extends StatelessWidget {
   final int index;
-  final int count;
   final double width;
   final bool withDot;
   final double padding;
@@ -233,7 +276,6 @@ class _NumberPoint extends StatelessWidget {
   const _NumberPoint({
     Key? key,
     required this.index,
-    required this.count,
     required this.width,
     required this.style,
     this.withDot = true,
@@ -242,11 +284,12 @@ class _NumberPoint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentNumber = index + 1;
     return Container(
       alignment: AlignmentDirectional.topEnd,
       width: width,
       padding: EdgeInsetsDirectional.only(end: padding),
-      child: Text(withDot ? '$index.' : '$index', style: style),
+      child: Text(withDot ? '$currentNumber.' : '$currentNumber', style: style),
     );
   }
 }

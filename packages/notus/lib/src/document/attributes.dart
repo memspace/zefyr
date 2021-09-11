@@ -1,6 +1,7 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'dart:math' as math;
 import 'package:collection/collection.dart';
 import 'package:quiver/core.dart';
 
@@ -81,6 +82,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
+    NotusAttribute.indent.key: NotusAttribute.indent,
   };
 
   // Inline attributes
@@ -115,6 +117,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.heading.level3].
   static NotusAttribute<int> get h3 => heading.level3;
+
+  /// Indent attribute
+  static const indent = IndentAttributeBuilder._();
 
   /// Block attribute
   // ignore: const_eval_throws_exception
@@ -399,4 +404,13 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a block of lines as a quote.
   NotusAttribute<String> get quote =>
       NotusAttribute<String>._(key, scope, 'quote');
+}
+
+class IndentAttributeBuilder extends NotusAttributeBuilder<int> {
+  static const _kIndent = 'indent';
+  const IndentAttributeBuilder._()
+      : super._(_kIndent, NotusAttributeScope.line);
+
+  NotusAttribute<int> withLevel(int level) =>
+      NotusAttribute._(key, scope, math.max(math.min(8, level), 1));
 }

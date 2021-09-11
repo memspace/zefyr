@@ -1162,7 +1162,7 @@ class RawEditorState extends EditorState
         result.add(EditableTextLine(
           node: node,
           textDirection: _textDirection,
-          indentWidth: 0,
+          indentWidth: _getIndentForLine(node, _themeData),
           spacing: _getSpacingForLine(node, _themeData),
           cursorController: _cursorController,
           selection: widget.controller.selection,
@@ -1197,6 +1197,11 @@ class RawEditorState extends EditorState
       }
     }
     return result;
+  }
+
+  double _getIndentForLine(LineNode node, ZefyrThemeData theme) {
+    final indentationLevel = node.style.get(NotusAttribute.indent)?.value ?? 0;
+    return indentationLevel * 16;
   }
 
   VerticalSpacing _getSpacingForLine(LineNode node, ZefyrThemeData theme) {

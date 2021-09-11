@@ -381,6 +381,81 @@ Widget _selectHeadingStyleButtonBuilder(BuildContext context,
   );
 }
 
+class IndentationButton extends StatefulWidget {
+  final bool increase;
+  final ZefyrController controller;
+
+  const IndentationButton(
+      {Key? key, this.increase = true, required this.controller})
+      : super(key: key);
+
+  @override
+  _IndentationButtonState createState() => _IndentationButtonState();
+}
+
+class _IndentationButtonState extends State<IndentationButton> {
+  NotusStyle get _selectionStyle => widget.controller.getSelectionStyle();
+
+  void _didChangeEditingValue() {
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_didChangeEditingValue);
+  }
+
+  @override
+  void didUpdateWidget(covariant IndentationButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_didChangeEditingValue);
+      widget.controller.addListener(_didChangeEditingValue);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_didChangeEditingValue);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isEnabled = !_selectionStyle.containsSame(NotusAttribute.block.code);
+    final theme = Theme.of(context);
+    final iconColor = isEnabled ? theme.iconTheme.color : theme.disabledColor;
+    return ZIconButton(
+      highlightElevation: 0,
+      hoverElevation: 0,
+      size: 32,
+      icon: Icon(
+          widget.increase
+              ? Icons.format_indent_increase
+              : Icons.format_indent_decrease,
+          size: 18,
+          color: iconColor),
+      fillColor: theme.canvasColor,
+      onPressed: isEnabled
+          ? () {
+              final indentLevel =
+                  _selectionStyle.get(NotusAttribute.indent)?.value ?? 0;
+              if (indentLevel == 0 && !widget.increase) {
+                return;
+              }
+              if (indentLevel == 1 && !widget.increase) {
+                widget.controller.formatSelection(NotusAttribute.indent.unset);
+              } else {
+                widget.controller.formatSelection(NotusAttribute.indent
+                    .withLevel(indentLevel + (widget.increase ? 1 : -1)));
+              }
+            }
+          : null,
+    );
+  }
+}
+
 class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
   final List<Widget> children;
 
@@ -435,6 +510,14 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           icon: Icons.format_strikethrough,
           controller: controller,
         ),
+      ),
+      IndentationButton(
+        increase: false,
+        controller: controller,
+      ),
+      SizedBox(width: 1),
+      IndentationButton(
+        controller: controller,
       ),
       Visibility(
           visible: !hideHeadingStyle,
