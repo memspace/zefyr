@@ -404,6 +404,10 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
     bool hideDirection = false,
     List<Widget> leading = const <Widget>[],
     List<Widget> trailing = const <Widget>[],
+    bool hideRightAlignment = false,
+    bool hideLeftAlignment = false,
+    bool hideCenterAlignment = false,
+    bool hideJustifyAlignment = false,
   }) {
     return ZefyrToolbar(key: key, children: [
       ...leading,
@@ -460,6 +464,42 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
         child: ToggleStyleButton(
           attribute: NotusAttribute.rtl,
           icon: Icons.format_textdirection_r_to_l,
+          controller: controller,
+        )
+      ),
+      VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
+      Visibility(
+        visible: !hideLeftAlignment,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.left,
+          icon: Icons.format_align_left,
+          controller: controller,
+        ),
+      ),
+      SizedBox(width: 1),
+      Visibility(
+        visible: !hideCenterAlignment,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.center,
+          icon: Icons.format_align_center,
+          controller: controller,
+        ),
+      ),
+      SizedBox(width: 1),
+      Visibility(
+        visible: !hideRightAlignment,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.right,
+          icon: Icons.format_align_right,
+          controller: controller,
+        ),
+      ),
+      SizedBox(width: 1),
+      Visibility(
+        visible: !hideJustifyAlignment,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.justify,
+          icon: Icons.format_align_justify,
           controller: controller,
         ),
       ),

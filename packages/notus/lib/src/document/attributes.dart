@@ -73,6 +73,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 ///   * [NotusAttribute.heading]
 ///   * [NotusAttribute.block]
 ///   * [NotusAttribute.direction]
+///   * [NotusAttribute.alignment]
 class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static final Map<String, NotusAttributeBuilder> _registry = {
     NotusAttribute.bold.key: NotusAttribute.bold,
@@ -84,6 +85,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.direction.key: NotusAttribute.direction,
+    NotusAttribute.alignment.key: NotusAttribute.alignment,
   };
 
   // Inline attributes
@@ -143,6 +145,20 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.direction.rtl].
   static NotusAttribute<String> get rtl => direction.rtl;
+  /// Alignment attribute
+  static const alignment = AlignmentAttributeBuilder._();
+
+  /// Alias for [NotusAttribute.alignment.right]
+  static NotusAttribute<String> get right => alignment.right;
+
+  /// Alias for [NotusAttribute.alignment.left]
+  static NotusAttribute<String> get left => alignment.left;
+
+  /// Alias for [NotusAttribute.alignment.center]
+  static NotusAttribute<String> get center => alignment.center;
+
+  /// Alias for [NotusAttribute.alignment.justify]
+  static NotusAttribute<String> get justify => alignment.justify;
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
@@ -423,4 +439,22 @@ class DirectionAttributeBuilder extends NotusAttributeBuilder<String> {
       : super._(_kDirection, NotusAttributeScope.line);
 
   NotusAttribute<String> get rtl => NotusAttribute<String>._(key, scope, 'rtl');
+}
+
+class AlignmentAttributeBuilder extends NotusAttributeBuilder<String> {
+  static const _kAlignment = 'alignment';
+  const AlignmentAttributeBuilder._()
+      : super._(_kAlignment, NotusAttributeScope.line);
+
+  NotusAttribute<String> get right =>
+      NotusAttribute<String>._(key, scope, 'right');
+
+  NotusAttribute<String> get left =>
+      NotusAttribute<String>._(key, scope, 'left');
+
+  NotusAttribute<String> get center =>
+      NotusAttribute<String>._(key, scope, 'center');
+
+  NotusAttribute<String> get justify =>
+      NotusAttribute<String>._(key, scope, 'justify');
 }
