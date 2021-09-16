@@ -23,7 +23,7 @@ class EditorPageState extends State<EditorPage> {
     _focusNode = FocusNode();
     _loadDocument().then((document) {
       setState(() {
-        _controller = ZefyrController(document);
+        _controller = ZefyrController(document: document);
       });
     });
   }

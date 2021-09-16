@@ -121,4 +121,50 @@ void main() {
       expect(actual, isNull);
     });
   });
+
+  group('$UnsetMentionRule', () {
+    final rule = UnsetMentionRule();
+
+    test('no mention attribute overlaps with deletion range', () {
+      final doc = Delta()
+        ..insert('Text')
+        ..insert('@User', NotusAttribute.mention.fromString('1').toJson());
+      final actual = rule.apply(doc, 1, 2);
+      expect(actual, null);
+    });
+
+    test('mention attribute is inside deletion range', () {
+      final doc = Delta()
+        ..insert('Text')
+        ..insert('@User', NotusAttribute.mention.fromString('1').toJson())
+        ..insert('Text');
+      final actual = rule.apply(doc, 2, 8);
+      expect(actual, null);
+    });
+
+    test('part of mention attribute is before deletion range', () {
+      final doc = Delta()
+        ..insert('@User', NotusAttribute.mention.fromString('1').toJson())
+        ..insert('Text');
+      final actual = rule.apply(doc, 4, 4);
+      expect(
+          actual,
+          Delta()
+            ..retain(4, {NotusAttribute.mention.key: null})
+            ..delete(4));
+    });
+
+    test('part of mention attribute is after deletion range', () {
+      final doc = Delta()
+        ..insert('Text')
+        ..insert('@User', NotusAttribute.mention.fromString('1').toJson());
+      final actual = rule.apply(doc, 3, 3);
+      expect(
+          actual,
+          Delta()
+            ..retain(3)
+            ..delete(3)
+            ..retain(3, {NotusAttribute.mention.key: null}));
+    });
+  });
 }
