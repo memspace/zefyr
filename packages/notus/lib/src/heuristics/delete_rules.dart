@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:notus/src/document/attributes.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 /// A heuristic rule for delete operations.
@@ -39,6 +40,89 @@ class CatchAllDeleteRule extends DeleteRule {
     return Delta()
       ..retain(index)
       ..delete(iter.hasNext ? length : length - 1);
+  }
+}
+
+/// Removes mention attribute if deleted segment overlaps a
+/// text segment with mention attribute
+class UnsetMentionRule extends DeleteRule {
+  const UnsetMentionRule();
+
+  Map<String, dynamic> _getAttributes(Operation? operation) =>
+      operation?.attributes ?? const <String, dynamic>{};
+
+  String _getText(Operation? operation) =>
+      operation?.data is String ? operation!.data as String : '';
+
+  bool _isMention(Map<String, dynamic> attr) =>
+      attr.containsKey(NotusAttribute.mention.key);
+
+  bool _isPartOfSameMention(Map<String, dynamic> a, Map<String, dynamic> b) =>
+      _isMention(a) &&
+      _isMention(b) &&
+      (a[NotusAttribute.mention.key] == b[NotusAttribute.mention.key]);
+
+  @override
+  Delta? apply(Delta document, int index, int length) {
+    final iter = DeltaIterator(document);
+
+    final previous = iter.skip(index);
+    final deletedFirstOp = iter.skip(1);
+    final deletedLastOp = iter.skip(length - 1) ?? deletedFirstOp;
+    final next = iter.next();
+
+    final deletedFirstOpAttrs = _getAttributes(deletedFirstOp);
+    final deletedLastOpAttrs = _getAttributes(deletedLastOp);
+
+    /// It's true if one or both ends of the deleted part is mention
+    /// (It can be a part of mention or the whole mention)
+    final deletedPartEndsAreMention =
+        _isMention(deletedFirstOpAttrs) || _isMention(deletedLastOpAttrs);
+
+    if (!deletedPartEndsAreMention) {
+      return null;
+    }
+
+    final previousAttrs = _getAttributes(previous);
+    final nextAttrs = _getAttributes(next);
+
+    /// Will be true if the beginning of the deleted part is part of a mention
+    /// outside of deleted part's scope
+    final partOfMentionIsBefore =
+        _isPartOfSameMention(deletedFirstOpAttrs, previousAttrs);
+
+    /// Will be true if the ending of the deleted part is part of a mention
+    /// outside of deleted part's scope
+    final partOfMentionIsAfter =
+        _isPartOfSameMention(deletedLastOpAttrs, nextAttrs);
+
+    if (!partOfMentionIsBefore && !partOfMentionIsAfter) {
+      return null;
+    }
+
+    final previousText = _getText(previous);
+    final nextText = _getText(next);
+
+    var delta = Delta();
+
+    if (partOfMentionIsBefore) {
+      delta = delta
+        ..retain(index - previousText.length)
+        ..retain(previousText.length,
+            previousAttrs..[NotusAttribute.mention.key] = null);
+    } else {
+      delta = delta..retain(index);
+    }
+
+    delta = delta..delete(length);
+
+    if (partOfMentionIsAfter) {
+      delta = delta
+        ..retain(
+            nextText.length, nextAttrs..[NotusAttribute.mention.key] = null);
+    }
+
+    return delta;
   }
 }
 

@@ -14,6 +14,19 @@ import 'layout_expanded.dart';
 import 'layout_scrollable.dart';
 import 'settings.dart';
 
+const _mentionTriggers = ['@'];
+
+const Map<String, String> _usersList = {
+  '1': 'Amelia',
+  '2': 'Oliver',
+  '3': 'Olivia',
+  '4': 'Jack',
+  '5': 'Isla',
+  '6': 'Harry',
+  '7': 'Emily',
+  '8': 'Jacob',
+};
+
 class HomePage extends StatefulWidget {
   const HomePage({Key key}) : super(key: key);
 
@@ -41,16 +54,33 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadFromAssets() async {
+    final mentionOptions = MentionOptions(
+        mentionTriggers: _mentionTriggers,
+        suggestionsBuilder: _mentionSuggestionBuilder,
+        itemBuilder: (context, key, query) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              child: Text(
+                _usersList[key],
+                textAlign: TextAlign.center,
+              ),
+            ),
+        onMentionClicked: _mentionClicked);
     try {
       final result = await rootBundle.loadString('assets/welcome.note');
       final doc = NotusDocument.fromJson(jsonDecode(result));
       setState(() {
-        _controller = ZefyrController(doc);
+        _controller = ZefyrController(
+          document: doc,
+          mentionOptions: mentionOptions,
+        );
       });
     } catch (error) {
       final doc = NotusDocument()..insert(0, 'Empty asset');
       setState(() {
-        _controller = ZefyrController(doc);
+        _controller = ZefyrController(
+          document: doc,
+          mentionOptions: mentionOptions,
+        );
       });
     }
   }
@@ -180,6 +210,20 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     );
+  }
+
+  Map<String, String> _mentionSuggestionBuilder(String trigger, String value) {
+    var suggestions = <String, String>{};
+    _usersList.forEach((key, name) {
+      if (name.startsWith(value)) {
+        suggestions.putIfAbsent(key, () => name);
+      }
+    });
+    return suggestions;
+  }
+
+  void _mentionClicked(String key, String value) {
+    print('$value clicked with key of $key');
   }
 
   void _launchUrl(String url) async {

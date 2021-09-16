@@ -65,13 +65,13 @@ class _DemoScaffoldState extends State<DemoScaffold> {
           await rootBundle.loadString('assets/${widget.documentFilename}');
       final doc = NotusDocument.fromJson(jsonDecode(result));
       setState(() {
-        _controller = ZefyrController(doc);
+        _controller = ZefyrController(document: doc);
         _loading = false;
       });
     } catch (error) {
       final doc = NotusDocument()..insert(0, 'Empty asset');
       setState(() {
-        _controller = ZefyrController(doc);
+        _controller = ZefyrController(document: doc);
         _loading = false;
       });
     }
@@ -84,14 +84,14 @@ class _DemoScaffoldState extends State<DemoScaffold> {
       final data = await file.readAsString();
       final doc = NotusDocument.fromJson(jsonDecode(data));
       setState(() {
-        _controller = ZefyrController(doc);
+        _controller = ZefyrController(document: doc);
         _loading = false;
         _canSave = true;
       });
     } else {
       final doc = NotusDocument()..insert(0, 'Empty asset');
       setState(() {
-        _controller = ZefyrController(doc);
+        _controller = ZefyrController(document: doc);
         _loading = false;
         _canSave = true;
       });

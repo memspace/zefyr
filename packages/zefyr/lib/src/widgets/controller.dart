@@ -14,10 +14,46 @@ List<String> _insertionToggleableStyleKeys = [
   NotusAttribute.inlineCode.key,
 ];
 
+typedef MentionSuggestionsBuilder = Map<String, String> Function(
+    String trigger, String query);
+
+typedef MentionSuggestionItemBuilder = Widget Function(
+    BuildContext context, String id, String query);
+
+class MentionOptions {
+  final List<String> mentionTriggers;
+  final MentionSuggestionsBuilder suggestionsBuilder;
+  final MentionSuggestionItemBuilder itemBuilder;
+  final Function(String, String)? onMentionClicked;
+
+  MentionOptions({
+    required this.mentionTriggers,
+    required this.suggestionsBuilder,
+    required this.itemBuilder,
+    this.onMentionClicked,
+  }) : assert(mentionTriggers.isNotEmpty);
+}
+
 class ZefyrController extends ChangeNotifier {
-  ZefyrController([NotusDocument? document])
+  MentionOptions? _mentionOptions;
+  String? _mentionQuery;
+  String? _mentionTrigger;
+
+  ZefyrController({NotusDocument? document, MentionOptions? mentionOptions})
       : document = document ?? NotusDocument(),
-        _selection = const TextSelection.collapsed(offset: 0);
+        _selection = const TextSelection.collapsed(offset: 0),
+        _mentionOptions = mentionOptions;
+
+  MentionOptions? get mentionOptions => _mentionOptions;
+
+  set mentionOptions(MentionOptions? value) {
+    _mentionOptions = value;
+    _checkForMentionTriggers();
+  }
+
+  String? get mentionQuery => _mentionQuery;
+
+  String? get mentionTrigger => _mentionTrigger;
 
   /// Document managed by this controller.
   final NotusDocument document;
@@ -185,6 +221,46 @@ class ZefyrController extends ChangeNotifier {
     _selection = value;
 //    _lastChangeSource = source;
     _ensureSelectionBeforeLastBreak();
+    _checkForMentionTriggers();
+  }
+
+  bool get isMentioning => _mentionTrigger != null;
+
+  /// Checks if collapsed cursor is after a mention trigger
+  /// which isn't submitted yet
+  void _checkForMentionTriggers() {
+    _mentionQuery = null;
+    _mentionTrigger = null;
+
+    if (mentionOptions == null || !selection.isCollapsed) {
+      return;
+    }
+
+    final plainText = document.toPlainText();
+    final indexOfLastMentionTrigger = plainText
+        .substring(0, selection.end)
+        .lastIndexOf(RegExp(mentionOptions!.mentionTriggers.join('|')));
+
+    if (indexOfLastMentionTrigger < 0) {
+      return;
+    }
+
+    if (plainText
+        .substring(indexOfLastMentionTrigger, selection.end)
+        .contains(RegExp(r'\n'))) {
+      return;
+    }
+
+    final isMentionSubmitted =
+        document.collectStyle(indexOfLastMentionTrigger, 0);
+    if (isMentionSubmitted.contains(NotusAttribute.mention)) {
+      return;
+    }
+
+    _mentionQuery =
+        plainText.substring(indexOfLastMentionTrigger + 1, selection.end);
+    _mentionTrigger = plainText.substring(
+        indexOfLastMentionTrigger, indexOfLastMentionTrigger + 1);
   }
 
   // Ensures that selection does not include last line break which

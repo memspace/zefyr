@@ -1,6 +1,7 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quill_delta/quill_delta.dart';
@@ -12,7 +13,7 @@ void main() {
 
     setUp(() {
       var doc = NotusDocument();
-      controller = ZefyrController(doc);
+      controller = ZefyrController(document: doc);
     });
 
     test('dispose', () {
@@ -191,6 +192,21 @@ void main() {
           ..insert('\n'),
       );
       // expect(controller.lastChangeSource, ChangeSource.local);
+    });
+
+    test('checking for mention', () {
+      late String mentionTrigger, mentionQuery;
+      controller.mentionOptions = MentionOptions(
+        mentionTriggers: ['@', '#'],
+        suggestionsBuilder: (_, __) => {},
+        itemBuilder: (_, __, ___) => Container(),
+      );
+      var change = Delta()..insert('@a');
+      var selection = TextSelection.collapsed(offset: 2);
+      controller.compose(change, selection: selection);
+      expect(controller.mentionTrigger, '@');
+      expect(controller.mentionQuery, 'a');
+      expect(controller.isMentioning, true);
     });
   });
 }

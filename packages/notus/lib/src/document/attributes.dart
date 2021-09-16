@@ -74,6 +74,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 ///   * [NotusAttribute.block]
 ///   * [NotusAttribute.direction]
 ///   * [NotusAttribute.alignment]
+///   * [NotusAttribute.mention]
 class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static final Map<String, NotusAttributeBuilder> _registry = {
     NotusAttribute.bold.key: NotusAttribute.bold,
@@ -87,6 +88,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.direction.key: NotusAttribute.direction,
     NotusAttribute.alignment.key: NotusAttribute.alignment,
+    NotusAttribute.mention.key: NotusAttribute.mention,
   };
 
   // Inline attributes
@@ -109,6 +111,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Link style attribute.
   // ignore: const_eval_throws_exception
   static const link = LinkAttributeBuilder._();
+
+  /// Mention style attribute.
+  static const mention = MentionAttributeBuilder._();
 
   // Line attributes
 
@@ -381,6 +386,18 @@ class _StrikethroughAttribute extends NotusAttribute<bool> {
 /// Applies code style to a text segment.
 class _InlineCodeAttribute extends NotusAttribute<bool> {
   const _InlineCodeAttribute() : super._('c', NotusAttributeScope.inline, true);
+}
+
+/// Builder for mention attribute values.
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.mention] instead.
+class MentionAttributeBuilder extends NotusAttributeBuilder<String> {
+  static const _kMention = 'mention';
+  const MentionAttributeBuilder._() : super._(_kMention, NotusAttributeScope.inline);
+
+  NotusAttribute<String> fromString(String value) =>
+      NotusAttribute<String>._(key, scope, value);
 }
 
 /// Builder for link attribute values.
