@@ -11,6 +11,7 @@ final h1Style = NotusStyle().merge(NotusAttribute.h1);
 final h2Style = NotusStyle().merge(NotusAttribute.h2);
 final ulStyle = NotusStyle().merge(NotusAttribute.ul);
 final bqStyle = NotusStyle().merge(NotusAttribute.bq);
+final rightStyle = NotusStyle().merge(NotusAttribute.right);
 
 void main() {
   group('$LineNode', () {
@@ -130,13 +131,17 @@ void main() {
     test('format line', () {
       root.insert(0, 'Hello world', null);
       root.retain(11, 1, h1Style);
+      root.retain(11, 1, rightStyle);
 
       final line = root.first as LineNode;
       expect(line, hasLength(12));
 
       final delta = Delta()
         ..insert('Hello world')
-        ..insert('\n', NotusAttribute.h1.toJson());
+        ..insert('\n', {
+          NotusAttribute.h1.key: NotusAttribute.h1.value,
+          NotusAttribute.alignment.key: NotusAttribute.right.value,
+        });
       expect(line.toDelta(), delta);
     });
 

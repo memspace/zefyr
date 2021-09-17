@@ -8,7 +8,6 @@ class RenderParagraphProxy extends RenderProxyBox
     implements RenderContentProxyBox {
   RenderParagraphProxy({
     required TextStyle textStyle,
-    required TextAlign textAlign,
     required double textScaleFactor,
     required TextWidthBasis textWidthBasis,
     RenderParagraph? child,
@@ -18,7 +17,7 @@ class RenderParagraphProxy extends RenderProxyBox
     TextHeightBehavior? textHeightBehavior,
   })  : _prototypePainter = TextPainter(
             text: TextSpan(text: ' ', style: textStyle),
-            textAlign: textAlign,
+            textAlign: TextAlign.left,
             textDirection: textDirection,
             textScaleFactor: textScaleFactor,
             strutStyle: strutStyle,
