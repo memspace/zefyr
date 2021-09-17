@@ -5,6 +5,7 @@ import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:test/test.dart';
 
+final rightAttrs = NotusStyle().merge(NotusAttribute.right);
 final ulAttrs = NotusStyle().merge(NotusAttribute.ul);
 final olAttrs = NotusStyle().merge(NotusAttribute.ol);
 final h1Attrs = NotusStyle().merge(NotusAttribute.h1);
@@ -74,6 +75,20 @@ void main() {
       expect(block.style.get(NotusAttribute.block), NotusAttribute.ul);
       expect(block.childCount, 1);
       expect(block.first, const TypeMatcher<LineNode>());
+    });
+
+    test('format first line as list and right aligned', () {
+      root.insert(0, 'Hello world\nAb cd ef!', null);
+      root.retain(11, 1, rightAttrs);
+      root.retain(11, 1, ulAttrs);
+
+      expect(root.childCount, 2);
+      final block = root.first as BlockNode;
+      expect(block.style.get(NotusAttribute.block), NotusAttribute.ul);
+      expect(block.childCount, 1);
+      expect(block.first, const TypeMatcher<LineNode>());
+      final line = block.first as LineNode;
+      expect(line.style.get(NotusAttribute.alignment), NotusAttribute.right);
     });
 
     test('format two sibling lines as list', () {
