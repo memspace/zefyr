@@ -8,8 +8,10 @@ import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-/// A box in which a single widget can be scrolled using a [ViewportBuilder]
+/// Very similar to [SingleChildView] but with a [ViewportBuilder] argument
+/// instead of a [Widget]
 ///
+/// Useful when child needs [ViewportOffset] (e.g. [RenderEditor])
 /// see: [SingleChildScrollView]
 class ZefyrSingleChildScrollView extends StatelessWidget {
   /// Creates a box in which a single widget can be scrolled.
@@ -123,8 +125,9 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
       restorationId: restorationId,
       viewportBuilder: (BuildContext context, ViewportOffset offset) {
         var contents = viewportBuilder(context, offset);
-        if (padding != null)
+        if (padding != null) {
           contents = Padding(padding: padding!, child: contents);
+        }
         return _SingleChildViewport(
             axisDirection: axisDirection,
             offset: offset,
@@ -180,7 +183,7 @@ class _RenderSingleChildViewport extends RenderBox
     double cacheExtent = RenderAbstractViewport.defaultCacheExtent,
     RenderBox? child,
     required Clip clipBehavior,
-  })   : _axisDirection = axisDirection,
+  })  : _axisDirection = axisDirection,
         _offset = offset,
         _cacheExtent = cacheExtent,
         _clipBehavior = clipBehavior {
@@ -380,17 +383,22 @@ class _RenderSingleChildViewport extends RenderBox
       }
 
       if (_shouldClipAtPaintOffset(paintOffset) && clipBehavior != Clip.none) {
-        _clipRectLayer = context.pushClipRect(
-            needsCompositing, offset, Offset.zero & size, paintContents,
-            clipBehavior: clipBehavior, oldLayer: _clipRectLayer);
+        _clipRectLayer.layer = context.pushClipRect(
+          needsCompositing,
+          offset,
+          Offset.zero & size,
+          paintContents,
+          clipBehavior: clipBehavior,
+          oldLayer: _clipRectLayer.layer,
+        );
       } else {
-        _clipRectLayer = null;
+        _clipRectLayer.layer = null;
         paintContents(context, offset);
       }
     }
   }
 
-  ClipRectLayer? _clipRectLayer;
+  final _clipRectLayer = LayerHandle<ClipRectLayer>();
 
   @override
   void applyPaintTransform(RenderBox child, Matrix4 transform) {

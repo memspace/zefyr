@@ -210,8 +210,6 @@ class RenderEditor extends RenderEditableContainerBox
   /// visible on the screen.
   ValueListenable<bool> get selectionStartInViewport =>
       _selectionStartInViewport;
-
-  // TODO: implement selectionStartInViewport
   final ValueNotifier<bool> _selectionStartInViewport =
       ValueNotifier<bool>(true);
 
@@ -225,7 +223,6 @@ class RenderEditor extends RenderEditableContainerBox
   /// This bool indicates whether the text is scrolled so that the handle is
   /// inside the text field viewport, as opposed to whether it is actually
   /// visible on the screen.
-  // TODO: implement selectionEndInViewport
   ValueListenable<bool> get selectionEndInViewport => _selectionEndInViewport;
   final ValueNotifier<bool> _selectionEndInViewport = ValueNotifier<bool>(true);
 
@@ -242,8 +239,6 @@ class RenderEditor extends RenderEditableContainerBox
     // _applyFloatingPointHack. Ideally, the rounding mismatch will be fixed and
     // this can be changed to be a strict check instead of an approximation.
     const visibleRegionSlop = 0.5;
-    print('Visible region : ${visibleRegion.inflate(visibleRegionSlop)}');
-    print('Start / effective : $startOffset / $effectiveOffset');
     _selectionStartInViewport.value = visibleRegion
         .inflate(visibleRegionSlop)
         .contains(startOffset + effectiveOffset);
@@ -256,6 +251,8 @@ class RenderEditor extends RenderEditableContainerBox
         .contains(endOffset + effectiveOffset);
   }
 
+  // returns offset relative to this at which the caret will be painted
+  // given a global TextPosition
   Offset _getOffsetForCaret(TextPosition position) {
     final child = childAtPosition(position);
     final childPosition = child.globalToLocalPosition(position);

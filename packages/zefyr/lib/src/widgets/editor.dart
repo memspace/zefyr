@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 import 'package:zefyr/src/widgets/baseline_proxy.dart';
-import 'package:zefyr/src/widgets/single-child-scroll-view.dart';
+import 'package:zefyr/src/widgets/single_child_scroll_view.dart';
 
 import '../rendering/editor.dart';
 import '../services/keyboard.dart';
@@ -1226,7 +1226,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   _Editor({
     required Key key,
     required List<Widget> children,
-    ViewportOffset? this.offset,
+    this.offset,
     required this.document,
     required this.textDirection,
     required this.hasFocus,
