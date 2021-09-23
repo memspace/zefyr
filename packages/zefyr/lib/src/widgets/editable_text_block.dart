@@ -53,10 +53,8 @@ class EditableTextBlock extends StatelessWidget {
     final preferredDirection = node.style.get(NotusAttribute.direction);
     if (preferredDirection == NotusAttribute.rtl) {
       return TextDirection.rtl;
-    } else if (preferredDirection == NotusAttribute.ltr) {
-      return TextDirection.ltr;
     }
-    return Directionality.of(context);
+    return TextDirection.ltr;
   }
 
   List<Widget> _buildChildren(BuildContext context) {
@@ -68,23 +66,26 @@ class EditableTextBlock extends StatelessWidget {
       index++;
       final nodeTextDirection =
           getTextDirectionForNode(context, line as LineNode);
-      children.add(EditableTextLine(
-        node: line,
+      children.add(Directionality(
         textDirection: nodeTextDirection,
-        spacing: _getSpacingForLine(line, index, count, theme),
-        leading: _buildLeading(context, line, index, count),
-        indentWidth: _getIndentWidth(),
-        devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
-        body: TextLine(
+        child: EditableTextLine(
           node: line,
-          embedBuilder: embedBuilder,
           textDirection: nodeTextDirection,
+          spacing: _getSpacingForLine(line, index, count, theme),
+          leading: _buildLeading(context, line, index, count),
+          indentWidth: _getIndentWidth(),
+          devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
+          body: TextLine(
+            node: line,
+            embedBuilder: embedBuilder,
+            textDirection: nodeTextDirection,
+          ),
+          cursorController: cursorController,
+          selection: selection,
+          selectionColor: selectionColor,
+          enableInteractiveSelection: enableInteractiveSelection,
+          hasFocus: hasFocus,
         ),
-        cursorController: cursorController,
-        selection: selection,
-        selectionColor: selectionColor,
-        enableInteractiveSelection: enableInteractiveSelection,
-        hasFocus: hasFocus,
       ));
     }
     return children.toList(growable: false);

@@ -137,11 +137,8 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Direction attribute
   static const direction = DirectionAttributeBuilder._();
 
-  /// Alias for [NotusAttribute.direction.ltr].
+  /// Alias for [NotusAttribute.direction.rtl].
   static NotusAttribute<String> get rtl => direction.rtl;
-
-  /// Alias for [NotusAttribute.direction.ltr].
-  static NotusAttribute<String> get ltr => direction.ltr;
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
@@ -417,6 +414,4 @@ class DirectionAttributeBuilder extends NotusAttributeBuilder<String> {
       : super._(_kDirection, NotusAttributeScope.line);
 
   NotusAttribute<String> get rtl => NotusAttribute<String>._(key, scope, 'rtl');
-
-  NotusAttribute<String> get ltr => NotusAttribute<String>._(key, scope, 'ltr');
 }

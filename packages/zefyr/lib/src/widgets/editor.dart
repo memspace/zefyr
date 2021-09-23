@@ -1155,14 +1155,12 @@ class RawEditorState extends EditorState
     );
   }
 
-  TextDirection getTextDirectionForStyledNode(StyledNode node){
+  TextDirection getTextDirectionForStyledNode(StyledNode node) {
     final preferredDirection = node.style.get(NotusAttribute.direction);
     if (preferredDirection == NotusAttribute.rtl) {
       return TextDirection.rtl;
-    } else if (preferredDirection == NotusAttribute.ltr) {
-      return TextDirection.ltr;
     }
-    return _textDirection;
+    return TextDirection.ltr;
   }
 
   List<Widget> _buildChildren(BuildContext context) {
