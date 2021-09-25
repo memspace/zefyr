@@ -50,16 +50,14 @@ class TextLine extends StatelessWidget {
 
   TextAlign getTextAlign(LineNode node) {
     final alignment = node.style.get(NotusAttribute.alignment);
-    if (alignment == NotusAttribute.alignment.left) {
-      return TextAlign.left;
-    } else if (alignment == NotusAttribute.alignment.center) {
+    if (alignment == NotusAttribute.center) {
       return TextAlign.center;
-    } else if (alignment == NotusAttribute.alignment.right) {
+    } else if (alignment == NotusAttribute.right) {
       return TextAlign.right;
-    } else if (alignment == NotusAttribute.alignment.justify) {
+    } else if (alignment == NotusAttribute.justify) {
       return TextAlign.justify;
     }
-    return TextAlign.start;
+    return TextAlign.left;
   }
 
   TextSpan buildText(BuildContext context, LineNode node) {

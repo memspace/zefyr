@@ -469,15 +469,6 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       Visibility(
-        visible: !hideLeftAlignment,
-        child: ToggleStyleButton(
-          attribute: NotusAttribute.left,
-          icon: Icons.format_align_left,
-          controller: controller,
-        ),
-      ),
-      SizedBox(width: 1),
-      Visibility(
         visible: !hideCenterAlignment,
         child: ToggleStyleButton(
           attribute: NotusAttribute.center,

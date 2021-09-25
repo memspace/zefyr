@@ -151,9 +151,6 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.alignment.right]
   static NotusAttribute<String> get right => alignment.right;
 
-  /// Alias for [NotusAttribute.alignment.left]
-  static NotusAttribute<String> get left => alignment.left;
-
   /// Alias for [NotusAttribute.alignment.center]
   static NotusAttribute<String> get center => alignment.center;
 
@@ -448,9 +445,6 @@ class AlignmentAttributeBuilder extends NotusAttributeBuilder<String> {
 
   NotusAttribute<String> get right =>
       NotusAttribute<String>._(key, scope, 'right');
-
-  NotusAttribute<String> get left =>
-      NotusAttribute<String>._(key, scope, 'left');
 
   NotusAttribute<String> get center =>
       NotusAttribute<String>._(key, scope, 'center');
