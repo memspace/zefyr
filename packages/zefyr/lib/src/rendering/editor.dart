@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:notus/notus.dart';
 
 import '../widgets/selection_utils.dart';
@@ -95,7 +96,7 @@ abstract class RenderAbstractEditor {
 ///
 /// Children of [RenderEditor] must be instances of [RenderEditableBox].
 class RenderEditor extends RenderEditableContainerBox
-    implements RenderAbstractEditor {
+    implements RenderAbstractEditor, TextLayoutMetrics {
   RenderEditor({
     ViewportOffset? offset,
     List<RenderEditableBox>? children,
@@ -627,4 +628,37 @@ class RenderEditor extends RenderEditableContainerBox
     final boxParentData = targetChild.parentData as BoxParentData;
     return childLocalRect.shift(Offset(0, boxParentData.offset.dy));
   }
+
+  // Implements TextLayoutMetrics
+
+  @override
+  TextPosition getTextPositionBelow(TextPosition position) {
+    final targetChild = childAtPosition(position);
+    final localPosition = targetChild.globalToLocalPosition(position);
+    return targetChild.getPositionBelow(localPosition)!;
+  }
+
+  @override
+  TextPosition getTextPositionAbove(TextPosition position) {
+    final targetChild = childAtPosition(position);
+    final localPosition = targetChild.globalToLocalPosition(position);
+    return targetChild.getPositionAbove(localPosition)!;
+  }
+
+  @override
+  TextSelection getLineAtOffset(TextPosition position) {
+    final targetChild = childAtPosition(position);
+    final localPosition = targetChild.globalToLocalPosition(position);
+    final line = targetChild.getLineBoundary(localPosition);
+    return TextSelection(baseOffset: line.start, extentOffset: line.end);
+  }
+
+  @override
+  TextRange getWordBoundary(TextPosition position) {
+    final targetChild = childAtPosition(position);
+    final localPosition = targetChild.globalToLocalPosition(position);
+    return targetChild.getWordBoundary(localPosition);
+  }
+
+  // End of TextLayoutMetrics implementation
 }

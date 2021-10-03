@@ -687,7 +687,8 @@ class RawEditorState extends EditorState
         TickerProviderStateMixin<RawEditor>,
         RawEditorStateKeyboardMixin,
         RawEditorStateTextInputClientMixin,
-        RawEditorStateSelectionDelegateMixin
+        RawEditorStateSelectionDelegateMixin,
+        TextEditingActionTarget
     implements TextSelectionDelegate {
   final GlobalKey _editorKey = GlobalKey();
 
@@ -720,6 +721,24 @@ class RawEditorState extends EditorState
   FocusAttachment? _focusAttachment;
 
   FocusNode? _focusNode;
+
+  /// Implements TextEditingActionTarget
+  @override
+  void debugAssertLayoutUpToDate() {}
+
+  @override
+  bool get readOnly => widget.readOnly;
+
+  @override
+  bool get obscureText => false;
+
+  @override
+  bool get selectionEnabled => widget.selectionEnabled;
+
+  @override
+  TextLayoutMetrics get textLayoutMetrics => renderEditor;
+
+  /// end of TextEditingActionTarget implementation
 
   @override
   FocusNode get effectiveFocusNode => widget.focusNode ?? _focusNode!;
@@ -1073,6 +1092,76 @@ class RawEditorState extends EditorState
     setState(() {
       // Inform the widget that the value of clipboardStatus has changed.
     });
+  }
+
+  // Copy pasted from flutter/lib/src/widgets/editable_text.dart
+  @override
+  void copySelection(SelectionChangedCause cause) {
+    super.copySelection(cause);
+    if (cause == SelectionChangedCause.toolbar) {
+      bringIntoView(textEditingValue.selection.extent);
+      hideToolbar(false);
+
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          break;
+        case TargetPlatform.macOS:
+        case TargetPlatform.android:
+        case TargetPlatform.fuchsia:
+        case TargetPlatform.linux:
+        case TargetPlatform.windows:
+          // Collapse the selection and hide the toolbar and handles.
+          userUpdateTextEditingValue(
+            TextEditingValue(
+              text: textEditingValue.text,
+              selection: TextSelection.collapsed(
+                  offset: textEditingValue.selection.end),
+            ),
+            SelectionChangedCause.toolbar,
+          );
+          break;
+      }
+    }
+  }
+
+  // Copy pasted from flutter/lib/src/widgets/editable_text.dart
+  @override
+  void cutSelection(SelectionChangedCause cause) {
+    super.cutSelection(cause);
+    if (cause == SelectionChangedCause.toolbar) {
+      bringIntoView(textEditingValue.selection.extent);
+      hideToolbar();
+    }
+  }
+
+  // Copy pasted from flutter/lib/src/widgets/editable_text.dart
+  @override
+  Future<void> pasteText(SelectionChangedCause cause) async {
+    await super.pasteText(cause);
+    if (cause == SelectionChangedCause.toolbar) {
+      bringIntoView(textEditingValue.selection.extent);
+      hideToolbar();
+    }
+  }
+
+  // Copy pasted from flutter/lib/src/widgets/editable_text.dart
+  @override
+  void selectAll(SelectionChangedCause cause) {
+    super.selectAll(cause);
+    if (cause == SelectionChangedCause.toolbar) {
+      bringIntoView(textEditingValue.selection.extent);
+    }
+  }
+
+  // copy/pasted from flutter/lib/src/widgets/editable_text.dart
+  @override
+  void setTextEditingValue(
+      TextEditingValue newValue, SelectionChangedCause cause) {
+    if (newValue == textEditingValue) {
+      return;
+    }
+    textEditingValue = newValue;
+    userUpdateTextEditingValue(newValue, cause);
   }
 
   @override
