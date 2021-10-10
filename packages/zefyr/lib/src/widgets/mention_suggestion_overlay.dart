@@ -8,6 +8,7 @@ class MentionSuggestionOverlay {
   final RenderEditor renderObject;
   final Widget debugRequiredFor;
   final Map<String, String> suggestions;
+  final String query, trigger;
   final TextEditingValue textEditingValue;
   final Function(String, String)? suggestionSelected;
   final MentionSuggestionItemBuilder itemBuilder;
@@ -20,6 +21,8 @@ class MentionSuggestionOverlay {
     required this.debugRequiredFor,
     required this.suggestions,
     required this.itemBuilder,
+    required this.query,
+    required this.trigger,
     this.suggestionSelected,
   });
 
@@ -31,6 +34,8 @@ class MentionSuggestionOverlay {
               textEditingValue: textEditingValue,
               suggestionSelected: suggestionSelected,
               itemBuilder: itemBuilder,
+              query: query,
+              trigger: trigger,
             ));
     Overlay.of(context, rootOverlay: true, debugRequiredFor: debugRequiredFor)
         ?.insert(overlayEntry!);
@@ -56,6 +61,7 @@ const double listMaxHeight = 200;
 class _MentionSuggestionList extends StatelessWidget {
   final RenderEditor renderObject;
   final Map<String, String> suggestions;
+  final String query, trigger;
   final TextEditingValue textEditingValue;
   final Function(String, String)? suggestionSelected;
   final MentionSuggestionItemBuilder itemBuilder;
@@ -66,6 +72,8 @@ class _MentionSuggestionList extends StatelessWidget {
     required this.suggestions,
     required this.textEditingValue,
     required this.itemBuilder,
+    required this.query,
+    required this.trigger,
     this.suggestionSelected,
   }) : super(key: key);
 
@@ -80,15 +88,20 @@ class _MentionSuggestionList extends StatelessWidget {
     final baseLineHeight =
         renderObject.preferredLineHeight(textEditingValue.selection.base);
     final listMaxWidth = editingRegion.width / 2;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final mediaQueryData = MediaQuery.of(context);
+    final screenHeight = mediaQueryData.size.height;
 
-    var positionFromTop = endpoints[0].point.dy + editingRegion.top;
+    double? positionFromTop = endpoints[0].point.dy + editingRegion.top;
     double? positionFromRight = editingRegion.width - endpoints[0].point.dx;
     double? positionFromLeft;
+    double? positionFromBottom;
 
-    if (positionFromTop + listMaxHeight > screenHeight) {
-      positionFromTop = positionFromTop - listMaxHeight - baseLineHeight;
+    if (positionFromTop + listMaxHeight >
+        screenHeight - mediaQueryData.viewInsets.bottom) {
+      positionFromTop = null;
+      positionFromBottom = screenHeight - editingRegion.bottom + baseLineHeight;
     }
+
     if (positionFromRight + listMaxWidth > editingRegion.width) {
       positionFromRight = null;
       positionFromLeft = endpoints[0].point.dx;
@@ -96,6 +109,7 @@ class _MentionSuggestionList extends StatelessWidget {
 
     return Positioned(
       top: positionFromTop,
+      bottom: positionFromBottom,
       right: positionFromRight,
       left: positionFromLeft,
       child: ConstrainedBox(
@@ -111,9 +125,11 @@ class _MentionSuggestionList extends StatelessWidget {
       child: SingleChildScrollView(
         child: IntrinsicWidth(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: suggestions.keys
-                .map((key) => _buildListItem(context, key, suggestions[key]!))
+                .map((id) =>
+                    _buildListItem(context, id, trigger, suggestions[id]!))
                 .toList(),
           ),
         ),
@@ -121,10 +137,11 @@ class _MentionSuggestionList extends StatelessWidget {
     );
   }
 
-  Widget _buildListItem(BuildContext context, String key, String text) {
+  Widget _buildListItem(
+      BuildContext context, String id, String trigger, String text) {
     return InkWell(
-      onTap: () => suggestionSelected?.call(key, text),
-      child: itemBuilder(context, key, text),
+      onTap: () => suggestionSelected?.call(id, text),
+      child: itemBuilder(context, id, trigger, query),
     );
   }
 }

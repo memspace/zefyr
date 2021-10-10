@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
     final mentionOptions = MentionOptions(
         mentionTriggers: _mentionTriggers,
         suggestionsBuilder: _mentionSuggestionBuilder,
-        itemBuilder: (context, key, query) => Padding(
+        itemBuilder: (context, key, trigger, query) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               child: Text(
                 _usersList[key],
