@@ -280,8 +280,8 @@ class _TextLineState extends State<TextLine> {
     if (nodeStyle.containsSame(NotusAttribute.italic)) {
       result = _mergeTextStyleWithDecoration(result, theme.italic);
     }
-    if (style.contains(NotusAttribute.link) ||
-        style.contains(NotusAttribute.mention)) {
+    if (nodeStyle.contains(NotusAttribute.link) ||
+        nodeStyle.contains(NotusAttribute.mention)) {
       result = _mergeTextStyleWithDecoration(result, theme.link);
     }
     if (nodeStyle.contains(NotusAttribute.underline)) {

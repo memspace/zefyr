@@ -1115,6 +1115,8 @@ class RawEditorState extends EditorState
           textEditingValue: textEditingValue,
           renderObject: renderEditor,
           debugRequiredFor: widget,
+          query: widget.controller.mentionQuery!,
+          trigger: widget.controller.mentionTrigger!,
           suggestions:
               widget.controller.mentionOptions!.suggestionsBuilder.call(
             widget.controller.mentionTrigger!,
@@ -1133,7 +1135,7 @@ class RawEditorState extends EditorState
     }
   }
 
-  void _handleMentionSuggestionSelected(String key, String value) {
+  void _handleMentionSuggestionSelected(String id, String value) {
     final controller = widget.controller;
     final mentionStartIndex =
         controller.selection.end - controller.mentionQuery!.length - 1;
@@ -1145,7 +1147,7 @@ class RawEditorState extends EditorState
         selection: TextSelection.collapsed(
             offset: mentionStartIndex + replacementText.length));
     controller.formatText(mentionStartIndex, replacementText.length - 1,
-        NotusAttribute.mention.fromString(key));
+        NotusAttribute.mention.fromString(id));
   }
 
   void _handleSelectionChanged(

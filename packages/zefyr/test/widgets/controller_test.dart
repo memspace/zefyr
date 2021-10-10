@@ -199,7 +199,7 @@ void main() {
       controller.mentionOptions = MentionOptions(
         mentionTriggers: ['@', '#'],
         suggestionsBuilder: (_, __) => {},
-        itemBuilder: (_, __, ___) => Container(),
+        itemBuilder: (_, __, ___, ____) => Container(),
       );
       var change = Delta()..insert('@a');
       var selection = TextSelection.collapsed(offset: 2);

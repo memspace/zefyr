@@ -18,10 +18,10 @@ typedef MentionSuggestionsBuilder = Map<String, String> Function(
     String trigger, String query);
 
 typedef MentionSuggestionItemBuilder = Widget Function(
-    BuildContext context, String id, String query);
+    BuildContext context, String id, String trigger, String query);
 
 class MentionOptions {
-  final List<String> mentionTriggers;
+  final Iterable<String> mentionTriggers;
   final MentionSuggestionsBuilder suggestionsBuilder;
   final MentionSuggestionItemBuilder itemBuilder;
   final Function(String, String)? onMentionClicked;
