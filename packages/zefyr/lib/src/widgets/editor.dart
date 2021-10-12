@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -1058,7 +1060,7 @@ class RawEditorState extends EditorState
 
       if (offset != null) {
         _scrollController.animateTo(
-          offset,
+          math.min(offset, _scrollController.position.maxScrollExtent),
           duration: _caretAnimationDuration,
           curve: _caretAnimationCurve,
         );
