@@ -236,7 +236,6 @@ class _ZefyrFieldState extends State<ZefyrField> {
         return InputDecorator(
           decoration: _getEffectiveDecoration(),
           isFocused: widget.focusNode!.hasFocus,
-          // TODO: Document should be considered empty of it has single empty line with no styles applied
           isEmpty: _isEmpty,
           child: child,
         );
@@ -245,8 +244,9 @@ class _ZefyrFieldState extends State<ZefyrField> {
     );
   }
 
-  bool get _isEmpty => widget.controller.document.length == 1 &&
-      !(widget.controller.document.root.first is BlockNode);
+  bool get _isEmpty =>
+      widget.controller.document.length == 1 &&
+      widget.controller.document.root.first is! BlockNode;
 
   InputDecoration _getEffectiveDecoration() {
     final effectiveDecoration = (widget.decoration ?? const InputDecoration())
