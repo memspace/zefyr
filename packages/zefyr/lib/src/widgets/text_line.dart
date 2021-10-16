@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
@@ -64,9 +65,15 @@ class TextLine extends StatelessWidget {
     final segment = node as TextNode;
     final attrs = segment.style;
 
+    MouseCursor? cursor;
+    if (attrs.contains(NotusAttribute.link)) {
+      cursor = SystemMouseCursors.click;
+    }
+
     return TextSpan(
       text: segment.value,
       style: _getInlineTextStyle(attrs, theme),
+      mouseCursor: cursor,
     );
   }
 
