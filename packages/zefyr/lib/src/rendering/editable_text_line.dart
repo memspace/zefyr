@@ -708,5 +708,17 @@ class RenderEditableTextLine extends RenderEditableBox {
     _cursorPainter.paint(context.canvas, effectiveOffset, position);
   }
 
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    if (body == null) return false;
+    final parentData = body!.parentData as BoxParentData;
+    return result.addWithPaintOffset(
+        offset: parentData.offset,
+        position: position,
+        hitTest: (BoxHitTestResult result, Offset position) {
+          return body!.hitTest(result, position: position);
+        });
+  }
+
 // End render box overrides
 }
