@@ -378,13 +378,8 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     final segment = segmentResult.node as LeafNode;
     if (segment.style.contains(NotusAttribute.link) &&
         editor!.widget.onLaunchUrl != null) {
-      if (editor!.widget.readOnly) {
-        editor!
-            .widget.onLaunchUrl!(segment.style.get(NotusAttribute.link)!.value);
-      } else {
-        // TODO: Implement a toolbar to display the URL and allow to launch it.
-        // editor.showToolbar();
-      }
+      editor!
+          .widget.onLaunchUrl!(segment.style.get(NotusAttribute.link)!.value);
     }
   }
 
