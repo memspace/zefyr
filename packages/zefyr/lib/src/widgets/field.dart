@@ -244,9 +244,18 @@ class _ZefyrFieldState extends State<ZefyrField> {
     );
   }
 
-  bool get _isEmpty =>
-      widget.controller.document.length == 1 &&
-      widget.controller.document.root.first is! BlockNode;
+  /// Field is considered empty if document's length is 1
+  /// or its only node has no styles
+  bool get _isEmpty {
+    if (widget.controller.document.length > 1) {
+      return false;
+    }
+    final node = widget.controller.document.root.first;
+    if (node is StyledNode) {
+      return node.style.isEmpty;
+    }
+    return true;
+  }
 
   InputDecoration _getEffectiveDecoration() {
     final effectiveDecoration = (widget.decoration ?? const InputDecoration())
