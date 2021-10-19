@@ -18,21 +18,11 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
   /// Creates a box in which a single widget can be scrolled.
   const ZefyrSingleChildScrollView({
     Key? key,
-    this.padding,
-    bool? primary,
     this.physics,
-    this.controller,
+    required this.controller,
     required this.viewportBuilder,
     this.restorationId,
-  })  : assert(
-            !(controller != null && primary == true),
-            'Primary ScrollViews obtain their ScrollController via inheritance from a PrimaryScrollController widget. '
-            'You cannot both set primary to true and pass an explicit controller.'),
-        primary = primary ?? controller == null,
-        super(key: key);
-
-  /// The amount of space by which to inset the child.
-  final EdgeInsetsGeometry? padding;
+  }) : super(key: key);
 
   /// An object that can be used to control the position to which this scroll
   /// view is scrolled.
@@ -46,22 +36,7 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
   /// [ScrollController.keepScrollOffset]). It can be used to read the current
   /// scroll position (see [ScrollController.offset]), or change it (see
   /// [ScrollController.animateTo]).
-  final ScrollController? controller;
-
-  /// Whether this is the primary scroll view associated with the parent
-  /// [PrimaryScrollController].
-  ///
-  /// When true, the scroll view is used for default [ScrollAction]s. If a
-  /// ScrollAction is not handled by an otherwise focused part of the application,
-  /// the ScrollAction will be evaluated using this scroll view, for example,
-  /// when executing [Shortcuts] key events like page up and down.
-  ///
-  /// On iOS, this identifies the scroll view that will scroll to top in
-  /// response to a tap in the status bar.
-  ///
-  /// Defaults to true when [scrollDirection] is vertical and [controller] is
-  /// not specified.
-  final bool primary;
+  final ScrollController controller;
 
   /// How the scroll view should respond to user input.
   ///
@@ -84,8 +59,7 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final axisDirection = _getDirection(context);
-    final scrollController =
-        primary ? PrimaryScrollController.of(context) : controller;
+    final scrollController = controller;
     final scrollable = Scrollable(
       dragStartBehavior: DragStartBehavior.start,
       axisDirection: axisDirection,
@@ -93,16 +67,13 @@ class ZefyrSingleChildScrollView extends StatelessWidget {
       physics: physics,
       restorationId: restorationId,
       viewportBuilder: (BuildContext context, ViewportOffset offset) {
-        var contents = viewportBuilder(context, offset);
-        if (padding != null) {
-          contents = Padding(padding: padding!, child: contents);
-        }
-        return _SingleChildViewport(offset: offset, child: contents);
+        return _SingleChildViewport(
+          offset: offset,
+          child: viewportBuilder(context, offset),
+        );
       },
     );
-    return primary && scrollController != null
-        ? PrimaryScrollController.none(child: scrollable)
-        : scrollable;
+    return scrollable;
   }
 }
 
