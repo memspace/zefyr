@@ -244,17 +244,15 @@ class _ZefyrFieldState extends State<ZefyrField> {
     );
   }
 
-  /// Field is considered empty if document's length is 1
-  /// or its only node has no styles
+  /// Field is considered empty when the document consists of
+  /// a single empty line of text with no styles applied to it
   bool get _isEmpty {
     if (widget.controller.document.length > 1) {
       return false;
     }
     final node = widget.controller.document.root.first;
-    if (node is StyledNode) {
-      return node.style.isEmpty;
-    }
-    return true;
+    assert(node is StyledNode);
+    return (node as StyledNode).style.isEmpty;
   }
 
   InputDecoration _getEffectiveDecoration() {
