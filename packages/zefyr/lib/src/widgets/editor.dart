@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 import 'package:zefyr/src/widgets/baseline_proxy.dart';
+import 'package:zefyr/src/widgets/single_child_scroll_view.dart';
 
 import '../rendering/editor.dart';
 import '../services/keyboard.dart';
@@ -1113,10 +1114,25 @@ class RawEditorState extends EditorState
       child = BaselineProxy(
         textStyle: _themeData.paragraph.style,
         padding: baselinePadding,
-        child: SingleChildScrollView(
+        child: ZefyrSingleChildScrollView(
           controller: _scrollController,
           physics: widget.scrollPhysics,
-          child: child,
+          viewportBuilder: (_, offset) => CompositedTransformTarget(
+            link: _toolbarLayerLink,
+            child: _Editor(
+              key: _editorKey,
+              offset: offset,
+              document: widget.controller.document,
+              selection: widget.controller.selection,
+              hasFocus: _hasFocus,
+              textDirection: _textDirection,
+              startHandleLayerLink: _startHandleLayerLink,
+              endHandleLayerLink: _endHandleLayerLink,
+              onSelectionChanged: _handleSelectionChanged,
+              padding: widget.padding,
+              children: _buildChildren(context),
+            ),
+          ),
         ),
       );
     }
@@ -1212,6 +1228,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   _Editor({
     required Key key,
     required List<Widget> children,
+    this.offset,
     required this.document,
     required this.textDirection,
     required this.hasFocus,
@@ -1222,6 +1239,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     this.padding = EdgeInsets.zero,
   }) : super(key: key, children: children);
 
+  final ViewportOffset? offset;
   final NotusDocument document;
   final TextDirection textDirection;
   final bool hasFocus;
@@ -1234,6 +1252,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   @override
   RenderEditor createRenderObject(BuildContext context) {
     return RenderEditor(
+      offset: offset,
       document: document,
       textDirection: textDirection,
       hasFocus: hasFocus,
@@ -1248,6 +1267,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, covariant RenderEditor renderObject) {
+    renderObject.offset = offset;
     renderObject.document = document;
     renderObject.node = document.root;
     renderObject.textDirection = textDirection;
