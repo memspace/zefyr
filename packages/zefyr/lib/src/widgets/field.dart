@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:notus/notus.dart';
 
 import 'controller.dart';
 import 'editor.dart';
@@ -235,13 +236,23 @@ class _ZefyrFieldState extends State<ZefyrField> {
         return InputDecorator(
           decoration: _getEffectiveDecoration(),
           isFocused: widget.focusNode!.hasFocus,
-          // TODO: Document should be considered empty of it has single empty line with no styles applied
-          isEmpty: widget.controller.document.length == 1,
+          isEmpty: _isEmpty,
           child: child,
         );
       },
       child: child,
     );
+  }
+
+  /// Field is considered empty when the document consists of
+  /// a single empty line of text with no styles applied to it
+  bool get _isEmpty {
+    if (widget.controller.document.length > 1) {
+      return false;
+    }
+    final node = widget.controller.document.root.first;
+    assert(node is StyledNode);
+    return (node as StyledNode).style.isEmpty;
   }
 
   InputDecoration _getEffectiveDecoration() {
