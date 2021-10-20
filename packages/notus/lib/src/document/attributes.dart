@@ -184,9 +184,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! NotusAttribute<T>) return false;
-    return key == other.key &&
-        scope == other.scope &&
-        value == other.value;
+    return key == other.key && scope == other.scope && value == other.value;
   }
 
   @override
@@ -341,7 +339,8 @@ class _UnderlineAttribute extends NotusAttribute<bool> {
 
 /// Applies strikethrough style to a text segment.
 class _StrikethroughAttribute extends NotusAttribute<bool> {
-  const _StrikethroughAttribute() : super._('s', NotusAttributeScope.inline, true);
+  const _StrikethroughAttribute()
+      : super._('s', NotusAttributeScope.inline, true);
 }
 
 /// Builder for link attribute values.

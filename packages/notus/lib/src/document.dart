@@ -299,7 +299,9 @@ class NotusDocument {
   Object _normalizeData(Object data) {
     return data is String
         ? data
-        : data is EmbeddableObject ? data : EmbeddableObject.fromJson(data as Map<String, dynamic>);
+        : data is EmbeddableObject
+            ? data
+            : EmbeddableObject.fromJson(data as Map<String, dynamic>);
   }
 
   /// Loads [document] delta into this document.

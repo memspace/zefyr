@@ -89,7 +89,9 @@ void main() {
     test('heading styles', () {
       void runFor(
           NotusAttribute<int> attribute, String source, String expected) {
-        final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
+        final delta = Delta()
+          ..insert(source)
+          ..insert('\n', attribute.toJson());
         final result = notusMarkdown.encode(delta);
         expect(result, expected);
       }
@@ -102,7 +104,9 @@ void main() {
     test('block styles', () {
       void runFor(
           NotusAttribute<String> attribute, String source, String expected) {
-        final delta = Delta()..insert(source)..insert('\n', attribute.toJson());
+        final delta = Delta()
+          ..insert(source)
+          ..insert('\n', attribute.toJson());
         final result = notusMarkdown.encode(delta);
         expect(result, expected);
       }
