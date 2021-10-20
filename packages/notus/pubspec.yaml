@@ -15,10 +15,3 @@ dependencies:
 
 dev_dependencies:
   test: ^1.10.0
-
-# because when running 'pub run test' meta is incompatible
-# with the analyzer version we use
-# see https://github.com/dart-lang/sdk/issues/46687
-# if travis runs without it: just drop it :)
-dependency_overrides:
-  meta: 1.6.0
