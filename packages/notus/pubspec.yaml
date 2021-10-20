@@ -9,16 +9,16 @@ environment:
 
 dependencies:
   collection: ^1.15.0
+  coverage: ^1.0.3
   quill_delta: ^3.0.0-nullsafety.1
   quiver: ^3.0.1
 
 dev_dependencies:
-  pedantic: ^1.0.0
   test: ^1.10.0
-  test_coverage: ^0.5.0
 
 # because when running 'pub run test' meta is incompatible
 # with the analyzer version we use
 # see https://github.com/dart-lang/sdk/issues/46687
+# if travis runs without it: just drop it :)
 dependency_overrides:
   meta: 1.6.0
