@@ -13,6 +13,8 @@ description: A new Flutter project.
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+1
 
+publish_to: none
+
 environment:
   sdk: ">=2.9.0 <3.0.0"
 
@@ -32,9 +34,11 @@ dependencies:
   zefyr:
     path: ../
 
-#dependency_overrides:
-#  notus:
-#    path: ../../notus
+dependency_overrides:
+ notus:
+   path: ../../notus
+ quill_delta:
+   path: ../../../../quill-delta-dart
 
 dev_dependencies:
   flutter_test:
