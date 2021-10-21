@@ -20,6 +20,18 @@
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"
+    },
+    {
+      "name": "Dart Tests",
+      "program": "test",
+      "request": "launch",
+      "type": "dart",
+      // "args": ["--plain-name", "preserve line"],
+      // "args": ["--plain-name", "apply simple"],
+      // "args": ["--plain-name", "applies to lines in the middle"],
+      "args": ["--plain-name", "replace applies heuristic"],
+
+      "cwd": "packages/notus"
     }
   ]
 }
