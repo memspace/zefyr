@@ -405,7 +405,6 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
     List<Widget> leading = const <Widget>[],
     List<Widget> trailing = const <Widget>[],
     bool hideRightAlignment = false,
-    bool hideLeftAlignment = false,
     bool hideCenterAlignment = false,
     bool hideJustifyAlignment = false,
   }) {
