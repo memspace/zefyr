@@ -21,7 +21,7 @@ cache:
     - $HOME/.pub-cache
 
 env:
-  - FLUTTER_VERSION=master
+  - FLUTTER_VERSION=stable
 
 before_script:
   - pwd
@@ -32,4 +32,6 @@ script:
 - pwd
 - ./tool/travis.sh notus
 - ./tool/travis.sh zefyr
-- bash <(curl -s https://codecov.io/bash)
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

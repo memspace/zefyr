@@ -2,7 +2,7 @@
 
 set -e
 
-$TRAVIS_BUILD_DIR/flutter/bin/flutter test
+flutter test || $TRAVIS_BUILD_DIR/flutter/bin/flutter test
 
-dartfmt -n --set-exit-if-changed lib/
-dartfmt -n --set-exit-if-changed test/
+dart format -o none --set-exit-if-changed lib/
+dart format -o none --set-exit-if-changed test/

@@ -211,7 +211,9 @@ class AutoExitBlockRule extends InsertRule {
     // therefore we can exit this block.
     final attributes = target.attributes ?? <String, dynamic>{};
     attributes.addAll(NotusAttribute.block.unset.toJson());
-    return Delta()..retain(index)..retain(1, attributes);
+    return Delta()
+      ..retain(index)
+      ..retain(1, attributes);
   }
 }
 
@@ -335,10 +337,14 @@ class ForceNewlineForInsertsAroundEmbedRule extends InsertRule {
     if (cursorBeforeEmbed || cursorAfterEmbed) {
       final delta = Delta()..retain(index);
       if (cursorBeforeEmbed && !data.endsWith('\n')) {
-        return delta..insert(data)..insert('\n');
+        return delta
+          ..insert(data)
+          ..insert('\n');
       }
       if (cursorAfterEmbed && !data.startsWith('\n')) {
-        return delta..insert('\n')..insert(data);
+        return delta
+          ..insert('\n')
+          ..insert(data);
       }
       return delta..insert(data);
     }
@@ -418,7 +424,9 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
       result.retain(nextNewline.skippedLength!);
       final opText = nextNewline.op!.data as String;
       final lf = opText.indexOf('\n');
-      result..retain(lf)..retain(1, resetStyle);
+      result
+        ..retain(lf)
+        ..retain(1, resetStyle);
     }
 
     return result;

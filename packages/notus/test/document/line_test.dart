@@ -213,7 +213,9 @@ void main() {
       expect(root.childCount, 1);
       final line = root.first as LineNode;
       expect(line.childCount, 1);
-      final delta = Delta()..insert('delnes')..insert('\n', h2Style.toJson());
+      final delta = Delta()
+        ..insert('delnes')
+        ..insert('\n', h2Style.toJson());
       expect(line.toDelta(), delta);
     });
 

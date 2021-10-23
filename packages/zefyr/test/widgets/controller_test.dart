@@ -85,7 +85,9 @@ void main() {
       expect(notified, isTrue);
       expect(
         controller.document.toDelta(),
-        Delta()..insert('Words', NotusAttribute.bold.toJson())..insert('\n'),
+        Delta()
+          ..insert('Words', NotusAttribute.bold.toJson())
+          ..insert('\n'),
       );
       // expect(controller.lastChangeSource, ChangeSource.local);
     });
@@ -149,7 +151,9 @@ void main() {
       expect(notified, isTrue);
       expect(
         controller.document.toDelta(),
-        Delta()..insert('Words', NotusAttribute.bold.toJson())..insert('\n'),
+        Delta()
+          ..insert('Words', NotusAttribute.bold.toJson())
+          ..insert('\n'),
       );
       // expect(controller.lastChangeSource, ChangeSource.local);
     });
@@ -182,7 +186,9 @@ void main() {
       expect(notified, isTrue);
       expect(
         controller.document.toDelta(),
-        Delta()..insert('Word', NotusAttribute.bold.toJson())..insert('\n'),
+        Delta()
+          ..insert('Word', NotusAttribute.bold.toJson())
+          ..insert('\n'),
       );
       // expect(controller.lastChangeSource, ChangeSource.local);
     });
