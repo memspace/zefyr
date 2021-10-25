@@ -11,7 +11,6 @@ import 'theme.dart';
 
 class EditableTextBlock extends StatelessWidget {
   final BlockNode node;
-  final TextDirection textDirection;
   final VerticalSpacing spacing;
   final CursorController cursorController;
   final TextSelection selection;
@@ -24,7 +23,6 @@ class EditableTextBlock extends StatelessWidget {
   EditableTextBlock({
     Key? key,
     required this.node,
-    required this.textDirection,
     required this.spacing,
     required this.cursorController,
     required this.selection,
@@ -42,7 +40,6 @@ class EditableTextBlock extends StatelessWidget {
     final theme = ZefyrTheme.of(context)!;
     return _EditableBlock(
       node: node,
-      textDirection: textDirection,
       padding: spacing,
       contentPadding: contentPadding,
       decoration: _getDecorationForBlock(node, theme) ?? BoxDecoration(),
@@ -62,7 +59,6 @@ class EditableTextBlock extends StatelessWidget {
         textDirection: nodeTextDirection,
         child: EditableTextLine(
           node: line,
-          textDirection: nodeTextDirection,
           spacing: _getSpacingForLine(line, index, count, theme),
           leading: _buildLeading(context, line, index, count),
           indentWidth: _getIndentWidth(),
@@ -70,7 +66,6 @@ class EditableTextBlock extends StatelessWidget {
           body: TextLine(
             node: line,
             embedBuilder: embedBuilder,
-            textDirection: nodeTextDirection,
           ),
           cursorController: cursorController,
           selection: selection,
@@ -185,7 +180,6 @@ class EditableTextBlock extends StatelessWidget {
 
 class _EditableBlock extends MultiChildRenderObjectWidget {
   final BlockNode node;
-  final TextDirection textDirection;
   final VerticalSpacing padding;
   final Decoration decoration;
   final EdgeInsets? contentPadding;
@@ -193,7 +187,6 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
   _EditableBlock({
     Key? key,
     required this.node,
-    required this.textDirection,
     required this.decoration,
     required List<Widget> children,
     this.contentPadding,
@@ -209,7 +202,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
   RenderEditableTextBlock createRenderObject(BuildContext context) {
     return RenderEditableTextBlock(
       node: node,
-      textDirection: textDirection,
+      textDirection: Directionality.of(context),
       padding: _padding,
       decoration: decoration,
       contentPadding: _contentPadding,
@@ -220,7 +213,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
   void updateRenderObject(
       BuildContext context, covariant RenderEditableTextBlock renderObject) {
     renderObject.node = node;
-    renderObject.textDirection = textDirection;
+    renderObject.textDirection = Directionality.of(context);
     renderObject.padding = _padding;
     renderObject.decoration = decoration;
     renderObject.contentPadding = _contentPadding;

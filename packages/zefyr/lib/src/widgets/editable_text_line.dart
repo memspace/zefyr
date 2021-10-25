@@ -26,7 +26,6 @@ class EditableTextLine extends RenderObjectWidget {
   /// Space above and below [body] of this text line.
   final VerticalSpacing spacing;
 
-  final TextDirection textDirection;
   final CursorController cursorController;
   final TextSelection selection;
   final Color selectionColor;
@@ -39,7 +38,6 @@ class EditableTextLine extends RenderObjectWidget {
     Key? key,
     required this.node,
     required this.body,
-    required this.textDirection,
     required this.cursorController,
     required this.selection,
     required this.selectionColor,
@@ -65,7 +63,7 @@ class EditableTextLine extends RenderObjectWidget {
     return RenderEditableTextLine(
       node: node,
       padding: _padding,
-      textDirection: textDirection,
+      textDirection: Directionality.of(context),
       cursorController: cursorController,
       selection: selection,
       selectionColor: selectionColor,
@@ -80,7 +78,7 @@ class EditableTextLine extends RenderObjectWidget {
       BuildContext context, covariant RenderEditableTextLine renderObject) {
     renderObject.node = node;
     renderObject.padding = _padding;
-    renderObject.textDirection = textDirection;
+    renderObject.textDirection = Directionality.of(context);
     renderObject.cursorController = cursorController;
     renderObject.selection = selection;
     renderObject.selectionColor = selectionColor;
