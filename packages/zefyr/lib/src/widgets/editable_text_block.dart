@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/util.dart';
 
 import '../rendering/editable_text_block.dart';
 import 'cursor.dart';
@@ -49,14 +50,6 @@ class EditableTextBlock extends StatelessWidget {
     );
   }
 
-  TextDirection getTextDirectionForNode(BuildContext context, StyledNode node) {
-    final preferredDirection = node.style.get(NotusAttribute.direction);
-    if (preferredDirection == NotusAttribute.rtl) {
-      return TextDirection.rtl;
-    }
-    return TextDirection.ltr;
-  }
-
   List<Widget> _buildChildren(BuildContext context) {
     final theme = ZefyrTheme.of(context)!;
     final count = node.children.length;
@@ -64,8 +57,7 @@ class EditableTextBlock extends StatelessWidget {
     var index = 0;
     for (final line in node.children) {
       index++;
-      final nodeTextDirection =
-          getTextDirectionForNode(context, line as LineNode);
+      final nodeTextDirection = getDirectionOfNode(line as LineNode);
       children.add(Directionality(
         textDirection: nodeTextDirection,
         child: EditableTextLine(

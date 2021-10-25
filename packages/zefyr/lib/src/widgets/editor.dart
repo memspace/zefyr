@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 import 'package:zefyr/src/widgets/baseline_proxy.dart';
 import 'package:zefyr/src/widgets/single_child_scroll_view.dart';
+import 'package:zefyr/util.dart';
 
 import '../rendering/editor.dart';
 import '../services/keyboard.dart';
@@ -1155,19 +1156,11 @@ class RawEditorState extends EditorState
     );
   }
 
-  TextDirection getTextDirectionForStyledNode(StyledNode node) {
-    final preferredDirection = node.style.get(NotusAttribute.direction);
-    if (preferredDirection == NotusAttribute.rtl) {
-      return TextDirection.rtl;
-    }
-    return TextDirection.ltr;
-  }
-
   List<Widget> _buildChildren(BuildContext context) {
     final result = <Widget>[];
     for (final node in widget.controller.document.root.children) {
       if (node is LineNode) {
-        final textDirection = getTextDirectionForStyledNode(node);
+        final textDirection = getDirectionOfNode(node);
         result.add(EditableTextLine(
           node: node,
           textDirection: textDirection,
@@ -1187,7 +1180,7 @@ class RawEditorState extends EditorState
         ));
       } else if (node is BlockNode) {
         final block = node.style.get(NotusAttribute.block);
-        final textDirection = getTextDirectionForStyledNode(node);
+        final textDirection = getDirectionOfNode(node);
         result.add(EditableTextBlock(
           node: node,
           textDirection: textDirection,
