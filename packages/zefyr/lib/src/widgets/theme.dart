@@ -72,8 +72,8 @@ class ZefyrThemeData {
   /// Style of strikethrough text.
   final TextStyle strikethrough;
 
-  /// Style of inline code text.
-  final TextStyle inlineCode;
+  /// Theme of inline code.
+  final InlineCodeThemeData inlineCode;
 
   /// Style of links in text.
   final TextStyle link;
@@ -142,11 +142,10 @@ class ZefyrThemeData {
       italic: TextStyle(fontStyle: FontStyle.italic),
       underline: TextStyle(decoration: TextDecoration.underline),
       strikethrough: TextStyle(decoration: TextDecoration.lineThrough),
-      inlineCode: TextStyle(
+      inlineCode: InlineCodeThemeData(TextStyle(
         color: Colors.blue.shade900.withOpacity(0.9),
         fontFamily: fontFamily,
-        fontSize: 13.0,
-      ),
+      )),
       link: TextStyle(
         color: themeData.accentColor,
         decoration: TextDecoration.underline,
@@ -219,8 +218,8 @@ class ZefyrThemeData {
     TextStyle? italic,
     TextStyle? underline,
     TextStyle? strikethrough,
-    TextStyle? inlineCode,
     TextStyle? link,
+    InlineCodeThemeData? inlineCode,
     TextBlockTheme? paragraph,
     TextBlockTheme? heading1,
     TextBlockTheme? heading2,
@@ -290,4 +289,13 @@ class TextBlockTheme {
     this.lineSpacing = const VerticalSpacing.zero(),
     this.decoration,
   });
+}
+
+/// Theme data for inline code.
+class InlineCodeThemeData {
+
+  /// Base text style for an inline code.
+  final TextStyle style;
+
+  InlineCodeThemeData(this.style);
 }
