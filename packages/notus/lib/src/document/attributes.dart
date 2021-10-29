@@ -78,6 +78,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.italic.key: NotusAttribute.italic,
     NotusAttribute.underline.key: NotusAttribute.underline,
     NotusAttribute.strikethrough.key: NotusAttribute.strikethrough,
+    NotusAttribute.inlineCode.key: NotusAttribute.inlineCode,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
@@ -96,6 +97,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Strikethrough style attribute.
   static const strikethrough = _StrikethroughAttribute();
+
+  /// Inline code style attribute.
+  static const inlineCode = _InlineCodeAttribute();
 
   /// Link style attribute.
   // ignore: const_eval_throws_exception
@@ -341,6 +345,11 @@ class _UnderlineAttribute extends NotusAttribute<bool> {
 class _StrikethroughAttribute extends NotusAttribute<bool> {
   const _StrikethroughAttribute()
       : super._('s', NotusAttributeScope.inline, true);
+}
+
+/// Applies code style to a text segment.
+class _InlineCodeAttribute extends NotusAttribute<bool> {
+  const _InlineCodeAttribute() : super._('c', NotusAttributeScope.inline, true);
 }
 
 /// Builder for link attribute values.
