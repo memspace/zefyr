@@ -401,8 +401,11 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
     bool hideQuote = false,
     bool hideLink = false,
     bool hideHorizontalRule = false,
+    List<Widget> leading = const <Widget>[],
+    List<Widget> trailing = const <Widget>[],
   }) {
     return ZefyrToolbar(key: key, children: [
+      ...leading,
       Visibility(
         visible: !hideBoldButton,
         child: ToggleStyleButton(
@@ -504,6 +507,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           icon: Icons.horizontal_rule,
         ),
       ),
+      ...trailing,
     ]);
   }
 
