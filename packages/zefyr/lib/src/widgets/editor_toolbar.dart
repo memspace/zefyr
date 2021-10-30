@@ -393,6 +393,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
     bool hideItalicButton = false,
     bool hideUnderLineButton = false,
     bool hideStrikeThrough = false,
+    bool hideInlineCode = false,
     bool hideHeadingStyle = false,
     bool hideListNumbers = false,
     bool hideListBullets = false,
@@ -401,8 +402,11 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
     bool hideLink = false,
     bool hideHorizontalRule = false,
     bool hideDirection = false,
+    List<Widget> leading = const <Widget>[],
+    List<Widget> trailing = const <Widget>[],
   }) {
     return ZefyrToolbar(key: key, children: [
+      ...leading,
       Visibility(
         visible: !hideBoldButton,
         child: ToggleStyleButton(
@@ -435,6 +439,15 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
         child: ToggleStyleButton(
           attribute: NotusAttribute.strikethrough,
           icon: Icons.format_strikethrough,
+          controller: controller,
+        ),
+      ),
+      SizedBox(width: 1),
+      Visibility(
+        visible: !hideInlineCode,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.inlineCode,
+          icon: Icons.code,
           controller: controller,
         ),
       ),
@@ -507,6 +520,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           icon: Icons.horizontal_rule,
         ),
       ),
+      ...trailing,
     ]);
   }
 
