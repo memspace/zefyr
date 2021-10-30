@@ -72,6 +72,7 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
 ///   * [NotusAttribute.link]
 ///   * [NotusAttribute.heading]
 ///   * [NotusAttribute.block]
+///   * [NotusAttribute.direction]
 class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   static final Map<String, NotusAttributeBuilder> _registry = {
     NotusAttribute.bold.key: NotusAttribute.bold,
@@ -82,6 +83,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
+    NotusAttribute.direction.key: NotusAttribute.direction,
   };
 
   // Inline attributes
@@ -135,6 +137,12 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.block.code].
   static NotusAttribute<String> get code => block.code;
+
+  /// Direction attribute
+  static const direction = DirectionAttributeBuilder._();
+
+  /// Alias for [NotusAttribute.direction.rtl].
+  static NotusAttribute<String> get rtl => direction.rtl;
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
@@ -407,4 +415,12 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a block of lines as a quote.
   NotusAttribute<String> get quote =>
       NotusAttribute<String>._(key, scope, 'quote');
+}
+
+class DirectionAttributeBuilder extends NotusAttributeBuilder<String> {
+  static const _kDirection = 'direction';
+  const DirectionAttributeBuilder._()
+      : super._(_kDirection, NotusAttributeScope.line);
+
+  NotusAttribute<String> get rtl => NotusAttribute<String>._(key, scope, 'rtl');
 }

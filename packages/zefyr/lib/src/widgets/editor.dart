@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 import 'package:zefyr/src/widgets/baseline_proxy.dart';
 import 'package:zefyr/src/widgets/single_child_scroll_view.dart';
+import 'package:zefyr/util.dart';
 
 import '../rendering/editor.dart';
 import '../services/keyboard.dart';
@@ -1159,38 +1160,41 @@ class RawEditorState extends EditorState
     final result = <Widget>[];
     for (final node in widget.controller.document.root.children) {
       if (node is LineNode) {
-        result.add(EditableTextLine(
-          node: node,
-          textDirection: _textDirection,
-          indentWidth: 0,
-          spacing: _getSpacingForLine(node, _themeData),
-          cursorController: _cursorController,
-          selection: widget.controller.selection,
-          selectionColor: widget.selectionColor,
-          enableInteractiveSelection: widget.enableInteractiveSelection,
-          body: TextLine(
+        result.add(Directionality(
+          textDirection: getDirectionOfNode(node),
+          child: EditableTextLine(
             node: node,
-            textDirection: _textDirection,
-            embedBuilder: widget.embedBuilder,
+            indentWidth: 0,
+            spacing: _getSpacingForLine(node, _themeData),
+            cursorController: _cursorController,
+            selection: widget.controller.selection,
+            selectionColor: widget.selectionColor,
+            enableInteractiveSelection: widget.enableInteractiveSelection,
+            body: TextLine(
+              node: node,
+              embedBuilder: widget.embedBuilder,
+            ),
+            hasFocus: _hasFocus,
+            devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
           ),
-          hasFocus: _hasFocus,
-          devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         ));
       } else if (node is BlockNode) {
         final block = node.style.get(NotusAttribute.block);
-        result.add(EditableTextBlock(
-          node: node,
-          textDirection: _textDirection,
-          spacing: _getSpacingForBlock(node, _themeData),
-          cursorController: _cursorController,
-          selection: widget.controller.selection,
-          selectionColor: widget.selectionColor,
-          enableInteractiveSelection: widget.enableInteractiveSelection,
-          hasFocus: _hasFocus,
-          contentPadding: (block == NotusAttribute.block.code)
-              ? EdgeInsets.all(16.0)
-              : null,
-          embedBuilder: widget.embedBuilder,
+        result.add(Directionality(
+          textDirection: getDirectionOfNode(node),
+          child: EditableTextBlock(
+            node: node,
+            spacing: _getSpacingForBlock(node, _themeData),
+            cursorController: _cursorController,
+            selection: widget.controller.selection,
+            selectionColor: widget.selectionColor,
+            enableInteractiveSelection: widget.enableInteractiveSelection,
+            hasFocus: _hasFocus,
+            contentPadding: (block == NotusAttribute.block.code)
+                ? EdgeInsets.all(16.0)
+                : null,
+            embedBuilder: widget.embedBuilder,
+          ),
         ));
       } else {
         throw StateError('Unreachable.');

@@ -14,14 +14,12 @@ import 'theme.dart';
 class TextLine extends StatelessWidget {
   /// Line of text represented by this widget.
   final LineNode node;
-  final TextDirection? textDirection;
   final ZefyrEmbedBuilder embedBuilder;
 
   const TextLine({
     Key? key,
     required this.node,
     required this.embedBuilder,
-    this.textDirection,
   }) : super(key: key);
 
   @override
@@ -37,12 +35,10 @@ class TextLine extends StatelessWidget {
         StrutStyle.fromTextStyle(text.style!, forceStrutHeight: true);
     return RichTextProxy(
       textStyle: text.style!,
-      textDirection: textDirection,
       strutStyle: strutStyle,
       locale: Localizations.maybeLocaleOf(context),
       child: RichText(
         text: buildText(context, node),
-        textDirection: textDirection,
         strutStyle: strutStyle,
         textScaleFactor: MediaQuery.textScaleFactorOf(context),
       ),

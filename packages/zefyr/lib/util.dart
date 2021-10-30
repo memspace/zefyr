@@ -6,7 +6,9 @@
 library zefyr.util;
 
 import 'dart:math' as math;
+import 'dart:ui';
 
+import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 export 'src/fast_diff.dart';
@@ -38,4 +40,12 @@ int getPositionDelta(Delta user, Delta actual) {
     }
   }
   return diff;
+}
+
+TextDirection getDirectionOfNode(StyledNode node) {
+  final direction = node.style.get(NotusAttribute.direction);
+  if (direction == NotusAttribute.rtl) {
+    return TextDirection.rtl;
+  }
+  return TextDirection.ltr;
 }

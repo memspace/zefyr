@@ -401,6 +401,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
     bool hideQuote = false,
     bool hideLink = false,
     bool hideHorizontalRule = false,
+    bool hideDirection = false,
     List<Widget> leading = const <Widget>[],
     List<Widget> trailing = const <Widget>[],
   }) {
@@ -447,6 +448,18 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
         child: ToggleStyleButton(
           attribute: NotusAttribute.inlineCode,
           icon: Icons.code,
+          controller: controller,
+        ),
+      ),
+      Visibility(
+          visible: !hideDirection,
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+      Visibility(
+        visible: !hideDirection,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.rtl,
+          icon: Icons.format_textdirection_r_to_l,
           controller: controller,
         ),
       ),

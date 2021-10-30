@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/util.dart';
 
 import '../rendering/editable_text_block.dart';
 import 'cursor.dart';
@@ -10,7 +11,6 @@ import 'theme.dart';
 
 class EditableTextBlock extends StatelessWidget {
   final BlockNode node;
-  final TextDirection textDirection;
   final VerticalSpacing spacing;
   final CursorController cursorController;
   final TextSelection selection;
@@ -23,7 +23,6 @@ class EditableTextBlock extends StatelessWidget {
   EditableTextBlock({
     Key? key,
     required this.node,
-    required this.textDirection,
     required this.spacing,
     required this.cursorController,
     required this.selection,
@@ -41,7 +40,6 @@ class EditableTextBlock extends StatelessWidget {
     final theme = ZefyrTheme.of(context)!;
     return _EditableBlock(
       node: node,
-      textDirection: textDirection,
       padding: spacing,
       contentPadding: contentPadding,
       decoration: _getDecorationForBlock(node, theme) ?? BoxDecoration(),
@@ -56,23 +54,25 @@ class EditableTextBlock extends StatelessWidget {
     var index = 0;
     for (final line in node.children) {
       index++;
-      children.add(EditableTextLine(
-        node: line as LineNode,
-        textDirection: textDirection,
-        spacing: _getSpacingForLine(line, index, count, theme),
-        leading: _buildLeading(context, line, index, count),
-        indentWidth: _getIndentWidth(),
-        devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
-        body: TextLine(
+      final nodeTextDirection = getDirectionOfNode(line as LineNode);
+      children.add(Directionality(
+        textDirection: nodeTextDirection,
+        child: EditableTextLine(
           node: line,
-          textDirection: textDirection,
-          embedBuilder: embedBuilder,
+          spacing: _getSpacingForLine(line, index, count, theme),
+          leading: _buildLeading(context, line, index, count),
+          indentWidth: _getIndentWidth(),
+          devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
+          body: TextLine(
+            node: line,
+            embedBuilder: embedBuilder,
+          ),
+          cursorController: cursorController,
+          selection: selection,
+          selectionColor: selectionColor,
+          enableInteractiveSelection: enableInteractiveSelection,
+          hasFocus: hasFocus,
         ),
-        cursorController: cursorController,
-        selection: selection,
-        selectionColor: selectionColor,
-        enableInteractiveSelection: enableInteractiveSelection,
-        hasFocus: hasFocus,
       ));
     }
     return children.toList(growable: false);
@@ -180,7 +180,6 @@ class EditableTextBlock extends StatelessWidget {
 
 class _EditableBlock extends MultiChildRenderObjectWidget {
   final BlockNode node;
-  final TextDirection textDirection;
   final VerticalSpacing padding;
   final Decoration decoration;
   final EdgeInsets? contentPadding;
@@ -188,7 +187,6 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
   _EditableBlock({
     Key? key,
     required this.node,
-    required this.textDirection,
     required this.decoration,
     required List<Widget> children,
     this.contentPadding,
@@ -204,7 +202,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
   RenderEditableTextBlock createRenderObject(BuildContext context) {
     return RenderEditableTextBlock(
       node: node,
-      textDirection: textDirection,
+      textDirection: Directionality.of(context),
       padding: _padding,
       decoration: decoration,
       contentPadding: _contentPadding,
@@ -215,7 +213,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
   void updateRenderObject(
       BuildContext context, covariant RenderEditableTextBlock renderObject) {
     renderObject.node = node;
-    renderObject.textDirection = textDirection;
+    renderObject.textDirection = Directionality.of(context);
     renderObject.padding = _padding;
     renderObject.decoration = decoration;
     renderObject.contentPadding = _contentPadding;
