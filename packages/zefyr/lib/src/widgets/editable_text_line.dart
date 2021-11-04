@@ -34,7 +34,7 @@ class EditableTextLine extends RenderObjectWidget {
   final double devicePixelRatio;
 
   /// Creates an editable line of text.
-  EditableTextLine({
+  const EditableTextLine({
     Key? key,
     required this.node,
     required this.body,
