@@ -264,6 +264,13 @@ mixin RawEditorStateTextInputClientMixin on EditorState
             .localToGlobal(_lastBoundedOffset! + floatingCursorOffset));
         renderEditor.setFloatingCursor(
             point.state, _lastBoundedOffset!, _lastTextPosition!);
+        final newSelection = TextSelection.collapsed(
+            offset: _lastTextPosition!.offset,
+            affinity: _lastTextPosition!.affinity);
+        // Setting selection as floating cursor moves will have scroll view
+        // bring background cursor into view
+        renderEditor.onSelectionChanged!(
+            newSelection, SelectionChangedCause.drag);
         break;
       case FloatingCursorDragState.End:
         // We skip animation if no update has happened.
