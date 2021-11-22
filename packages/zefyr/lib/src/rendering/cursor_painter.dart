@@ -113,9 +113,6 @@ class FloatingCursorPainter {
 
   Rect? floatingCursorRect;
 
-  // TODO: decide how to use it
-  bool showRegularCaret = true;
-
   final Paint floatingCursorPaint = Paint();
 
   void paint(Canvas canvas) {
