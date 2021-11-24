@@ -246,10 +246,10 @@ abstract class ContainerNode<T extends Node> extends Node {
   }
 
   @override
-  void retain(int index, int length, NotusStyle? attributes) {
+  void retain(int index, int length, NotusStyle? style) {
     assert(isNotEmpty);
     final res = lookup(index);
-    res.node!.retain(res.offset, length, attributes);
+    res.node!.retain(res.offset, length, style);
   }
 
   @override

@@ -85,9 +85,7 @@ void main() {
     test('applies and keeps block style', () {
       final style = NotusAttribute.ul.toJson();
       style.addAll(NotusAttribute.h1.toJson());
-      final doc = Delta()
-        ..insert('Hello world')
-        ..insert('\n', style);
+      final doc = Delta()..insert('Hello world')..insert('\n', style);
       final actual = rule.apply(doc, 11, '\n');
       expect(actual, isNotNull);
       final expected = Delta()
@@ -132,9 +130,7 @@ void main() {
 
     test('applies only on empty line', () {
       final ul = NotusAttribute.ul.toJson();
-      final doc = Delta()
-        ..insert('Item 1')
-        ..insert('\n', ul);
+      final doc = Delta()..insert('Item 1')..insert('\n', ul);
       final actual = rule.apply(doc, 6, '\n');
       expect(actual, isNull);
     });
@@ -150,18 +146,14 @@ void main() {
 
     test('ignores non-empty line at the beginning of a document', () {
       final ul = NotusAttribute.ul.toJson();
-      final doc = Delta()
-        ..insert('Text')
-        ..insert('\n', ul);
+      final doc = Delta()..insert('Text')..insert('\n', ul);
       final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNull);
     });
 
     test('ignores empty lines in the middle of a block', () {
       final ul = NotusAttribute.ul.toJson();
-      final doc = Delta()
-        ..insert('Line1')
-        ..insert('\n\n\n\n', ul);
+      final doc = Delta()..insert('Line1')..insert('\n\n\n\n', ul);
       final actual = rule.apply(doc, 7, '\n');
       expect(actual, isNull);
     });
@@ -277,21 +269,21 @@ void main() {
 
     test('preserves heading style of the original line', () {
       final quote = NotusAttribute.block.quote.toJson();
-      final h1_unset = NotusAttribute.heading.unset.toJson();
-      final quote_h1 = NotusAttribute.block.quote.toJson();
-      quote_h1.addAll(NotusAttribute.heading.level1.toJson());
+      final h1Unset = NotusAttribute.heading.unset.toJson();
+      final quoteH1 = NotusAttribute.block.quote.toJson();
+      quoteH1.addAll(NotusAttribute.heading.level1.toJson());
       final doc = Delta()
         ..insert('One and two')
-        ..insert('\n', quote_h1)
+        ..insert('\n', quoteH1)
         ..insert('Three')
         ..insert('\n', quote);
       final actual = rule.apply(doc, 8, '111\n');
       final expected = Delta()
         ..retain(8)
         ..insert('111')
-        ..insert('\n', quote_h1)
+        ..insert('\n', quoteH1)
         ..retain(3)
-        ..retain(1, h1_unset);
+        ..retain(1, h1Unset);
       expect(actual, expected);
     });
   });
