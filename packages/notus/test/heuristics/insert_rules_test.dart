@@ -352,4 +352,36 @@ void main() {
       expect(actual, expected);
     });
   });
+
+  group('$MarkdownBlockShortcutsInsertRule', () {
+    final rule = MarkdownBlockShortcutsInsertRule();
+
+    test('apply markdown shortcut on single-line document', () {
+      final doc = Delta()..insert('#\n');
+      final actual = rule.apply(doc, 1, ' ');
+      final expected = Delta()
+        ..delete(1)
+        ..retain(1, NotusAttribute.h1.toJson());
+      expect(actual, expected);
+    });
+
+    test('ignores if already formatted with the same style', () {
+      final doc = Delta()
+        ..insert('#')
+        ..insert('\n', NotusAttribute.h1.toJson());
+      final actual = rule.apply(doc, 1, ' ');
+      expect(actual, isNull);
+    });
+
+    test('changes existing style', () {
+      final doc = Delta()
+        ..insert('##')
+        ..insert('\n', NotusAttribute.h1.toJson());
+      final actual = rule.apply(doc, 2, ' ');
+      final expected = Delta()
+        ..delete(2)
+        ..retain(1, NotusAttribute.h2.toJson());
+      expect(actual, expected);
+    });
+  });
 }

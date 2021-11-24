@@ -5,6 +5,7 @@
 import 'package:quill_delta/quill_delta.dart';
 
 import '../document/attributes.dart';
+import 'utils.dart';
 
 /// The result of [_findNextNewline] function.
 class _FindResult {
@@ -211,9 +212,7 @@ class AutoExitBlockRule extends InsertRule {
     // therefore we can exit this block.
     final attributes = target.attributes ?? <String, dynamic>{};
     attributes.addAll(NotusAttribute.block.unset.toJson());
-    return Delta()
-      ..retain(index)
-      ..retain(1, attributes);
+    return Delta()..retain(index)..retain(1, attributes);
   }
 }
 
@@ -337,14 +336,10 @@ class ForceNewlineForInsertsAroundEmbedRule extends InsertRule {
     if (cursorBeforeEmbed || cursorAfterEmbed) {
       final delta = Delta()..retain(index);
       if (cursorBeforeEmbed && !data.endsWith('\n')) {
-        return delta
-          ..insert(data)
-          ..insert('\n');
+        return delta..insert(data)..insert('\n');
       }
       if (cursorAfterEmbed && !data.startsWith('\n')) {
-        return delta
-          ..insert('\n')
-          ..insert(data);
+        return delta..insert('\n')..insert(data);
       }
       return delta..insert(data);
     }
@@ -424,9 +419,7 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
       result.retain(nextNewline.skippedLength!);
       final opText = nextNewline.op!.data as String;
       final lf = opText.indexOf('\n');
-      result
-        ..retain(lf)
-        ..retain(1, resetStyle);
+      result..retain(lf)..retain(1, resetStyle);
     }
 
     return result;
@@ -490,5 +483,78 @@ class InsertEmbedsRule extends InsertRule {
       }
     }
     return attributes;
+  }
+}
+
+/// Replaces certain Markdown shortcuts with actual line or block styles.
+class MarkdownBlockShortcutsInsertRule extends InsertRule {
+  static final rules = {
+    '-': NotusAttribute.block.bulletList,
+    '*': NotusAttribute.block.bulletList,
+    '1.': NotusAttribute.block.numberList,
+    "'''": NotusAttribute.block.code,
+    '```': NotusAttribute.block.code,
+    '>': NotusAttribute.block.quote,
+    '#': NotusAttribute.h1,
+    '##': NotusAttribute.h2,
+    '###': NotusAttribute.h3,
+  };
+  const MarkdownBlockShortcutsInsertRule();
+
+  @override
+  Delta? apply(Delta document, int index, Object data) {
+    if (data is! String) return null;
+    if (data != ' ') return null;
+
+    final iter = DeltaIterator(document);
+    final prefixOps = skipToLineAt(iter, index);
+
+    if (prefixOps.any((element) => element.data is! String)) return null;
+
+    final prefix = prefixOps.map((e) => e.data).cast<String>().join();
+
+    if (prefix.isEmpty) return null;
+
+    final attribute = rules[prefix];
+    if (attribute == null) return null;
+
+    /// First, delete the shortcut prefix itself.
+    final result = Delta()
+      ..retain(index - prefix.length)
+      ..delete(prefix.length);
+
+    // Scan to the end of line to apply the style attribute.
+    while (iter.hasNext) {
+      final op = iter.next();
+      if (op.data is! String) {
+        result.retain(op.length);
+        continue;
+      }
+
+      final text = op.data as String;
+      final pos = text.indexOf('\n');
+
+      if (pos == -1) {
+        result.retain(op.length);
+        continue;
+      }
+
+      result.retain(pos);
+
+      final attrs = <String, dynamic>{};
+      final currentLineAttrs = op.attributes;
+      if (currentLineAttrs != null) {
+        // the attribute already exists abort
+        if (currentLineAttrs[attribute.key] == attribute.value) return null;
+        attrs.addAll(currentLineAttrs);
+      }
+      attrs.addAll(attribute.toJson());
+
+      result.retain(1, attrs);
+
+      break;
+    }
+
+    return result;
   }
 }
