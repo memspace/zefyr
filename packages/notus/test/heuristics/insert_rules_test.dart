@@ -392,5 +392,60 @@ void main() {
         ..retain(1, NotusAttribute.code.toJson());
       expect(actual, expected);
     });
+
+    test('applies to lines in the middle of an operation', () {
+      final doc = Delta()..insert('line\n###\nzefy\n');
+      final changes = rule.apply(doc, 8, ' ');
+      final actual = doc.compose(changes!)..trim();
+      final expected = Delta()
+        ..insert('line\n')
+        ..insert('\n', NotusAttribute.h3.toJson())
+        ..insert('zefy\n');
+
+      expect(actual, expected);
+    });
+
+    test('detect previous line correctly', () {
+      final doc = Delta()
+        ..insert('line\nzefy\n')
+        ..insert('###\n');
+      final changes = rule.apply(doc, 13, ' ');
+      final actual = doc.compose(changes!)..trim();
+      final expected = Delta()
+        ..insert('line\n')
+        ..insert('zefy\n')
+        ..insert('\n', NotusAttribute.h3.toJson());
+
+      expect(actual, expected);
+    });
+
+    test('preserve line attributes', () {
+      final doc = Delta()
+        ..insert('-item')
+        ..insert('\n', NotusAttribute.h1.toJson());
+      final changes = rule.apply(doc, 1, ' ');
+      final actual = doc.compose(changes!)..trim();
+      final expected = Delta()
+        ..insert('item')
+        ..insert(
+            '\n',
+            NotusAttribute.h1.toJson()
+              ..addAll(NotusAttribute.block.bulletList.toJson()));
+      expect(actual, expected);
+    });
+
+    test('ignores if already formatted', () {
+      final doc = Delta()
+        ..insert('- item')
+        ..insert('\n', NotusAttribute.block.bulletList.toJson());
+      final actual = rule.apply(doc, 1, ' ');
+      expect(actual, isNull);
+    });
+
+    test('reject document without \n', () {
+      final doc = Delta()..insert('- ');
+      final changes = rule.apply(doc, 1, ' ');
+      expect(changes, isNull);
+    });
   });
 }
