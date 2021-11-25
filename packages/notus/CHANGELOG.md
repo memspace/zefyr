@@ -1,3 +1,10 @@
+## 1.0.0-dev.9.0
+
+* Added `inlineCode` style ([#534](https://github.com/memspace/zefyr/pull/534)), by @Amir-P
+* Added text `direction` style for controlling RTL layouts ([#438](https://github.com/memspace/zefyr/pull/438)), by @Amir-P
+* Added Markdown block style shortcuts ([#558](https://github.com/memspace/zefyr/pull/558)), by @cgestes
+* Various internal linter fixes
+
 ## 1.0.0-dev.8.0
 
 * Fixed an issue with composing unset attributes with null-safety (#514)
