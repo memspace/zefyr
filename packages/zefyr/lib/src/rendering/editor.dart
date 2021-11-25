@@ -54,8 +54,11 @@ abstract class RenderAbstractEditor {
 
   /// Sets the screen position of the floating cursor and the text position
   /// closest to the cursor.
+  /// `resetLerpValue` drives the size of the floating cursor.
+  /// See [EditorState.floatingCursorResetController].
   void setFloatingCursor(FloatingCursorDragState dragState,
-      Offset lastBoundedOffset, TextPosition lastTextPosition);
+      Offset lastBoundedOffset, TextPosition lastTextPosition,
+      {double? resetLerpValue});
 
   /// If [ignorePointer] is false (the default) then this method is called by
   /// the internal gesture recognizer's [TapGestureRecognizer.onTapDown]
@@ -408,7 +411,7 @@ class RenderEditor extends RenderEditableContainerBox
     final lastWord =
         to == null ? firstWord : selectWordAtPosition(getPositionForOffset(to));
 
-    handleSelectionChange(
+    _handleSelectionChange(
       TextSelection(
         baseOffset: firstWord.base.offset,
         extentOffset: lastWord.extent.offset,
@@ -438,13 +441,13 @@ class RenderEditor extends RenderEditableContainerBox
       end: localWord.end + nodeOffset,
     );
     if (position.offset - word.start <= 1) {
-      handleSelectionChange(
+      _handleSelectionChange(
         TextSelection.collapsed(
             offset: word.start, affinity: TextAffinity.downstream),
         cause,
       );
     } else {
-      handleSelectionChange(
+      _handleSelectionChange(
         TextSelection.collapsed(
             offset: word.end, affinity: TextAffinity.upstream),
         cause,
@@ -478,7 +481,7 @@ class RenderEditor extends RenderEditableContainerBox
       affinity: fromPosition.affinity,
     );
     // Call [onSelectionChanged] only when the selection actually changed.
-    handleSelectionChange(newSelection, cause);
+    _handleSelectionChange(newSelection, cause);
   }
 
   @override
@@ -537,7 +540,7 @@ class RenderEditor extends RenderEditableContainerBox
   }
 
   // Call through to onSelectionChanged.
-  void handleSelectionChange(
+  void _handleSelectionChange(
     TextSelection nextSelection,
     SelectionChangedCause cause,
   ) {
@@ -681,7 +684,6 @@ class RenderEditor extends RenderEditableContainerBox
   bool _resetOriginOnRight = false;
   bool _resetOriginOnTop = false;
   bool _resetOriginOnBottom = false;
-  double? _resetFloatingCursorAnimationValue;
 
   /// Returns the position within the editor closest to the raw cursor offset.
   Offset calculateBoundedFloatingCursorOffset(
@@ -755,13 +757,11 @@ class RenderEditor extends RenderEditableContainerBox
       _resetOriginOnBottom = false;
     }
     _floatingCursorOn = dragState != FloatingCursorDragState.End;
-    _resetFloatingCursorAnimationValue = resetLerpValue;
     if (_floatingCursorOn) {
       _floatingCursorTextPosition = textPosition;
-      final double? animationValue = _resetFloatingCursorAnimationValue;
-      final EdgeInsets sizeAdjustment = animationValue != null
+      final EdgeInsets sizeAdjustment = resetLerpValue != null
           ? EdgeInsets.lerp(
-              _kFloatingCaretSizeIncrease, EdgeInsets.zero, animationValue)!
+              _kFloatingCaretSizeIncrease, EdgeInsets.zero, resetLerpValue)!
           : _kFloatingCaretSizeIncrease;
       final child = childAtPosition(textPosition);
       final caretPrototype =

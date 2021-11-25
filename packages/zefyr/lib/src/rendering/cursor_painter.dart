@@ -103,6 +103,8 @@ class CursorPainter {
 // The corner radius of the floating cursor in pixels.
 const Radius _kFloatingCaretRadius = Radius.circular(1.0);
 
+/// Floating painter responsible for painting the floating cursor when
+/// floating mode is activated
 class FloatingCursorPainter {
   FloatingCursorPainter({
     required this.floatingCursorRect,

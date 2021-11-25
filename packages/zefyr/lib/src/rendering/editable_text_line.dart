@@ -717,6 +717,11 @@ class RenderEditableTextLine extends RenderEditableBox {
     }
   }
 
+  // Paints regular cursor OR the background cursor when floating cursor
+  // is activated. The background cursor shows the closest text position of
+  // the regular cursor corresponding to the current floating cursor
+  // position should the latter be released
+  // For painting of floating cursor, see RenderEditor::_paintFloatingCursor
   void _paintCursor(PaintingContext context, Offset effectiveOffset) {
     var textPosition = _cursorController.isFloatingCursorActive
         ? TextPosition(

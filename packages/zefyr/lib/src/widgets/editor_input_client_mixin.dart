@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:zefyr/src/rendering/editor.dart';
 import 'package:zefyr/util.dart';
 
 import 'editor.dart';
@@ -270,7 +271,7 @@ mixin RawEditorStateTextInputClientMixin on EditorState
         // Setting selection as floating cursor moves will have scroll view
         // bring background cursor into view
         renderEditor.onSelectionChanged!(
-            newSelection, SelectionChangedCause.drag);
+            newSelection, SelectionChangedCause.forcePress);
         break;
       case FloatingCursorDragState.End:
         // We skip animation if no update has happened.
@@ -283,6 +284,12 @@ mixin RawEditorStateTextInputClientMixin on EditorState
     }
   }
 
+  /// Specifies the floating cursor dimensions and position based
+  /// the animation controller value.
+  /// The floating cursor is resized
+  /// (see [RenderAbstractEditor.setFloatingCursor])
+  /// and repositioned (linear interpolation between position of floating cursor
+  /// and current position of background cursor)
   void onFloatingCursorResetTick() {
     final Offset finalPosition =
         renderEditor.getLocalRectForCaret(_lastTextPosition!).centerLeft -
@@ -290,11 +297,6 @@ mixin RawEditorStateTextInputClientMixin on EditorState
     if (floatingCursorResetController.isCompleted) {
       renderEditor.setFloatingCursor(
           FloatingCursorDragState.End, finalPosition, _lastTextPosition!);
-      if (_lastTextPosition!.offset != renderEditor.selection.baseOffset) {
-        renderEditor.handleSelectionChange(
-            TextSelection.collapsed(offset: _lastTextPosition!.offset),
-            SelectionChangedCause.forcePress);
-      }
       _startCaretRect = null;
       _lastTextPosition = null;
       _pointOffsetOrigin = null;

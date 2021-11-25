@@ -669,6 +669,8 @@ abstract class EditorState extends State<RawEditor> {
 
   EditorTextSelectionOverlay? get selectionOverlay;
 
+  /// Controls the floating cursor animation when it is released.
+  /// The floating cursor is animated to merge with the regular cursor.
   AnimationController get floatingCursorResetController;
 
   bool showToolbar();
