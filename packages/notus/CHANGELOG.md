@@ -1,3 +1,7 @@
+## 1.0.0-dev.10.0
+
+* Activated the new Markdown block style shortcuts rule.
+
 ## 1.0.0-dev.9.0
 
 * Added `inlineCode` style ([#534](https://github.com/memspace/zefyr/pull/534)), by @Amir-P

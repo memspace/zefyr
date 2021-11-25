@@ -35,6 +35,10 @@ int getPositionDelta(Delta user, Delta actual) {
         continue;
       }
       diff += actualOp.length;
+    } else if (userOp.isRetain && actualOp.isDelete) {
+      // User skipped some text which was deleted by a heuristic rule, we
+      // should shift the cursor backwards.
+      diff -= userOp.length;
     } else {
       // TODO: this likely needs to cover more edge cases.
     }

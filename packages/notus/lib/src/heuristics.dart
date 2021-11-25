@@ -30,6 +30,7 @@ class NotusHeuristics {
       // Blocks
       AutoExitBlockRule(), // must go first
       PreserveBlockStyleOnInsertRule(),
+      MarkdownBlockShortcutsInsertRule(),
       // Lines
       PreserveLineStyleOnSplitRule(),
       ResetLineFormatOnNewLineRule(),
