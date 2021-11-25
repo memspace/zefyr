@@ -669,6 +669,10 @@ abstract class EditorState extends State<RawEditor> {
 
   EditorTextSelectionOverlay? get selectionOverlay;
 
+  /// Controls the floating cursor animation when it is released.
+  /// The floating cursor is animated to merge with the regular cursor.
+  AnimationController get floatingCursorResetController;
+
   bool showToolbar();
 
   void hideToolbar();
@@ -697,7 +701,6 @@ class RawEditorState extends EditorState
 
   // Cursors
   late CursorController _cursorController;
-  FloatingCursorController? _floatingCursorController;
 
   // Keyboard
   late KeyboardEventHandler _keyboardListener;
@@ -710,6 +713,11 @@ class RawEditorState extends EditorState
   @override
   ScrollController get scrollController => _scrollController;
   late ScrollController _scrollController;
+
+  @override
+  AnimationController get floatingCursorResetController =>
+      _floatingCursorResetController;
+  late AnimationController _floatingCursorResetController;
 
   final ClipboardStatusNotifier? _clipboardStatus =
       kIsWeb ? null : ClipboardStatusNotifier();
@@ -805,7 +813,7 @@ class RawEditorState extends EditorState
     _cursorController = CursorController(
       showCursor: ValueNotifier<bool>(widget.showCursor),
       style: widget.cursorStyle ??
-          CursorStyle(
+          const CursorStyle(
             // TODO: fallback to current theme's accent color
             color: Colors.blueAccent,
             backgroundColor: Colors.grey,
@@ -813,6 +821,10 @@ class RawEditorState extends EditorState
           ),
       tickerProvider: this,
     );
+
+    // Floating cursor
+    _floatingCursorResetController = AnimationController(vsync: this);
+    _floatingCursorResetController.addListener(onFloatingCursorResetTick);
 
     // Keyboard
     _keyboardListener = KeyboardEventHandler(
@@ -1093,6 +1105,7 @@ class RawEditorState extends EditorState
           document: widget.controller.document,
           selection: widget.controller.selection,
           hasFocus: _hasFocus,
+          cursorController: _cursorController,
           textDirection: _textDirection,
           startHandleLayerLink: _startHandleLayerLink,
           endHandleLayerLink: _endHandleLayerLink,
@@ -1131,6 +1144,7 @@ class RawEditorState extends EditorState
               endHandleLayerLink: _endHandleLayerLink,
               onSelectionChanged: _handleSelectionChanged,
               padding: widget.padding,
+              cursorController: _cursorController,
               children: _buildChildren(context),
             ),
           ),
@@ -1240,6 +1254,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     required this.startHandleLayerLink,
     required this.endHandleLayerLink,
     required this.onSelectionChanged,
+    required this.cursorController,
     this.padding = EdgeInsets.zero,
   }) : super(key: key, children: children);
 
@@ -1252,6 +1267,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   final LayerLink endHandleLayerLink;
   final TextSelectionChangedHandler onSelectionChanged;
   final EdgeInsetsGeometry padding;
+  final CursorController cursorController;
 
   @override
   RenderEditor createRenderObject(BuildContext context) {
@@ -1264,6 +1280,7 @@ class _Editor extends MultiChildRenderObjectWidget {
       startHandleLayerLink: startHandleLayerLink,
       endHandleLayerLink: endHandleLayerLink,
       onSelectionChanged: onSelectionChanged,
+      cursorController: cursorController,
       padding: padding,
     );
   }

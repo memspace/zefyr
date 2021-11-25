@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:notus/notus.dart';
 
 /// A common interface to render boxes which represent a piece of rich text
@@ -137,6 +138,10 @@ abstract class RenderEditableBox extends RenderBox {
   /// Returns the [Rect] in local coordinates for the caret at the given text
   /// position.
   Rect getLocalRectForCaret(TextPosition position);
+
+  /// Returns the [Rect] of the caret prototype at the given text
+  /// position. [Rect] starts at origin.
+  Rect getCaretPrototype(TextPosition position);
 }
 
 class EditableContainerParentData

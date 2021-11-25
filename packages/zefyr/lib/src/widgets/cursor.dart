@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import '../rendering/editor.dart';
-
 // The time it takes for the cursor to fade from fully opaque to fully
 // transparent and vice versa. A full cursor blink, from transparent to opaque
 // to transparent, is twice this duration.
@@ -107,11 +105,10 @@ class CursorStyle {
 /// cursor [style].
 class CursorController extends ChangeNotifier {
   CursorController({
-    required ValueNotifier<bool> showCursor,
+    required this.showCursor,
     required CursorStyle style,
     required TickerProvider tickerProvider,
-  })  : showCursor = showCursor,
-        _style = style,
+  })  : _style = style,
         _cursorBlink = ValueNotifier(false),
         _cursorColor = ValueNotifier(style.color) {
     _cursorBlinkOpacityController =
@@ -134,6 +131,17 @@ class CursorController extends ChangeNotifier {
 
   ValueNotifier<Color> get cursorColor => _cursorColor;
   final ValueNotifier<Color> _cursorColor;
+
+  final ValueNotifier<TextPosition?> _floatingCursorTextPosition =
+      ValueNotifier(null);
+
+  ValueNotifier<TextPosition?> get floatingCursorTextPosition =>
+      _floatingCursorTextPosition;
+
+  void setFloatingCursorTextPosition(TextPosition? position) =>
+      _floatingCursorTextPosition.value = position;
+
+  bool get isFloatingCursorActive => floatingCursorTextPosition.value != null;
 
   CursorStyle get style => _style;
   CursorStyle _style;
@@ -217,118 +225,5 @@ class CursorController extends ChangeNotifier {
         _style.color.withOpacity(_cursorBlinkOpacityController.value);
     cursorBlink.value =
         showCursor.value && _cursorBlinkOpacityController.value > 0;
-  }
-}
-
-class FloatingCursorController {
-  FloatingCursorController({
-    required TickerProvider tickerProvider,
-  }) {
-    _floatingCursorResetController = AnimationController(vsync: tickerProvider);
-    _floatingCursorResetController.addListener(_onFloatingCursorResetTick);
-  }
-
-  // The time it takes for the floating cursor to snap to the text aligned
-  // cursor position after the user has finished placing it.
-  static const Duration _floatingCursorResetTime = Duration(milliseconds: 125);
-
-  late AnimationController _floatingCursorResetController;
-
-  // The original position of the caret on FloatingCursorDragState.start.
-  Rect? _startCaretRect;
-
-  // The most recent text position as determined by the location of the floating
-  // cursor.
-  TextPosition? _lastTextPosition;
-
-  // The offset of the floating cursor as determined from the first update call.
-  Offset? _pointOffsetOrigin;
-
-  // The most recent position of the floating cursor.
-  Offset? _lastBoundedOffset;
-
-  // Because the center of the cursor is preferredLineHeight / 2 below the touch
-  // origin, but the touch origin is used to determine which line the cursor is
-  // on, we need this offset to correctly render and move the cursor.
-//  Offset get _floatingCursorOffset =>
-//      Offset(0, renderEditor.preferredLineHeight / 2);
-
-  void updateFloatingCursor(
-      RawFloatingCursorPoint point, RenderEditor renderEditor) {
-//    switch (point.state) {
-//      case FloatingCursorDragState.Start:
-//        if (_floatingCursorResetController.isAnimating) {
-//          _floatingCursorResetController.stop();
-//          _onFloatingCursorResetTick();
-//        }
-//        final TextPosition currentTextPosition =
-//            TextPosition(offset: renderEditor.selection.baseOffset);
-//        _startCaretRect =
-//            renderEditor.getLocalRectForCaret(currentTextPosition);
-//        renderEditor.setFloatingCursor(
-//            point.state,
-//            _startCaretRect.center - _floatingCursorOffset,
-//            currentTextPosition);
-//        break;
-//      case FloatingCursorDragState.Update:
-//        // We want to send in points that are centered around a (0,0) origin, so we cache the
-//        // position on the first update call.
-//        if (_pointOffsetOrigin != null) {
-//          final Offset centeredPoint = point.offset - _pointOffsetOrigin;
-//          final Offset rawCursorOffset =
-//              _startCaretRect.center + centeredPoint - _floatingCursorOffset;
-//          _lastBoundedOffset = renderEditor
-//              .calculateBoundedFloatingCursorOffset(rawCursorOffset);
-//          _lastTextPosition = renderEditor.getPositionForPoint(renderEditor
-//              .localToGlobal(_lastBoundedOffset + _floatingCursorOffset));
-//          renderEditor.setFloatingCursor(
-//              point.state, _lastBoundedOffset, _lastTextPosition);
-//        } else {
-//          _pointOffsetOrigin = point.offset;
-//        }
-//        break;
-//      case FloatingCursorDragState.End:
-//        // We skip animation if no update has happened.
-//        if (_lastTextPosition != null && _lastBoundedOffset != null) {
-//          _floatingCursorResetController.value = 0.0;
-//          _floatingCursorResetController.animateTo(1.0,
-//              duration: _floatingCursorResetTime, curve: Curves.decelerate);
-//        }
-//        break;
-//    }
-  }
-
-  void dispose() {
-    _floatingCursorResetController.removeListener(_onFloatingCursorResetTick);
-  }
-
-  void _onFloatingCursorResetTick() {
-//    final Offset finalPosition =
-//        renderEditable.getLocalRectForCaret(_lastTextPosition).centerLeft -
-//            _floatingCursorOffset;
-//    if (_floatingCursorResetController.isCompleted) {
-//      renderEditable.setFloatingCursor(
-//          FloatingCursorDragState.End, finalPosition, _lastTextPosition);
-//      if (_lastTextPosition.offset != renderEditable.selection.baseOffset)
-//        // The cause is technically the force cursor, but the cause is listed as tap as the desired functionality is the same.
-//        _handleSelectionChanged(
-//            TextSelection.collapsed(offset: _lastTextPosition.offset),
-//            renderEditable,
-//            SelectionChangedCause.forcePress);
-//      _startCaretRect = null;
-//      _lastTextPosition = null;
-//      _pointOffsetOrigin = null;
-//      _lastBoundedOffset = null;
-//    } else {
-//      final double lerpValue = _floatingCursorResetController.value;
-//      final double lerpX =
-//          ui.lerpDouble(_lastBoundedOffset.dx, finalPosition.dx, lerpValue);
-//      final double lerpY =
-//          ui.lerpDouble(_lastBoundedOffset.dy, finalPosition.dy, lerpValue);
-//
-//      renderEditable.setFloatingCursor(FloatingCursorDragState.Update,
-//          Offset(lerpX, lerpY), _lastTextPosition,
-//          resetLerpValue: lerpValue);
-//    }
   }
 }

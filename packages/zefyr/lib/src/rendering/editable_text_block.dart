@@ -267,6 +267,16 @@ class RenderEditableTextBlock extends RenderEditableContainerBox
         extentPoint.point + extentParentData.offset, extentPoint.direction);
   }
 
+  @override
+  Rect getCaretPrototype(TextPosition position) {
+    final child = childAtPosition(position);
+    final localPosition = TextPosition(
+      offset: position.offset - child.node.offset,
+      affinity: position.affinity,
+    );
+    return child.getCaretPrototype(localPosition);
+  }
+
   // End RenderEditableBox implementation
 
   @override

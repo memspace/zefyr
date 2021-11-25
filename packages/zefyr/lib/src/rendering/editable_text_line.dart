@@ -248,6 +248,9 @@ class RenderEditableTextLine extends RenderEditableBox {
   }
 
   @override
+  Rect getCaretPrototype(TextPosition position) => _caretPrototype;
+
+  @override
   TextPosition globalToLocalPosition(TextPosition position) {
     assert(node.containsOffset(position.offset),
         'The provided text position is not in the current node');
@@ -439,7 +442,7 @@ class RenderEditableTextLine extends RenderEditableBox {
       _cursorController.style.height ??
       // hard code position to 0 here but it really doesn't matter since it's
       // the same for the entire paragraph of text.
-      preferredLineHeight(TextPosition(offset: 0));
+      preferredLineHeight(const TextPosition(offset: 0));
 
   /// We cache containsCursor value because this method depends on the node
   /// state. In some cases the node gets detached from its document before this
@@ -448,8 +451,10 @@ class RenderEditableTextLine extends RenderEditableBox {
   bool? _containsCursor;
 
   bool get containsCursor {
-    return _containsCursor ??=
-        selection.isCollapsed && node.containsOffset(selection.baseOffset);
+    return _containsCursor ??= _cursorController.isFloatingCursorActive
+        ? node.containsOffset(
+            _cursorController.floatingCursorTextPosition.value!.offset)
+        : selection.isCollapsed && node.containsOffset(selection.baseOffset);
   }
 
   late Rect _caretPrototype;
@@ -482,6 +487,11 @@ class RenderEditableTextLine extends RenderEditableBox {
     }
   }
 
+  void _onFloatingCursorChange() {
+    _containsCursor = null;
+    markNeedsPaint();
+  }
+
   // End caret implementation
 
   //
@@ -494,6 +504,8 @@ class RenderEditableTextLine extends RenderEditableBox {
     for (final child in _children) {
       child.attach(owner);
     }
+    _cursorController.floatingCursorTextPosition
+        .addListener(_onFloatingCursorChange);
     if (containsCursor) {
       _cursorController.addListener(markNeedsLayout);
       _cursorController.cursorColor.addListener(markNeedsPaint);
@@ -506,6 +518,8 @@ class RenderEditableTextLine extends RenderEditableBox {
     for (final child in _children) {
       child.detach();
     }
+    _cursorController.floatingCursorTextPosition
+        .removeListener(_onFloatingCursorChange);
     if (containsCursor) {
       _cursorController.removeListener(markNeedsLayout);
       _cursorController.cursorColor.removeListener(markNeedsPaint);
@@ -633,7 +647,8 @@ class RenderEditableTextLine extends RenderEditableBox {
           maxHeight: body!.size.height);
       leading!.layout(leadingConstraints, parentUsesSize: true);
       final parentData = leading!.parentData as BoxParentData;
-      final dxOffset = textDirection == TextDirection.rtl ? body!.size.width : 0.0;
+      final dxOffset =
+          textDirection == TextDirection.rtl ? body!.size.width : 0.0;
       parentData.offset = Offset(dxOffset, _resolvedPadding!.top);
     }
 
@@ -646,12 +661,13 @@ class RenderEditableTextLine extends RenderEditableBox {
   }
 
   CursorPainter get _cursorPainter => CursorPainter(
-        editable: body!,
-        style: _cursorController.style,
-        cursorPrototype: _caretPrototype,
-        effectiveColor: _cursorController.cursorColor.value,
-        devicePixelRatio: devicePixelRatio,
-      );
+      editable: body!,
+      style: _cursorController.style,
+      cursorPrototype: _caretPrototype,
+      effectiveColor: _cursorController.isFloatingCursorActive
+          ? _cursorController.style.backgroundColor
+          : _cursorController.cursorColor.value,
+      devicePixelRatio: devicePixelRatio);
 
   @override
   void paint(PaintingContext context, Offset offset) {
@@ -701,12 +717,22 @@ class RenderEditableTextLine extends RenderEditableBox {
     }
   }
 
+  // Paints regular cursor OR the background cursor when floating cursor
+  // is activated. The background cursor shows the closest text position of
+  // the regular cursor corresponding to the current floating cursor
+  // position should the latter be released
+  // For painting of floating cursor, see RenderEditor::_paintFloatingCursor
   void _paintCursor(PaintingContext context, Offset effectiveOffset) {
-    final position = TextPosition(
-      offset: selection.extentOffset - node.documentOffset,
-      affinity: selection.base.affinity,
-    );
-    _cursorPainter.paint(context.canvas, effectiveOffset, position);
+    var textPosition = _cursorController.isFloatingCursorActive
+        ? TextPosition(
+            offset: _cursorController.floatingCursorTextPosition.value!.offset -
+                node.documentOffset,
+            affinity:
+                _cursorController.floatingCursorTextPosition.value!.affinity)
+        : TextPosition(
+            offset: selection.extentOffset - node.documentOffset,
+            affinity: selection.base.affinity);
+    _cursorPainter.paint(context.canvas, effectiveOffset, textPosition);
   }
 
   @override

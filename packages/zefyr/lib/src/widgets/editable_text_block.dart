@@ -20,7 +20,7 @@ class EditableTextBlock extends StatelessWidget {
   final EdgeInsets? contentPadding;
   final ZefyrEmbedBuilder embedBuilder;
 
-  EditableTextBlock({
+  const EditableTextBlock({
     Key? key,
     required this.node,
     required this.spacing,
