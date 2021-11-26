@@ -383,5 +383,14 @@ void main() {
         ..retain(1, NotusAttribute.h2.toJson());
       expect(actual, expected);
     });
+
+    test('code block format does not require a space after the shortcut', () {
+      final doc = Delta()..insert('``\n');
+      final actual = rule.apply(doc, 2, '`');
+      final expected = Delta()
+        ..delete(2)
+        ..retain(1, NotusAttribute.code.toJson());
+      expect(actual, expected);
+    });
   });
 }

@@ -488,7 +488,7 @@ class InsertEmbedsRule extends InsertRule {
 
 /// Replaces certain Markdown shortcuts with actual line or block styles.
 class MarkdownBlockShortcutsInsertRule extends InsertRule {
-  static final rules = {
+  static final rules = <String, NotusAttribute>{
     '-': NotusAttribute.block.bulletList,
     '*': NotusAttribute.block.bulletList,
     '1.': NotusAttribute.block.numberList,
@@ -501,23 +501,15 @@ class MarkdownBlockShortcutsInsertRule extends InsertRule {
   };
   const MarkdownBlockShortcutsInsertRule();
 
-  @override
-  Delta? apply(Delta document, int index, Object data) {
-    if (data is! String) return null;
-    if (data != ' ') return null;
-
-    final iter = DeltaIterator(document);
+  String? _getLinePrefix(DeltaIterator iter, int index) {
     final prefixOps = skipToLineAt(iter, index);
-
     if (prefixOps.any((element) => element.data is! String)) return null;
 
-    final prefix = prefixOps.map((e) => e.data).cast<String>().join();
+    return prefixOps.map((e) => e.data).cast<String>().join();
+  }
 
-    if (prefix.isEmpty) return null;
-
-    final attribute = rules[prefix];
-    if (attribute == null) return null;
-
+  Delta? _formatLine(
+      DeltaIterator iter, int index, String prefix, NotusAttribute attr) {
     /// First, delete the shortcut prefix itself.
     final result = Delta()
       ..retain(index - prefix.length)
@@ -545,10 +537,10 @@ class MarkdownBlockShortcutsInsertRule extends InsertRule {
       final currentLineAttrs = op.attributes;
       if (currentLineAttrs != null) {
         // the attribute already exists abort
-        if (currentLineAttrs[attribute.key] == attribute.value) return null;
+        if (currentLineAttrs[attr.key] == attr.value) return null;
         attrs.addAll(currentLineAttrs);
       }
-      attrs.addAll(attribute.toJson());
+      attrs.addAll(attr.toJson());
 
       result.retain(1, attrs);
 
@@ -556,5 +548,35 @@ class MarkdownBlockShortcutsInsertRule extends InsertRule {
     }
 
     return result;
+  }
+
+  @override
+  Delta? apply(Delta document, int index, Object data) {
+    if (data is! String) return null;
+
+    // Special case: code blocks don't need a `space` to get formatted, we can
+    // detect when the user types ``` (or ''') and apply the style immediately.
+    if (data == '`' || data == "'") {
+      final iter = DeltaIterator(document);
+      final prefix = _getLinePrefix(iter, index);
+      if (prefix == null || prefix.isEmpty) return null;
+      final shortcut = '$prefix$data';
+      if (shortcut == '```' || shortcut == "'''") {
+        return _formatLine(iter, index, prefix, NotusAttribute.code);
+      }
+    }
+
+    // Standard case: triggered by a space character after the shortcut.
+    if (data != ' ') return null;
+
+    final iter = DeltaIterator(document);
+    final prefix = _getLinePrefix(iter, index);
+
+    if (prefix == null || prefix.isEmpty) return null;
+
+    final attribute = rules[prefix];
+    if (attribute == null) return null;
+
+    return _formatLine(iter, index, prefix, attribute);
   }
 }
