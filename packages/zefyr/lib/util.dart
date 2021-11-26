@@ -6,7 +6,9 @@
 library zefyr.util;
 
 import 'dart:math' as math;
+import 'dart:ui';
 
+import 'package:notus/notus.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 export 'src/fast_diff.dart';
@@ -26,15 +28,28 @@ int getPositionDelta(Delta user, Delta actual) {
     } else if (userOp.isDelete && actualOp.isRetain) {
       diff += userOp.length;
     } else if (userOp.isRetain && actualOp.isInsert) {
-      if (actualOp.data.startsWith('\n')) {
+      final opText = actualOp.data is String ? actualOp.data as String : '';
+      if (opText.startsWith('\n')) {
         // At this point user input reached its end (retain). If a heuristic
         // rule inserts a new line we should keep cursor on it's original position.
         continue;
       }
       diff += actualOp.length;
+    } else if (userOp.isRetain && actualOp.isDelete) {
+      // User skipped some text which was deleted by a heuristic rule, we
+      // should shift the cursor backwards.
+      diff -= userOp.length;
     } else {
       // TODO: this likely needs to cover more edge cases.
     }
   }
   return diff;
+}
+
+TextDirection getDirectionOfNode(StyledNode node) {
+  final direction = node.style.get(NotusAttribute.direction);
+  if (direction == NotusAttribute.rtl) {
+    return TextDirection.rtl;
+  }
+  return TextDirection.ltr;
 }

@@ -7,7 +7,7 @@ import 'package:quill_delta/quill_delta.dart';
 
 import 'document/attributes.dart';
 import 'document/block.dart';
-import 'document/leaf.dart';
+import 'document/embeds.dart';
 import 'document/line.dart';
 import 'document/node.dart';
 import 'heuristics.dart';
@@ -44,16 +44,17 @@ class NotusDocument {
     _loadDocument(_delta);
   }
 
+  /// Creates new NotusDocument from provided JSON `data`.
   NotusDocument.fromJson(List data)
       : _heuristics = NotusHeuristics.fallback,
-        _delta = Delta.fromJson(data) {
+        _delta = _migrateDelta(Delta.fromJson(data)) {
     _loadDocument(_delta);
   }
 
+  /// Creates new NotusDocument from provided `delta`.
   NotusDocument.fromDelta(Delta delta)
-      : assert(delta != null),
-        _heuristics = NotusHeuristics.fallback,
-        _delta = delta {
+      : _heuristics = NotusHeuristics.fallback,
+        _delta = _migrateDelta(delta) {
     _loadDocument(_delta);
   }
 
@@ -77,7 +78,7 @@ class NotusDocument {
   Delta _delta;
 
   /// Returns plain text representation of this document.
-  String toPlainText() => _delta.toList().map((op) => op.data).join();
+  String toPlainText() => _root.children.map((e) => e.toPlainText()).join('');
 
   dynamic toJson() {
     return _delta.toJson();
@@ -94,18 +95,25 @@ class NotusDocument {
     _controller.close();
   }
 
-  /// Inserts [text] in this document at specified [index].
+  /// Inserts [data] in this document at specified [index].
   ///
-  /// This method applies heuristic rules before modifying this document and
-  /// produces a [NotusChange] with source set to [ChangeSource.local].
+  /// The `data` parameter can be either a String or an instance of
+  /// [EmbeddableObject].
+  ///
+  /// Applies heuristic rules before modifying this document and
+  /// produces a change event with its source set to [ChangeSource.local].
   ///
   /// Returns an instance of [Delta] actually composed into this document.
-  Delta insert(int index, String text) {
+  Delta insert(int index, Object data) {
     assert(index >= 0);
-    assert(text.isNotEmpty);
-    text = _sanitizeString(text);
-    if (text.isEmpty) return Delta();
-    final change = _heuristics.applyInsertRules(this, index, text);
+    if (data is String) {
+      if (data.isEmpty) return Delta();
+    } else {
+      assert(data is EmbeddableObject);
+      data = (data as EmbeddableObject).toJson();
+    }
+
+    final change = _heuristics.applyInsertRules(this, index, data);
     compose(change, ChangeSource.local);
     return change;
   }
@@ -127,49 +135,48 @@ class NotusDocument {
     return change;
   }
 
-  /// Replaces [length] of characters starting at [index] [text].
+  /// Replaces [length] of characters starting at [index] with [data].
   ///
   /// This method applies heuristic rules before modifying this document and
-  /// produces a [NotusChange] with source set to [ChangeSource.local].
+  /// produces a change event with its source set to [ChangeSource.local].
   ///
   /// Returns an instance of [Delta] actually composed into this document.
-  Delta replace(int index, int length, String text) {
-    assert(index >= 0 && (text.isNotEmpty || length > 0),
-        'With index $index, length $length and text "$text"');
+  Delta replace(int index, int length, Object data) {
+    assert(data is String || data is EmbeddableObject);
+
+    final dataIsNotEmpty = (data is String) ? data.isNotEmpty : true;
+
+    assert(index >= 0 && (dataIsNotEmpty || length > 0),
+        'With index $index, length $length and text "$data"');
+
     var delta = Delta();
-    // We have to compose before applying delete rules
+
+    // We have to insert before applying delete rules
     // Otherwise delete would be operating on stale document snapshot.
-    if (text.isNotEmpty) {
-      delta = insert(index + length, text);
+    if (dataIsNotEmpty) {
+      delta = insert(index + length, data);
     }
 
     if (length > 0) {
       final deleteDelta = delete(index, length);
       delta = delta.compose(deleteDelta);
     }
+
     return delta;
   }
 
   /// Formats segment of this document with specified [attribute].
   ///
   /// Applies heuristic rules before modifying this document and
-  /// produces a [NotusChange] with source set to [ChangeSource.local].
+  /// produces a change event with its source set to [ChangeSource.local].
   ///
   /// Returns an instance of [Delta] actually composed into this document.
   /// The returned [Delta] may be empty in which case this document remains
-  /// unchanged and no [NotusChange] is published to [changes] stream.
+  /// unchanged and no change event is published to the [changes] stream.
   Delta format(int index, int length, NotusAttribute attribute) {
-    assert(index >= 0 && length >= 0 && attribute != null);
+    assert(index >= 0 && length >= 0);
 
     var change = Delta();
-
-    if (attribute is EmbedAttribute && length > 0) {
-      // Must delete selected length of text before applying embed attribute
-      // since inserting an embed in non-empty selection is essentially a
-      // replace operation.
-      change = delete(index, length);
-      length = 0;
-    }
 
     final formatChange =
         _heuristics.applyFormatRules(this, index, length, attribute);
@@ -193,7 +200,7 @@ class NotusDocument {
   ///   for every character within this range (line-break characters excluded).
   NotusStyle collectStyle(int index, int length) {
     var result = lookupLine(index);
-    LineNode line = result.node;
+    var line = result.node as LineNode;
     return line.collectStyle(result.offset, length);
   }
 
@@ -202,11 +209,11 @@ class NotusDocument {
     // TODO: prevent user from moving caret after last line-break.
     var result = _root.lookup(offset, inclusive: true);
     if (result.node is LineNode) return result;
-    BlockNode block = result.node;
+    var block = result.node as BlockNode;
     return block.lookup(result.offset, inclusive: true);
   }
 
-  /// Composes [change] into this document.
+  /// Composes [change] Delta into this document.
   ///
   /// Use this method with caution as it does not apply heuristic rules to the
   /// [change].
@@ -223,11 +230,15 @@ class NotusDocument {
 
     var offset = 0;
     final before = toDelta();
+    change = _migrateDelta(change);
     for (final op in change.toList()) {
       final attributes =
           op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
       if (op.isInsert) {
-        _root.insert(offset, op.data, attributes);
+        // Must normalize data before inserting into the document, makes sure
+        // that any embedded objects are converted into EmbeddableObject type.
+        final data = _normalizeData(op.data);
+        _root.insert(offset, data, attributes);
       } else if (op.isDelete) {
         _root.delete(offset, op.length);
       } else if (op.attributes != null) {
@@ -259,24 +270,51 @@ class NotusDocument {
         'Cannot modify Notus document after it was closed.');
   }
 
-  String _sanitizeString(String value) {
-    if (value.contains(EmbedNode.kPlainTextPlaceholder)) {
-      return value.replaceAll(EmbedNode.kPlainTextPlaceholder, '');
-    } else {
-      return value;
+  /// Key of the embed attribute used in Notus 0.x (prior to 1.0).
+  static const String _kEmbedAttributeKey = 'embed';
+
+  /// Migrates `delta` to the latest format supported by Notus documents.
+  ///
+  /// Allows backward compatibility with 0.x versions of notus package.
+  static Delta _migrateDelta(Delta delta) {
+    final result = Delta();
+    for (final op in delta.toList()) {
+      if (op.hasAttribute(_kEmbedAttributeKey)) {
+        // Convert legacy embed style attribute into the embed insert operation.
+        final attrs = Map<String, dynamic>.from(op.attributes!);
+        final data = Map<String, dynamic>.from(attrs[_kEmbedAttributeKey]);
+        data[EmbeddableObject.kTypeKey] = data['type'];
+        data[EmbeddableObject.kInlineKey] = false;
+        data.remove('type');
+        final embed = EmbeddableObject.fromJson(data);
+        attrs.remove(_kEmbedAttributeKey);
+        result.push(Operation.insert(embed, attrs.isNotEmpty ? attrs : null));
+      } else {
+        result.push(op);
+      }
     }
+    return result;
+  }
+
+  Object _normalizeData(Object data) {
+    return data is String
+        ? data
+        : data is EmbeddableObject
+            ? data
+            : EmbeddableObject.fromJson(data as Map<String, dynamic>);
   }
 
   /// Loads [document] delta into this document.
   void _loadDocument(Delta doc) {
-    assert(doc.last.data.endsWith('\n'),
+    assert((doc.last.data as String).endsWith('\n'),
         'Invalid document delta. Document delta must always end with a line-break.');
     var offset = 0;
     for (final op in doc.toList()) {
       final style =
           op.attributes != null ? NotusStyle.fromJson(op.attributes) : null;
       if (op.isInsert) {
-        _root.insert(offset, op.data, style);
+        final data = _normalizeData(op.data);
+        _root.insert(offset, data, style);
       } else {
         throw ArgumentError.value(doc,
             'Document Delta can only contain insert operations but ${op.key} found.');

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:zefyr/zefyr.dart';
 
 import 'full_page.dart';
-import 'images.dart';
 
 enum _Options { darkTheme }
 
@@ -25,7 +24,10 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
   Widget build(BuildContext context) {
     final form = ListView(
       children: <Widget>[
-        TextField(decoration: InputDecoration(labelText: 'Name')),
+        TextField(
+          decoration: InputDecoration(labelText: 'Name'),
+          maxLines: 5,
+        ),
         buildEditor(),
         TextField(
           decoration: InputDecoration(labelText: 'Details'),
@@ -35,7 +37,7 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
     );
 
     final result = Scaffold(
-      resizeToAvoidBottomPadding: true,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: ZefyrLogo(),
         actions: [
@@ -45,11 +47,9 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
           )
         ],
       ),
-      body: ZefyrScaffold(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: form,
-        ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: form,
       ),
     );
 
@@ -61,13 +61,12 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
 
   Widget buildEditor() {
     return ZefyrField(
-      height: 200.0,
-      decoration: InputDecoration(labelText: 'Description'),
+      // height: 200.0,
+      // decoration: InputDecoration(labelText: 'Description'),
       controller: _controller,
       focusNode: _focusNode,
       autofocus: true,
-      imageDelegate: CustomImageDelegate(),
-      physics: ClampingScrollPhysics(),
+      // physics: ClampingScrollPhysics(),
     );
   }
 
@@ -84,8 +83,8 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
     return [
       CheckedPopupMenuItem(
         value: _Options.darkTheme,
-        child: Text('Dark theme'),
         checked: _darkTheme,
+        child: Text('Dark theme'),
       ),
     ];
   }

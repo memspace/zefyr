@@ -1,9 +1,10 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'package:test/test.dart';
-import 'package:quill_delta/quill_delta.dart';
+
 import 'package:notus/notus.dart';
+import 'package:quill_delta/quill_delta.dart';
+import 'package:test/test.dart';
 
 final ul = NotusAttribute.ul.toJson();
 final bold = NotusAttribute.bold.toJson();
@@ -59,10 +60,9 @@ void main() {
     final rule = EnsureEmbedLineRule();
 
     test('ensures line-break before embed', () {
-      final hr = NotusAttribute.embed.horizontalRule;
       final doc = Delta()
         ..insert('Document\n')
-        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n');
       final actual = rule.apply(doc, 8, 1);
       final expected = Delta()..retain(8);
@@ -70,10 +70,9 @@ void main() {
     });
 
     test('ensures line-break after embed', () {
-      final hr = NotusAttribute.embed.horizontalRule;
       final doc = Delta()
         ..insert('Document\n')
-        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n');
       final actual = rule.apply(doc, 10, 1);
       final expected = Delta()..retain(11);
@@ -81,12 +80,11 @@ void main() {
     });
 
     test('still deletes everything between embeds', () {
-      final hr = NotusAttribute.embed.horizontalRule;
       final doc = Delta()
         ..insert('Document\n')
-        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\nSome text\n')
-        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n');
       final actual = rule.apply(doc, 10, 11);
       final expected = Delta()
@@ -96,10 +94,9 @@ void main() {
     });
 
     test('allows deleting empty line after embed', () {
-      final hr = NotusAttribute.embed.horizontalRule;
       final doc = Delta()
         ..insert('Document\n')
-        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n')
         ..insert('\n', NotusAttribute.block.bulletList.toJson())
         ..insert('Text')
@@ -112,12 +109,11 @@ void main() {
     });
 
     test('allows deleting empty line(s) before embed', () {
-      final hr = NotusAttribute.embed.horizontalRule;
       final doc = Delta()
         ..insert('Document\n')
         ..insert('\n')
         ..insert('\n')
-        ..insert(kZeroWidthSpace, hr.toJson())
+        ..insert(BlockEmbed.horizontalRule)
         ..insert('\n')
         ..insert('Text')
         ..insert('\n');

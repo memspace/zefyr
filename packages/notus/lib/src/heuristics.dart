@@ -13,9 +13,10 @@ import 'heuristics/insert_rules.dart';
 /// [NotusDocument] documents.
 class NotusHeuristics {
   /// Default set of heuristic rules.
+  ///
+  /// Rule order matters.
   static const NotusHeuristics fallback = NotusHeuristics(
     formatRules: [
-      FormatEmbedsRule(),
       FormatLinkAtCaretPositionRule(),
       ResolveLineFormatRule(),
       ResolveInlineFormatRule(),
@@ -23,13 +24,20 @@ class NotusHeuristics {
       // attributes.
     ],
     insertRules: [
-      PreserveBlockStyleOnPasteRule(),
+      // Embeds
+      InsertEmbedsRule(),
       ForceNewlineForInsertsAroundEmbedRule(),
+      // Blocks
+      AutoExitBlockRule(), // must go first
+      PreserveBlockStyleOnInsertRule(),
+      MarkdownBlockShortcutsInsertRule(),
+      // Lines
       PreserveLineStyleOnSplitRule(),
-      AutoExitBlockRule(),
       ResetLineFormatOnNewLineRule(),
+      // Inlines
       AutoFormatLinksRule(),
       PreserveInlineStylesRule(),
+      // Catch-all
       CatchAllInsertRule(),
     ],
     deleteRules: [
@@ -40,9 +48,9 @@ class NotusHeuristics {
   );
 
   const NotusHeuristics({
-    this.formatRules,
-    this.insertRules,
-    this.deleteRules,
+    required this.formatRules,
+    required this.insertRules,
+    required this.deleteRules,
   });
 
   /// List of format rules in this registry.
@@ -56,10 +64,10 @@ class NotusHeuristics {
 
   /// Applies heuristic rules to specified insert operation based on current
   /// state of Notus [document].
-  Delta applyInsertRules(NotusDocument document, int index, String insert) {
+  Delta applyInsertRules(NotusDocument document, int index, Object data) {
     final delta = document.toDelta();
     for (var rule in insertRules) {
-      final result = rule.apply(delta, index, insert);
+      final result = rule.apply(delta, index, data);
       if (result != null) return result..trim();
     }
     throw StateError('Failed to apply insert heuristic rules: none applied.');

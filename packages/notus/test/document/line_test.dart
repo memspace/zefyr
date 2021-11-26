@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 import 'package:notus/notus.dart';
+import 'package:notus/src/document/embeds.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:test/test.dart';
 
@@ -13,7 +14,7 @@ final bqStyle = NotusStyle().merge(NotusAttribute.bq);
 
 void main() {
   group('$LineNode', () {
-    ContainerNode root;
+    late ContainerNode root;
     setUp(() {
       root = RootNode();
     });
@@ -29,7 +30,7 @@ void main() {
     test('hasEmbed', () {
       final node = LineNode();
       expect(node.hasEmbed, isFalse);
-      node.add(EmbedNode());
+      node.add(EmbedNode(BlockEmbed.horizontalRule));
       expect(node.hasEmbed, isTrue);
     });
 
@@ -38,13 +39,13 @@ void main() {
           0, 'Hello world\nThis is my first multiline\nItem\ndocument.', null);
       root.retain(38, 1, ulStyle);
       root.retain(43, 1, bqStyle);
-      LineNode line = root.first;
+      final line = root.first as LineNode;
       expect(line.toPlainText(), 'Hello world\n');
-      var next = line.nextLine;
+      var next = line.nextLine!;
       expect(next.toPlainText(), 'This is my first multiline\n');
-      next = next.nextLine;
+      next = next.nextLine!;
       expect(next.toPlainText(), 'Item\n');
-      next = next.nextLine;
+      next = next.nextLine!;
       expect(next.toPlainText(), 'document.\n');
       expect(next.nextLine, isNull);
     });
@@ -61,7 +62,7 @@ void main() {
       root.insert(0, 'This house is a circus', null);
       root.retain(0, 4, boldStyle);
       root.retain(16, 6, boldStyle);
-      LineNode line = root.first;
+      final line = root.first as LineNode;
       final newLine = line.splitAt(10);
       expect(line.toPlainText(), 'This house\n');
       expect(newLine.toPlainText(), ' is a circus\n');
@@ -103,11 +104,11 @@ void main() {
       root.insert(11, '!!!\n', null);
       expect(root.childCount, 2);
 
-      LineNode line = root.first;
+      final line = root.first as LineNode;
       expect(line, hasLength(15));
       expect(line.toDelta(), Delta()..insert('Hello world!!!\n'));
 
-      LineNode line2 = root.last;
+      final line2 = root.last as LineNode;
       expect(line2, hasLength(1));
       expect(line2.toDelta(), Delta()..insert('\n'));
     });
@@ -117,7 +118,7 @@ void main() {
       root.retain(6, 5, boldStyle);
       root.insert(11, '!!!', null);
 
-      LineNode line = root.first;
+      final line = root.first as LineNode;
       expect(line, hasLength(15));
       final delta = Delta()
         ..insert('Hello ')
@@ -130,7 +131,7 @@ void main() {
       root.insert(0, 'Hello world', null);
       root.retain(11, 1, h1Style);
 
-      LineNode line = root.first;
+      final line = root.first as LineNode;
       expect(line, hasLength(12));
 
       final delta = Delta()
@@ -159,7 +160,7 @@ void main() {
       root.retain(11, 1, unsetBlock);
       expect(root.childCount, 1);
       expect(root.first, const TypeMatcher<LineNode>());
-      LineNode line = root.first;
+      final line = root.first as LineNode;
       expect(line.style.contains(NotusAttribute.block), isFalse);
     });
 
@@ -167,7 +168,7 @@ void main() {
       root.insert(0, 'Hello world\n\n\n', null);
       root.retain(11, 3, ulStyle);
       expect(root.children, hasLength(2));
-      BlockNode block = root.first;
+      final block = root.first as BlockNode;
       expect(block.children, hasLength(3));
       expect(block.toPlainText(), 'Hello world\n\n\n');
     });
@@ -184,7 +185,7 @@ void main() {
       root.delete(4, 3);
       root.delete(6, 1);
       expect(root.childCount, 1);
-      LineNode line = root.first;
+      final line = root.first as LineNode;
       expect(line, hasLength(8));
       expect(line.childCount, 1);
       final lineDelta = Delta()..insert('Hellord\n');
@@ -196,7 +197,7 @@ void main() {
       root.retain(6, 5, boldStyle);
       root.delete(10, 5);
       expect(root.childCount, 1);
-      LineNode line = root.first;
+      final line = root.first as LineNode;
       expect(line, hasLength(18));
       final lineDelta = Delta()
         ..insert('Hello ')
@@ -210,9 +211,11 @@ void main() {
       root.retain(21, 1, h2Style);
       root.delete(3, 15);
       expect(root.childCount, 1);
-      LineNode line = root.first;
+      final line = root.first as LineNode;
       expect(line.childCount, 1);
-      final delta = Delta()..insert('delnes')..insert('\n', h2Style.toJson());
+      final delta = Delta()
+        ..insert('delnes')
+        ..insert('\n', h2Style.toJson());
       expect(line.toDelta(), delta);
     });
 
@@ -231,7 +234,7 @@ void main() {
       expect(root.childCount, 4);
       root.delete(38, 1);
       expect(root.childCount, 3);
-      LineNode line = root.children.elementAt(1);
+      final line = root.children.elementAt(1) as LineNode;
       expect(line.style.get(NotusAttribute.heading), NotusAttribute.h2);
     });
 
@@ -248,7 +251,7 @@ void main() {
           0, 'Hello world\nThis is my first multiline\ndocument.', null);
       root.delete(37, 1);
       expect(root.childCount, 3);
-      LineNode line = root.children.elementAt(1);
+      final line = root.children.elementAt(1) as LineNode;
       expect(line.toDelta(), Delta()..insert('This is my first multilin\n'));
     });
 
@@ -259,19 +262,17 @@ void main() {
       root.retain(38, 1, h2Style);
       root.retain(23, 5, boldStyle);
       var result = root.lookup(20);
-      LineNode line = result.node;
+      final line = result.node as LineNode;
       var attrs = line.collectStyle(result.offset, 5);
       expect(attrs, h2Style);
     });
 
     test('collectStyle with embed nodes', () {
       root.insert(0, 'Hello world\n\nMore text.\n', null);
-      var style = NotusStyle();
-      style = style.put(NotusAttribute.embed.horizontalRule);
-      root.insert(12, EmbedNode.kPlainTextPlaceholder, style);
+      root.insert(12, BlockEmbed.horizontalRule, null);
 
       var lookup = root.lookup(0);
-      LineNode line = lookup.node;
+      final line = lookup.node as LineNode;
       var result = line.collectStyle(lookup.offset, 15);
       expect(result, isEmpty);
     });

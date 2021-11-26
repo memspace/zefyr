@@ -1,1 +1,9 @@
-include: package:pedantic/analysis_options.yaml
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    always_declare_return_types: true
+    prefer_single_quotes: true
+    sort_child_properties_last: true
+    unawaited_futures: true
+    unsafe_html: true

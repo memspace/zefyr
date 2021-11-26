@@ -6,10 +6,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:quill_delta/quill_delta.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zefyr/zefyr.dart';
-
-import 'images.dart';
 
 class ZefyrLogo extends StatelessWidget {
   @override
@@ -37,15 +35,11 @@ final doc =
     r'xibility in mind. It provides clean interface for distraction-free editing. Think Medium.com-like experience.\nMarkdown inspired semantics"},{"insert":"\n","attributes":{"heading":2}},{"insert":"Ever needed to have a heading line inside of a quote block, like this:\nI’m a Markdown heading"},{"insert":"\n","attributes":{"block":"quote","heading":3}},{"insert":"And I’m a regular paragraph"},{"insert":"\n","attributes":{"block":"quote"}},{"insert":"Code blocks"},{"insert":"\n","attributes":{"headin'
     r'g":2}},{"insert":"Of course:\nimport ‘package:flutter/material.dart’;"},{"insert":"\n","attributes":{"block":"code"}},{"insert":"import ‘package:zefyr/zefyr.dart’;"},{"insert":"\n\n","attributes":{"block":"code"}},{"insert":"void main() {"},{"insert":"\n","attributes":{"block":"code"}},{"insert":" runApp(MyZefyrApp());"},{"insert":"\n","attributes":{"block":"code"}},{"insert":"}"},{"insert":"\n","attributes":{"block":"code"}},{"insert":"\n\n\n"}]';
 
-Delta getDelta() {
-  return Delta.fromJson(json.decode(doc) as List);
-}
-
 enum _Options { darkTheme }
 
 class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
   final ZefyrController _controller =
-      ZefyrController(NotusDocument.fromDelta(getDelta()));
+      ZefyrController(NotusDocument.fromJson(json.decode(doc)));
   final FocusNode _focusNode = FocusNode();
   bool _editing = false;
   StreamSubscription<NotusChange> _sub;
@@ -71,7 +65,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
         ? IconButton(onPressed: _stopEditing, icon: Icon(Icons.save))
         : IconButton(onPressed: _startEditing, icon: Icon(Icons.edit));
     final result = Scaffold(
-      resizeToAvoidBottomPadding: true,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: ZefyrLogo(),
         actions: [
@@ -82,20 +76,25 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
           )
         ],
       ),
-      body: ZefyrScaffold(
-        child: ZefyrEditor(
-          controller: _controller,
-          focusNode: _focusNode,
-          mode: _editing ? ZefyrMode.edit : ZefyrMode.select,
-          imageDelegate: CustomImageDelegate(),
-          keyboardAppearance: _darkTheme ? Brightness.dark : Brightness.light,
-        ),
+      body: ZefyrField(
+        padding: EdgeInsets.all(16),
+        controller: _controller,
+        focusNode: _focusNode,
+        readOnly: !_editing,
+        onLaunchUrl: _launchUrl,
+        // keyboardAppearance: _darkTheme ? Brightness.dark : Brightness.light,
       ),
     );
     if (_darkTheme) {
       return Theme(data: ThemeData.dark(), child: result);
     }
     return Theme(data: ThemeData(primarySwatch: Colors.cyan), child: result);
+  }
+
+  void _launchUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    }
   }
 
   void handlePopupItemSelected(value) {
@@ -111,8 +110,8 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
     return [
       CheckedPopupMenuItem(
         value: _Options.darkTheme,
-        child: Text('Dark theme'),
         checked: _darkTheme,
+        child: Text('Dark theme'),
       ),
     ];
   }

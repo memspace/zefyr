@@ -32,12 +32,10 @@ class EditorPageState extends State<EditorPage> {
   Widget build(BuildContext context) {
     final body = (_controller == null)
         ? Center(child: CircularProgressIndicator())
-        : ZefyrScaffold(
-            child: ZefyrEditor(
-              padding: EdgeInsets.all(16),
-              controller: _controller,
-              focusNode: _focusNode,
-            ),
+        : ZefyrField(
+            padding: EdgeInsets.all(16),
+            controller: _controller,
+            focusNode: _focusNode,
           );
 
     return Scaffold(
@@ -67,7 +65,7 @@ class EditorPageState extends State<EditorPage> {
       return NotusDocument.fromJson(jsonDecode(contents));
     }
     final delta = Delta()..insert('Zefyr Quick Start\n');
-    return NotusDocument.fromDelta(delta);
+    return NotusDocument()..compose(delta, ChangeSource.local);
   }
 
   void _saveDocument(BuildContext context) {
@@ -78,7 +76,8 @@ class EditorPageState extends State<EditorPage> {
     final file = File(Directory.systemTemp.path + '/quick_start.json');
     // And show a snack bar on success.
     file.writeAsString(contents).then((_) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text('Saved.')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Saved.')));
     });
   }
 }

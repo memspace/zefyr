@@ -11,7 +11,7 @@ final h1Attrs = NotusStyle().merge(NotusAttribute.h1);
 
 void main() {
   group('$BlockNode', () {
-    ContainerNode root;
+    late ContainerNode root;
     setUp(() {
       root = RootNode();
     });
@@ -39,8 +39,8 @@ void main() {
       root.retain(7, 1, ulAttrs);
       root.retain(13, 1, ulAttrs);
       expect(root.childCount, 1);
-      BlockNode block = root.first;
-      LineNode line = block.children.elementAt(1);
+      final block = root.first as BlockNode;
+      final line = block.children.elementAt(1) as LineNode;
       block.unwrapLine(line);
       expect(root.children, hasLength(3));
       expect(root.children.elementAt(0), const TypeMatcher<BlockNode>());
@@ -53,12 +53,12 @@ void main() {
       root.retain(11, 1, ulAttrs);
 
       expect(root.childCount, 1);
-      BlockNode block = root.first;
+      final block = root.first as BlockNode;
       expect(block.style.get(NotusAttribute.block), NotusAttribute.ul);
       expect(block.childCount, 1);
       expect(block.first, const TypeMatcher<LineNode>());
 
-      LineNode line = block.first;
+      final line = block.first as LineNode;
       final delta = Delta()
         ..insert('Hello world')
         ..insert('\n', ulAttrs.toJson());
@@ -70,7 +70,7 @@ void main() {
       root.retain(21, 1, ulAttrs);
 
       expect(root.childCount, 2);
-      BlockNode block = root.last;
+      final block = root.last as BlockNode;
       expect(block.style.get(NotusAttribute.block), NotusAttribute.ul);
       expect(block.childCount, 1);
       expect(block.first, const TypeMatcher<LineNode>());
@@ -82,7 +82,7 @@ void main() {
       root.retain(21, 1, ulAttrs);
 
       expect(root.childCount, 1);
-      BlockNode block = root.first;
+      final block = root.first as BlockNode;
       expect(block.style.get(NotusAttribute.block), NotusAttribute.ul);
       expect(block.childCount, 2);
       expect(block.first, const TypeMatcher<LineNode>());
@@ -155,7 +155,7 @@ void main() {
       expect(root.toDelta(), expected);
     });
 
-    test('insert line-break at the begining of the document', () {
+    test('insert line-break at the beginning of the document', () {
       root.insert(
           0, 'London Grammar Songs\nHey now\nStrong\nIf You Wait', null);
       root.retain(20, 1, ulAttrs);

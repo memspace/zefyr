@@ -35,7 +35,9 @@ void main() {
       final actual = rule.apply(doc, 0, 0, NotusAttribute.ul);
       expect(actual, isNotNull);
       final ul = NotusAttribute.ul.toJson();
-      final expected = Delta()..retain(7)..retain(1, ul);
+      final expected = Delta()
+        ..retain(7)
+        ..retain(1, ul);
       expect(actual, expected);
     });
 
@@ -48,7 +50,9 @@ void main() {
         ..insert('\n', ul)
         ..insert('Three!\n');
       final actual = rule.apply(doc, 7, 0, NotusAttribute.ul);
-      final expected = Delta()..retain(9)..retain(1, ul);
+      final expected = Delta()
+        ..retain(9)
+        ..retain(1, ul);
       expect(actual, expected);
     });
   });
@@ -89,7 +93,9 @@ void main() {
 
       final actual = rule.apply(doc, 13, 0, newLink);
       expect(actual, isNotNull);
-      final expected = Delta()..retain(10)..retain(7, newLink.toJson());
+      final expected = Delta()
+        ..retain(10)
+        ..retain(7, newLink.toJson());
       expect(actual, expected);
     });
   });
