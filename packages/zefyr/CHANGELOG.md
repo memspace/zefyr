@@ -50,6 +50,10 @@ migration.
   layout, e.g. a `ListView`.
 * `ZefyrEditr.onLaunchUrl` callback is invoked when the user wants to open a link.
 
+## 0.12.0
+
+* Updated to support Flutter 1.22
+
 ## 0.11.0
 
 * Updated to support Flutter 1.17.0
