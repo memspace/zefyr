@@ -1,3 +1,7 @@
+## Unreleased
+
+* Improved auto-formatting of code blocks from Markdown shortcuts ([#560](https://github.com/memspace/zefyr/pull/560))
+
 ## 1.0.0-dev.10.0
 
 * Activated the new Markdown block style shortcuts rule.
