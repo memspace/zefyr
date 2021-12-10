@@ -181,8 +181,7 @@ class ToggleStyleButton extends StatefulWidget {
     required this.icon,
     required this.controller,
     this.childBuilder = defaultToggleStyleButtonBuilder,
-  })  : assert(!attribute.isUnset),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   _ToggleStyleButtonState createState() => _ToggleStyleButtonState();
@@ -194,16 +193,13 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
   NotusStyle get _selectionStyle => widget.controller.getSelectionStyle();
 
   void _didChangeEditingValue() {
-    setState(() {
-      _isToggled =
-          widget.controller.getSelectionStyle().containsSame(widget.attribute);
-    });
+    setState(() => _checkIsToggled());
   }
 
   @override
   void initState() {
     super.initState();
-    _isToggled = _selectionStyle.containsSame(widget.attribute);
+    _checkIsToggled();
     widget.controller.addListener(_didChangeEditingValue);
   }
 
@@ -213,7 +209,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_didChangeEditingValue);
       widget.controller.addListener(_didChangeEditingValue);
-      _isToggled = _selectionStyle.containsSame(widget.attribute);
+      _checkIsToggled();
     }
   }
 
@@ -239,9 +235,19 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
 
   void _toggleAttribute() {
     if (_isToggled) {
-      widget.controller.formatSelection(widget.attribute.unset);
+      if (!widget.attribute.isUnset) {
+        widget.controller.formatSelection(widget.attribute.unset);
+      }
     } else {
       widget.controller.formatSelection(widget.attribute);
+    }
+  }
+
+  void _checkIsToggled() {
+    if (widget.attribute.isUnset) {
+      _isToggled = !_selectionStyle.contains(widget.attribute);
+    } else {
+      _isToggled = _selectionStyle.containsSame(widget.attribute);
     }
   }
 }
@@ -404,9 +410,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
     bool hideDirection = false,
     List<Widget> leading = const <Widget>[],
     List<Widget> trailing = const <Widget>[],
-    bool hideRightAlignment = false,
-    bool hideCenterAlignment = false,
-    bool hideJustifyAlignment = false,
+    bool hideAlignment = false,
   }) {
     return ZefyrToolbar(key: key, children: [
       ...leading,
@@ -459,16 +463,24 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           child: VerticalDivider(
               indent: 16, endIndent: 16, color: Colors.grey.shade400)),
       Visibility(
-        visible: !hideDirection,
-        child: ToggleStyleButton(
-          attribute: NotusAttribute.rtl,
-          icon: Icons.format_textdirection_r_to_l,
-          controller: controller,
-        )
-      ),
+          visible: !hideDirection,
+          child: ToggleStyleButton(
+            attribute: NotusAttribute.rtl,
+            icon: Icons.format_textdirection_r_to_l,
+            controller: controller,
+          )),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       Visibility(
-        visible: !hideCenterAlignment,
+        visible: !hideAlignment,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.left,
+          icon: Icons.format_align_left,
+          controller: controller,
+        ),
+      ),
+      SizedBox(width: 1),
+      Visibility(
+        visible: !hideAlignment,
         child: ToggleStyleButton(
           attribute: NotusAttribute.center,
           icon: Icons.format_align_center,
@@ -477,7 +489,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       SizedBox(width: 1),
       Visibility(
-        visible: !hideRightAlignment,
+        visible: !hideAlignment,
         child: ToggleStyleButton(
           attribute: NotusAttribute.right,
           icon: Icons.format_align_right,
@@ -486,7 +498,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       SizedBox(width: 1),
       Visibility(
-        visible: !hideJustifyAlignment,
+        visible: !hideAlignment,
         child: ToggleStyleButton(
           attribute: NotusAttribute.justify,
           icon: Icons.format_align_justify,

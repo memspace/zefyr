@@ -148,6 +148,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alignment attribute
   static const alignment = AlignmentAttributeBuilder._();
 
+  /// Alias for [NotusAttribute.alignment.unset]
+  static NotusAttribute<String> get left => alignment.unset;
+
   /// Alias for [NotusAttribute.alignment.right]
   static NotusAttribute<String> get right => alignment.right;
 
