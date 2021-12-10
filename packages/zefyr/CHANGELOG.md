@@ -1,3 +1,26 @@
+## 1.0.0-beta.1.0
+
+This first public beta release brings many improvements, new features and bug fixes. As well as,
+support for the latest Flutter 2.8 stable version.
+
+Below list only highlights some of the changes included in this release.
+
+* Support Flutter 2.8 
+* Ability to hide individual toolbar items in basic factory ([#448](https://github.com/memspace/zefyr/pull/448))
+* Support null-safety
+* Fixed: FocusNode instance is not created if not provided ([#523](https://github.com/memspace/zefyr/pull/523))
+* Fixed: Fix caret display when cursor on embed line ([#526](https://github.com/memspace/zefyr/pull/526))
+* Bring into view upon selection extension ([#527](https://github.com/memspace/zefyr/pull/527))
+* Fixed: Swapping handles order is prevented ([#532](https://github.com/memspace/zefyr/pull/532))
+* Fixed: Wrong offset for animating ScrollView ([#536](https://github.com/memspace/zefyr/pull/536))
+* Fixed: Visibility of text selection handlers on scroll ([#533](https://github.com/memspace/zefyr/pull/533))
+* Fixed: ZefyrField decoration hint doesn't disappear correctly ([#537](https://github.com/memspace/zefyr/pull/537))
+* Fixed: null-safety issue EditableTextLine ([#544](https://github.com/memspace/zefyr/pull/544))
+* ZefyrToolbar.basic(): allow to prepend / append buttons ([#547](https://github.com/memspace/zefyr/pull/547))
+* Added text direction feature ([#438](https://github.com/memspace/zefyr/pull/438))
+* Fixed: hitTestChildren to allow embedded content receive gesture/mouse events ([#557](https://github.com/memspace/zefyr/pull/557))
+* Floating cursor support for iOS ([#555](https://github.com/memspace/zefyr/pull/555))
+
 ## 1.0.0-dev.2.0
 
 * Fixed: Hide selection handle when the current selection is collapsed on Android (#435).
