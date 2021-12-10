@@ -1,6 +1,6 @@
 ## Unreleased
 
-## 1.0.0-beta.1.0
+## 1.0.0-rc.1
 
 * Improved auto-formatting of code blocks from Markdown shortcuts ([#560](https://github.com/memspace/zefyr/pull/560))
 

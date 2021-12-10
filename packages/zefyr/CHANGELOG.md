@@ -1,7 +1,7 @@
-## 1.0.0-beta.1.0
+## 1.0.0-rc.1
 
-This first public beta release brings many improvements, new features and bug fixes. As well as,
-support for the latest Flutter 2.8 stable version.
+This first public release candidate release brings many improvements, new features and bug fixes. 
+As well as, support for the latest Flutter 2.8 stable version.
 
 Below list only highlights some of the changes included in this release.
 
