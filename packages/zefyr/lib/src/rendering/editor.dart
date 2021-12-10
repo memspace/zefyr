@@ -28,7 +28,7 @@ const EdgeInsets _kFloatingCaretSizeIncrease =
     EdgeInsets.symmetric(horizontal: 0.5, vertical: 1.0);
 
 /// Base interface for editable render objects.
-abstract class RenderAbstractEditor {
+abstract class RenderAbstractEditor implements TextLayoutMetrics {
   TextSelection selectWordAtPosition(TextPosition position);
 
   TextSelection selectLineAtPosition(TextPosition position);
@@ -115,6 +115,7 @@ abstract class RenderAbstractEditor {
 ///
 /// Children of [RenderEditor] must be instances of [RenderEditableBox].
 class RenderEditor extends RenderEditableContainerBox
+    with RelayoutWhenSystemFontsChangeMixin
     implements RenderAbstractEditor {
   RenderEditor({
     ViewportOffset? offset,
@@ -496,19 +497,7 @@ class RenderEditor extends RenderEditableContainerBox
 
   @override
   TextSelection selectWordAtPosition(TextPosition position) {
-//    assert(
-//    _textLayoutLastMaxWidth == constraints.maxWidth &&
-//        _textLayoutLastMinWidth == constraints.minWidth,
-//    'Last width ($_textLayoutLastMinWidth, $_textLayoutLastMaxWidth) not the same as max width constraint (${constraints.minWidth}, ${constraints.maxWidth}).');
-    final child = childAtPosition(position);
-    final nodeOffset = child.node.offset;
-    final localPosition = TextPosition(
-        offset: position.offset - nodeOffset, affinity: position.affinity);
-    final localWord = child.getWordBoundary(localPosition);
-    final word = TextRange(
-      start: localWord.start + nodeOffset,
-      end: localWord.end + nodeOffset,
-    );
+    final word = getWordBoundary(position);
     // When long-pressing past the end of the text, we want a collapsed cursor.
     if (position.offset >= word.end) {
       return TextSelection.fromPosition(position);
@@ -518,19 +507,7 @@ class RenderEditor extends RenderEditableContainerBox
 
   @override
   TextSelection selectLineAtPosition(TextPosition position) {
-//    assert(
-//    _textLayoutLastMaxWidth == constraints.maxWidth &&
-//        _textLayoutLastMinWidth == constraints.minWidth,
-//    'Last width ($_textLayoutLastMinWidth, $_textLayoutLastMaxWidth) not the same as max width constraint (${constraints.minWidth}, ${constraints.maxWidth}).');
-    final child = childAtPosition(position);
-    final nodeOffset = child.node.offset;
-    final localPosition = TextPosition(
-        offset: position.offset - nodeOffset, affinity: position.affinity);
-    final localLineRange = child.getLineBoundary(localPosition);
-    final line = TextRange(
-      start: localLineRange.start + nodeOffset,
-      end: localLineRange.end + nodeOffset,
-    );
+    final line = getLineAtOffset(position);
 
     // When long-pressing past the end of the text, we want a collapsed cursor.
     if (position.offset >= line.end) {
@@ -780,5 +757,120 @@ class RenderEditor extends RenderEditableContainerBox
     _floatingCursorPainter.paint(context.canvas);
   }
 
-// End floating cursor
+  // End floating cursor
+
+  // Start TextLayoutMetrics implementation
+
+  /// Return a [TextSelection] containing the line of the given [TextPosition].
+  @override
+  TextSelection getLineAtOffset(TextPosition position) {
+    final child = childAtPosition(position);
+    final nodeOffset = child.node.offset;
+    final localPosition = TextPosition(
+        offset: position.offset - nodeOffset, affinity: position.affinity);
+    final localLineRange = child.getLineBoundary(localPosition);
+    final line = TextRange(
+      start: localLineRange.start + nodeOffset,
+      end: localLineRange.end + nodeOffset,
+    );
+    return TextSelection(baseOffset: line.start, extentOffset: line.end);
+  }
+
+  @override
+  TextRange getWordBoundary(TextPosition position) {
+    final child = childAtPosition(position);
+    final nodeOffset = child.node.offset;
+    final localPosition = TextPosition(
+        offset: position.offset - nodeOffset, affinity: position.affinity);
+    final localWord = child.getWordBoundary(localPosition);
+    return TextRange(
+      start: localWord.start + nodeOffset,
+      end: localWord.end + nodeOffset,
+    );
+  }
+
+  /// Returns the TextPosition above the given offset into the text.
+  ///
+  /// If the offset is already on the first line, the offset of the first
+  /// character will be returned.
+  @override
+  TextPosition getTextPositionAbove(TextPosition position) {
+    final child = childAtPosition(position);
+    final localPosition =
+        TextPosition(offset: position.offset - child.node.documentOffset);
+
+    TextPosition? newPosition = child.getPositionAbove(localPosition);
+
+    if (newPosition == null) {
+      // There was no text above in the current child, check the direct
+      // sibling.
+      final sibling = childBefore(child);
+      if (sibling == null) {
+        // reached beginning of the document, move to the
+        // first character
+        newPosition = const TextPosition(offset: 0);
+      } else {
+        final caretOffset = child.getOffsetForCaret(localPosition);
+        final testPosition = TextPosition(offset: sibling.node.length - 1);
+        final testOffset = sibling.getOffsetForCaret(testPosition);
+        final finalOffset = Offset(caretOffset.dx, testOffset.dy);
+        final siblingPosition = sibling.getPositionForOffset(finalOffset);
+        newPosition = TextPosition(
+            offset: sibling.node.documentOffset + siblingPosition.offset);
+      }
+    } else {
+      newPosition =
+          TextPosition(offset: child.node.documentOffset + newPosition.offset);
+    }
+    return newPosition;
+  }
+
+  /// Returns the TextPosition below the given offset into the text.
+  ///
+  /// If the offset is already on the last line, the offset of the last
+  /// character will be returned.
+  @override
+  TextPosition getTextPositionBelow(TextPosition position) {
+    final child = childAtPosition(position);
+    final localPosition =
+        TextPosition(offset: position.offset - child.node.documentOffset);
+
+    TextPosition? newPosition = child.getPositionBelow(localPosition);
+
+    if (newPosition == null) {
+      // There was no text above in the current child, check the direct
+      // sibling.
+      final sibling = childAfter(child);
+      if (sibling == null) {
+        // reached beginning of the document, move to the
+        // last character
+        newPosition = TextPosition(offset: _document.length - 1);
+      } else {
+        final caretOffset = child.getOffsetForCaret(localPosition);
+        const testPosition = TextPosition(offset: 0);
+        final testOffset = sibling.getOffsetForCaret(testPosition);
+        final finalOffset = Offset(caretOffset.dx, testOffset.dy);
+        final siblingPosition = sibling.getPositionForOffset(finalOffset);
+        newPosition = TextPosition(
+            offset: sibling.node.documentOffset + siblingPosition.offset);
+      }
+    } else {
+      newPosition =
+          TextPosition(offset: child.node.documentOffset + newPosition.offset);
+    }
+    return newPosition;
+  }
+
+  // End TextLayoutMetrics implementation
+
+  @override
+  void systemFontsDidChange() {
+    super.systemFontsDidChange();
+    markNeedsLayout();
+  }
+
+  void debugAssertLayoutUpToDate() {
+    // no-op?
+    // this assert was added by Flutter TextEditingActionTarget so we have to comply here.
+  }
 }

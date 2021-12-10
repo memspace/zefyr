@@ -7,20 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:notus/notus.dart';
 import 'package:zefyr/src/widgets/baseline_proxy.dart';
 import 'package:zefyr/src/widgets/single_child_scroll_view.dart';
 import 'package:zefyr/util.dart';
 
 import '../rendering/editor.dart';
-import '../services/keyboard.dart';
 import 'controller.dart';
 import 'cursor.dart';
 import 'editable_text_block.dart';
 import 'editable_text_line.dart';
 import 'editor_input_client_mixin.dart';
-import 'editor_keyboard_mixin.dart';
 import 'editor_selection_delegate_mixin.dart';
 import 'text_line.dart';
 import 'text_selection.dart';
@@ -658,12 +655,9 @@ class RawEditor extends StatefulWidget {
 ///   * [RawEditorStateTextInputClientMixin]
 ///   * [RawEditorStateSelectionDelegateMixin]
 ///
-abstract class EditorState extends State<RawEditor> {
+abstract class EditorState extends State<RawEditor>
+    implements TextSelectionDelegate {
   ScrollController get scrollController;
-
-  TextEditingValue get textEditingValue;
-
-  set textEditingValue(TextEditingValue value);
 
   RenderEditor get renderEditor;
 
@@ -675,12 +669,7 @@ abstract class EditorState extends State<RawEditor> {
 
   bool showToolbar();
 
-  void hideToolbar();
-
   void requestKeyboard();
-
-  void userUpdateTextEditingValue(
-      TextEditingValue value, SelectionChangedCause cause) {}
 
   FocusNode get effectiveFocusNode;
 }
@@ -690,7 +679,7 @@ class RawEditorState extends EditorState
         AutomaticKeepAliveClientMixin<RawEditor>,
         WidgetsBindingObserver,
         TickerProviderStateMixin<RawEditor>,
-        RawEditorStateKeyboardMixin,
+        TextEditingActionTarget,
         RawEditorStateTextInputClientMixin,
         RawEditorStateSelectionDelegateMixin
     implements TextSelectionDelegate {
@@ -701,9 +690,6 @@ class RawEditorState extends EditorState
 
   // Cursors
   late CursorController _cursorController;
-
-  // Keyboard
-  late KeyboardEventHandler _keyboardListener;
 
   // Selection overlay
   @override
@@ -738,6 +724,18 @@ class RawEditorState extends EditorState
   @override
   bool get wantKeepAlive => effectiveFocusNode.hasFocus;
 
+  @override
+  bool get obscureText => false;
+
+  @override
+  bool get selectionEnabled => widget.selectionEnabled;
+
+  @override
+  bool get readOnly => widget.readOnly;
+
+  @override
+  TextLayoutMetrics get textLayoutMetrics => renderEditor;
+
   TextDirection get _textDirection {
     final result = Directionality.maybeOf(context);
     assert(result != null,
@@ -751,6 +749,21 @@ class RawEditorState extends EditorState
   @override
   RenderEditor get renderEditor =>
       _editorKey.currentContext!.findRenderObject() as RenderEditor;
+
+  @override
+  void setTextEditingValue(
+      TextEditingValue newValue, SelectionChangedCause cause) {
+    if (newValue == textEditingValue) {
+      return;
+    }
+    textEditingValue = newValue;
+    userUpdateTextEditingValue(newValue, cause);
+  }
+
+  @override
+  void debugAssertLayoutUpToDate() {
+    renderEditor.debugAssertLayoutUpToDate();
+  }
 
   /// Express interest in interacting with the keyboard.
   ///
@@ -790,6 +803,65 @@ class RawEditorState extends EditorState
     return true;
   }
 
+  @override
+  void copySelection(SelectionChangedCause cause) {
+    // Copied straight from EditableTextState
+    super.copySelection(cause);
+    if (cause == SelectionChangedCause.toolbar) {
+      bringIntoView(textEditingValue.selection.extent);
+      hideToolbar(false);
+
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          break;
+        case TargetPlatform.macOS:
+        case TargetPlatform.android:
+        case TargetPlatform.fuchsia:
+        case TargetPlatform.linux:
+        case TargetPlatform.windows:
+          // Collapse the selection and hide the toolbar and handles.
+          userUpdateTextEditingValue(
+            TextEditingValue(
+              text: textEditingValue.text,
+              selection: TextSelection.collapsed(
+                  offset: textEditingValue.selection.end),
+            ),
+            SelectionChangedCause.toolbar,
+          );
+          break;
+      }
+    }
+  }
+
+  @override
+  void cutSelection(SelectionChangedCause cause) {
+    // Copied straight from EditableTextState
+    super.cutSelection(cause);
+    if (cause == SelectionChangedCause.toolbar) {
+      bringIntoView(textEditingValue.selection.extent);
+      hideToolbar();
+    }
+  }
+
+  @override
+  Future<void> pasteText(SelectionChangedCause cause) async {
+    // Copied straight from EditableTextState
+    super.pasteText(cause); // ignore: unawaited_futures
+    if (cause == SelectionChangedCause.toolbar) {
+      bringIntoView(textEditingValue.selection.extent);
+      hideToolbar();
+    }
+  }
+
+  @override
+  void selectAll(SelectionChangedCause cause) {
+    // Copied straight from EditableTextState
+    super.selectAll(cause);
+    if (cause == SelectionChangedCause.toolbar) {
+      bringIntoView(textEditingValue.selection.extent);
+    }
+  }
+
   void _updateSelectionOverlayForScroll() {
     _selectionOverlay?.updateForScroll();
   }
@@ -826,16 +898,8 @@ class RawEditorState extends EditorState
     _floatingCursorResetController = AnimationController(vsync: this);
     _floatingCursorResetController.addListener(onFloatingCursorResetTick);
 
-    // Keyboard
-    _keyboardListener = KeyboardEventHandler(
-      onCursorMovement: handleCursorMovement,
-      onShortcut: handleShortcut,
-      onDelete: handleDelete,
-    );
-
     // Focus
-    _focusAttachment = effectiveFocusNode.attach(context,
-        onKey: (node, event) => _keyboardListener.handleKeyEvent(event));
+    _focusAttachment = effectiveFocusNode.attach(context);
     effectiveFocusNode.addListener(_handleFocusChanged);
   }
 
@@ -892,8 +956,7 @@ class RawEditorState extends EditorState
       _focusNode = null;
       _createInternalFocusNodeIfNeeded();
       _focusAttachment?.detach();
-      _focusAttachment = effectiveFocusNode.attach(context,
-          onKey: (node, event) => _keyboardListener.handleKeyEvent(event));
+      _focusAttachment = effectiveFocusNode.attach(context);
       effectiveFocusNode.addListener(_handleFocusChanged);
       updateKeepAlive();
     }
