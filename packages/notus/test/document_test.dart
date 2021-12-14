@@ -248,6 +248,12 @@ void main() {
           'DartConf\n${EmbedNode.kObjectReplacementCharacter}\nLos Angeles\n');
     });
 
+    test('delete preserves last newline character', () {
+      final doc = dartconfDoc();
+      final result = doc.delete(20, 1);
+      expect(result, isEmpty);
+    });
+
     test('checks for closed state', () {
       final doc = dartconfDoc();
       expect(doc.isClosed, isFalse);

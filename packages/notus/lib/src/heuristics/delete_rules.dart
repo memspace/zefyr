@@ -14,6 +14,18 @@ abstract class DeleteRule {
   Delta? apply(Delta document, int index, int length);
 }
 
+class EnsureLastLineBreakDeleteRule extends DeleteRule {
+  @override
+  Delta? apply(Delta document, int index, int length) {
+    final iter = DeltaIterator(document);
+    iter.skip(index + length);
+
+    return Delta()
+      ..retain(index)
+      ..delete(iter.hasNext ? length : length - 1);
+  }
+}
+
 /// Fallback rule for delete operations which simply deletes specified text
 /// range without any special handling.
 class CatchAllDeleteRule extends DeleteRule {
@@ -21,9 +33,12 @@ class CatchAllDeleteRule extends DeleteRule {
 
   @override
   Delta? apply(Delta document, int index, int length) {
+    final iter = DeltaIterator(document);
+    iter.skip(index + length);
+
     return Delta()
       ..retain(index)
-      ..delete(length);
+      ..delete(iter.hasNext ? length : length - 1);
   }
 }
 
@@ -44,6 +59,14 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
     if (target.data != '\n') return null;
 
     iter.skip(length - 1);
+
+    if (!iter.hasNext) {
+      // User attempts to delete the last newline character, prevent it.
+      return Delta()
+        ..retain(index)
+        ..delete(length - 1);
+    }
+
     final result = Delta()
       ..retain(index)
       ..delete(length);
@@ -62,9 +85,7 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
         attributes ??= <String, dynamic>{};
         attributes.addAll(target.attributes!);
       }
-      result
-        ..retain(lf)
-        ..retain(1, attributes);
+      result..retain(lf)..retain(1, attributes);
       break;
     }
     return result;
