@@ -1,3 +1,8 @@
+## 1.0.0-rc.2
+
+* Inline code improvements: added backgroundColor, radius and style overrides for headings to
+  inline code theme ([#573](https://github.com/memspace/zefyr/pull/573))
+
 ## 1.0.0-rc.1
 
 This first public release candidate release brings many improvements, new features and bug fixes. 

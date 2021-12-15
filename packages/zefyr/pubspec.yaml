@@ -1,6 +1,6 @@
 name: zefyr
 description: Clean, minimalistic and collaboration-ready rich text editor for Flutter.
-version: 1.0.0-rc.1
+version: 1.0.0-rc.2
 homepage: https://github.com/memspace/zefyr
 
 environment:
