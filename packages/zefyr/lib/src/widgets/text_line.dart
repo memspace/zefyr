@@ -56,18 +56,18 @@ class TextLine extends StatelessWidget {
     );
   }
 
-  TextSpan _segmentToTextSpan(Node node, ZefyrThemeData theme) {
-    final segment = node as TextNode;
-    final attrs = segment.style;
+  TextSpan _segmentToTextSpan(Node segment, ZefyrThemeData theme) {
+    final text = segment as TextNode;
+    final attrs = text.style;
 
     return TextSpan(
-      text: segment.value,
-      style: _getInlineTextStyle(attrs, theme),
+      text: text.value,
+      style: _getInlineTextStyle(attrs, node.style, theme),
     );
   }
 
   TextStyle _getParagraphTextStyle(NotusStyle style, ZefyrThemeData theme) {
-    var textStyle = TextStyle();
+    var textStyle = const TextStyle();
     final heading = node.style.get(NotusAttribute.heading);
     if (heading == NotusAttribute.heading.level1) {
       textStyle = textStyle.merge(theme.heading1.style);
@@ -92,25 +92,27 @@ class TextLine extends StatelessWidget {
     return textStyle;
   }
 
-  TextStyle _getInlineTextStyle(NotusStyle style, ZefyrThemeData theme) {
-    var result = TextStyle();
-    if (style.containsSame(NotusAttribute.bold)) {
+  TextStyle _getInlineTextStyle(
+      NotusStyle nodeStyle, NotusStyle lineStyle, ZefyrThemeData theme) {
+    var result = const TextStyle();
+    if (nodeStyle.containsSame(NotusAttribute.bold)) {
       result = _mergeTextStyleWithDecoration(result, theme.bold);
     }
-    if (style.containsSame(NotusAttribute.italic)) {
+    if (nodeStyle.containsSame(NotusAttribute.italic)) {
       result = _mergeTextStyleWithDecoration(result, theme.italic);
     }
-    if (style.contains(NotusAttribute.link)) {
+    if (nodeStyle.contains(NotusAttribute.link)) {
       result = _mergeTextStyleWithDecoration(result, theme.link);
     }
-    if (style.contains(NotusAttribute.underline)) {
+    if (nodeStyle.contains(NotusAttribute.underline)) {
       result = _mergeTextStyleWithDecoration(result, theme.underline);
     }
-    if (style.contains(NotusAttribute.strikethrough)) {
+    if (nodeStyle.contains(NotusAttribute.strikethrough)) {
       result = _mergeTextStyleWithDecoration(result, theme.strikethrough);
     }
-    if (style.contains(NotusAttribute.inlineCode)) {
-      result = _mergeTextStyleWithDecoration(result, theme.inlineCode.style);
+    if (nodeStyle.contains(NotusAttribute.inlineCode)) {
+      result = _mergeTextStyleWithDecoration(
+          result, theme.inlineCode.styleFor(lineStyle));
     }
     return result;
   }

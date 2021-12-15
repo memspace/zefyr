@@ -60,6 +60,7 @@ class EditableTextLine extends RenderObjectWidget {
 
   @override
   RenderEditableTextLine createRenderObject(BuildContext context) {
+    final theme = ZefyrTheme.of(context)!;
     return RenderEditableTextLine(
       node: node,
       padding: _padding,
@@ -70,12 +71,14 @@ class EditableTextLine extends RenderObjectWidget {
       enableInteractiveSelection: enableInteractiveSelection,
       hasFocus: hasFocus,
       devicePixelRatio: devicePixelRatio,
+      inlineCodeTheme: theme.inlineCode,
     );
   }
 
   @override
   void updateRenderObject(
       BuildContext context, covariant RenderEditableTextLine renderObject) {
+    final theme = ZefyrTheme.of(context)!;
     renderObject.node = node;
     renderObject.padding = _padding;
     renderObject.textDirection = Directionality.of(context);
@@ -85,6 +88,7 @@ class EditableTextLine extends RenderObjectWidget {
     renderObject.enableInteractiveSelection = enableInteractiveSelection;
     renderObject.hasFocus = hasFocus;
     renderObject.devicePixelRatio = devicePixelRatio;
+    renderObject.inlineCodeTheme = theme.inlineCode;
   }
 }
 
