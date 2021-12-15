@@ -8,6 +8,7 @@ import 'package:notus/notus.dart';
 
 import '../widgets/cursor.dart';
 import '../widgets/selection_utils.dart';
+import '../widgets/theme.dart';
 import 'cursor_painter.dart';
 import 'editable_box.dart';
 
@@ -27,6 +28,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     required Color selectionColor,
     required bool enableInteractiveSelection,
     required bool hasFocus,
+    required InlineCodeThemeData inlineCodeTheme,
     double devicePixelRatio = 1.0,
     // Not implemented fields are below:
     ui.BoxHeightStyle selectionHeightStyle = ui.BoxHeightStyle.tight,
@@ -44,9 +46,17 @@ class RenderEditableTextLine extends RenderEditableBox {
         _selectionColor = selectionColor,
         _enableInteractiveSelection = enableInteractiveSelection,
         _devicePixelRatio = devicePixelRatio,
+        _inlineCodeTheme = inlineCodeTheme,
         _hasFocus = hasFocus;
 
   //
+
+  InlineCodeThemeData _inlineCodeTheme;
+  set inlineCodeTheme(InlineCodeThemeData theme) {
+    if (_inlineCodeTheme == theme) return;
+    _inlineCodeTheme = theme;
+    markNeedsLayout();
+  }
 
   // Start selection implementation
 
@@ -64,9 +74,10 @@ class RenderEditableTextLine extends RenderEditableBox {
   set selection(TextSelection value) {
     if (_selection == value) return;
     final hadSelection = containsSelection;
-    if (attached && containsCursor) {
+    if (_attachedToCursorController) {
       _cursorController.removeListener(markNeedsLayout);
       _cursorController.cursorColor.removeListener(markNeedsPaint);
+      _attachedToCursorController = false;
     }
     _selection = value;
     _selectionRects = null;
@@ -74,6 +85,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     if (attached && containsCursor) {
       _cursorController.addListener(markNeedsLayout);
       _cursorController.cursorColor.addListener(markNeedsPaint);
+      _attachedToCursorController = true;
     }
 
     if (hadSelection || containsSelection) {
@@ -498,6 +510,8 @@ class RenderEditableTextLine extends RenderEditableBox {
 
   // Start render box overrides
 
+  bool _attachedToCursorController = false;
+
   @override
   void attach(covariant PipelineOwner owner) {
     super.attach(owner);
@@ -509,6 +523,7 @@ class RenderEditableTextLine extends RenderEditableBox {
     if (containsCursor) {
       _cursorController.addListener(markNeedsLayout);
       _cursorController.cursorColor.addListener(markNeedsPaint);
+      _attachedToCursorController = true;
     }
   }
 
@@ -520,9 +535,10 @@ class RenderEditableTextLine extends RenderEditableBox {
     }
     _cursorController.floatingCursorTextPosition
         .removeListener(_onFloatingCursorChange);
-    if (containsCursor) {
+    if (_attachedToCursorController) {
       _cursorController.removeListener(markNeedsLayout);
       _cursorController.cursorColor.removeListener(markNeedsPaint);
+      _attachedToCursorController = false;
     }
   }
 
@@ -680,6 +696,30 @@ class RenderEditableTextLine extends RenderEditableBox {
     if (body != null) {
       final parentData = body!.parentData as BoxParentData;
       final effectiveOffset = offset + parentData.offset;
+
+      if (_inlineCodeTheme.backgroundColor != null) {
+        for (var item in node.children) {
+          if (item is! TextNode) continue;
+          if (!item.style.containsSame(NotusAttribute.inlineCode)) continue;
+          final textRange = TextSelection(
+              baseOffset: item.offset, extentOffset: item.offset + item.length);
+          final rects = body!.getBoxesForSelection(textRange);
+          final paint = Paint()..color = _inlineCodeTheme.backgroundColor!;
+          for (final box in rects) {
+            final rect = box.toRect().translate(0, 1).shift(effectiveOffset);
+            if (_inlineCodeTheme.radius == null) {
+              final paintRect = Rect.fromLTRB(
+                  rect.left - 2, rect.top, rect.right + 2, rect.bottom);
+              context.canvas.drawRect(paintRect, paint);
+            } else {
+              final paintRect = RRect.fromLTRBR(rect.left - 2, rect.top,
+                  rect.right + 2, rect.bottom, _inlineCodeTheme.radius!);
+              context.canvas.drawRRect(paintRect, paint);
+            }
+          }
+        }
+      }
+
       if (selectionEnabled && containsSelection) {
         final local = localSelection(node, selection);
         _selectionRects ??= body!.getBoxesForSelection(

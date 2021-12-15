@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/rendering.dart';
 
 import 'editable_box.dart';
@@ -98,7 +100,8 @@ class RenderParagraphProxy extends RenderProxyBox
 
   @override
   List<TextBox> getBoxesForSelection(TextSelection selection) {
-    return child!.getBoxesForSelection(selection);
+    return child!
+        .getBoxesForSelection(selection, boxHeightStyle: BoxHeightStyle.strut);
   }
 
   @override
