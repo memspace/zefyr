@@ -1,5 +1,7 @@
 ## Unreleased
 
+* Fixed: Updated heuristic rules to ensure the last newline character is always preserved ([#572](https://github.com/memspace/zefyr/pull/572))
+
 ## 1.0.0-rc.1
 
 * Improved auto-formatting of code blocks from Markdown shortcuts ([#560](https://github.com/memspace/zefyr/pull/560))
