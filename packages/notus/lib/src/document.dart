@@ -126,7 +126,6 @@ class NotusDocument {
   /// Returns an instance of [Delta] actually composed into this document.
   Delta delete(int index, int length) {
     assert(index >= 0 && length > 0);
-    // TODO: need a heuristic rule to ensure last line-break.
     final change = _heuristics.applyDeleteRules(this, index, length);
     if (change.isNotEmpty) {
       // Delete rules are allowed to prevent the edit so it may be empty.

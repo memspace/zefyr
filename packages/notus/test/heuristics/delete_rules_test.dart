@@ -41,6 +41,22 @@ void main() {
         ..retain(1, unsetUl);
       expect(actual, expected);
     });
+
+    test('preserves last newline character', () {
+      final doc = Delta()..insert('\n');
+      final actual = rule.apply(doc, 0, 1);
+      final expected = Delta();
+      expect(actual, expected);
+    });
+
+    test('preserves last newline character on multi character delete', () {
+      final doc = Delta()..insert('Document\nTitle\n');
+      final actual = rule.apply(doc, 8, 7);
+      final expected = Delta()
+        ..retain(8)
+        ..delete(6);
+      expect(actual, expected);
+    });
   });
 
   group('$CatchAllDeleteRule', () {
@@ -49,6 +65,22 @@ void main() {
     test('applies change as-is', () {
       final doc = Delta()..insert('Document\n');
       final actual = rule.apply(doc, 3, 5);
+      final expected = Delta()
+        ..retain(3)
+        ..delete(5);
+      expect(actual, expected);
+    });
+
+    test('preserves last newline character', () {
+      final doc = Delta()..insert('\n');
+      final actual = rule.apply(doc, 0, 1);
+      final expected = Delta();
+      expect(actual, expected);
+    });
+
+    test('preserves last newline character on multi character delete', () {
+      final doc = Delta()..insert('Document\n');
+      final actual = rule.apply(doc, 3, 6);
       final expected = Delta()
         ..retain(3)
         ..delete(5);
