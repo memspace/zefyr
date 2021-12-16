@@ -10,6 +10,8 @@ import 'full_page.dart';
 enum _Options { darkTheme }
 
 class FormEmbeddedScreen extends StatefulWidget {
+  const FormEmbeddedScreen({Key key}) : super(key: key);
+
   @override
   _FormEmbeddedScreenState createState() => _FormEmbeddedScreenState();
 }
@@ -24,12 +26,12 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
   Widget build(BuildContext context) {
     final form = ListView(
       children: <Widget>[
-        TextField(
+        const TextField(
           decoration: InputDecoration(labelText: 'Name'),
           maxLines: 5,
         ),
         buildEditor(),
-        TextField(
+        const TextField(
           decoration: InputDecoration(labelText: 'Details'),
           maxLines: 3,
         ),
@@ -39,7 +41,7 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
     final result = Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: ZefyrLogo(),
+        title: const ZefyrLogo(),
         actions: [
           PopupMenuButton<_Options>(
             itemBuilder: buildPopupMenu,
@@ -84,7 +86,7 @@ class _FormEmbeddedScreenState extends State<FormEmbeddedScreen> {
       CheckedPopupMenuItem(
         value: _Options.darkTheme,
         checked: _darkTheme,
-        child: Text('Dark theme'),
+        child: const Text('Dark theme'),
       ),
     ];
   }

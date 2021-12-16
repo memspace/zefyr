@@ -6,13 +6,15 @@ import 'package:flutter/material.dart';
 import 'src/home.dart';
 
 void main() {
-  runApp(ZefyrApp());
+  runApp(const ZefyrApp());
 }
 
 class ZefyrApp extends StatelessWidget {
+  const ZefyrApp({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Zefyr - rich-text editor for Flutter',
       home: HomePage(),

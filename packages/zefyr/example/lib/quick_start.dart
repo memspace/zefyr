@@ -6,32 +6,36 @@ import 'package:flutter/material.dart';
 import 'src/editor_page.dart';
 
 void main() {
-  runApp(QuickStartApp());
+  runApp(const QuickStartApp());
 }
 
 class QuickStartApp extends StatelessWidget {
+  const QuickStartApp({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Quick Start',
-      home: HomePage(),
+      home: const HomePage(),
       routes: {
-        '/editor': (context) => EditorPage(),
+        '/editor': (context) => const EditorPage(),
       },
     );
   }
 }
 
 class HomePage extends StatelessWidget {
+  const HomePage({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final navigator = Navigator.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('Quick Start')),
+      appBar: AppBar(title: const Text('Quick Start')),
       body: Center(
         child: TextButton(
           onPressed: () => navigator.pushNamed('/editor'),
-          child: Text('Open editor'),
+          child: const Text('Open editor'),
         ),
       ),
     );

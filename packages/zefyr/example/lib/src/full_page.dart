@@ -10,11 +10,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:zefyr/zefyr.dart';
 
 class ZefyrLogo extends StatelessWidget {
+  const ZefyrLogo({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: const <Widget>[
         Text('Ze'),
         FlutterLogo(size: 24.0),
         Text('yr'),
@@ -24,11 +26,13 @@ class ZefyrLogo extends StatelessWidget {
 }
 
 class FullPageEditorScreen extends StatefulWidget {
+  const FullPageEditorScreen({Key key}) : super(key: key);
+
   @override
   _FullPageEditorScreenState createState() => _FullPageEditorScreenState();
 }
 
-final doc =
+const doc =
     r'[{"insert":"Zefyr"},{"insert":"\n","attributes":{"heading":1}},{"insert":"Soft and gentle rich text editing for Flutter applications.","attributes":{"i":true}},{"insert":"\n"},{"insert":"​","attributes":{"embed":{"type":"image","source":"asset://images/breeze.jpg"}}},{"insert":"\n"},{"insert":"Photo by Hiroyuki Takeda.","attributes":{"i":true}},{"insert":"\nZefyr is currently in "},{"insert":"early preview","attributes":{"b":true}},{"insert":". If you have a feature request or found a bug, please file it at the "},{"insert":"issue tracker","attributes":{"a":"https://github.com/memspace/zefyr/issues"}},{"insert":'
     r'".\nDocumentation"},{"insert":"\n","attributes":{"heading":3}},{"insert":"Quick Start","attributes":{"a":"https://github.com/memspace/zefyr/blob/master/doc/quick_start.md"}},{"insert":"\n","attributes":{"block":"ul"}},{"insert":"Data Format and Document Model","attributes":{"a":"https://github.com/memspace/zefyr/blob/master/doc/data_and_document.md"}},{"insert":"\n","attributes":{"block":"ul"}},{"insert":"Style Attributes","attributes":{"a":"https://github.com/memspace/zefyr/blob/master/doc/attr'
     r'ibutes.md"}},{"insert":"\n","attributes":{"block":"ul"}},{"insert":"Heuristic Rules","attributes":{"a":"https://github.com/memspace/zefyr/blob/master/doc/heuristics.md"}},{"insert":"\n","attributes":{"block":"ul"}},{"insert":"FAQ","attributes":{"a":"https://github.com/memspace/zefyr/blob/master/doc/faq.md"}},{"insert":"\n","attributes":{"block":"ul"}},{"insert":"Clean and modern look"},{"insert":"\n","attributes":{"heading":2}},{"insert":"Zefyr’s rich text editor is built with simplicity and fle'
@@ -49,6 +53,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
   void initState() {
     super.initState();
     _sub = _controller.document.changes.listen((change) {
+      // ignore: avoid_print
       print('${change.source}: ${change.change}');
     });
   }
@@ -62,12 +67,12 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final done = _editing
-        ? IconButton(onPressed: _stopEditing, icon: Icon(Icons.save))
-        : IconButton(onPressed: _startEditing, icon: Icon(Icons.edit));
+        ? IconButton(onPressed: _stopEditing, icon: const Icon(Icons.save))
+        : IconButton(onPressed: _startEditing, icon: const Icon(Icons.edit));
     final result = Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: ZefyrLogo(),
+        title: const ZefyrLogo(),
         actions: [
           done,
           PopupMenuButton<_Options>(
@@ -77,7 +82,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
         ],
       ),
       body: ZefyrField(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         controller: _controller,
         focusNode: _focusNode,
         readOnly: !_editing,
@@ -111,7 +116,7 @@ class _FullPageEditorScreenState extends State<FullPageEditorScreen> {
       CheckedPopupMenuItem(
         value: _Options.darkTheme,
         checked: _darkTheme,
-        child: Text('Dark theme'),
+        child: const Text('Dark theme'),
       ),
     ];
   }

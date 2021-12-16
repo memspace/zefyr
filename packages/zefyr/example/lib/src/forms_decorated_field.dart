@@ -4,6 +4,8 @@ import 'package:zefyr/zefyr.dart';
 import 'scaffold.dart';
 
 class DecoratedFieldDemo extends StatefulWidget {
+  const DecoratedFieldDemo({Key key}) : super(key: key);
+
   @override
   _DecoratedFieldDemoState createState() => _DecoratedFieldDemoState();
 }
@@ -25,13 +27,13 @@ class _DecoratedFieldDemoState extends State<DecoratedFieldDemo> {
       padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: <Widget>[
-          TextField(
+          const TextField(
             decoration: InputDecoration(labelText: 'Title'),
           ),
           ZefyrField(
             controller: controller,
             focusNode: _focusNode,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               contentPadding: EdgeInsets.only(top: 8.0),
               labelText: 'Description',
               hintText: 'Detailed description, but not too detailed',
@@ -40,7 +42,7 @@ class _DecoratedFieldDemoState extends State<DecoratedFieldDemo> {
             // minHeight: 80.0,
             // maxHeight: 160.0,
           ),
-          TextField(
+          const TextField(
             decoration: InputDecoration(labelText: 'Final thoughts'),
             maxLines: 3,
           ),

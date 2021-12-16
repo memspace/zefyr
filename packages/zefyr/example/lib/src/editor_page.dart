@@ -6,6 +6,8 @@ import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 
 class EditorPage extends StatefulWidget {
+  const EditorPage({Key key}) : super(key: key);
+
   @override
   EditorPageState createState() => EditorPageState();
 }
@@ -31,20 +33,20 @@ class EditorPageState extends State<EditorPage> {
   @override
   Widget build(BuildContext context) {
     final body = (_controller == null)
-        ? Center(child: CircularProgressIndicator())
+        ? const Center(child: CircularProgressIndicator())
         : ZefyrField(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             controller: _controller,
             focusNode: _focusNode,
           );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editor page'),
+        title: const Text('Editor page'),
         actions: <Widget>[
           Builder(
             builder: (context) => IconButton(
-              icon: Icon(Icons.save),
+              icon: const Icon(Icons.save),
               onPressed: () => _saveDocument(context),
             ),
           )
@@ -59,9 +61,8 @@ class EditorPageState extends State<EditorPage> {
   Future<NotusDocument> _loadDocument() async {
     final file = File(Directory.systemTemp.path + '/quick_start.json');
     if (await file.exists()) {
-      final contents = await file
-          .readAsString()
-          .then((data) => Future.delayed(Duration(seconds: 1), () => data));
+      final contents = await file.readAsString().then(
+          (data) => Future.delayed(const Duration(seconds: 1), () => data));
       return NotusDocument.fromJson(jsonDecode(contents));
     }
     final delta = Delta()..insert('Zefyr Quick Start\n');
@@ -77,7 +78,7 @@ class EditorPageState extends State<EditorPage> {
     // And show a snack bar on success.
     file.writeAsString(contents).then((_) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Saved.')));
+          .showSnackBar(const SnackBar(content: Text('Saved.')));
     });
   }
 }
