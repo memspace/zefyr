@@ -30,7 +30,14 @@ class InsertEmbedButton extends StatelessWidget {
       onPressed: () {
         final index = controller.selection.baseOffset;
         final length = controller.selection.extentOffset - index;
-        controller.replaceText(index, length, BlockEmbed.horizontalRule);
+        // Move the cursor to the beginning of the line right after the embed.
+        // 2 = 1 for the embed itself and 1 for the newline after it
+        final newSelection = controller.selection.copyWith(
+          baseOffset: index + 2,
+          extentOffset: index + 2,
+        );
+        controller.replaceText(index, length, BlockEmbed.horizontalRule,
+            selection: newSelection);
       },
     );
   }
