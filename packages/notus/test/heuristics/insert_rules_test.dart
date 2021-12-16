@@ -392,5 +392,11 @@ void main() {
         ..retain(1, NotusAttribute.code.toJson());
       expect(actual, expected);
     });
+
+    test('first space does not break insertion', () {
+      final doc = Delta()..insert('``\n');
+      final actual = rule.apply(doc, 0, ' ');
+      expect(actual, isNull);
+    });
   });
 }

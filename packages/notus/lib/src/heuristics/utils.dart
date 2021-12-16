@@ -5,7 +5,9 @@ import 'package:quill_delta/quill_delta.dart';
 /// Skips to the beginning of line containing position at specified [length]
 /// and returns contents of the line skipped so far.
 List<Operation> skipToLineAt(DeltaIterator iter, int length) {
-  assert(length > 0);
+  if (length == 0) {
+    return List.empty(growable: false);
+  }
 
   final prefix = <Operation>[];
 
