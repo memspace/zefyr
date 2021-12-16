@@ -2,6 +2,7 @@
 
 * Inline code improvements: added backgroundColor, radius and style overrides for headings to
   inline code theme ([#573](https://github.com/memspace/zefyr/pull/573))
+* Fixed: Inserting horizontal rule moves cursor on the next line after it ([#576](https://github.com/memspace/zefyr/pull/576))
 
 ## 1.0.0-rc.1
 
