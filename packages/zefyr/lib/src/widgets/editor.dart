@@ -386,6 +386,13 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     }
   }
 
+  bool isShiftClick(PointerDeviceKind deviceKind) {
+    final pressed = RawKeyboard.instance.keysPressed;
+    return deviceKind == PointerDeviceKind.mouse &&
+        (pressed.contains(LogicalKeyboardKey.shiftLeft) ||
+            pressed.contains(LogicalKeyboardKey.shiftRight));
+  }
+
   @override
   void onSingleTapUp(TapUpDetails details) {
     editor!.hideToolbar();
@@ -402,7 +409,13 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
             case PointerDeviceKind.stylus:
             case PointerDeviceKind.invertedStylus:
               // Precise devices should place the cursor at a precise position.
-              renderEditor!.selectPosition(cause: SelectionChangedCause.tap);
+              // If `Shift` key is pressed then extend current selection instead.
+              if (isShiftClick(details.kind)) {
+                renderEditor!.extendSelection(details.globalPosition,
+                    cause: SelectionChangedCause.tap);
+              } else {
+                renderEditor!.selectPosition(cause: SelectionChangedCause.tap);
+              }
               break;
             case PointerDeviceKind.touch:
             case PointerDeviceKind.unknown:
@@ -1033,6 +1046,7 @@ class RawEditorState extends EditorState
 
   void _handleSelectionChanged(
       TextSelection selection, SelectionChangedCause cause) {
+    final oldSelection = widget.controller.selection;
     widget.controller.updateSelection(selection, source: ChangeSource.local);
 
     _selectionOverlay?.handlesVisible = _shouldShowSelectionHandles();
@@ -1040,6 +1054,16 @@ class RawEditorState extends EditorState
     // This will show the keyboard for all selection changes on the
     // editor, not just changes triggered by user gestures.
     requestKeyboard();
+
+    if (cause == SelectionChangedCause.drag) {
+      // When user updates the selection while dragging make sure to
+      // bring the updated position (base or extent) into view.
+      if (oldSelection.baseOffset != selection.baseOffset) {
+        bringIntoView(selection.base);
+      } else if (oldSelection.extentOffset != selection.extentOffset) {
+        bringIntoView(selection.extent);
+      }
+    }
   }
 
   void _handleFocusChanged() {

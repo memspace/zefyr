@@ -3,6 +3,8 @@
 * Inline code improvements: added backgroundColor, radius and style overrides for headings to
   inline code theme ([#573](https://github.com/memspace/zefyr/pull/573))
 * Fixed: Inserting horizontal rule moves cursor on the next line after it ([#576](https://github.com/memspace/zefyr/pull/576))
+* Added `Shift` + `Click` support for extending selection on desktop ([#577](https://github.com/memspace/zefyr/pull/577))
+* Added automatic scrolling while selecting text with mouse ([#577](https://github.com/memspace/zefyr/pull/577))
 
 ## 1.0.0-rc.1
 

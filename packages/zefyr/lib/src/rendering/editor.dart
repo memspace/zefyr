@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:notus/notus.dart';
@@ -86,7 +87,12 @@ abstract class RenderAbstractEditor implements TextLayoutMetrics {
   void selectWordEdge({required SelectionChangedCause cause});
 
   /// Select text between the global positions [from] and [to].
-  void selectPositionAt({
+  ///
+  /// Returns the new selection. Note that the returned value may not be
+  /// yet reflected in the latest widget state.
+  ///
+  /// Returns null if no change occurred.
+  TextSelection? selectPositionAt({
     required Offset from,
     Offset? to,
     required SelectionChangedCause cause,
@@ -134,6 +140,7 @@ class RenderEditor extends RenderEditableContainerBox
   })  : _document = document,
         _hasFocus = hasFocus,
         _selection = selection,
+        _extendSelectionOrigin = selection,
         _startHandleLayerLink = startHandleLayerLink,
         _endHandleLayerLink = endHandleLayerLink,
         _cursorController = cursorController,
@@ -192,7 +199,17 @@ class RenderEditor extends RenderEditableContainerBox
     if (_selection == value) return;
     _selection = value;
     markNeedsPaint();
+
+    if (!_shiftPressed && !_isDragging) {
+      // Only update extend selection origin if Shift key is not pressed and
+      // user is not dragging selection.
+      _extendSelectionOrigin = _selection;
+    }
   }
+
+  bool get _shiftPressed =>
+      RawKeyboard.instance.keysPressed.contains(LogicalKeyboardKey.shiftLeft) ||
+      RawKeyboard.instance.keysPressed.contains(LogicalKeyboardKey.shiftLeft);
 
   /// The [LayerLink] of start selection handle.
   ///
@@ -387,9 +404,33 @@ class RenderEditor extends RenderEditableContainerBox
 
   Offset? _lastTapDownPosition;
 
+  // Used on Desktop (mouse and keyboard enabled platforms) as base offset
+  // for extending selection, either with combination of `Shift` + Click or
+  // by dragging
+  TextSelection? _extendSelectionOrigin;
+
   @override
   void handleTapDown(TapDownDetails details) {
     _lastTapDownPosition = details.globalPosition;
+  }
+
+  bool _isDragging = false;
+
+  void handleDragStart(DragStartDetails details) {
+    _isDragging = true;
+
+    final newSelection = selectPositionAt(
+      from: details.globalPosition,
+      cause: SelectionChangedCause.drag,
+    );
+
+    if (newSelection == null) return;
+    // Make sure to remember the origin for extend selection.
+    _extendSelectionOrigin = newSelection;
+  }
+
+  void handleDragEnd(DragEndDetails details) {
+    _isDragging = false;
   }
 
   /// Called when the selection changes.
@@ -420,6 +461,34 @@ class RenderEditor extends RenderEditableContainerBox
       ),
       cause,
     );
+  }
+
+  /// Extends current selection to the position closest to specified offset.
+  void extendSelection(Offset to, {required SelectionChangedCause cause}) {
+    /// The below logic does not exactly match the native version because
+    /// we do not allow swapping of base and extent positions.
+    assert(_extendSelectionOrigin != null);
+    final position = getPositionForOffset(to);
+
+    if (position.offset < _extendSelectionOrigin!.baseOffset) {
+      _handleSelectionChange(
+        TextSelection(
+          baseOffset: position.offset,
+          extentOffset: _extendSelectionOrigin!.extentOffset,
+          affinity: selection.affinity,
+        ),
+        cause,
+      );
+    } else if (position.offset > _extendSelectionOrigin!.extentOffset) {
+      _handleSelectionChange(
+        TextSelection(
+          baseOffset: _extendSelectionOrigin!.baseOffset,
+          extentOffset: position.offset,
+          affinity: selection.affinity,
+        ),
+        cause,
+      );
+    }
   }
 
   @override
@@ -457,14 +526,14 @@ class RenderEditor extends RenderEditableContainerBox
   }
 
   @override
-  void selectPositionAt({
+  TextSelection? selectPositionAt({
     required Offset from,
     Offset? to,
     required SelectionChangedCause cause,
   }) {
     // _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
     if (onSelectionChanged == null) {
-      return;
+      return null;
     }
     final fromPosition = getPositionForOffset(from);
     final toPosition = to == null ? null : getPositionForOffset(to);
@@ -481,8 +550,10 @@ class RenderEditor extends RenderEditableContainerBox
       extentOffset: extentOffset,
       affinity: fromPosition.affinity,
     );
+
     // Call [onSelectionChanged] only when the selection actually changed.
     _handleSelectionChange(newSelection, cause);
+    return newSelection;
   }
 
   @override
@@ -539,22 +610,6 @@ class RenderEditor extends RenderEditableContainerBox
   }
 
   // Start RenderBox implementation
-
-  @override
-  void attach(PipelineOwner owner) {
-    super.attach(owner);
-//    _tap = TapGestureRecognizer(debugOwner: this)
-//      ..onTapDown = _handleTapDown
-//      ..onTap = _handleTap;
-//    _longPress = LongPressGestureRecognizer(debugOwner: this)..onLongPress = _handleLongPress;
-  }
-
-  @override
-  void detach() {
-//    _tap.dispose();
-//    _longPress.dispose();
-    super.detach();
-  }
 
   @override
   void paint(PaintingContext context, Offset offset) {
