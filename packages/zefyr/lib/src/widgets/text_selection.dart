@@ -865,10 +865,7 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///    this callback.
   @protected
   void onDragSelectionStart(DragStartDetails details) {
-    renderEditor!.selectPositionAt(
-      from: details.globalPosition,
-      cause: SelectionChangedCause.drag,
-    );
+    renderEditor!.handleDragStart(details);
   }
 
   /// Handler for [EditorTextSelectionGestureDetector.onDragSelectionUpdate].
@@ -883,11 +880,8 @@ class EditorTextSelectionGestureDetectorBuilder {
   @protected
   void onDragSelectionUpdate(
       DragStartDetails startDetails, DragUpdateDetails updateDetails) {
-    renderEditor!.selectPositionAt(
-      from: startDetails.globalPosition,
-      to: updateDetails.globalPosition,
-      cause: SelectionChangedCause.drag,
-    );
+    renderEditor!.extendSelection(updateDetails.globalPosition,
+        cause: SelectionChangedCause.drag);
   }
 
   /// Handler for [EditorTextSelectionGestureDetector.onDragSelectionEnd].
@@ -900,7 +894,7 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///    callback.
   @protected
   void onDragSelectionEnd(DragEndDetails details) {
-    /* Subclass should override this method if needed. */
+    renderEditor!.handleDragEnd(details);
   }
 
   /// Returns a [EditorTextSelectionGestureDetector] configured with the handlers
