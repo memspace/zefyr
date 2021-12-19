@@ -5,6 +5,8 @@
 * Fixed: Inserting horizontal rule moves cursor on the next line after it ([#576](https://github.com/memspace/zefyr/pull/576))
 * Added `Shift` + `Click` support for extending selection on desktop ([#577](https://github.com/memspace/zefyr/pull/577))
 * Added automatic scrolling while selecting text with mouse ([#577](https://github.com/memspace/zefyr/pull/577))
+* Added support for text alignment ([#565](https://github.com/memspace/zefyr/pull/565))
+* Added support for checklists ([#579](https://github.com/memspace/zefyr/pull/579))
 
 ## 1.0.0-rc.1
 
