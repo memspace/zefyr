@@ -286,6 +286,26 @@ void main() {
         ..retain(1, h1Unset);
       expect(actual, expected);
     });
+
+    test('preserves checked style of the original line', () {
+      final cl = NotusAttribute.cl.toJson();
+      final checkedUnset = NotusAttribute.checked.unset.toJson();
+      final clChecked = NotusAttribute.cl.toJson();
+      clChecked.addAll(NotusAttribute.checked.toJson());
+      final doc = Delta()
+        ..insert('One and two')
+        ..insert('\n', clChecked)
+        ..insert('Three')
+        ..insert('\n', cl);
+      final actual = rule.apply(doc, 8, '111\n');
+      final expected = Delta()
+        ..retain(8)
+        ..insert('111')
+        ..insert('\n', clChecked)
+        ..retain(3)
+        ..retain(1, checkedUnset);
+      expect(actual, expected);
+    });
   });
 
   group('$InsertEmbedsRule', () {

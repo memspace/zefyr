@@ -1,9 +1,9 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'package:test/test.dart';
-import 'package:quill_delta/quill_delta.dart';
 import 'package:notus/notus.dart';
+import 'package:quill_delta/quill_delta.dart';
+import 'package:test/test.dart';
 
 final ul = NotusAttribute.ul.toJson();
 final bold = NotusAttribute.bold.toJson();
@@ -35,9 +35,7 @@ void main() {
       final actual = rule.apply(doc, 0, 0, NotusAttribute.ul);
       expect(actual, isNotNull);
       final ul = NotusAttribute.ul.toJson();
-      final expected = Delta()
-        ..retain(7)
-        ..retain(1, ul);
+      final expected = Delta()..retain(7)..retain(1, ul);
       expect(actual, expected);
     });
 
@@ -50,9 +48,24 @@ void main() {
         ..insert('\n', ul)
         ..insert('Three!\n');
       final actual = rule.apply(doc, 7, 0, NotusAttribute.ul);
-      final expected = Delta()
-        ..retain(9)
-        ..retain(1, ul);
+      final expected = Delta()..retain(9)..retain(1, ul);
+      expect(actual, expected);
+    });
+
+    test('removing checklist style from a line also removes checked style', () {
+      final cl = NotusAttribute.cl.toJson();
+      final checkedCl = Map<String, dynamic>.from(cl)
+        ..addAll(NotusAttribute.checked.toJson());
+      final doc = Delta()
+        ..insert('Title\nOne')
+        ..insert('\n', checkedCl)
+        ..insert('Two')
+        ..insert('\n', cl)
+        ..insert('End!\n');
+      final actual = rule.apply(doc, 7, 0, NotusAttribute.cl.unset);
+      final noBlockNoChecked = NotusAttribute.block.unset.toJson()
+        ..addAll(NotusAttribute.checked.unset.toJson());
+      final expected = Delta()..retain(9)..retain(1, noBlockNoChecked);
       expect(actual, expected);
     });
   });
@@ -93,9 +106,7 @@ void main() {
 
       final actual = rule.apply(doc, 13, 0, newLink);
       expect(actual, isNotNull);
-      final expected = Delta()
-        ..retain(10)
-        ..retain(7, newLink.toJson());
+      final expected = Delta()..retain(10)..retain(7, newLink.toJson());
       expect(actual, expected);
     });
   });

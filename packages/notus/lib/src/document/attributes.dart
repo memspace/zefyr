@@ -83,6 +83,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.inlineCode.key: NotusAttribute.inlineCode,
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
+    NotusAttribute.checked.key: NotusAttribute.checked,
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.direction.key: NotusAttribute.direction,
     NotusAttribute.alignment.key: NotusAttribute.alignment,
@@ -124,6 +125,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.heading.level3].
   static NotusAttribute<int> get h3 => heading.level3;
 
+  /// Applies checked style to a line of text in checklist block.
+  static const checked = _CheckedAttribute();
+
   /// Block attribute
   // ignore: const_eval_throws_exception
   static const block = BlockAttributeBuilder._();
@@ -133,6 +137,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.block.numberList].
   static NotusAttribute<String> get ol => block.numberList;
+
+  /// Alias for [NotusAttribute.block.checkList].
+  static NotusAttribute<String> get cl => block.checkList;
 
   /// Alias for [NotusAttribute.block.quote].
   static NotusAttribute<String> get bq => block.quote;
@@ -408,6 +415,12 @@ class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
   NotusAttribute<int> get level3 => NotusAttribute<int>._(key, scope, 3);
 }
 
+/// Applies checked style to a line in a checklist block.
+class _CheckedAttribute extends NotusAttribute<bool> {
+  const _CheckedAttribute()
+      : super._('checked', NotusAttributeScope.line, true);
+}
+
 /// Builder for block attribute styles (number/bullet lists, code and quote).
 ///
 /// There is no need to use this class directly, consider using
@@ -423,6 +436,10 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a block of lines as a number list.
   NotusAttribute<String> get numberList =>
       NotusAttribute<String>._(key, scope, 'ol');
+
+  /// Formats a block of lines as a check list.
+  NotusAttribute<String> get checkList =>
+      NotusAttribute<String>._(key, scope, 'cl');
 
   /// Formats a block of lines as a code snippet, using monospace font.
   NotusAttribute<String> get code =>

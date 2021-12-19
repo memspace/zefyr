@@ -36,7 +36,7 @@ class ResolveLineFormatRule extends FormatRule {
       final op = iter.next(length - current);
       final opText = op.data is String ? op.data as String : '';
       if (opText.contains('\n')) {
-        final delta = _applyAttribute(op.data as String, attribute);
+        final delta = _applyAttribute(op.data as String, op, attribute);
         result = result.concat(delta);
       } else {
         result.retain(op.length);
@@ -52,22 +52,35 @@ class ResolveLineFormatRule extends FormatRule {
         result.retain(op.length);
         continue;
       }
-      result
-        ..retain(lf)
-        ..retain(1, attribute.toJson());
+      final delta = _applyAttribute(opText, op, attribute, firstOnly: true);
+      result = result.concat(delta);
       break;
     }
     return result;
   }
 
-  Delta _applyAttribute(String text, NotusAttribute attribute) {
+  Delta _applyAttribute(String text, Operation op, NotusAttribute attribute,
+      {bool firstOnly = false}) {
     final result = Delta();
     var offset = 0;
     var lf = text.indexOf('\n');
     while (lf >= 0) {
-      result
-        ..retain(lf - offset)
-        ..retain(1, attribute.toJson());
+      Map<String, dynamic> actualStyle = attribute.toJson();
+
+      NotusStyle opStyle = NotusStyle.fromJson(op.attributes);
+      if (opStyle.containsSame(NotusAttribute.block.checkList) &&
+          opStyle.containsSame(NotusAttribute.checked) &&
+          attribute.key == NotusAttribute.block.key &&
+          attribute.value != NotusAttribute.block.checkList.value) {
+        // Unset checked state when changing block style from checkList to something else
+        actualStyle[NotusAttribute.checked.key] = null;
+      }
+      result..retain(lf - offset)..retain(1, actualStyle);
+
+      if (firstOnly) {
+        return result;
+      }
+
       offset = lf + 1;
       lf = text.indexOf('\n', offset);
     }
@@ -101,9 +114,7 @@ class ResolveInlineFormatRule extends FormatRule {
       if (lf != -1) {
         var pos = 0;
         while (lf != -1) {
-          result
-            ..retain(lf - pos, attribute.toJson())
-            ..retain(1);
+          result..retain(lf - pos, attribute.toJson())..retain(1);
           pos = lf + 1;
           lf = opText.indexOf('\n', pos);
         }
@@ -151,9 +162,7 @@ class FormatLinkAtCaretPositionRule extends FormatRule {
     // no-op action.
     if (retain == 0) return null;
 
-    result
-      ..retain(startIndex)
-      ..retain(retain, attribute.toJson());
+    result..retain(startIndex)..retain(retain, attribute.toJson());
 
     return result;
   }

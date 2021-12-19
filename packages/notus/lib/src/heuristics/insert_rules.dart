@@ -389,12 +389,17 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
       NotusAttribute.block.key: lineStyle[NotusAttribute.block.key]
     };
 
-    Map<String, dynamic>? resetStyle;
+    Map<String, dynamic> resetStyle = {};
     // If current line had heading style applied to it we'll need to move this
     // style to the newly inserted line before it and reset style of the
     // original line.
     if (lineStyle.containsKey(NotusAttribute.heading.key)) {
-      resetStyle = NotusAttribute.heading.unset.toJson();
+      resetStyle.addAll(NotusAttribute.heading.unset.toJson());
+    }
+
+    // Similarly for the checked style
+    if (lineStyle.containsKey(NotusAttribute.checked.key)) {
+      resetStyle.addAll(NotusAttribute.checked.unset.toJson());
     }
 
     // Go over each inserted line and ensure block style is applied.
@@ -415,7 +420,7 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
     }
 
     // Reset style of the original newline character if needed.
-    if (resetStyle != null) {
+    if (resetStyle.isNotEmpty) {
       result.retain(nextNewline.skippedLength!);
       final opText = nextNewline.op!.data as String;
       final lf = opText.indexOf('\n');
@@ -492,6 +497,7 @@ class MarkdownBlockShortcutsInsertRule extends InsertRule {
     '-': NotusAttribute.block.bulletList,
     '*': NotusAttribute.block.bulletList,
     '1.': NotusAttribute.block.numberList,
+    '[]': NotusAttribute.block.checkList,
     "'''": NotusAttribute.block.code,
     '```': NotusAttribute.block.code,
     '>': NotusAttribute.block.quote,
