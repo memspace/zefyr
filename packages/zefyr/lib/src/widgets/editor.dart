@@ -1286,6 +1286,7 @@ class RawEditorState extends EditorState
           child: EditableTextBlock(
             node: node,
             controller: widget.controller,
+            readOnly: widget.readOnly,
             spacing: _getSpacingForBlock(node, _themeData),
             cursorController: _cursorController,
             selection: widget.controller.selection,
