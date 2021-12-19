@@ -418,7 +418,7 @@ void main() {
       final actual = rule.apply(doc, 0, ' ');
       expect(actual, isNull);
     });
-    
+
     test('applies to lines in the middle of an operation', () {
       final doc = Delta()..insert('line\n###\nzefy\n');
       final changes = rule.apply(doc, 8, ' ');
@@ -432,9 +432,7 @@ void main() {
     });
 
     test('detect previous line correctly', () {
-      final doc = Delta()
-        ..insert('line\nzefy\n')
-        ..insert('###\n');
+      final doc = Delta()..insert('line\nzefy\n')..insert('###\n');
       final changes = rule.apply(doc, 13, ' ');
       final actual = doc.compose(changes!)..trim();
       final expected = Delta()
@@ -466,12 +464,6 @@ void main() {
         ..insert('\n', NotusAttribute.block.bulletList.toJson());
       final actual = rule.apply(doc, 1, ' ');
       expect(actual, isNull);
-    });
-
-    test('reject document without \n', () {
-      final doc = Delta()..insert('- ');
-      final changes = rule.apply(doc, 1, ' ');
-      expect(changes, isNull);
     });
   });
 }
