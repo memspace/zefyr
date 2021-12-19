@@ -42,6 +42,12 @@ class RenderParagraphProxy extends RenderProxyBox
     markNeedsLayout();
   }
 
+  set textAlign(TextAlign value) {
+    if (_prototypePainter.textAlign == value) return;
+    _prototypePainter.textAlign = value;
+    markNeedsLayout();
+  }
+
   set textScaleFactor(double value) {
     if (_prototypePainter.textScaleFactor == value) return;
     _prototypePainter.textScaleFactor = value;
