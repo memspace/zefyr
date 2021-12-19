@@ -3,7 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:zefyr/zefyr.dart';
 
 /// Applies a Zefyr editor theme to descendant widgets.
@@ -22,7 +21,7 @@ class ZefyrTheme extends InheritedWidget {
   /// Applies the given theme [data] to [child].
   ///
   /// The [data] and [child] arguments must not be null.
-  ZefyrTheme({
+  const ZefyrTheme({
     Key? key,
     required this.data,
     required Widget child,
@@ -122,7 +121,7 @@ class ZefyrThemeData {
       fontSize: 16.0,
       height: 1.3,
     );
-    final baseSpacing = const VerticalSpacing(top: 6.0, bottom: 10);
+    const baseSpacing = VerticalSpacing(top: 6.0, bottom: 10);
 
     String fontFamily;
     switch (themeData.platform) {
@@ -164,7 +163,7 @@ class ZefyrThemeData {
         ),
       ),
       link: TextStyle(
-        color: themeData.accentColor,
+        color: themeData.colorScheme.primaryVariant,
         decoration: TextDecoration.underline,
       ),
       paragraph: TextBlockTheme(

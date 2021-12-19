@@ -16,7 +16,7 @@ class BaselineProxy extends SingleChildRenderObjectWidget {
   final TextStyle textStyle;
   final EdgeInsets padding;
 
-  BaselineProxy({
+  const BaselineProxy({
     Key? key,
     Widget? child,
     required this.textStyle,

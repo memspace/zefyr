@@ -53,10 +53,10 @@ class _DesktopScaffold extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(color: Colors.grey.shade800),
-            constraints: BoxConstraints(minWidth: 260, maxWidth: 260),
+            constraints: const BoxConstraints(minWidth: 260, maxWidth: 260),
             child: Column(children: [
               appBar,
-              Divider(
+              const Divider(
                 height: 1,
                 color: Colors.white,
                 thickness: 1,

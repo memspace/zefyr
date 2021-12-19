@@ -4,6 +4,8 @@ import 'package:zefyr/zefyr.dart';
 import 'scaffold.dart';
 
 class ExpandedLayout extends StatefulWidget {
+  const ExpandedLayout({Key key}) : super(key: key);
+
   @override
   _ExpandedLayoutState createState() => _ExpandedLayoutState();
 }
@@ -44,7 +46,7 @@ class _ExpandedLayoutState extends State<ExpandedLayout> {
           focusNode: _focusNode,
           autofocus: true,
           expands: _expands,
-          padding: EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
         ),
       ),
     );

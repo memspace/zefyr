@@ -4,6 +4,8 @@ import 'package:zefyr/zefyr.dart';
 import 'scaffold.dart';
 
 class ReadOnlyView extends StatefulWidget {
+  const ReadOnlyView({Key key}) : super(key: key);
+
   @override
   _ReadOnlyViewState createState() => _ReadOnlyViewState();
 }
@@ -41,7 +43,7 @@ class _ReadOnlyViewState extends State<ReadOnlyView> {
           expands: true,
           readOnly: !_edit,
           showCursor: _edit,
-          padding: EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
         ),
       ),
     );

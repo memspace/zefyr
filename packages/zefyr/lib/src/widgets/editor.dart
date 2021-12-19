@@ -462,7 +462,7 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
 }
 
 class RawEditor extends StatefulWidget {
-  RawEditor({
+  const RawEditor({
     Key? key,
     required this.controller,
     this.focusNode,
@@ -1149,8 +1149,8 @@ class RawEditorState extends EditorState
       }
 
       final viewport = RenderAbstractViewport.of(renderEditor)!;
-      final editorOffset =
-          renderEditor.localToGlobal(Offset(0.0, 0.0), ancestor: viewport);
+      final editorOffset = renderEditor.localToGlobal(const Offset(0.0, 0.0),
+          ancestor: viewport);
       final offsetInViewport = _scrollController.offset + editorOffset.dy;
 
       final offset = renderEditor.getOffsetToRevealCursor(
@@ -1240,7 +1240,7 @@ class RawEditorState extends EditorState
     }
 
     final constraints = widget.expands
-        ? BoxConstraints.expand()
+        ? const BoxConstraints.expand()
         : BoxConstraints(
             minHeight: widget.minHeight ?? 0.0,
             maxHeight: widget.maxHeight ?? double.infinity);
@@ -1294,7 +1294,7 @@ class RawEditorState extends EditorState
             enableInteractiveSelection: widget.enableInteractiveSelection,
             hasFocus: _hasFocus,
             contentPadding: (block == NotusAttribute.block.code)
-                ? EdgeInsets.all(16.0)
+                ? const EdgeInsets.all(16.0)
                 : null,
             embedBuilder: widget.embedBuilder,
           ),

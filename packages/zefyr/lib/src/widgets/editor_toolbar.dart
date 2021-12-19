@@ -107,7 +107,7 @@ class _LinkStyleButtonState extends State<LinkStyleButton> {
     showDialog<String>(
       context: context,
       builder: (ctx) {
-        return _LinkDialog();
+        return const _LinkDialog();
       },
     ).then(_linkSubmitted);
   }
@@ -132,7 +132,7 @@ class _LinkDialogState extends State<_LinkDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       content: TextField(
-        decoration: InputDecoration(labelText: 'Paste a link'),
+        decoration: const InputDecoration(labelText: 'Paste a link'),
         autofocus: true,
         onChanged: _linkChanged,
       ),
@@ -140,7 +140,7 @@ class _LinkDialogState extends State<_LinkDialog> {
         //TODO: Update to use TextButton
         TextButton(
           onPressed: _link.isNotEmpty ? _applyLink : null,
-          child: Text('Apply'),
+          child: const Text('Apply'),
         ),
       ],
     );
@@ -182,7 +182,7 @@ class ToggleStyleButton extends StatefulWidget {
   /// Builder function to customize visual representation of this button.
   final ToggleStyleButtonBuilder childBuilder;
 
-  ToggleStyleButton({
+  const ToggleStyleButton({
     Key? key,
     required this.attribute,
     required this.icon,
@@ -350,7 +350,7 @@ class _SelectHeadingStyleButtonState extends State<SelectHeadingStyleButton> {
 
 Widget _selectHeadingStyleButtonBuilder(BuildContext context,
     NotusAttribute? value, ValueChanged<NotusAttribute?> onSelected) {
-  final style = TextStyle(fontSize: 12);
+  const style = TextStyle(fontSize: 12);
 
   final valueToText = {
     NotusAttribute.heading.unset: 'Normal text',
@@ -389,7 +389,7 @@ Widget _selectHeadingStyleButtonBuilder(BuildContext context,
     onSelected: onSelected,
     child: Text(
       valueToText[value as NotusAttribute<int>]!,
-      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
     ),
   );
 }
@@ -430,7 +430,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           controller: controller,
         ),
       ),
-      SizedBox(width: 1),
+      const SizedBox(width: 1),
       Visibility(
         visible: !hideItalicButton,
         child: ToggleStyleButton(
@@ -439,7 +439,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           controller: controller,
         ),
       ),
-      SizedBox(width: 1),
+      const SizedBox(width: 1),
       Visibility(
         visible: !hideUnderLineButton,
         child: ToggleStyleButton(
@@ -448,7 +448,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           controller: controller,
         ),
       ),
-      SizedBox(width: 1),
+      const SizedBox(width: 1),
       Visibility(
         visible: !hideStrikeThrough,
         child: ToggleStyleButton(
@@ -457,7 +457,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           controller: controller,
         ),
       ),
-      SizedBox(width: 1),
+      const SizedBox(width: 1),
       Visibility(
         visible: !hideInlineCode,
         child: ToggleStyleButton(
@@ -486,7 +486,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           controller: controller,
         ),
       ),
-      SizedBox(width: 1),
+      const SizedBox(width: 1),
       Visibility(
         visible: !hideAlignment,
         child: ToggleStyleButton(
@@ -495,7 +495,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           controller: controller,
         ),
       ),
-      SizedBox(width: 1),
+      const SizedBox(width: 1),
       Visibility(
         visible: !hideAlignment,
         child: ToggleStyleButton(
@@ -504,7 +504,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           controller: controller,
         ),
       ),
-      SizedBox(width: 1),
+      const SizedBox(width: 1),
       Visibility(
         visible: !hideAlignment,
         child: ToggleStyleButton(
@@ -586,14 +586,14 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
   _ZefyrToolbarState createState() => _ZefyrToolbarState();
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class _ZefyrToolbarState extends State<ZefyrToolbar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       constraints: BoxConstraints.tightFor(height: widget.preferredSize.height),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -726,14 +726,14 @@ class _ZDropdownButtonState<T> extends State<ZDropdownButton<T>> {
 
   Widget _buildContent(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints.tightFor(width: 110),
+      constraints: const BoxConstraints.tightFor(width: 110),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Row(
           children: [
             widget.child,
             Expanded(child: Container()),
-            Icon(Icons.arrow_drop_down, size: 14)
+            const Icon(Icons.arrow_drop_down, size: 14)
           ],
         ),
       ),

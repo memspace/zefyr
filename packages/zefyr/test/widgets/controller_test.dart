@@ -25,9 +25,9 @@ void main() {
       controller.addListener(() {
         notified = true;
       });
-      controller.updateSelection(TextSelection.collapsed(offset: 0));
+      controller.updateSelection(const TextSelection.collapsed(offset: 0));
       expect(notified, isTrue);
-      expect(controller.selection, TextSelection.collapsed(offset: 0));
+      expect(controller.selection, const TextSelection.collapsed(offset: 0));
       // expect(controller.lastChangeSource, ChangeSource.remote);
     });
 
@@ -36,7 +36,7 @@ void main() {
       controller.addListener(() {
         notified = true;
       });
-      var selection = TextSelection.collapsed(offset: 5);
+      var selection = const TextSelection.collapsed(offset: 5);
       var change = Delta()..insert('Words');
       controller.compose(change, selection: selection);
       expect(notified, isTrue);
@@ -50,13 +50,13 @@ void main() {
       controller.addListener(() {
         notified = true;
       });
-      var selection = TextSelection.collapsed(offset: 5);
+      var selection = const TextSelection.collapsed(offset: 5);
       var change = Delta()..insert('Words');
       controller.compose(change, selection: selection);
       var change2 = Delta()..insert('More ');
       controller.compose(change2);
       expect(notified, isTrue);
-      var expectedSelection = TextSelection.collapsed(offset: 10);
+      var expectedSelection = const TextSelection.collapsed(offset: 10);
       expect(controller.selection, expectedSelection);
       expect(controller.document.toDelta(), Delta()..insert('More Words\n'));
       // expect(controller.lastChangeSource, ChangeSource.remote);
@@ -67,7 +67,7 @@ void main() {
       controller.addListener(() {
         notified = true;
       });
-      var selection = TextSelection.collapsed(offset: 5);
+      var selection = const TextSelection.collapsed(offset: 5);
       controller.replaceText(0, 0, 'Words', selection: selection);
       expect(notified, isTrue);
       expect(controller.selection, selection);
@@ -145,7 +145,7 @@ void main() {
       controller.addListener(() {
         notified = true;
       });
-      var selection = TextSelection(baseOffset: 0, extentOffset: 5);
+      var selection = const TextSelection(baseOffset: 0, extentOffset: 5);
       controller.replaceText(0, 0, 'Words', selection: selection);
       controller.formatSelection(NotusAttribute.bold);
       expect(notified, isTrue);
@@ -159,7 +159,7 @@ void main() {
     });
 
     test('getSelectionStyle', () {
-      var selection = TextSelection.collapsed(offset: 3);
+      var selection = const TextSelection.collapsed(offset: 3);
       controller.replaceText(0, 0, 'Words', selection: selection);
       controller.formatText(0, 5, NotusAttribute.bold);
       var result = controller.getSelectionStyle();
@@ -167,7 +167,7 @@ void main() {
     });
 
     test('getSelectionStyle with toggled style', () {
-      var selection = TextSelection.collapsed(offset: 3);
+      var selection = const TextSelection.collapsed(offset: 3);
       controller.replaceText(0, 0, 'Words', selection: selection);
       controller.formatText(3, 0, NotusAttribute.bold);
 

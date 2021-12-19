@@ -4,6 +4,8 @@ import 'package:zefyr/zefyr.dart';
 import 'scaffold.dart';
 
 class ScrollableLayout extends StatefulWidget {
+  const ScrollableLayout({Key key}) : super(key: key);
+
   @override
   _ScrollableLayoutState createState() => _ScrollableLayoutState();
 }
@@ -32,7 +34,7 @@ class _ScrollableLayoutState extends State<ScrollableLayout> {
         child: ListView(
           controller: _scrollController,
           children: [
-            ListTile(
+            const ListTile(
               leading: Icon(
                 Icons.warning_sharp,
                 color: Colors.green,
@@ -41,34 +43,27 @@ class _ScrollableLayoutState extends State<ScrollableLayout> {
               subtitle: Text(
                   'Below you can see Zefyr editor which is embedded into this ListView'),
             ),
-            Divider(),
+            const Divider(),
             ZefyrEditor(
               controller: controller,
               focusNode: _focusNode,
               scrollController: _scrollController,
               scrollable: false,
               autofocus: true,
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
             ),
-            Divider(),
+            const Divider(),
             ListTile(
-              leading: Icon(
+              leading: const Icon(
                 Icons.question_answer,
                 color: Colors.blue,
               ),
-              title: Text('Everything looks good?'),
-              subtitle: Text('If yes then just hit the Submit button'),
+              title: const Text('Everything looks good?'),
+              subtitle: const Text('If yes then just hit the Submit button'),
               trailing: TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      Theme.of(context).accentColor),
-                ),
                 onPressed: () =>
                     showDialog(context: context, builder: _buildThanks),
-                child: Text(
-                  'Submit',
-                  style: Theme.of(context).accentTextTheme.button,
-                ),
+                child: const Text('Submit'),
               ),
             ),
           ],
@@ -79,12 +74,12 @@ class _ScrollableLayoutState extends State<ScrollableLayout> {
 
   Widget _buildThanks(BuildContext context) {
     return AlertDialog(
-      title: Text('Thanks'),
-      content: Text('This is a demo so nothing really happens.'),
+      title: const Text('Thanks'),
+      content: const Text('This is a demo so nothing really happens.'),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Close'),
+          child: const Text('Close'),
         )
       ],
     );

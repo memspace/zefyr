@@ -17,7 +17,7 @@ List<String> _insertionToggleableStyleKeys = [
 class ZefyrController extends ChangeNotifier {
   ZefyrController([NotusDocument? document])
       : document = document ?? NotusDocument(),
-        _selection = TextSelection.collapsed(offset: 0);
+        _selection = const TextSelection.collapsed(offset: 0);
 
   /// Document managed by this controller.
   final NotusDocument document;
@@ -108,7 +108,7 @@ class ZefyrController extends ChangeNotifier {
   void formatText(int index, int length, NotusAttribute attribute) {
     final change = document.format(index, length, attribute);
     // _lastChangeSource = ChangeSource.local;
-    final source = ChangeSource.local;
+    const source = ChangeSource.local;
 
     if (length == 0 && _insertionToggleableStyleKeys.contains(attribute.key)) {
       // Add the attribute to our toggledStyle. It will be used later upon insertion.

@@ -3,9 +3,10 @@ import 'package:flutter/widgets.dart';
 import '../rendering/embed_proxy.dart';
 
 class EmbedProxy extends SingleChildRenderObjectWidget {
-  EmbedProxy({
+  const EmbedProxy({
+    Key? key,
     required Widget child,
-  }) : super(child: child);
+  }) : super(key: key, child: child);
 
   @override
   RenderEmbedProxy createRenderObject(BuildContext context) {

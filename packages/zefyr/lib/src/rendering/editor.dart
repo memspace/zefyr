@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:notus/notus.dart';
 
 import '../../zefyr.dart';
 import '../widgets/selection_utils.dart';

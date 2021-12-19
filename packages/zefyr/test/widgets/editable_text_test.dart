@@ -35,7 +35,7 @@ Future<void> enterText(WidgetTester tester, String text) async {
     tester.testTextInput.updateEditingValue(
       TextEditingValue(
         text: text,
-        selection: TextSelection.collapsed(offset: 6),
+        selection: const TextSelection.collapsed(offset: 6),
       ),
     );
     await tester.idle();

@@ -44,7 +44,7 @@ class RenderEmbedProxy extends RenderProxyBox implements RenderContentProxyBox {
 
   @override
   TextRange getWordBoundary(TextPosition position) {
-    return TextRange(start: 0, end: 1);
+    return const TextRange(start: 0, end: 1);
   }
 
   @override
