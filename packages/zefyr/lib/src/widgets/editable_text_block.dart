@@ -3,6 +3,7 @@ import 'package:notus/notus.dart';
 import 'package:zefyr/util.dart';
 
 import '../rendering/editable_text_block.dart';
+import 'controller.dart';
 import 'cursor.dart';
 import 'editable_text_line.dart';
 import 'editor.dart';
@@ -11,6 +12,7 @@ import 'theme.dart';
 
 class EditableTextBlock extends StatelessWidget {
   final BlockNode node;
+  final ZefyrController controller;
   final VerticalSpacing spacing;
   final CursorController cursorController;
   final TextSelection selection;
@@ -23,6 +25,7 @@ class EditableTextBlock extends StatelessWidget {
   const EditableTextBlock({
     Key? key,
     required this.node,
+    required this.controller,
     required this.spacing,
     required this.cursorController,
     required this.selection,
@@ -105,6 +108,12 @@ class EditableTextBlock extends StatelessWidget {
         padding: 16.0,
         withDot: false,
       );
+    } else if (block == NotusAttribute.block.checkList) {
+      return _CheckboxPoint(
+        size: 14,
+        value: node.style.containsSame(NotusAttribute.checked),
+        onChanged: (checked) => _toggle(node, checked),
+      );
     } else {
       return null;
     }
@@ -175,6 +184,12 @@ class EditableTextBlock extends StatelessWidget {
       return theme.code.decoration;
     }
     return null;
+  }
+
+  void _toggle(LineNode node, bool checked) {
+    final attr =
+        checked ? NotusAttribute.checked : NotusAttribute.checked.unset;
+    controller.formatText(node.documentOffset, 0, attr);
   }
 }
 
@@ -266,6 +281,56 @@ class _BulletPoint extends StatelessWidget {
       width: width,
       padding: EdgeInsetsDirectional.only(end: 13.0),
       child: Text('•', style: style),
+    );
+  }
+}
+
+class _CheckboxPoint extends StatefulWidget {
+  final double size;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  const _CheckboxPoint({
+    Key? key,
+    required this.size,
+    required this.value,
+    required this.onChanged,
+  }) : super(key: key);
+
+  @override
+  _CheckboxPointState createState() => _CheckboxPointState();
+}
+
+class _CheckboxPointState extends State<_CheckboxPoint> {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: SizedBox(
+        width: widget.size,
+        height: widget.size,
+        child: Material(
+          elevation: 0,
+          color: widget.value
+              ? theme.colorScheme.primary
+              : theme.colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              width: 1,
+              color: widget.value
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withOpacity(0.5),
+            ),
+            borderRadius: BorderRadius.circular(2),
+          ),
+          child: InkWell(
+            onTap: () => widget.onChanged(!widget.value),
+            child: widget.value
+                ? Icon(Icons.check,
+                    size: widget.size, color: theme.colorScheme.onPrimary)
+                : null,
+          ),
+        ),
+      ),
     );
   }
 }

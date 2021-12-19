@@ -410,6 +410,7 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
     bool hideHeadingStyle = false,
     bool hideListNumbers = false,
     bool hideListBullets = false,
+    bool hideListChecks = false,
     bool hideCodeBlock = false,
     bool hideQuote = false,
     bool hideLink = false,
@@ -534,6 +535,14 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           attribute: NotusAttribute.block.bulletList,
           controller: controller,
           icon: Icons.format_list_bulleted,
+        ),
+      ),
+      Visibility(
+        visible: !hideListChecks,
+        child: ToggleStyleButton(
+          attribute: NotusAttribute.block.checkList,
+          controller: controller,
+          icon: Icons.checklist,
         ),
       ),
       Visibility(

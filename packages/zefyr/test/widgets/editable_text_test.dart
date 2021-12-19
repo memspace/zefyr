@@ -30,7 +30,7 @@ void main() {
   });
 }
 
-Future<Null> enterText(WidgetTester tester, String text) async {
+Future<void> enterText(WidgetTester tester, String text) async {
   return TestAsyncUtils.guard(() async {
     tester.testTextInput.updateEditingValue(
       TextEditingValue(
