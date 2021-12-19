@@ -1,5 +1,6 @@
-## Unreleased
+## 1.0.0-rc.2
 
+* Added support for checklists ([#578](https://github.com/memspace/zefyr/pull/578))
 * Fixed: Updated heuristic rules to ensure the last newline character is always preserved ([#572](https://github.com/memspace/zefyr/pull/572))
 * Fixed: Inserting space in the beginning of a document resulted in an AssertionError in debug mode ([#574](https://github.com/memspace/zefyr/pull/574))
 

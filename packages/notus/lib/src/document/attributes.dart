@@ -136,6 +136,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.block.numberList].
   static NotusAttribute<String> get ol => block.numberList;
 
+  /// Alias for [NotusAttribute.block.checkList].
+  static NotusAttribute<String> get cl => block.checkList;
+
   /// Alias for [NotusAttribute.block.quote].
   static NotusAttribute<String> get bq => block.quote;
 
