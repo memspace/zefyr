@@ -8,17 +8,18 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:notus/notus.dart';
-import 'package:zefyr/src/widgets/baseline_proxy.dart';
-import 'package:zefyr/src/widgets/single_child_scroll_view.dart';
 import 'package:zefyr/util.dart';
 
 import '../rendering/editor.dart';
+import 'baseline_proxy.dart';
 import 'controller.dart';
 import 'cursor.dart';
 import 'editable_text_block.dart';
 import 'editable_text_line.dart';
 import 'editor_input_client_mixin.dart';
 import 'editor_selection_delegate_mixin.dart';
+import 'shortcuts.dart';
+import 'single_child_scroll_view.dart';
 import 'text_line.dart';
 import 'text_selection.dart';
 import 'theme.dart';
@@ -278,7 +279,7 @@ class _ZefyrEditorState extends State<ZefyrEditor>
         break;
     }
 
-    final child = RawEditor(
+    Widget child = RawEditor(
       key: _editorKey,
       controller: widget.controller,
       focusNode: widget.focusNode,
@@ -310,6 +311,10 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       selectionColor: selectionColor,
       showSelectionHandles: showSelectionHandles,
       selectionControls: textSelectionControls,
+    );
+
+    child = ZefyrShortcuts(
+      child: ZefyrActions(child: child),
     );
 
     return _selectionGestureDetectorBuilder.buildGestureDetector(
@@ -703,6 +708,8 @@ class RawEditorState extends EditorState
 
   // Cursors
   late CursorController _cursorController;
+
+  ZefyrController get controller => widget.controller;
 
   // Selection overlay
   @override

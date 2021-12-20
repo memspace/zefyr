@@ -1,3 +1,7 @@
+## 1.0.0-rc.3
+
+* Added keyboard shortcuts for bold, italic and underline styles.
+
 ## 1.0.0-rc.2
 
 * Inline code improvements: added backgroundColor, radius and style overrides for headings to
