@@ -3,16 +3,34 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 
-import '../rendering/editor.dart';
-import 'text_line.dart';
+/// List of possible actions returned from [LinkActionPickerDelegate].
+enum LinkMenuAction {
+  /// Launch the link
+  launch,
 
-Future<LinkMenuAction> defaultShowLinkActionsMenu(BuildContext context,
-    String link, Node linkNode, RenderEditor renderEditor) async {
+  /// Copy to clipboard
+  copy,
+
+  /// Remove link style attribute
+  remove,
+
+  /// No-op
+  none,
+}
+
+/// Used internally by Zefyr widget layer.
+typedef LinkActionPicker = Future<LinkMenuAction> Function(Node linkNode);
+
+typedef LinkActionPickerDelegate = Future<LinkMenuAction> Function(
+    BuildContext context, String link);
+
+Future<LinkMenuAction> defaultLinkActionPickerDelegate(
+    BuildContext context, String link) async {
   switch (defaultTargetPlatform) {
     case TargetPlatform.iOS:
       return _showCupertinoLinkMenu(context, link);
     case TargetPlatform.android:
-      return _showMaterialMenu(context, link, linkNode, renderEditor);
+      return _showMaterialMenu(context, link);
     default:
       assert(false,
           'defaultShowLinkActionsMenu not supposed to be invoked for $defaultTargetPlatform');
@@ -89,8 +107,8 @@ class _CupertinoAction extends StatelessWidget {
   }
 }
 
-Future<LinkMenuAction> _showMaterialMenu(BuildContext context, String link,
-    Node linkNode, RenderEditor renderEditor) async {
+Future<LinkMenuAction> _showMaterialMenu(
+    BuildContext context, String link) async {
   final result = await showModalBottomSheet<LinkMenuAction>(
     context: context,
     builder: (ctx) {

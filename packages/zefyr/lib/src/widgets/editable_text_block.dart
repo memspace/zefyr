@@ -7,6 +7,7 @@ import 'controller.dart';
 import 'cursor.dart';
 import 'editable_text_line.dart';
 import 'editor.dart';
+import 'link.dart';
 import 'text_line.dart';
 import 'theme.dart';
 

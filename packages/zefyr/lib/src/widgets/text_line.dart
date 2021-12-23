@@ -4,19 +4,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:notus/notus.dart';
-import 'package:zefyr/src/widgets/controller.dart';
 
+import 'controller.dart';
 import 'editable_text_line.dart';
 import 'editor.dart';
 import 'embed_proxy.dart';
 import 'keyboard_listener.dart';
+import 'link.dart';
 import 'rich_text_proxy.dart';
 import 'theme.dart';
-
-
-enum LinkMenuAction { launch, copy, remove, none }
-
-typedef LinkActionPicker = Future<LinkMenuAction> Function(Node linkNode);
 
 /// Line of text in Zefyr editor.
 ///
