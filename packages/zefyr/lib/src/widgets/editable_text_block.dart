@@ -20,8 +20,10 @@ class EditableTextBlock extends StatelessWidget {
   final Color selectionColor;
   final bool enableInteractiveSelection;
   final bool hasFocus;
-  final EdgeInsets? contentPadding;
   final ZefyrEmbedBuilder embedBuilder;
+  final LinkActionPicker linkActionPicker;
+  final ValueChanged<String?>? onLaunchUrl;
+  final EdgeInsets? contentPadding;
 
   const EditableTextBlock({
     Key? key,
@@ -35,6 +37,8 @@ class EditableTextBlock extends StatelessWidget {
     required this.enableInteractiveSelection,
     required this.hasFocus,
     required this.embedBuilder,
+    required this.linkActionPicker,
+    this.onLaunchUrl,
     this.contentPadding,
   }) : super(key: key);
 
@@ -70,7 +74,11 @@ class EditableTextBlock extends StatelessWidget {
           devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
           body: TextLine(
             node: line,
+            readOnly: readOnly,
+            controller: controller,
             embedBuilder: embedBuilder,
+            linkActionPicker: linkActionPicker,
+            onLaunchUrl: onLaunchUrl,
           ),
           cursorController: cursorController,
           selection: selection,

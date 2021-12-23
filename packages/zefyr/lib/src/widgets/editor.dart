@@ -8,6 +8,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:notus/notus.dart';
+import 'package:zefyr/src/widgets/keyboard_listener.dart';
+import 'package:zefyr/src/widgets/link.dart';
 import 'package:zefyr/util.dart';
 
 import '../rendering/editor.dart';
@@ -371,26 +373,6 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     }
   }
 
-  void _launchUrlIfNeeded(TapUpDetails details) {
-    final pos = renderEditor!.getPositionForOffset(details.globalPosition);
-    final result = editor!.widget.controller.document.lookupLine(pos.offset);
-    if (result.node == null) return;
-    final line = result.node as LineNode;
-    final segmentResult = line.lookup(result.offset);
-    if (segmentResult.node == null) return;
-    final segment = segmentResult.node as LeafNode;
-    if (segment.style.contains(NotusAttribute.link) &&
-        editor!.widget.onLaunchUrl != null) {
-      if (editor!.widget.readOnly) {
-        editor!
-            .widget.onLaunchUrl!(segment.style.get(NotusAttribute.link)!.value);
-      } else {
-        // TODO: Implement a toolbar to display the URL and allow to launch it.
-        // editor.showToolbar();
-      }
-    }
-  }
-
   bool isShiftClick(PointerDeviceKind deviceKind) {
     final pressed = RawKeyboard.instance.keysPressed;
     return deviceKind == PointerDeviceKind.mouse &&
@@ -401,9 +383,6 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
   @override
   void onSingleTapUp(TapUpDetails details) {
     editor!.hideToolbar();
-
-    // TODO: Explore if we can forward tap up events to the TextSpan gesture detector
-    _launchUrlIfNeeded(details);
 
     if (delegate.selectionEnabled) {
       switch (Theme.of(_state.context).platform) {
@@ -1182,6 +1161,12 @@ class RawEditorState extends EditorState
     });
   }
 
+  Future<LinkMenuAction> _linkActionPicker(Node linkNode) async {
+    final link =
+        (linkNode as StyledNode).style.get(NotusAttribute.link)!.value!;
+    return defaultShowLinkActionsMenu(context, link, linkNode, renderEditor);
+  }
+
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
@@ -1256,9 +1241,11 @@ class RawEditorState extends EditorState
       data: _themeData,
       child: MouseRegion(
         cursor: SystemMouseCursors.text,
-        child: Container(
-          constraints: constraints,
-          child: child,
+        child: ZefyrKeyboardListener(
+          child: Container(
+            constraints: constraints,
+            child: child,
+          ),
         ),
       ),
     );
@@ -1280,7 +1267,11 @@ class RawEditorState extends EditorState
             enableInteractiveSelection: widget.enableInteractiveSelection,
             body: TextLine(
               node: node,
+              readOnly: widget.readOnly,
+              controller: widget.controller,
               embedBuilder: widget.embedBuilder,
+              linkActionPicker: _linkActionPicker,
+              onLaunchUrl: widget.onLaunchUrl,
             ),
             hasFocus: _hasFocus,
             devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
@@ -1304,6 +1295,8 @@ class RawEditorState extends EditorState
                 ? const EdgeInsets.all(16.0)
                 : null,
             embedBuilder: widget.embedBuilder,
+            linkActionPicker: _linkActionPicker,
+            onLaunchUrl: widget.onLaunchUrl,
           ),
         ));
       } else {

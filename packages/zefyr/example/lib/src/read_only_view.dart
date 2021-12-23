@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zefyr/zefyr.dart';
 
 import 'scaffold.dart';
@@ -44,9 +45,17 @@ class _ReadOnlyViewState extends State<ReadOnlyView> {
           readOnly: !_edit,
           showCursor: _edit,
           padding: const EdgeInsets.symmetric(horizontal: 8),
+          onLaunchUrl: _launchUrl,
         ),
       ),
     );
+  }
+
+  void _launchUrl(String url) async {
+    final result = await canLaunch(url);
+    if (result) {
+      await launch(url);
+    }
   }
 
   void _toggleEdit() {
