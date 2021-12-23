@@ -8,8 +8,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:notus/notus.dart';
-import 'package:zefyr/util.dart';
 
+import '../../util.dart';
 import '../rendering/editor.dart';
 import 'baseline_proxy.dart';
 import 'controller.dart';
@@ -18,6 +18,8 @@ import 'editable_text_block.dart';
 import 'editable_text_line.dart';
 import 'editor_input_client_mixin.dart';
 import 'editor_selection_delegate_mixin.dart';
+import 'keyboard_listener.dart';
+import 'link.dart';
 import 'shortcuts.dart';
 import 'single_child_scroll_view.dart';
 import 'text_line.dart';
@@ -178,6 +180,21 @@ class ZefyrEditor extends StatefulWidget {
   /// Defaults to [defaultZefyrEmbedBuilder].
   final ZefyrEmbedBuilder embedBuilder;
 
+  /// Delegate function responsible for showing menu with link actions on
+  /// mobile platforms (iOS, Android).
+  ///
+  /// The menu is triggered in editing mode ([readOnly] is set to `false`)
+  /// when the user long-presses a link-styled text segment.
+  ///
+  /// Zefyr provides default implementation which can be overridden by this
+  /// field to customize the user experience.
+  ///
+  /// By default on iOS the menu is displayed with [showCupertinoModalPopup]
+  /// which constructs an instance of [CupertinoActionSheet]. For Android,
+  /// the menu is displayed with [showModalBottomSheet] and a list of
+  /// Material [ListTile]s.
+  final LinkActionPickerDelegate linkActionPickerDelegate;
+
   const ZefyrEditor({
     Key? key,
     required this.controller,
@@ -197,6 +214,7 @@ class ZefyrEditor extends StatefulWidget {
     this.scrollPhysics,
     this.onLaunchUrl,
     this.embedBuilder = defaultZefyrEmbedBuilder,
+    this.linkActionPickerDelegate = defaultLinkActionPickerDelegate,
   }) : super(key: key);
 
   @override
@@ -298,6 +316,7 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       scrollPhysics: widget.scrollPhysics,
       onLaunchUrl: widget.onLaunchUrl,
       embedBuilder: widget.embedBuilder,
+      linkActionPickerDelegate: widget.linkActionPickerDelegate,
       // encapsulated fields below
       cursorStyle: CursorStyle(
         color: cursorColor,
@@ -371,26 +390,6 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     }
   }
 
-  void _launchUrlIfNeeded(TapUpDetails details) {
-    final pos = renderEditor!.getPositionForOffset(details.globalPosition);
-    final result = editor!.widget.controller.document.lookupLine(pos.offset);
-    if (result.node == null) return;
-    final line = result.node as LineNode;
-    final segmentResult = line.lookup(result.offset);
-    if (segmentResult.node == null) return;
-    final segment = segmentResult.node as LeafNode;
-    if (segment.style.contains(NotusAttribute.link) &&
-        editor!.widget.onLaunchUrl != null) {
-      if (editor!.widget.readOnly) {
-        editor!
-            .widget.onLaunchUrl!(segment.style.get(NotusAttribute.link)!.value);
-      } else {
-        // TODO: Implement a toolbar to display the URL and allow to launch it.
-        // editor.showToolbar();
-      }
-    }
-  }
-
   bool isShiftClick(PointerDeviceKind deviceKind) {
     final pressed = RawKeyboard.instance.keysPressed;
     return deviceKind == PointerDeviceKind.mouse &&
@@ -401,9 +400,6 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
   @override
   void onSingleTapUp(TapUpDetails details) {
     editor!.hideToolbar();
-
-    // TODO: Explore if we can forward tap up events to the TextSpan gesture detector
-    _launchUrlIfNeeded(details);
 
     if (delegate.selectionEnabled) {
       switch (Theme.of(_state.context).platform) {
@@ -496,6 +492,7 @@ class RawEditor extends StatefulWidget {
     this.showSelectionHandles = false,
     this.selectionControls,
     this.embedBuilder = defaultZefyrEmbedBuilder,
+    this.linkActionPickerDelegate = defaultLinkActionPickerDelegate,
   })  : assert(scrollable || scrollController != null),
         assert(maxHeight == null || maxHeight > 0),
         assert(minHeight == null || minHeight >= 0),
@@ -640,6 +637,8 @@ class RawEditor extends StatefulWidget {
   ///
   /// Defaults to [defaultZefyrEmbedBuilder].
   final ZefyrEmbedBuilder embedBuilder;
+
+  final LinkActionPickerDelegate linkActionPickerDelegate;
 
   bool get selectionEnabled => enableInteractiveSelection;
 
@@ -1182,6 +1181,12 @@ class RawEditorState extends EditorState
     });
   }
 
+  Future<LinkMenuAction> _linkActionPicker(Node linkNode) async {
+    final link =
+        (linkNode as StyledNode).style.get(NotusAttribute.link)!.value!;
+    return widget.linkActionPickerDelegate(context, link);
+  }
+
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
@@ -1256,9 +1261,11 @@ class RawEditorState extends EditorState
       data: _themeData,
       child: MouseRegion(
         cursor: SystemMouseCursors.text,
-        child: Container(
-          constraints: constraints,
-          child: child,
+        child: ZefyrKeyboardListener(
+          child: Container(
+            constraints: constraints,
+            child: child,
+          ),
         ),
       ),
     );
@@ -1280,7 +1287,11 @@ class RawEditorState extends EditorState
             enableInteractiveSelection: widget.enableInteractiveSelection,
             body: TextLine(
               node: node,
+              readOnly: widget.readOnly,
+              controller: widget.controller,
               embedBuilder: widget.embedBuilder,
+              linkActionPicker: _linkActionPicker,
+              onLaunchUrl: widget.onLaunchUrl,
             ),
             hasFocus: _hasFocus,
             devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
@@ -1304,6 +1315,8 @@ class RawEditorState extends EditorState
                 ? const EdgeInsets.all(16.0)
                 : null,
             embedBuilder: widget.embedBuilder,
+            linkActionPicker: _linkActionPicker,
+            onLaunchUrl: widget.onLaunchUrl,
           ),
         ));
       } else {

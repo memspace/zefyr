@@ -1,6 +1,9 @@
 ## 1.0.0-rc.3
 
-* Added keyboard shortcuts for bold, italic and underline styles.
+* Added keyboard shortcuts for bold, italic and underline styles. ([#580](https://github.com/memspace/zefyr/pull/580))
+* Launch URL improvements: allow launching links in editing mode ([#581](https://github.com/memspace/zefyr/pull/581))
+  - For desktop platforms: links launch on `Cmd` + `Click` (macOS) or `Ctrl` + `Click` (windows, linux)
+  - For mobile platforms: long-pressing a link shows a context menu with multiple actions (Open, Copy, Remove) for the user to choose from.
 
 ## 1.0.0-rc.2
 
