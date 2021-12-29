@@ -134,6 +134,13 @@ class ZefyrEditor extends StatefulWidget {
   /// set to `false`.
   final double? maxHeight;
 
+  /// The maximum width to be occupied by the content of this editor.
+  ///
+  /// If this is not null and and this editor's width is larger than this value
+  /// then the contents will be constrained to the provided maximum width and
+  /// horizontally centered. This is mostly useful on devices with wide screens.
+  final double? maxContentWidth;
+
   /// Whether this editor's height will be sized to fill its parent.
   ///
   /// This only has effect if [scrollable] is set to `true`.
@@ -208,6 +215,7 @@ class ZefyrEditor extends StatefulWidget {
     this.enableInteractiveSelection = true,
     this.minHeight,
     this.maxHeight,
+    this.maxContentWidth,
     this.expands = false,
     this.textCapitalization = TextCapitalization.sentences,
     this.keyboardAppearance = Brightness.light,
@@ -310,6 +318,7 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       enableInteractiveSelection: widget.enableInteractiveSelection,
       minHeight: widget.minHeight,
       maxHeight: widget.maxHeight,
+      maxContentWidth: widget.maxContentWidth,
       expands: widget.expands,
       textCapitalization: widget.textCapitalization,
       keyboardAppearance: widget.keyboardAppearance,
@@ -476,6 +485,7 @@ class RawEditor extends StatefulWidget {
     this.enableInteractiveSelection = true,
     this.minHeight,
     this.maxHeight,
+    this.maxContentWidth,
     this.expands = false,
     this.textCapitalization = TextCapitalization.none,
     this.keyboardAppearance = Brightness.light,
@@ -583,6 +593,13 @@ class RawEditor extends StatefulWidget {
 
   /// The minimum height this editor can have.
   final double? minHeight;
+
+  /// The maximum width to be occupied by the content of this editor.
+  ///
+  /// If this is not null and and this editor's width is larger than this value
+  /// then the contents will be constrained to the provided maximum width and
+  /// horizontally centered. This is mostly useful on devices with wide screens.
+  final double? maxContentWidth;
 
   /// Whether this widget's height will be sized to fill its parent.
   ///
@@ -1210,6 +1227,7 @@ class RawEditorState extends EditorState
           endHandleLayerLink: _endHandleLayerLink,
           onSelectionChanged: _handleSelectionChanged,
           padding: widget.padding,
+          maxContentWidth: widget.maxContentWidth,
           children: _buildChildren(context),
         ),
       ),
@@ -1243,6 +1261,7 @@ class RawEditorState extends EditorState
               endHandleLayerLink: _endHandleLayerLink,
               onSelectionChanged: _handleSelectionChanged,
               padding: widget.padding,
+              maxContentWidth: widget.maxContentWidth,
               cursorController: _cursorController,
               children: _buildChildren(context),
             ),
@@ -1365,6 +1384,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     required this.onSelectionChanged,
     required this.cursorController,
     this.padding = EdgeInsets.zero,
+    this.maxContentWidth,
   }) : super(key: key, children: children);
 
   final ViewportOffset? offset;
@@ -1376,6 +1396,7 @@ class _Editor extends MultiChildRenderObjectWidget {
   final LayerLink endHandleLayerLink;
   final TextSelectionChangedHandler onSelectionChanged;
   final EdgeInsetsGeometry padding;
+  final double? maxContentWidth;
   final CursorController cursorController;
 
   @override
@@ -1391,6 +1412,7 @@ class _Editor extends MultiChildRenderObjectWidget {
       onSelectionChanged: onSelectionChanged,
       cursorController: cursorController,
       padding: padding,
+      maxContentWidth: maxContentWidth,
     );
   }
 
@@ -1407,6 +1429,7 @@ class _Editor extends MultiChildRenderObjectWidget {
     renderObject.endHandleLayerLink = endHandleLayerLink;
     renderObject.onSelectionChanged = onSelectionChanged;
     renderObject.padding = padding;
+    renderObject.maxContentWidth = maxContentWidth;
   }
 
   @override
