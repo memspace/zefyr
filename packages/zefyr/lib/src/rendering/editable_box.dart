@@ -207,7 +207,7 @@ class RenderEditableContainerBox extends RenderBox
   EdgeInsets? get resolvedPadding => _resolvedPadding;
   EdgeInsets? _resolvedPadding;
 
-  void _resolvePadding() {
+  void resolvePadding() {
     if (_resolvedPadding != null) {
       return;
     }
@@ -251,7 +251,7 @@ class RenderEditableContainerBox extends RenderBox
   /// returns the last child.
   RenderEditableBox childAtOffset(Offset offset) {
     assert(firstChild != null);
-    _resolvePadding();
+    resolvePadding();
 
     if (offset.dy <= _resolvedPadding!.top) return firstChild!;
     if (offset.dy >= size.height - _resolvedPadding!.bottom) return lastChild!;
@@ -306,7 +306,7 @@ class RenderEditableContainerBox extends RenderBox
       ]);
     }());
 
-    _resolvePadding();
+    resolvePadding();
     assert(_resolvedPadding != null);
 
     var mainAxisExtent = _resolvedPadding!.top;
@@ -358,7 +358,7 @@ class RenderEditableContainerBox extends RenderBox
 
   @override
   double computeMinIntrinsicWidth(double height) {
-    _resolvePadding();
+    resolvePadding();
     final horizontalPadding = _resolvedPadding!.left + _resolvedPadding!.right;
     final verticalPadding = _resolvedPadding!.top + _resolvedPadding!.bottom;
     return _getIntrinsicCrossAxis((RenderBox child) {
@@ -369,7 +369,7 @@ class RenderEditableContainerBox extends RenderBox
 
   @override
   double computeMaxIntrinsicWidth(double height) {
-    _resolvePadding();
+    resolvePadding();
     final horizontalPadding = _resolvedPadding!.left + _resolvedPadding!.right;
     final verticalPadding = _resolvedPadding!.top + _resolvedPadding!.bottom;
     return _getIntrinsicCrossAxis((RenderBox child) {
@@ -380,7 +380,7 @@ class RenderEditableContainerBox extends RenderBox
 
   @override
   double computeMinIntrinsicHeight(double width) {
-    _resolvePadding();
+    resolvePadding();
     final horizontalPadding = _resolvedPadding!.left + _resolvedPadding!.right;
     final verticalPadding = _resolvedPadding!.top + _resolvedPadding!.bottom;
     return _getIntrinsicMainAxis((RenderBox child) {
@@ -391,7 +391,7 @@ class RenderEditableContainerBox extends RenderBox
 
   @override
   double computeMaxIntrinsicHeight(double width) {
-    _resolvePadding();
+    resolvePadding();
     final horizontalPadding = _resolvedPadding!.left + _resolvedPadding!.right;
     final verticalPadding = _resolvedPadding!.top + _resolvedPadding!.bottom;
     return _getIntrinsicMainAxis((RenderBox child) {
@@ -402,7 +402,7 @@ class RenderEditableContainerBox extends RenderBox
 
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
-    _resolvePadding();
+    resolvePadding();
     return defaultComputeDistanceToFirstActualBaseline(baseline)! +
         _resolvedPadding!.top;
   }

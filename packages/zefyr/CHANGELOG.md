@@ -1,3 +1,14 @@
+## 1.0.0-rc.4
+
+* Added `maxContentWidth` constraint to ZefyrEditor. When this property is not null the editor's
+  content will only stretch up to the specified value. This does not affect the overall editor
+  width, it will still try to expand horizontally to fill the entire available area. Side effects
+  of setting `maxContentWidth` include:
+  - the scrollbar (for desktop platforms) will appear at the right edge of the full editor width,
+    which may not be the same as the right edge of the content.
+  - gesture and mouse events outside of the content area are still handled by the editor.
+  Both of the above are desired behaviors.
+
 ## 1.0.0-rc.3
 
 * Added keyboard shortcuts for bold, italic and underline styles. ([#580](https://github.com/memspace/zefyr/pull/580))

@@ -136,6 +136,7 @@ class RenderEditor extends RenderEditableContainerBox
     this.onSelectionChanged,
     EdgeInsets floatingCursorAddedMargin =
         const EdgeInsets.fromLTRB(4, 4, 4, 5),
+    double? maxContentWidth,
   })  : _document = document,
         _hasFocus = hasFocus,
         _selection = selection,
@@ -143,6 +144,7 @@ class RenderEditor extends RenderEditableContainerBox
         _startHandleLayerLink = startHandleLayerLink,
         _endHandleLayerLink = endHandleLayerLink,
         _cursorController = cursorController,
+        _maxContentWidth = maxContentWidth,
         super(
           children: children,
           node: document.root,
@@ -234,6 +236,13 @@ class RenderEditor extends RenderEditableContainerBox
     if (_endHandleLayerLink == value) return;
     _endHandleLayerLink = value;
     markNeedsPaint();
+  }
+
+  double? _maxContentWidth;
+  set maxContentWidth(double? value) {
+    if (_maxContentWidth == value) return;
+    _maxContentWidth = value;
+    markNeedsLayout();
   }
 
   final CursorController _cursorController;
@@ -609,6 +618,61 @@ class RenderEditor extends RenderEditableContainerBox
   }
 
   // Start RenderBox implementation
+
+  @override
+  void performLayout() {
+    assert(() {
+      if (!constraints.hasBoundedHeight) return true;
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary(
+            'RenderEditableContainerBox must have unlimited space along its main axis.'),
+        ErrorDescription(
+            'RenderEditableContainerBox does not clip or resize its children, so it must be '
+            'placed in a parent that does not constrain the main '
+            'axis.'),
+        ErrorHint(
+            'You probably want to put the RenderEditableContainerBox inside a '
+            'RenderViewport with a matching main axis.')
+      ]);
+    }());
+    assert(() {
+      if (constraints.hasBoundedWidth) return true;
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary(
+            'RenderEditableContainerBox must have a bounded constraint for its cross axis.'),
+        ErrorDescription(
+            'RenderEditableContainerBox forces its children to expand to fit the RenderEditableContainerBox\'s container, '
+            'so it must be placed in a parent that constrains the cross '
+            'axis to a finite dimension.'),
+      ]);
+    }());
+
+    resolvePadding();
+    assert(resolvedPadding != null);
+
+    var mainAxisExtent = resolvedPadding!.top;
+    var child = firstChild;
+    final innerConstraints = BoxConstraints.tightFor(
+            width: math.min(
+                _maxContentWidth ?? double.infinity, constraints.maxWidth))
+        .deflate(resolvedPadding!);
+    final leftOffset = _maxContentWidth == null
+        ? 0.0
+        : math.max((constraints.maxWidth - _maxContentWidth!) / 2, 0);
+    while (child != null) {
+      child.layout(innerConstraints, parentUsesSize: true);
+      final childParentData = child.parentData as EditableContainerParentData;
+      childParentData.offset =
+          Offset(resolvedPadding!.left + leftOffset, mainAxisExtent);
+      mainAxisExtent += child.size.height;
+      assert(child.parentData == childParentData);
+      child = childParentData.nextSibling;
+    }
+    mainAxisExtent += resolvedPadding!.bottom;
+    size = constraints.constrain(Size(constraints.maxWidth, mainAxisExtent));
+
+    assert(size.isFinite);
+  }
 
   @override
   void paint(PaintingContext context, Offset offset) {

@@ -166,7 +166,7 @@ class _HomePageState extends State<HomePage> {
         Expanded(
           child: Container(
             color: Colors.white,
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+            padding: const EdgeInsets.only(left: 16.0, right: 0.0),
             child: ZefyrEditor(
               controller: _controller,
               focusNode: _focusNode,
@@ -174,6 +174,7 @@ class _HomePageState extends State<HomePage> {
               // readOnly: true,
               // padding: EdgeInsets.only(left: 16, right: 16),
               onLaunchUrl: _launchUrl,
+              maxContentWidth: 800,
             ),
           ),
         ),
