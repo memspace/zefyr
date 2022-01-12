@@ -35,7 +35,7 @@ class ZefyrShortcuts extends Shortcuts {
     SingleActivator(LogicalKeyboardKey.keyB, control: true):
         ToggleBoldStyleIntent(),
     SingleActivator(LogicalKeyboardKey.keyI, control: true):
-        ToggleBoldStyleIntent(),
+        ToggleItalicStyleIntent(),
     SingleActivator(LogicalKeyboardKey.keyU, control: true):
         ToggleUnderlineStyleIntent(),
   };
