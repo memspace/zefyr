@@ -496,7 +496,7 @@ void main() {
           ...NotusAttribute.alignment.right.toJson(),
           ...NotusAttribute.direction.rtl.toJson(),
         });
-      expect(actual,expected);
+      expect(actual, expected);
     });
 
     test('inserted text is ltr', () {
@@ -509,7 +509,7 @@ void main() {
           ...NotusAttribute.alignment.unset.toJson(),
           ...NotusAttribute.direction.unset.toJson(),
         });
-      expect(actual,expected);
+      expect(actual, expected);
     });
   });
 }

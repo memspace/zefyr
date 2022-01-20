@@ -152,6 +152,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.direction.rtl].
   static NotusAttribute<String> get rtl => direction.rtl;
+
   /// Alignment attribute
   static const alignment = AlignmentAttributeBuilder._();
 

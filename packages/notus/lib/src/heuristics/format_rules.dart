@@ -75,7 +75,9 @@ class ResolveLineFormatRule extends FormatRule {
         // Unset checked state when changing block style from checkList to something else
         actualStyle[NotusAttribute.checked.key] = null;
       }
-      result..retain(lf - offset)..retain(1, actualStyle);
+      result
+        ..retain(lf - offset)
+        ..retain(1, actualStyle);
 
       if (firstOnly) {
         return result;
@@ -114,7 +116,9 @@ class ResolveInlineFormatRule extends FormatRule {
       if (lf != -1) {
         var pos = 0;
         while (lf != -1) {
-          result..retain(lf - pos, attribute.toJson())..retain(1);
+          result
+            ..retain(lf - pos, attribute.toJson())
+            ..retain(1);
           pos = lf + 1;
           lf = opText.indexOf('\n', pos);
         }
@@ -162,7 +166,9 @@ class FormatLinkAtCaretPositionRule extends FormatRule {
     // no-op action.
     if (retain == 0) return null;
 
-    result..retain(startIndex)..retain(retain, attribute.toJson());
+    result
+      ..retain(startIndex)
+      ..retain(retain, attribute.toJson());
 
     return result;
   }

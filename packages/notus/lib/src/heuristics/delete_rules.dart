@@ -85,7 +85,9 @@ class PreserveLineStyleOnMergeRule extends DeleteRule {
         attributes ??= <String, dynamic>{};
         attributes.addAll(target.attributes!);
       }
-      result..retain(lf)..retain(1, attributes);
+      result
+        ..retain(lf)
+        ..retain(1, attributes);
       break;
     }
     return result;
