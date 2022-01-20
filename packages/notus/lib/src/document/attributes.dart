@@ -1,6 +1,7 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'dart:math' as math;
 import 'package:collection/collection.dart';
 import 'package:quiver/core.dart';
 
@@ -41,7 +42,9 @@ abstract class NotusAttributeBuilder<T> implements NotusAttributeKey<T> {
   @override
   final String key;
   final NotusAttributeScope scope;
+
   NotusAttribute<T> get unset => NotusAttribute<T>._(key, scope, null);
+
   NotusAttribute<T> withValue(T? value) =>
       NotusAttribute<T>._(key, scope, value);
 }
@@ -87,6 +90,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.direction.key: NotusAttribute.direction,
     NotusAttribute.alignment.key: NotusAttribute.alignment,
+    NotusAttribute.indent.key: NotusAttribute.indent,
   };
 
   // Inline attributes
@@ -125,6 +129,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.heading.level3].
   static NotusAttribute<int> get h3 => heading.level3;
 
+  /// Indent attribute
+  static const indent = IndentAttributeBuilder._();
+
   /// Applies checked style to a line of text in checklist block.
   static const checked = _CheckedAttribute();
 
@@ -152,6 +159,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.direction.rtl].
   static NotusAttribute<String> get rtl => direction.rtl;
+
   /// Alignment attribute
   static const alignment = AlignmentAttributeBuilder._();
 
@@ -389,6 +397,7 @@ class _InlineCodeAttribute extends NotusAttribute<bool> {
 /// [NotusAttribute.link] instead.
 class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kLink = 'a';
+
   const LinkAttributeBuilder._() : super._(_kLink, NotusAttributeScope.inline);
 
   /// Creates a link attribute with specified link [value].
@@ -402,6 +411,7 @@ class LinkAttributeBuilder extends NotusAttributeBuilder<String> {
 /// [NotusAttribute.heading] instead.
 class HeadingAttributeBuilder extends NotusAttributeBuilder<int> {
   static const _kHeading = 'heading';
+
   const HeadingAttributeBuilder._()
       : super._(_kHeading, NotusAttributeScope.line);
 
@@ -427,6 +437,7 @@ class _CheckedAttribute extends NotusAttribute<bool> {
 /// [NotusAttribute.block] instead.
 class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kBlock = 'block';
+
   const BlockAttributeBuilder._() : super._(_kBlock, NotusAttributeScope.line);
 
   /// Formats a block of lines as a bullet list.
@@ -452,6 +463,7 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
 
 class DirectionAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kDirection = 'direction';
+
   const DirectionAttributeBuilder._()
       : super._(_kDirection, NotusAttributeScope.line);
 
@@ -460,6 +472,7 @@ class DirectionAttributeBuilder extends NotusAttributeBuilder<String> {
 
 class AlignmentAttributeBuilder extends NotusAttributeBuilder<String> {
   static const _kAlignment = 'alignment';
+
   const AlignmentAttributeBuilder._()
       : super._(_kAlignment, NotusAttributeScope.line);
 
@@ -471,4 +484,20 @@ class AlignmentAttributeBuilder extends NotusAttributeBuilder<String> {
 
   NotusAttribute<String> get justify =>
       NotusAttribute<String>._(key, scope, 'justify');
+}
+
+const _maxIndentationLevel = 8;
+
+class IndentAttributeBuilder extends NotusAttributeBuilder<int> {
+  static const _kIndent = 'indent';
+
+  const IndentAttributeBuilder._()
+      : super._(_kIndent, NotusAttributeScope.line);
+
+  NotusAttribute<int> withLevel(int level) {
+    if (level == 0) {
+      return unset;
+    }
+    return NotusAttribute._(key, scope, math.min(_maxIndentationLevel, level));
+  }
 }
