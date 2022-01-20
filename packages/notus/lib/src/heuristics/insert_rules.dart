@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:intl/intl.dart' as intl;
 import 'package:quill_delta/quill_delta.dart';
 
 import '../document/attributes.dart';
@@ -212,7 +213,9 @@ class AutoExitBlockRule extends InsertRule {
     // therefore we can exit this block.
     final attributes = target.attributes ?? <String, dynamic>{};
     attributes.addAll(NotusAttribute.block.unset.toJson());
-    return Delta()..retain(index)..retain(1, attributes);
+    return Delta()
+      ..retain(index)
+      ..retain(1, attributes);
   }
 }
 
@@ -336,10 +339,14 @@ class ForceNewlineForInsertsAroundEmbedRule extends InsertRule {
     if (cursorBeforeEmbed || cursorAfterEmbed) {
       final delta = Delta()..retain(index);
       if (cursorBeforeEmbed && !data.endsWith('\n')) {
-        return delta..insert(data)..insert('\n');
+        return delta
+          ..insert(data)
+          ..insert('\n');
       }
       if (cursorAfterEmbed && !data.startsWith('\n')) {
-        return delta..insert('\n')..insert(data);
+        return delta
+          ..insert('\n')
+          ..insert(data);
       }
       return delta..insert(data);
     }
@@ -424,7 +431,9 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
       result.retain(nextNewline.skippedLength!);
       final opText = nextNewline.op!.data as String;
       final lf = opText.indexOf('\n');
-      result..retain(lf)..retain(1, resetStyle);
+      result
+        ..retain(lf)
+        ..retain(1, resetStyle);
     }
 
     return result;
@@ -505,6 +514,7 @@ class MarkdownBlockShortcutsInsertRule extends InsertRule {
     '##': NotusAttribute.h2,
     '###': NotusAttribute.h3,
   };
+
   const MarkdownBlockShortcutsInsertRule();
 
   String? _getLinePrefix(DeltaIterator iter, int index) {
@@ -584,5 +594,47 @@ class MarkdownBlockShortcutsInsertRule extends InsertRule {
     if (attribute == null) return null;
 
     return _formatLine(iter, index, prefix, attribute);
+  }
+}
+
+class AutoTextDirectionRule extends InsertRule {
+  final _isRTL = intl.Bidi.startsWithRtl;
+
+  const AutoTextDirectionRule();
+
+  bool _isInEmptyLine(Operation? previous, Operation next) {
+    final previousText = previous?.data as String?;
+    final nextText = next.data as String?;
+    return (previousText?.endsWith('\n') ?? true) &&
+        (nextText?.startsWith('\n') ?? false);
+  }
+
+  @override
+  Delta? apply(Delta document, int index, Object data) {
+    if (data is! String || data == '\n') return null;
+
+    final iter = DeltaIterator(document);
+    final previous = iter.skip(index);
+    final next = iter.next();
+
+    if (!_isInEmptyLine(previous, next)) return null;
+
+    final Map<String, dynamic> attributes;
+    if (_isRTL(data)) {
+      attributes = {
+        ...NotusAttribute.rtl.toJson(),
+        ...NotusAttribute.alignment.right.toJson(),
+      };
+    } else {
+      attributes = {
+        ...NotusAttribute.rtl.unset.toJson(),
+        ...NotusAttribute.alignment.unset.toJson(),
+      };
+    }
+
+    return Delta()
+      ..retain(index)
+      ..insert(data)
+      ..retain(1, attributes);
   }
 }

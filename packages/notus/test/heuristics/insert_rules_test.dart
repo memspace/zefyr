@@ -85,7 +85,9 @@ void main() {
     test('applies and keeps block style', () {
       final style = NotusAttribute.ul.toJson();
       style.addAll(NotusAttribute.h1.toJson());
-      final doc = Delta()..insert('Hello world')..insert('\n', style);
+      final doc = Delta()
+        ..insert('Hello world')
+        ..insert('\n', style);
       final actual = rule.apply(doc, 11, '\n');
       expect(actual, isNotNull);
       final expected = Delta()
@@ -130,7 +132,9 @@ void main() {
 
     test('applies only on empty line', () {
       final ul = NotusAttribute.ul.toJson();
-      final doc = Delta()..insert('Item 1')..insert('\n', ul);
+      final doc = Delta()
+        ..insert('Item 1')
+        ..insert('\n', ul);
       final actual = rule.apply(doc, 6, '\n');
       expect(actual, isNull);
     });
@@ -146,14 +150,18 @@ void main() {
 
     test('ignores non-empty line at the beginning of a document', () {
       final ul = NotusAttribute.ul.toJson();
-      final doc = Delta()..insert('Text')..insert('\n', ul);
+      final doc = Delta()
+        ..insert('Text')
+        ..insert('\n', ul);
       final actual = rule.apply(doc, 0, '\n');
       expect(actual, isNull);
     });
 
     test('ignores empty lines in the middle of a block', () {
       final ul = NotusAttribute.ul.toJson();
-      final doc = Delta()..insert('Line1')..insert('\n\n\n\n', ul);
+      final doc = Delta()
+        ..insert('Line1')
+        ..insert('\n\n\n\n', ul);
       final actual = rule.apply(doc, 7, '\n');
       expect(actual, isNull);
     });
@@ -432,7 +440,9 @@ void main() {
     });
 
     test('detect previous line correctly', () {
-      final doc = Delta()..insert('line\nzefy\n')..insert('###\n');
+      final doc = Delta()
+        ..insert('line\nzefy\n')
+        ..insert('###\n');
       final changes = rule.apply(doc, 13, ' ');
       final actual = doc.compose(changes!)..trim();
       final expected = Delta()
@@ -464,6 +474,42 @@ void main() {
         ..insert('\n', NotusAttribute.block.bulletList.toJson());
       final actual = rule.apply(doc, 1, ' ');
       expect(actual, isNull);
+    });
+  });
+
+  group('$AutoTextDirectionRule', () {
+    final rule = AutoTextDirectionRule();
+
+    test('ignores if insert is not in an empty line', () {
+      var doc = Delta()..insert('abc\n');
+      expect(rule.apply(doc, 3, 'd'), null);
+      expect(rule.apply(doc, 0, 'd'), null);
+    });
+
+    test('inserted text is rtl', () {
+      var doc = Delta()..insert('abc\n\n');
+      final actual = rule.apply(doc, 4, 'ب');
+      final expected = Delta()
+        ..retain(4)
+        ..insert('ب')
+        ..retain(1, {
+          ...NotusAttribute.alignment.right.toJson(),
+          ...NotusAttribute.direction.rtl.toJson(),
+        });
+      expect(actual,expected);
+    });
+
+    test('inserted text is ltr', () {
+      var doc = Delta()..insert('abc\n\n');
+      final actual = rule.apply(doc, 4, 'd');
+      final expected = Delta()
+        ..retain(4)
+        ..insert('d')
+        ..retain(1, {
+          ...NotusAttribute.alignment.unset.toJson(),
+          ...NotusAttribute.direction.unset.toJson(),
+        });
+      expect(actual,expected);
     });
   });
 }

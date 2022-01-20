@@ -34,9 +34,12 @@ class NotusHeuristics {
       // Lines
       PreserveLineStyleOnSplitRule(),
       ResetLineFormatOnNewLineRule(),
+      AutoTextDirectionRule(),
+
       // Inlines
       AutoFormatLinksRule(),
       PreserveInlineStylesRule(),
+
       // Catch-all
       CatchAllInsertRule(),
     ],

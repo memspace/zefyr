@@ -46,6 +46,15 @@ class ZefyrController extends ChangeNotifier {
     return lineStyle;
   }
 
+  bool _shouldApplyToggledStyles(Delta delta) =>
+      toggledStyles.isNotEmpty &&
+      delta.isNotEmpty &&
+      ((delta.length <= 2 && // covers single insert and a retain+insert
+              delta.last.isInsert) ||
+          (delta.length <= 3 &&
+              delta.last.isRetain // special case for AutoTextDirectionRule
+          ));
+
   /// Replaces [length] characters in the document starting at [index] with
   /// provided [text].
   ///
@@ -66,10 +75,7 @@ class ZefyrController extends ChangeNotifier {
       delta = document.replace(index, length, data);
       // If the delta is an insert operation and we have toggled
       // some styles, then apply those styles to the inserted text.
-      if (toggledStyles.isNotEmpty &&
-          delta.isNotEmpty &&
-          delta.length <= 2 && // covers single insert and a retain+insert
-          delta.last.isInsert) {
+      if (_shouldApplyToggledStyles(delta)) {
         final dataLength = data is String ? data.length : 1;
         final retainDelta = Delta()
           ..retain(index)
@@ -107,6 +113,7 @@ class ZefyrController extends ChangeNotifier {
 
   void formatText(int index, int length, NotusAttribute attribute) {
     final change = document.format(index, length, attribute);
+
     // _lastChangeSource = ChangeSource.local;
     const source = ChangeSource.local;
 
@@ -122,6 +129,7 @@ class ZefyrController extends ChangeNotifier {
     final extent = change.transformPosition(_selection.extentOffset);
     final adjustedSelection =
         _selection.copyWith(baseOffset: base, extentOffset: extent);
+
     if (_selection != adjustedSelection) {
       _updateSelectionSilent(adjustedSelection, source: source);
     }
@@ -187,9 +195,9 @@ class ZefyrController extends ChangeNotifier {
     _ensureSelectionBeforeLastBreak();
   }
 
-  // Ensures that selection does not include last line break which
-  // prevents deletion of the last line in the document.
-  // This is required by Notus document model.
+// Ensures that selection does not include last line break which
+// prevents deletion of the last line in the document.
+// This is required by Notus document model.
   void _ensureSelectionBeforeLastBreak() {
     final end = document.length - 1;
     final base = math.min(_selection.baseOffset, end);
