@@ -75,25 +75,25 @@ class ZefyrActions extends Actions {
 
   static final Map<Type, Action<Intent>> _shortcutsActions =
       <Type, Action<Intent>>{
-    ToggleBoldStyleIntent: _ToggleInlineStyleAction(NotusAttribute.bold),
-    ToggleItalicStyleIntent: _ToggleInlineStyleAction(NotusAttribute.italic),
-    ToggleUnderlineStyleIntent:
-        _ToggleInlineStyleAction(NotusAttribute.underline),
+    // ToggleBoldStyleIntent: _ToggleInlineStyleAction(NotusAttribute.bold),
+    // ToggleItalicStyleIntent: _ToggleInlineStyleAction(NotusAttribute.italic),
+    // ToggleUnderlineStyleIntent:
+    //     _ToggleInlineStyleAction(NotusAttribute.underline),
   };
 }
 
-class _ToggleInlineStyleAction extends TextEditingAction<Intent> {
+class _ToggleInlineStyleAction extends Action<Intent> {
+  final RawEditorState editorState;
   final NotusAttribute attribute;
 
-  _ToggleInlineStyleAction(this.attribute);
+  _ToggleInlineStyleAction(this.editorState, this.attribute);
 
   @override
   Object? invoke(Intent intent, [BuildContext? context]) {
-    assert(textEditingActionTarget is RawEditorState);
-    final editorState = textEditingActionTarget as RawEditorState;
     final style = editorState.controller.getSelectionStyle();
     final actualAttr =
         style.containsSame(attribute) ? attribute.unset : attribute;
     editorState.controller.formatSelection(actualAttr);
+    return null;
   }
 }
