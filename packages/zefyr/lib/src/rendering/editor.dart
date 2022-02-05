@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -981,14 +982,46 @@ class RenderEditor extends RenderEditableContainerBox
 
   // End TextLayoutMetrics implementation
 
+  ZefyrVerticalCaretMovementRun startVerticalCaretMovement(
+      TextPosition startPosition) {
+    return ZefyrVerticalCaretMovementRun._(
+      this,
+      startPosition,
+    );
+  }
+
   @override
   void systemFontsDidChange() {
     super.systemFontsDidChange();
     markNeedsLayout();
   }
+}
 
-  void debugAssertLayoutUpToDate() {
-    // no-op?
-    // this assert was added by Flutter TextEditingActionTarget so we have to comply here.
+class ZefyrVerticalCaretMovementRun
+    extends BidirectionalIterator<TextPosition> {
+  ZefyrVerticalCaretMovementRun._(
+    this._editor,
+    this._currentTextPosition,
+  );
+
+  TextPosition _currentTextPosition;
+
+  final RenderEditor _editor;
+
+  @override
+  TextPosition get current {
+    return _currentTextPosition;
+  }
+
+  @override
+  bool moveNext() {
+    _currentTextPosition = _editor.getTextPositionBelow(_currentTextPosition);
+    return true;
+  }
+
+  @override
+  bool movePrevious() {
+    _currentTextPosition = _editor.getTextPositionAbove(_currentTextPosition);
+    return true;
   }
 }

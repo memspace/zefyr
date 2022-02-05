@@ -35,7 +35,7 @@ class ZefyrShortcuts extends Shortcuts {
     SingleActivator(LogicalKeyboardKey.keyB, control: true):
         ToggleBoldStyleIntent(),
     SingleActivator(LogicalKeyboardKey.keyI, control: true):
-        ToggleBoldStyleIntent(),
+        ToggleItalicStyleIntent(),
     SingleActivator(LogicalKeyboardKey.keyU, control: true):
         ToggleUnderlineStyleIntent(),
   };
@@ -82,18 +82,18 @@ class ZefyrActions extends Actions {
   };
 }
 
-class _ToggleInlineStyleAction extends TextEditingAction<Intent> {
+class _ToggleInlineStyleAction extends ContextAction<Intent> {
   final NotusAttribute attribute;
 
   _ToggleInlineStyleAction(this.attribute);
 
   @override
   Object? invoke(Intent intent, [BuildContext? context]) {
-    assert(textEditingActionTarget is RawEditorState);
-    final editorState = textEditingActionTarget as RawEditorState;
+    final editorState = context!.findAncestorStateOfType<RawEditorState>()!;
     final style = editorState.controller.getSelectionStyle();
     final actualAttr =
         style.containsSame(attribute) ? attribute.unset : attribute;
     editorState.controller.formatSelection(actualAttr);
+    return null;
   }
 }
