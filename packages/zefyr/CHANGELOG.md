@@ -1,3 +1,8 @@
+## 1.0.0-rc.5
+
+* Upgraded to support Flutter 2.10.
+
+
 ## 1.0.0-rc.4
 
 * Added `maxContentWidth` constraint to ZefyrEditor. When this property is not null the editor's
