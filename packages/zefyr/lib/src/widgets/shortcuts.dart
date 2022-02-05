@@ -35,7 +35,7 @@ class ZefyrShortcuts extends Shortcuts {
     SingleActivator(LogicalKeyboardKey.keyB, control: true):
         ToggleBoldStyleIntent(),
     SingleActivator(LogicalKeyboardKey.keyI, control: true):
-        ToggleBoldStyleIntent(),
+        ToggleItalicStyleIntent(),
     SingleActivator(LogicalKeyboardKey.keyU, control: true):
         ToggleUnderlineStyleIntent(),
   };
@@ -75,21 +75,21 @@ class ZefyrActions extends Actions {
 
   static final Map<Type, Action<Intent>> _shortcutsActions =
       <Type, Action<Intent>>{
-    // ToggleBoldStyleIntent: _ToggleInlineStyleAction(NotusAttribute.bold),
-    // ToggleItalicStyleIntent: _ToggleInlineStyleAction(NotusAttribute.italic),
-    // ToggleUnderlineStyleIntent:
-    //     _ToggleInlineStyleAction(NotusAttribute.underline),
+    ToggleBoldStyleIntent: _ToggleInlineStyleAction(NotusAttribute.bold),
+    ToggleItalicStyleIntent: _ToggleInlineStyleAction(NotusAttribute.italic),
+    ToggleUnderlineStyleIntent:
+        _ToggleInlineStyleAction(NotusAttribute.underline),
   };
 }
 
-class _ToggleInlineStyleAction extends Action<Intent> {
-  final RawEditorState editorState;
+class _ToggleInlineStyleAction extends ContextAction<Intent> {
   final NotusAttribute attribute;
 
-  _ToggleInlineStyleAction(this.editorState, this.attribute);
+  _ToggleInlineStyleAction(this.attribute);
 
   @override
   Object? invoke(Intent intent, [BuildContext? context]) {
+    final editorState = context!.findAncestorStateOfType<RawEditorState>()!;
     final style = editorState.controller.getSelectionStyle();
     final actualAttr =
         style.containsSame(attribute) ? attribute.unset : attribute;

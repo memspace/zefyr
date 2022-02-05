@@ -20,6 +20,7 @@ import 'editor_input_client_mixin.dart';
 import 'editor_selection_delegate_mixin.dart';
 import 'keyboard_listener.dart';
 import 'link.dart';
+import 'shortcuts.dart';
 import 'single_child_scroll_view.dart';
 import 'text_line.dart';
 import 'text_selection.dart';
@@ -340,9 +341,9 @@ class _ZefyrEditorState extends State<ZefyrEditor>
       selectionControls: textSelectionControls,
     );
 
-    // child = ZefyrShortcuts(
-    //   child: ZefyrActions(child: child),
-    // );
+    child = ZefyrShortcuts(
+      child: ZefyrActions(child: child),
+    );
 
     return _selectionGestureDetectorBuilder.buildGestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -757,18 +758,6 @@ class RawEditorState extends EditorState
   @override
   bool get wantKeepAlive => effectiveFocusNode.hasFocus;
 
-  // @override
-  // bool get obscureText => false;
-  //
-  // @override
-  // bool get selectionEnabled => widget.selectionEnabled;
-  //
-  // @override
-  // bool get readOnly => widget.readOnly;
-
-  // @override
-  // TextLayoutMetrics get textLayoutMetrics => renderEditor;
-
   TextDirection get _textDirection {
     final result = Directionality.maybeOf(context);
     assert(result != null,
@@ -782,21 +771,6 @@ class RawEditorState extends EditorState
   @override
   RenderEditor get renderEditor =>
       _editorKey.currentContext!.findRenderObject() as RenderEditor;
-  //
-  // @override
-  // void setTextEditingValue(
-  //     TextEditingValue newValue, SelectionChangedCause cause) {
-  //   if (newValue == textEditingValue) {
-  //     return;
-  //   }
-  //   textEditingValue = newValue;
-  //   userUpdateTextEditingValue(newValue, cause);
-  // }
-
-  // @override
-  // void debugAssertLayoutUpToDate() {
-  //   renderEditor.debugAssertLayoutUpToDate();
-  // }
 
   /// Express interest in interacting with the keyboard.
   ///
@@ -1052,6 +1026,7 @@ class RawEditorState extends EditorState
     setState(() {
       /* We use widget.controller.value in build(). */
     });
+    _adjacentLineAction.stopCurrentVerticalRunIfSelectionChanges();
   }
 
   void _handleSelectionChanged(
@@ -2106,11 +2081,6 @@ class _UpdateTextSelectionToAdjacentLineAction<
     if (!value.selection.isValid) {
       return;
     }
-
-    // if (_verticalMovementRun?.isValid == false) {
-    //   _verticalMovementRun = null;
-    //   _runSelection = null;
-    // }
 
     final ZefyrVerticalCaretMovementRun currentRun = _verticalMovementRun ??
         state.renderEditor

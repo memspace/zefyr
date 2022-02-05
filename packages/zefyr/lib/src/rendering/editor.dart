@@ -995,11 +995,6 @@ class RenderEditor extends RenderEditableContainerBox
     super.systemFontsDidChange();
     markNeedsLayout();
   }
-
-  void debugAssertLayoutUpToDate() {
-    // no-op?
-    // this assert was added by Flutter TextEditingActionTarget so we have to comply here.
-  }
 }
 
 class ZefyrVerticalCaretMovementRun
@@ -1012,9 +1007,6 @@ class ZefyrVerticalCaretMovementRun
   TextPosition _currentTextPosition;
 
   final RenderEditor _editor;
-
-  // final Map<int, MapEntry<Offset, TextPosition>> _positionCache =
-  //     <int, MapEntry<Offset, TextPosition>>{};
 
   @override
   TextPosition get current {
