@@ -810,8 +810,16 @@ class RawEditorState extends EditorState
     return true;
   }
 
+  /// Copy current selection to [Clipboard].
   @override
   void copySelection(SelectionChangedCause cause) {
+    final TextSelection selection = textEditingValue.selection;
+    final String text = textEditingValue.text;
+    assert(selection != null);
+    if (selection.isCollapsed) {
+      return;
+    }
+    Clipboard.setData(ClipboardData(text: selection.textInside(text)));
     if (cause == SelectionChangedCause.toolbar) {
       bringIntoView(textEditingValue.selection.extent);
       hideToolbar(false);
@@ -824,12 +832,11 @@ class RawEditorState extends EditorState
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-          // Collapse the selection and hide the toolbar and handles.
+        // Collapse the selection and hide the toolbar and handles.
           userUpdateTextEditingValue(
             TextEditingValue(
               text: textEditingValue.text,
-              selection: TextSelection.collapsed(
-                  offset: textEditingValue.selection.end),
+              selection: TextSelection.collapsed(offset: textEditingValue.selection.end),
             ),
             SelectionChangedCause.toolbar,
           );
@@ -838,26 +845,60 @@ class RawEditorState extends EditorState
     }
   }
 
+  /// Cut current selection to [Clipboard].
   @override
   void cutSelection(SelectionChangedCause cause) {
+    if (widget.readOnly) {
+      return;
+    }
+    final TextSelection selection = textEditingValue.selection;
+    final String text = textEditingValue.text;
+    assert(selection != null);
+    if (selection.isCollapsed) {
+      return;
+    }
+    Clipboard.setData(ClipboardData(text: selection.textInside(text)));
+    _replaceText(ReplaceTextIntent(textEditingValue, '', selection, cause));
     if (cause == SelectionChangedCause.toolbar) {
       bringIntoView(textEditingValue.selection.extent);
       hideToolbar();
     }
   }
 
+  /// Paste text from [Clipboard].
   @override
   Future<void> pasteText(SelectionChangedCause cause) async {
-    // Copied straight from EditableTextState
+    if (widget.readOnly) {
+      return;
+    }
+    final TextSelection selection = textEditingValue.selection;
+    assert(selection != null);
+    if (!selection.isValid) {
+      return;
+    }
+    // Snapshot the input before using `await`.
+    // See https://github.com/flutter/flutter/issues/11427
+    final ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (data == null) {
+      return;
+    }
+
+    _replaceText(ReplaceTextIntent(textEditingValue, data.text!, selection, cause));
     if (cause == SelectionChangedCause.toolbar) {
       bringIntoView(textEditingValue.selection.extent);
       hideToolbar();
     }
   }
 
+  /// Select the entire text value.
   @override
   void selectAll(SelectionChangedCause cause) {
-    // Copied straight from EditableTextState
+    userUpdateTextEditingValue(
+      textEditingValue.copyWith(
+        selection: TextSelection(baseOffset: 0, extentOffset: textEditingValue.text.length),
+      ),
+      cause,
+    );
     if (cause == SelectionChangedCause.toolbar) {
       bringIntoView(textEditingValue.selection.extent);
     }
