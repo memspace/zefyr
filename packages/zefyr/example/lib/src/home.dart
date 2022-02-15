@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:example/src/read_only_view.dart';
+import 'package:example/src/realtime_page.dart';
 import 'package:file/local.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -154,6 +155,17 @@ class _HomePageState extends State<HomePage> {
           visualDensity: VisualDensity.compact,
           onTap: _decoratedField,
         ),
+        ListTile(
+          title: Text('REALTIME EXAMPLES', style: headerStyle),
+          // dense: true,
+          visualDensity: VisualDensity.compact,
+        ),
+        ListTile(
+          title: const Text('¶   Realtime', style: itemStyle),
+          dense: true,
+          visualDensity: VisualDensity.compact,
+          onTap: _realtime,
+        ),
       ],
     );
   }
@@ -220,6 +232,18 @@ class _HomePageState extends State<HomePage> {
         builder: (BuildContext context) => SettingsProvider(
           settings: _settings,
           child: const ScrollableLayout(),
+        ),
+      ),
+    );
+  }
+
+  void _realtime() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => SettingsProvider(
+          settings: _settings,
+          child: const RealtimeEditorPage(),
         ),
       ),
     );
