@@ -2,20 +2,26 @@ name: zefyr
 description: Clean, minimalistic and collaboration-ready rich text editor for Flutter.
 version: 1.0.0-rc.5
 homepage: https://github.com/memspace/zefyr
+publish_to: none
 
 environment:
-  sdk: '>=2.15.0 <3.0.0'
+  sdk: ">=2.18.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  collection: ^1.14.6
-  url_launcher: ^6.0.9
-  quill_delta: ^3.0.0-nullsafety.1
-  notus: ^1.0.0-rc.2
-  characters: ^1.0.0
+  collection: 1.16.0
+  url_launcher: ^6.1.6
+  quill_delta: ^3.0.0-nullsafety.2
+
+  notus:
+    git:
+      url: https://github.com/ujwalbasnet1/zefyr
+      path: packages/notus
+
+  characters: ^1.2.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.4
+  flutter_lints: ^2.0.1
