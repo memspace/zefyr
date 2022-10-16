@@ -16,8 +16,9 @@ dependencies:
 
   notus:
     git:
-      url: https://github.com/ujwalbasnet1/zefyr
+      url: https://github.com/memspace/zefyr
       path: packages/notus
+      ref: 6f9281913c8f8699444a745cf8ada92a87c6a908
 
   characters: ^1.2.1
 
