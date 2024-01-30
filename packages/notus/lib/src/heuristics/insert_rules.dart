@@ -260,7 +260,7 @@ class PreserveInlineStylesRule extends InsertRule {
       return noLinkResult;
     }
     // We must make sure links are identical in previous and next operations.
-    if (attributes![NotusAttribute.link.key] ==
+    if (attributes[NotusAttribute.link.key] ==
         nextAttributes[NotusAttribute.link.key]) {
       return Delta()
         ..retain(index)
